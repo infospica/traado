@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * VendorClaimStatusService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri May 19 11:03:21 IST 2017 
+ * @version	1.0, Fri May 19 11:03:21 IST 2017
  */
+public abstract class VendorClaimStatusService {
 
-public abstract class VendorClaimStatusService {  
- 
- /**
+  /**
    * VendorClaimStatus paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class VendorClaimStatusService {
     sql.count("select count(scm_vendor_claim_status.id) as total from scm_vendor_claim_status scm_vendor_claim_status"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_vendor_claim_status.title","scm_vendor_claim_status.created_by","scm_vendor_claim_status.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_vendor_claim_status.id","scm_vendor_claim_status.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_vendor_claim_status.created_at","scm_vendor_claim_status.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_vendor_claim_status.title", "scm_vendor_claim_status.created_by", "scm_vendor_claim_status.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_vendor_claim_status.id", "scm_vendor_claim_status.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_vendor_claim_status.created_at", "scm_vendor_claim_status.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of VendorClaimStatus.
-  * @param main
-  * @return List of VendorClaimStatus
-  */
+
+  /**
+   * Return List of VendorClaimStatus.
+   *
+   * @param main
+   * @return List of VendorClaimStatus
+   */
   public static final List<VendorClaimStatus> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getVendorClaimStatusSqlPaged(main));
+    return AppService.listPagedJpa(main, getVendorClaimStatusSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class VendorClaimStatusService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select VendorClaimStatus by key.
-  * @param main
-  * @param scmVendorClaimStatus
-  * @return VendorClaimStatus
-  */
+  /**
+   * Select VendorClaimStatus by key.
+   *
+   * @param main
+   * @param scmVendorClaimStatus
+   * @return VendorClaimStatus
+   */
   public static final VendorClaimStatus selectByPk(Main main, VendorClaimStatus scmVendorClaimStatus) {
     return (VendorClaimStatus) AppService.find(main, VendorClaimStatus.class, scmVendorClaimStatus.getId());
   }
 
- /**
-  * Insert VendorClaimStatus.
-  * @param main
-  * @param scmVendorClaimStatus
-  */
+  /**
+   * Insert VendorClaimStatus.
+   *
+   * @param main
+   * @param scmVendorClaimStatus
+   */
   public static final void insert(Main main, VendorClaimStatus scmVendorClaimStatus) {
     insertAble(main, scmVendorClaimStatus);  //Validating
     AppService.insert(main, scmVendorClaimStatus);
 
   }
 
- /**
-  * Update VendorClaimStatus by key.
-  * @param main
-  * @param scmVendorClaimStatus
-  * @return VendorClaimStatus
-  */
+  /**
+   * Update VendorClaimStatus by key.
+   *
+   * @param main
+   * @param scmVendorClaimStatus
+   * @return VendorClaimStatus
+   */
   public static final VendorClaimStatus updateByPk(Main main, VendorClaimStatus scmVendorClaimStatus) {
     updateAble(main, scmVendorClaimStatus); //Validating
     return (VendorClaimStatus) AppService.update(main, scmVendorClaimStatus);
@@ -106,8 +107,7 @@ public abstract class VendorClaimStatusService {
   public static void insertOrUpdate(Main main, VendorClaimStatus scmVendorClaimStatus) {
     if (scmVendorClaimStatus.getId() == null) {
       insert(main, scmVendorClaimStatus);
-    }
-    else{
+    } else {
       updateByPk(main, scmVendorClaimStatus);
     }
   }
@@ -123,27 +123,29 @@ public abstract class VendorClaimStatusService {
     insert(main, scmVendorClaimStatus);
   }
 
- /**
-  * Delete VendorClaimStatus.
-  * @param main
-  * @param scmVendorClaimStatus
-  */
+  /**
+   * Delete VendorClaimStatus.
+   *
+   * @param main
+   * @param scmVendorClaimStatus
+   */
   public static final void deleteByPk(Main main, VendorClaimStatus scmVendorClaimStatus) {
     deleteAble(main, scmVendorClaimStatus); //Validation
     AppService.delete(main, VendorClaimStatus.class, scmVendorClaimStatus.getId());
   }
-	
- /**
-  * Delete Array of VendorClaimStatus.
-  * @param main
-  * @param scmVendorClaimStatus
-  */
+
+  /**
+   * Delete Array of VendorClaimStatus.
+   *
+   * @param main
+   * @param scmVendorClaimStatus
+   */
   public static final void deleteByPkArray(Main main, VendorClaimStatus[] scmVendorClaimStatus) {
     for (VendorClaimStatus e : scmVendorClaimStatus) {
       deleteByPk(main, e);
     }
   }
-  
+
   /**
    * Validate delete.
    *

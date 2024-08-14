@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.fin.view;
 
@@ -34,7 +34,7 @@ import static spica.fin.service.BankReconciliationService.selectSumOfDebitCredit
 @Named(value = "bankReconciliationView")
 @ViewScoped
 public class BankReconciliationView implements Serializable {
-  
+
   private transient List<BankReconciliation> bankReconciliationList;
   private transient Integer reconciliationOptions;
   private transient Date selectedDate;
@@ -46,14 +46,14 @@ public class BankReconciliationView implements Serializable {
   private transient Double credit;
   @Inject
   private AccountingMainView accountingMainView;
-  
+
   @PostConstruct
   public void init() {
     selectedLedger = (AccountingLedger) Jsf.popupParentValue(AccountingLedger.class);
     getChequeBounce().setAccountingLedgerId(selectedLedger);
     reconciliationOptions = AccountingConstant.BANK_CHEQUE_ISSUED;
   }
-  
+
   public void switchBankReconciliation(MainView main, String viewType) {
     try {
       bankchargeLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_BANK_CHARGE, selectedLedger.getCompanyId().getId());
@@ -63,7 +63,7 @@ public class BankReconciliationView implements Serializable {
       main.close();
     }
   }
-  
+
   public List<BankReconciliation> getBankReconciliationList(MainView main) {
     if (StringUtil.isEmpty(bankReconciliationList)) {
       try {
@@ -79,7 +79,7 @@ public class BankReconciliationView implements Serializable {
     }
     return bankReconciliationList;
   }
-  
+
   public String actionSave(MainView main) {
     try {
       BankReconciliationService.updateBankReconciliation(main, bankReconciliationList);
@@ -92,7 +92,7 @@ public class BankReconciliationView implements Serializable {
     }
     return null;
   }
-  
+
   public void loadBankReconciliation(MainView main) {
     try {
       // if (getBankReconciliationSelected().getId() != null) {
@@ -106,7 +106,7 @@ public class BankReconciliationView implements Serializable {
       main.close();
     }
   }
-  
+
   public String actionDeleteBounce(MainView main) {
     try {
       BankReconciliationService.deleteBounce(main, getChequeBounce());
@@ -120,7 +120,7 @@ public class BankReconciliationView implements Serializable {
     }
     return null;
   }
-  
+
   public String actionSaveBounce(MainView main) {
     try {
       AccountingChequeBounceService.insertOrUpdateChequeBounce(main, bankchargeLedger, bankReconciliationSelected, chequeBounce);
@@ -133,7 +133,7 @@ public class BankReconciliationView implements Serializable {
     }
     return null;
   }
-  
+
   public void calculatetax() {
     if (bankchargeLedger.getCgstId() != null && bankchargeLedger.getSgstId() != null) {
       chequeBounce.setCgstAmount(chequeBounce.getBankCharge() * bankchargeLedger.getCgstId().getRatePercentage() / 100);
@@ -144,18 +144,18 @@ public class BankReconciliationView implements Serializable {
     }
     chequeBounce.setPenaltyAmount(chequeBounce.getTotalAmount());
   }
-  
+
   public void filterWithStatus(ValueChangeEvent event) {
     bankReconciliationList = null;
 //    if ((event.getOldValue() == null || event.getNewValue() == null) || (!event.getNewValue().equals(event.getOldValue()))) {
 //      bankReconciliationList = null;
 //    }
   }
-  
+
   public void dialogClose() {
     Jsf.closePopup(null);
   }
-  
+
   public void applyAllProcessed() {
     for (BankReconciliation bc : bankReconciliationList) {
       bc.setProcessedAt(bc.getProcessedAt() == null ? selectedDate : bc.getProcessedAt());
@@ -173,93 +173,93 @@ public class BankReconciliationView implements Serializable {
     accountingMainView.setFromDate(wawo.entity.util.DateUtil.moveMonths(accountingMainView.getFromDate(), pos));
     bankReconciliationList = null;
   }
-  
+
   public void setBankReconciliationList(List<BankReconciliation> bankReconciliationList) {
     this.bankReconciliationList = bankReconciliationList;
   }
-  
+
   public Integer getReconciliationOptions() {
     return reconciliationOptions;
   }
-  
+
   public void setReconciliationOptions(Integer reconciliationOptions) {
     this.reconciliationOptions = reconciliationOptions;
   }
-  
+
   public Date getSelectedDate() {
     return selectedDate;
   }
-  
+
   public void setSelectedDate(Date selectedDate) {
     this.selectedDate = selectedDate;
   }
-  
+
   public BankReconciliation getBankReconciliationSelected() {
     if (bankReconciliationSelected == null) {
       bankReconciliationSelected = new BankReconciliation();
     }
     return bankReconciliationSelected;
   }
-  
+
   public void setBankReconciliationSelected(BankReconciliation bankReconciliationSelected) {
     getChequeBounce().setBankCharge(null);
     getChequeBounce().setPenaltyAmount(null);
     this.bankReconciliationSelected = bankReconciliationSelected;
   }
-  
+
   public AccountingChequeBounce getChequeBounce() {
     if (chequeBounce == null) {
       chequeBounce = new AccountingChequeBounce();
     }
     return chequeBounce;
   }
-  
+
   public void setChequeBounce(AccountingChequeBounce chequeBounce) {
     this.chequeBounce = chequeBounce;
   }
-  
+
   public AccountingLedger getBankchargeLedger() {
     return bankchargeLedger;
   }
-  
+
   public void setBankchargeLedger(AccountingLedger bankchargeLedger) {
     this.bankchargeLedger = bankchargeLedger;
   }
-  
+
   public void onFromDateSelect(SelectEvent event) {
     accountingMainView.setFromDate((Date) event.getObject());
     setBankReconciliationList(null);
   }
-  
+
   public void onToDateSelect(SelectEvent event) {
     accountingMainView.setToDate((Date) event.getObject());
     setBankReconciliationList(null);
   }
-  
+
   public void openBankChargesPopup() {
     Jsf.popupForm(AccountingLedgerTransactionService.BANK_CHARGES_POPUP, getBankchargeLedger());
   }
-  
+
   public AccountingLedger getSelectedLedger() {
     return selectedLedger;
   }
-  
+
   public void setSelectedLedger(AccountingLedger selectedLedger) {
     this.selectedLedger = selectedLedger;
   }
-  
+
   public Double getDebit() {
     return debit;
   }
-  
+
   public void setDebit(Double debit) {
     this.debit = debit;
   }
-  
+
   public Double getCredit() {
     return credit;
   }
-  
+
   public void setCredit(Double credit) {
     this.credit = credit;
   }

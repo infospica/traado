@@ -130,13 +130,13 @@ public abstract class PlatformSettlementService {
   public static final void deleteByPk(Main main, PlatformSettlement platformSettlement) {
     PlatformSettlementIs.deleteAble(main, platformSettlement); //Validation
     AppService.delete(main, PlatformSettlement.class, platformSettlement.getId());
-     main.clear();
+    main.clear();
     main.param(SystemRuntimeConfig.PLATFORM_STATUS_NEW.getId());
     main.param(platformSettlement.getId());
     AppService.updateSql(main, Platform.class, "update scm_platform set status_id=? where id in(select platform_id from scm_platform_settlement_item where platform_settlement_id=?)", false);
     main.clear();
     AppService.deleteSql(main, Platform.class, "delete from scm_platform where parent_id in(select id from scm_platform where id in(select platform_id from scm_platform_settlement_item where platform_settlement_id=?))", new Object[]{platformSettlement.getId()});
-    AppService.deleteSql(main, PlatformSettlementItem.class, "delete from scm_platform_settlement_item where platform_settlement_id=?", new Object[]{platformSettlement.getId()});   
+    AppService.deleteSql(main, PlatformSettlementItem.class, "delete from scm_platform_settlement_item where platform_settlement_id=?", new Object[]{platformSettlement.getId()});
   }
 
   /**

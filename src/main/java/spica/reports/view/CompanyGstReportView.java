@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -61,7 +61,6 @@ public class CompanyGstReportView extends FilterObjects implements Serializable 
   private transient Integer exportFormat = SystemConstants.EXPORT;
   private transient int totalNo;
   private transient int totalCancelled;
-
 
   public List<Gst1Report> getGstb2bReportList(MainView main) {
     if (StringUtil.isEmpty(gstb2bReportList) && !main.hasError()) {
@@ -297,14 +296,14 @@ public class CompanyGstReportView extends FilterObjects implements Serializable 
 //  public void openPurchaseReturnPopup(Integer id) {
 //    Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getPurchaseReturnView().replaceFirst("/scm", ""), id, id);
 //  }
-
   public void openInvoicePopup(PopUpView popUpView, Integer id, String type) {
     popUpView.showInvoices(id, type);
     Jsf.update("confirmDlg");
   }
- public void loadDraftList(MainView main){
-       if (draftList == null || exportFormat == SystemConstants.EXPORT_ALL) {
-      draftList = new ArrayList<>();      
+
+  public void loadDraftList(MainView main) {
+    if (draftList == null || exportFormat == SystemConstants.EXPORT_ALL) {
+      draftList = new ArrayList<>();
       try {
         if (getType().equals(SystemConstants.B2B) || exportFormat == SystemConstants.EXPORT_ALL) {
           draftList.addAll(Gst1ReportService.getSalesInvoiceDraftList(main, filterParameters, company));
@@ -322,12 +321,13 @@ public class CompanyGstReportView extends FilterObjects implements Serializable 
           draftList = Gst1ReportService.getSalesInvoiceDraftList(main, filterParameters, company);
         }
       } catch (Throwable t) {
-        main.error(t,"error.select", null);
+        main.error(t, "error.select", null);
       } finally {
         main.close();
       }
     }
- }
+  }
+
   public List<Gst1Report> getDraftList() {
     return draftList;
   }
@@ -370,7 +370,7 @@ public class CompanyGstReportView extends FilterObjects implements Serializable 
   }
 
   public List<AccountGroup> accountGroupAuto(String filter) {
-    if (getCompany() != null && filterParameters != null) {   
+    if (getCompany() != null && filterParameters != null) {
       MainView main = Jsf.getMain();
       try {
         return UserRuntimeService.accountGroupAutoAll(main, filter, getCompany().getId(), UserRuntimeView.instance().getAppUser());

@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.view;
 
 import java.io.Serializable;
@@ -26,52 +25,56 @@ import spica.fin.service.BankAccountTypeService;
 
 /**
  * BankAccountTypeView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Mar 30 12:35:25 IST 2016 
+ * @version	1.0, Wed Mar 30 12:35:25 IST 2016
  */
-
-@Named(value="bankAccountTypeView")
+@Named(value = "bankAccountTypeView")
 @ViewScoped
-public class BankAccountTypeView implements Serializable{
+public class BankAccountTypeView implements Serializable {
 
   private transient BankAccountType bankAccountType;	//Domain object/selected Domain.
   private transient LazyDataModel<BankAccountType> bankAccountTypeLazyModel; 	//For lazy loading datatable.
   private transient BankAccountType[] bankAccountTypeSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public BankAccountTypeView() {
     super();
   }
- 
+
   /**
    * Return BankAccountType.
+   *
    * @return BankAccountType.
-   */  
+   */
   public BankAccountType getBankAccountType() {
-    if(bankAccountType == null) {
+    if (bankAccountType == null) {
       bankAccountType = new BankAccountType();
     }
     return bankAccountType;
-  }   
-  
+  }
+
   /**
    * Set BankAccountType.
+   *
    * @param bankAccountType.
-   */   
+   */
   public void setBankAccountType(BankAccountType bankAccountType) {
     this.bankAccountType = bankAccountType;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchBankAccountType(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchBankAccountType(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -83,40 +86,44 @@ public class BankAccountTypeView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create bankAccountTypeLazyModel.
+   *
    * @param main
    */
   private void loadBankAccountTypeList(final MainView main) {
     if (bankAccountTypeLazyModel == null) {
       bankAccountTypeLazyModel = new LazyDataModel<BankAccountType>() {
-      private List<BankAccountType> list;      
-      @Override
-      public List<BankAccountType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = BankAccountTypeService.listPaged(main);
-          main.commit(bankAccountTypeLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<BankAccountType> list;
+
+        @Override
+        public List<BankAccountType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = BankAccountTypeService.listPaged(main);
+            main.commit(bankAccountTypeLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(BankAccountType bankAccountType) {
-        return bankAccountType.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(BankAccountType bankAccountType) {
+          return bankAccountType.getId();
+        }
+
+        @Override
         public BankAccountType getRowData(String rowKey) {
           if (list != null) {
             for (BankAccountType obj : list) {
@@ -132,11 +139,12 @@ public class BankAccountTypeView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_bank_account_type/";	
+    String SUB_FOLDER = "scm_bank_account_type/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -152,7 +160,7 @@ public class BankAccountTypeView implements Serializable{
    */
   public String cloneBankAccountType(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneBankAccountType(main, "clone"); 
+    return saveOrCloneBankAccountType(main, "clone");
   }
 
   /**
@@ -178,14 +186,13 @@ public class BankAccountTypeView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error"+ key);
+      main.rollback(t, "error" + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many BankAccountType.
    *
@@ -201,7 +208,7 @@ public class BankAccountTypeView implements Serializable{
       } else {
         BankAccountTypeService.deleteByPk(main, getBankAccountType());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -215,23 +222,26 @@ public class BankAccountTypeView implements Serializable{
 
   /**
    * Return LazyDataModel of BankAccountType.
+   *
    * @return
    */
   public LazyDataModel<BankAccountType> getBankAccountTypeLazyModel() {
     return bankAccountTypeLazyModel;
   }
 
- /**
-  * Return BankAccountType[].
-  * @return 
-  */
+  /**
+   * Return BankAccountType[].
+   *
+   * @return
+   */
   public BankAccountType[] getBankAccountTypeSelected() {
     return bankAccountTypeSelected;
   }
-  
+
   /**
    * Set BankAccountType[].
-   * @param bankAccountTypeSelected 
+   *
+   * @param bankAccountTypeSelected
    */
   public void setBankAccountTypeSelected(BankAccountType[] bankAccountTypeSelected) {
     this.bankAccountTypeSelected = bankAccountTypeSelected;

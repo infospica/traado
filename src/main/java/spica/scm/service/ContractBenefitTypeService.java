@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * ContractBenefitTypeService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Jun 23 15:26:44 IST 2016 
+ * @version	1.0, Thu Jun 23 15:26:44 IST 2016
  */
+public abstract class ContractBenefitTypeService {
 
-public abstract class ContractBenefitTypeService {  
- 
- /**
+  /**
    * ContractBenefitType paginated query.
    *
    * @param main
@@ -37,18 +35,19 @@ public abstract class ContractBenefitTypeService {
     sql.join(""); //Join Query
 
     sql.string(new String[]{"scm_contract_benefit_type.title"}); //String search or sort fields
-    sql.number(new String[]{"scm_contract_benefit_type.id","scm_contract_benefit_type.is_percentage","scm_contract_benefit_type.is_slab"}); //Numeric search or sort fields
+    sql.number(new String[]{"scm_contract_benefit_type.id", "scm_contract_benefit_type.is_percentage", "scm_contract_benefit_type.is_slab"}); //Numeric search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of ContractBenefitType.
-  * @param main
-  * @return List of ContractBenefitType
-  */
+
+  /**
+   * Return List of ContractBenefitType.
+   *
+   * @param main
+   * @return List of ContractBenefitType
+   */
   public static final List<ContractBenefitType> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getContractBenefitTypeSqlPaged(main));
+    return AppService.listPagedJpa(main, getContractBenefitTypeSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class ContractBenefitTypeService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select ContractBenefitType by key.
-  * @param main
-  * @param contractBenefitType
-  * @return ContractBenefitType
-  */
+  /**
+   * Select ContractBenefitType by key.
+   *
+   * @param main
+   * @param contractBenefitType
+   * @return ContractBenefitType
+   */
   public static final ContractBenefitType selectByPk(Main main, ContractBenefitType contractBenefitType) {
     return (ContractBenefitType) AppService.find(main, ContractBenefitType.class, contractBenefitType.getId());
   }
 
- /**
-  * Insert ContractBenefitType.
-  * @param main
-  * @param contractBenefitType
-  */
+  /**
+   * Insert ContractBenefitType.
+   *
+   * @param main
+   * @param contractBenefitType
+   */
   public static final void insert(Main main, ContractBenefitType contractBenefitType) {
     insertAble(main, contractBenefitType);  //Validating
     AppService.insert(main, contractBenefitType);
 
   }
 
- /**
-  * Update ContractBenefitType by key.
-  * @param main
-  * @param contractBenefitType
-  * @return ContractBenefitType
-  */
+  /**
+   * Update ContractBenefitType by key.
+   *
+   * @param main
+   * @param contractBenefitType
+   * @return ContractBenefitType
+   */
   public static final ContractBenefitType updateByPk(Main main, ContractBenefitType contractBenefitType) {
     updateAble(main, contractBenefitType); //Validating
     return (ContractBenefitType) AppService.update(main, contractBenefitType);
@@ -106,9 +107,8 @@ public abstract class ContractBenefitTypeService {
   public static void insertOrUpdate(Main main, ContractBenefitType contractBenefitType) {
     if (contractBenefitType.getId() == null) {
       insert(main, contractBenefitType);
-    }
-    else{
-        updateByPk(main, contractBenefitType);
+    } else {
+      updateByPk(main, contractBenefitType);
     }
   }
 
@@ -123,26 +123,29 @@ public abstract class ContractBenefitTypeService {
     insert(main, contractBenefitType);
   }
 
- /**
-  * Delete ContractBenefitType.
-  * @param main
-  * @param contractBenefitType
-  */
+  /**
+   * Delete ContractBenefitType.
+   *
+   * @param main
+   * @param contractBenefitType
+   */
   public static final void deleteByPk(Main main, ContractBenefitType contractBenefitType) {
     deleteAble(main, contractBenefitType); //Validation
     AppService.delete(main, ContractBenefitType.class, contractBenefitType.getId());
   }
-	
- /**
-  * Delete Array of ContractBenefitType.
-  * @param main
-  * @param contractBenefitType
-  */
+
+  /**
+   * Delete Array of ContractBenefitType.
+   *
+   * @param main
+   * @param contractBenefitType
+   */
   public static final void deleteByPkArray(Main main, ContractBenefitType[] contractBenefitType) {
     for (ContractBenefitType e : contractBenefitType) {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

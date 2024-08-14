@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
@@ -21,7 +21,7 @@ public class NearExpiryStockReportService {
 
   public static List<NearExpiryStockReport> getNearExpiryStockReportList(Main main, FilterParameters filterParameters) {
     String sql = null;
-    if (filterParameters.getReportType()!=null && Integer.parseInt(filterParameters.getReportType()) == SystemConstants.SUMMARY.intValue()) {
+    if (filterParameters.getReportType() != null && Integer.parseInt(filterParameters.getReportType()) == SystemConstants.SUMMARY.intValue()) {
       sql = "select product_id ,product_name,hsn_code,pack_size,sum(mrp_value) mrp_value,expiry_days,purchase_rate,sum(quantity_saleable) quantity_saleable, sum(quantity_free_saleable) quantity_free_saleable\n"
               + ",expiry_date_actual,batch_no \n"
               + "FROM getStockNearExpiryList(?,?,?)\n"

@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * PurchaseReqStatusService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Apr 11 14:41:21 IST 2016 
+ * @version	1.0, Mon Apr 11 14:41:21 IST 2016
  */
+public abstract class PurchaseReqStatusService {
 
-public abstract class PurchaseReqStatusService {  
- 
- /**
+  /**
    * PurchaseReqStatus paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class PurchaseReqStatusService {
     sql.count("select count(scm_purchase_req_status.id) from scm_purchase_req_status scm_purchase_req_status"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_purchase_req_status.title","scm_purchase_req_status.created_by","scm_purchase_req_status.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_purchase_req_status.id","scm_purchase_req_status.sort_order"}); //Number search or sort fields
-    sql.date(new String[]{"scm_purchase_req_status.created_at","scm_purchase_req_status.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_purchase_req_status.title", "scm_purchase_req_status.created_by", "scm_purchase_req_status.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_purchase_req_status.id", "scm_purchase_req_status.sort_order"}); //Number search or sort fields
+    sql.date(new String[]{"scm_purchase_req_status.created_at", "scm_purchase_req_status.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of PurchaseReqStatus.
-  * @param main
-  * @return List of PurchaseReqStatus
-  */
+
+  /**
+   * Return List of PurchaseReqStatus.
+   *
+   * @param main
+   * @return List of PurchaseReqStatus
+   */
   public static final List<PurchaseReqStatus> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getPurchaseReqStatusSqlPaged(main));
+    return AppService.listPagedJpa(main, getPurchaseReqStatusSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class PurchaseReqStatusService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select PurchaseReqStatus by key.
-  * @param main
-  * @param purchaseReqStatus
-  * @return PurchaseReqStatus
-  */
+  /**
+   * Select PurchaseReqStatus by key.
+   *
+   * @param main
+   * @param purchaseReqStatus
+   * @return PurchaseReqStatus
+   */
   public static final PurchaseReqStatus selectByPk(Main main, PurchaseReqStatus purchaseReqStatus) {
     return (PurchaseReqStatus) AppService.find(main, PurchaseReqStatus.class, purchaseReqStatus.getId());
   }
 
- /**
-  * Insert PurchaseReqStatus.
-  * @param main
-  * @param purchaseReqStatus
-  */
+  /**
+   * Insert PurchaseReqStatus.
+   *
+   * @param main
+   * @param purchaseReqStatus
+   */
   public static final void insert(Main main, PurchaseReqStatus purchaseReqStatus) {
     insertAble(main, purchaseReqStatus);  //Validating
     AppService.insert(main, purchaseReqStatus);
 
   }
 
- /**
-  * Update PurchaseReqStatus by key.
-  * @param main
-  * @param purchaseReqStatus
-  * @return PurchaseReqStatus
-  */
+  /**
+   * Update PurchaseReqStatus by key.
+   *
+   * @param main
+   * @param purchaseReqStatus
+   * @return PurchaseReqStatus
+   */
   public static final PurchaseReqStatus updateByPk(Main main, PurchaseReqStatus purchaseReqStatus) {
     updateAble(main, purchaseReqStatus); //Validating
     return (PurchaseReqStatus) AppService.update(main, purchaseReqStatus);
@@ -106,8 +107,8 @@ public abstract class PurchaseReqStatusService {
   public static void insertOrUpdate(Main main, PurchaseReqStatus purchaseReqStatus) {
     if (purchaseReqStatus.getId() == null) {
       insert(main, purchaseReqStatus);
-    } else{
-    updateByPk(main, purchaseReqStatus);
+    } else {
+      updateByPk(main, purchaseReqStatus);
     }
   }
 
@@ -122,26 +123,29 @@ public abstract class PurchaseReqStatusService {
     insert(main, purchaseReqStatus);
   }
 
- /**
-  * Delete PurchaseReqStatus.
-  * @param main
-  * @param purchaseReqStatus
-  */
+  /**
+   * Delete PurchaseReqStatus.
+   *
+   * @param main
+   * @param purchaseReqStatus
+   */
   public static final void deleteByPk(Main main, PurchaseReqStatus purchaseReqStatus) {
     deleteAble(main, purchaseReqStatus); //Validation
     AppService.delete(main, PurchaseReqStatus.class, purchaseReqStatus.getId());
   }
-	
- /**
-  * Delete Array of PurchaseReqStatus.
-  * @param main
-  * @param purchaseReqStatus
-  */
+
+  /**
+   * Delete Array of PurchaseReqStatus.
+   *
+   * @param main
+   * @param purchaseReqStatus
+   */
   public static final void deleteByPkArray(Main main, PurchaseReqStatus[] purchaseReqStatus) {
     for (PurchaseReqStatus e : purchaseReqStatus) {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

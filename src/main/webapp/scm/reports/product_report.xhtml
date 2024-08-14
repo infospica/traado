@@ -2,7 +2,7 @@
   #{masterReportView.reset()}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
@@ -138,7 +138,7 @@
         <p:column sortBy="#{row.id}" field="id"  filterBy="#{row.id}" filterStyleClass="hidden" exportable="true" visible="false">
           <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
           <h:outputText value="#{appView.display(row.id)}" escape="false" /></p:column>
-          
+
         <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden">
           <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
           <p:commandLink actionListener="#{masterReportView.showProduct(row, popUpView)}" immediate="true" >

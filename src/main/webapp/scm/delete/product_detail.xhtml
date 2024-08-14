@@ -68,9 +68,9 @@
         <p:column headerText="#{lang.marginPercentage}" sortBy="#{productDetailVar.productByContractId.marginPercentage}" field="product_by_contract_id.margin_percentage"><h:outputText value="#{appView.display(productDetailVar.productByContractId.marginPercentage)}" title="#{appView.title(productDetailVar.productByContractId.marginPercentage)}" escape="false" /></p:column>
         <p:column headerText="#{lang.batchNo}" sortBy="#{productDetailVar.batchNo}" field="batch_no"><h:outputText value="#{appView.display(productDetailVar.batchNo)}" title="#{appView.title(productDetailVar.batchNo)}" escape="false" /></p:column>
         <p:column headerText="#{lang.expiryDateActual}" sortBy="#{productDetailVar.expiryDateActual}" field="expiry_date_actual" ><h:outputText value="#{appView.dateTime(productDetailVar.expiryDateActual)}" escape="false" /></p:column>
-        
+
         <p:column headerText="#{lang.valueMrp}" sortBy="#{productDetailVar.valueMrp}" field="value_mrp" style="text-align: right"><h:outputText value="#{appView.decimal(productDetailVar.valueMrp)}" escape="false" /></p:column>
-        
+
         <p:column headerText="#{lang.createdBy}" sortBy="#{productDetailVar.createdBy}" field="created_by"><h:outputText value="#{appView.display(productDetailVar.createdBy)}" title="#{appView.title(productDetailVar.createdBy)}" escape="false" /></p:column>
         <p:column headerText="#{lang.lastModifiedBy}" sortBy="#{productDetailVar.lastModifiedBy}" field="modified_by"><h:outputText value="#{appView.display(productDetailVar.lastModifiedBy)}" title="#{appView.title(productDetailVar.lastModifiedBy)}" escape="false" /></p:column>
         <p:column headerText="#{lang.createdAt}" sortBy="#{productDetailVar.createdAt}" field="created_at" ><h:outputText value="#{appView.dateTime(productDetailVar.createdAt)}" escape="false" /></p:column>

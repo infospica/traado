@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -28,17 +27,18 @@ import spica.scm.domain.ProductDetail;
 
 /**
  * SalesReqDetailsView
+ *
  * @author	Spirit 1.2
  * @version	1.0, Tue May 10 17:16:17 IST 2016
  */
-
-@Named(value="salesReqDetailsView")
+@Named(value = "salesReqDetailsView")
 @ViewScoped
-public class SalesReqDetailsView implements Serializable{
+public class SalesReqDetailsView implements Serializable {
 
   private transient SalesReqDetails salesReqDetails;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesReqDetails> salesReqDetailsLazyModel; 	//For lazy loading datatable.
   private transient SalesReqDetails[] salesReqDetailsSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
    */
@@ -48,10 +48,11 @@ public class SalesReqDetailsView implements Serializable{
 
   /**
    * Return SalesReqDetails.
+   *
    * @return SalesReqDetails.
    */
   public SalesReqDetails getSalesReqDetails() {
-    if(salesReqDetails == null) {
+    if (salesReqDetails == null) {
       salesReqDetails = new SalesReqDetails();
     }
     return salesReqDetails;
@@ -59,6 +60,7 @@ public class SalesReqDetailsView implements Serializable{
 
   /**
    * Set SalesReqDetails.
+   *
    * @param salesReqDetails.
    */
   public void setSalesReqDetails(SalesReqDetails salesReqDetails) {
@@ -67,13 +69,14 @@ public class SalesReqDetailsView implements Serializable{
 
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
    * @return
    */
- public String switchSalesReqDetails(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchSalesReqDetails(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -85,7 +88,7 @@ public class SalesReqDetailsView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
@@ -94,31 +97,35 @@ public class SalesReqDetailsView implements Serializable{
 
   /**
    * Create salesReqDetailsLazyModel.
+   *
    * @param main
    */
   private void loadSalesReqDetailsList(final MainView main) {
     if (salesReqDetailsLazyModel == null) {
       salesReqDetailsLazyModel = new LazyDataModel<SalesReqDetails>() {
-      private List<SalesReqDetails> list;
-      @Override
-      public List<SalesReqDetails> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SalesReqDetailsService.listPaged(main);
-          main.commit(salesReqDetailsLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SalesReqDetails> list;
+
+        @Override
+        public List<SalesReqDetails> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SalesReqDetailsService.listPaged(main);
+            main.commit(salesReqDetailsLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SalesReqDetails salesReqDetails) {
-        return salesReqDetails.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SalesReqDetails salesReqDetails) {
+          return salesReqDetails.getId();
+        }
+
+        @Override
         public SalesReqDetails getRowData(String rowKey) {
           if (list != null) {
             for (SalesReqDetails obj : list) {
@@ -139,6 +146,7 @@ public class SalesReqDetailsView implements Serializable{
 
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -180,13 +188,12 @@ public class SalesReqDetailsView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
-
 
   /**
    * Delete one or many SalesReqDetails.
@@ -203,7 +210,7 @@ public class SalesReqDetailsView implements Serializable{
       } else {
         SalesReqDetailsService.deleteByPk(main, getSalesReqDetails());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -217,56 +224,59 @@ public class SalesReqDetailsView implements Serializable{
 
   /**
    * Return LazyDataModel of SalesReqDetails.
+   *
    * @return
    */
   public LazyDataModel<SalesReqDetails> getSalesReqDetailsLazyModel() {
     return salesReqDetailsLazyModel;
   }
 
- /**
-  * Return SalesReqDetails[].
-  * @return
-  */
+  /**
+   * Return SalesReqDetails[].
+   *
+   * @return
+   */
   public SalesReqDetails[] getSalesReqDetailsSelected() {
     return salesReqDetailsSelected;
   }
 
   /**
    * Set SalesReqDetails[].
+   *
    * @param salesReqDetailsSelected
    */
   public void setSalesReqDetailsSelected(SalesReqDetails[] salesReqDetailsSelected) {
     this.salesReqDetailsSelected = salesReqDetailsSelected;
   }
 
-
-
- /**
-  * SalesReq autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.salesReqAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.salesReqAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * SalesReq autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.salesReqAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.salesReqAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<SalesReq> salesReqAuto(String filter) {
     return ScmLookupView.salesReqAuto(filter);
-  } 
-  
-   /**
-  * ProductDetail autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.productDetailAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.productDetailAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  }
+
+  /**
+   * ProductDetail autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.productDetailAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.productDetailAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<ProductDetail> productDetailAuto(String filter) {
     return ScmLookupView.productDetailAuto(filter);
   }

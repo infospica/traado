@@ -13,7 +13,7 @@
     .data{
       font-size: 8px;
       color:#222;
-    } 
+    }
     .dataTitle{
       font-size: 9px;
       font-weight: bold;
@@ -51,7 +51,7 @@
 
   <div class="print invoice content-wrapper" onclick="closePopup()" style="background-color: white;width:730px;margin: 10px;line-height: 1.1em;">
 
-      <h:inputHidden value="#{salesReturnPrintView.salesReturn.invoiceNo}" id="invoiceNo" />
+    <h:inputHidden value="#{salesReturnPrintView.salesReturn.invoiceNo}" id="invoiceNo" />
     <h:inputHidden value="#{request.contextPath}/#{accountingConstant.INVOICE_PRINT_PROXY_URL}" id="proxyUrl" />
 
     <table class="mainTable">
@@ -72,7 +72,7 @@
     <div class="data">
       <div class="R" style="padding-right: 150px;"></div>
       <div class="C"> 
-          <h:outputLabel value="Email:#{salesReturnPrintView.companyAddress.email}" rendered="#{salesReturnPrintView.companyAddress.email!=null}" />
+        <h:outputLabel value="Email:#{salesReturnPrintView.companyAddress.email}" rendered="#{salesReturnPrintView.companyAddress.email!=null}" />
         &#160;&#160;&#160;&#160;
         <h:outputLabel value="Web:#{salesReturnPrintView.companyAddress.website}" rendered="#{salesReturnPrintView.companyAddress.website!=null}" />
       </div>
@@ -83,7 +83,7 @@
   <div class="loading" ></div>
   <script src="#{request.contextPath}/theme1/js/kendo.all.min.js" type="text/javascript" ></script>
   <script>
-    
+
     $(".export-pdf").click(function () {
       // Convert the DOM element to a drawing using kendo.drawing.drawDOM
       genPdf();
@@ -93,38 +93,38 @@
 
     });
   </script>
-  
- 
-  
-  
-    <script>
-      function genPdf() {
-        kendo.drawing.drawDOM($(".content-wrapper"), {forcePageBreak: ".page-break"})
-                .then(function (group) {
-                  // Render the result as a PDF file
-                  return kendo.drawing.exportPDF(group, {
-                    landscape: true,
-                    multiPage: true,
-                    margin: {left: "1cm", top: "1cm", right: "1cm", bottom: "1cm"}
-                  });
-                })
-                .done(function (data) {
-                  // Save the PDF file
-                  kendo.saveAs({
-                    dataURI: data,
-                    fileName: $("#invoiceNo").val(),
-                    forceProxy: true,
-                    proxyURL: $("#proxyUrl").val()
-                  });
+
+
+
+
+  <script>
+    function genPdf() {
+      kendo.drawing.drawDOM($(".content-wrapper"), {forcePageBreak: ".page-break"})
+              .then(function (group) {
+                // Render the result as a PDF file
+                return kendo.drawing.exportPDF(group, {
+                  landscape: true,
+                  multiPage: true,
+                  margin: {left: "1cm", top: "1cm", right: "1cm", bottom: "1cm"}
                 });
-      }
+              })
+              .done(function (data) {
+                // Save the PDF file
+                kendo.saveAs({
+                  dataURI: data,
+                  fileName: $("#invoiceNo").val(),
+                  forceProxy: true,
+                  proxyURL: $("#proxyUrl").val()
+                });
+              });
+    }
 
 
-     
 
 
-    </script>
-  
+
+  </script>
+
 
 
 </ui:composition>

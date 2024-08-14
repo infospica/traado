@@ -2,8 +2,10 @@
   padding-bottom: 0px;
 }
 
-* { box-sizing: border-box; }
-.grid {              
+* {
+  box-sizing: border-box;
+}
+.grid {
   max-width: 800px;
 }
 
@@ -22,16 +24,16 @@
 
   height: auto;
   float: left;
-  border:none;  
+  border:none;
 }
 
 .grid-head{
   font-size: 17px;
-  font-weight: bold;  
+  font-weight: bold;
 }
 
-.grid-row{  
-  padding-top: 5px; 
+.grid-row{
+  padding-top: 5px;
   padding-right: 10px;
 }
 .oneBtn .ui-state-active {
@@ -46,19 +48,19 @@
 }
 
 .composer{
- 
-  
+
+
   height:auto;
- 
+
 }
 .composer.ql-editor{
   background-color: #FFF;
 }
 .dlgWidget.ui-dialog .ui-widget {
-  
+
 }
 .dlgWidget.ui-dialog.ui-widget-content .ui-dialog-content{
-  padding:0px; 
+  padding:0px;
   border:none;
 }
 #comPanel{
@@ -78,7 +80,7 @@
   background-color: #444;
   height:40px;
   padding:10px;
-  
+
   color: #FFF !important;
   font-size: 17px;
   font-weight: 400;

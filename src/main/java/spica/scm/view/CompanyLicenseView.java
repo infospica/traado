@@ -16,11 +16,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
 import wawo.app.faces.JsfIo;
@@ -54,7 +52,7 @@ public class CompanyLicenseView implements Serializable {
   private transient Date fromMax;
   private transient Date toMin;
   private transient Date toMax;
-  
+
   /**
    * Getting the parent object and id for edit.
    */
@@ -354,7 +352,7 @@ public class CompanyLicenseView implements Serializable {
   }
 
   public void companyLicenseDocPopupClose() {
-    Jsf.popupReturn(parent,null);
+    Jsf.popupReturn(parent, null);
   }
 
   public List<Status> statusAuto(String filter) {
@@ -393,8 +391,4 @@ public class CompanyLicenseView implements Serializable {
     this.toMax = toMax;
   }
 
-
-  
-  
-  
 }

@@ -19,11 +19,17 @@ function openPopupId(id, url, qs, focusId) {
   }
 }
 
-function showError(mess){
-  setTimeout(function () { showalert(mess, '#messages', 'danger', -1); mess = ''; }, 300);
+function showError(mess) {
+  setTimeout(function () {
+    showalert(mess, '#messages', 'danger', -1);
+    mess = '';
+  }, 300);
 }
 function showSuccess(mess) {
-  setTimeout(function () { showalert(mess, '#messages', 'danger', -1); mess = ''; }, 300);
+  setTimeout(function () {
+    showalert(mess, '#messages', 'danger', -1);
+    mess = '';
+  }, 300);
 }
 // custom autocomplete wrapper
 

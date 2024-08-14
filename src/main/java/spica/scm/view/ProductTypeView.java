@@ -84,7 +84,7 @@ public class ProductTypeView implements Serializable {
   }
 
   public SelectItem getSelectItemProductType() {
-    if(selectItemProductType == null){
+    if (selectItemProductType == null) {
       selectItemProductType = new SelectItem();
     }
     return selectItemProductType;
@@ -209,7 +209,7 @@ public class ProductTypeView implements Serializable {
       if (null != key) {
         switch (key) {
           case "save":
-            if(getSelectItemProductType() != null){
+            if (getSelectItemProductType() != null) {
               getProductType().setTitle(getSelectItemProductType().getItemLabel());
               getProductType().setProductTypeCode(getSelectItemProductType().getTextValue());
             }

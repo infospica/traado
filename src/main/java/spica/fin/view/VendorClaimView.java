@@ -46,18 +46,8 @@ import spica.scm.domain.Vendor;
 import spica.scm.domain.Company;
 import spica.fin.domain.VendorClaimStatus;
 import spica.scm.domain.ServiceCommodity;
-import spica.scm.domain.CompanyAddress;
-import spica.scm.domain.CompanyLicense;
-import spica.scm.domain.CompanySettings;
-import spica.scm.domain.VendorAddress;
-import spica.scm.domain.VendorLicense;
 import spica.scm.print.PrintVendorClaim;
 import spica.scm.service.CommodityService;
-import spica.scm.service.CompanyAddressService;
-import spica.scm.service.CompanyLicenseService;
-import spica.scm.service.CompanySettingsService;
-import spica.scm.service.VendorAddressService;
-import spica.scm.service.VendorLicenseService;
 import spica.scm.tax.GstIndia;
 import spica.scm.tax.TaxCalculator;
 import spica.scm.view.ScmLookupView;
@@ -443,9 +433,8 @@ public class VendorClaimView implements Serializable {
       if (getVendorClaim().getAccountId() != null) {
         processedClaimList = VendorClaimService.selectProcessedClaim(main, getVendorClaim());
       }
-      
-//      List<VendorClaim> processedClaimList = null;
 
+//      List<VendorClaim> processedClaimList = null;
       for (int i = 1; i <= 12; i++) {
         PlatformData pd = new PlatformData();
         pd.setClaimMonth(Integer.parseInt(monthDate1.format(cal.getTime())));
@@ -919,17 +908,17 @@ public class VendorClaimView implements Serializable {
 //          }
 //        }
         boolean input = detail.getAccountingLedgerId().getLedgerCode().equals(AccountingConstant.LEDGER_CODE_TAX_INPUT);
-        if(detail.getTaxCodeId()!= null){
-        Double[] val = taxSummation.get(detail.getTaxCodeId().getCode());
-        if (val != null) {
-          Double t = val[0];
-          Double d = val[1];
-          double tax = t == null ? 0.0 : t + (detail.getTaxValue() == null ? 0.0 : detail.getTaxValue());
-          double dummy = d == null ? 0.0 : d;
-          taxSummation.put(detail.getTaxCodeId().getCode(), new Double[]{input ? tax : dummy, input ? dummy : tax});
-        } else {
-          taxSummation.put(detail.getTaxCodeId().getCode(), new Double[]{input ? detail.getTaxValue()==null?0.0:detail.getTaxValue()==null?0.0:detail.getTaxValue() : 0.0, input ? 0.0 : detail.getTaxValue()==null?0.0:detail.getTaxValue()});
-        }
+        if (detail.getTaxCodeId() != null) {
+          Double[] val = taxSummation.get(detail.getTaxCodeId().getCode());
+          if (val != null) {
+            Double t = val[0];
+            Double d = val[1];
+            double tax = t == null ? 0.0 : t + (detail.getTaxValue() == null ? 0.0 : detail.getTaxValue());
+            double dummy = d == null ? 0.0 : d;
+            taxSummation.put(detail.getTaxCodeId().getCode(), new Double[]{input ? tax : dummy, input ? dummy : tax});
+          } else {
+            taxSummation.put(detail.getTaxCodeId().getCode(), new Double[]{input ? detail.getTaxValue() == null ? 0.0 : detail.getTaxValue() == null ? 0.0 : detail.getTaxValue() : 0.0, input ? 0.0 : detail.getTaxValue() == null ? 0.0 : detail.getTaxValue()});
+          }
         }
       }
     }

@@ -322,7 +322,6 @@ public class CompanyBankView implements Serializable {
 //  public List<BankAccountType> bankAccountTypeAuto(String filter) {
 //     return ScmLookupView.bankAccountTypeAuto(filter);
 //  }
-
   /**
    * Bank autocomplete filter.
    * <pre>
@@ -373,11 +372,11 @@ public class CompanyBankView implements Serializable {
   public void companyBankContactDialogClose() {
     Jsf.popupReturn(parent, null);
   }
-  
+
   public List<Status> statusAuto(String filter) {
     return ScmLookupView.statusAuto(filter);
   }
-  
+
   public void accountTypeSelectEvent(SelectEvent event) {
   }
 }

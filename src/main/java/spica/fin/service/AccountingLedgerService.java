@@ -16,10 +16,8 @@ import spica.fin.domain.TradeOutstanding;
 import spica.scm.domain.AccountGroup;
 import spica.scm.domain.Company;
 import spica.scm.domain.Vendor;
-import spica.sys.UserRuntimeView;
 import wawo.app.Main;
 import wawo.app.common.AppService;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.SqlPage;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
@@ -152,7 +150,7 @@ public abstract class AccountingLedgerService {
   }
 
   public static void insertOrUpdateOpeningBalance(Main main, AccountingLedger mainLedger, List<TradeOutstanding> tradeOutstaningList) {
-       LedgerExternalDataService.saveOpeningEntry(main, mainLedger, tradeOutstaningList, mainLedger.getCompanyId());
+    LedgerExternalDataService.saveOpeningEntry(main, mainLedger, tradeOutstaningList, mainLedger.getCompanyId());
   }
 
   /**

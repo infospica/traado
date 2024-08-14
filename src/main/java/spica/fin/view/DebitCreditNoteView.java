@@ -69,7 +69,7 @@ import wawo.entity.util.StringUtil;
 @Named(value = "debitCreditNoteView")
 @ViewScoped
 public class DebitCreditNoteView implements Serializable {
-  
+
   private DebitCreditNote debitCreditNote;	//Domain object/selected Domain.
   private transient LazyDataModel<DebitCreditNote> debitCreditNoteLazyModel; 	//For lazy loading datatable.
   private transient DebitCreditNote[] debitCreditNoteSelected;	 //Selected Domain Array
@@ -94,7 +94,7 @@ public class DebitCreditNoteView implements Serializable {
   public DebitCreditNoteView() {
     super();
   }
-  
+
   @PostConstruct
   public void init() {
     MainView main = Jsf.getMain();
@@ -137,22 +137,22 @@ public class DebitCreditNoteView implements Serializable {
   public void setDebitCreditNote(DebitCreditNote debitCreditNote) {
     this.debitCreditNote = debitCreditNote;
   }
-  
+
   public List<Platform> getPlatformList() {
     return platformList;
   }
-  
+
   public void setPlatformList(List<Platform> platformList) {
     this.platformList = platformList;
   }
-  
+
   public List<DebitCreditNotePlatform> getDebitCreditNotePlatformList() {
     if (debitCreditNotePlatformList == null) {
       debitCreditNotePlatformList = new ArrayList<>();
     }
     return debitCreditNotePlatformList;
   }
-  
+
   public void setDebitCreditNotePlatformList(List<DebitCreditNotePlatform> debitCreditNotePlatformList) {
     this.debitCreditNotePlatformList = debitCreditNotePlatformList;
   }
@@ -172,7 +172,7 @@ public class DebitCreditNoteView implements Serializable {
   public List<DebitCreditNoteItem> getDebitCreditNoteItemList() {
     return debitCreditNoteItemList;
   }
-  
+
   public void setDebitCreditNoteItemList(List<DebitCreditNoteItem> debitCreditNoteItemList) {
     this.debitCreditNoteItemList = debitCreditNoteItemList;
   }
@@ -194,26 +194,26 @@ public class DebitCreditNoteView implements Serializable {
   public DebitCreditNote[] getDebitCreditNoteSelected() {
     return debitCreditNoteSelected;
   }
-  
+
   public Account getAccount() {
     if (account == null && (isSupplierDebitCreditNote() || isSupplierSalesbill())) {
       account = UserRuntimeView.instance().getAccount();
     }
     return account;
   }
-  
+
   public void setAccount(Account account) {
     getDebitCreditNote().setAccountId(account);
     this.account = account;
   }
-  
+
   public AccountGroup getAccountGroup() {
     if (accountGroup == null && isCustomerDebitCreditNote()) {
       accountGroup = UserRuntimeView.instance().getAccountGroup();
     }
     return accountGroup;
   }
-  
+
   public void setAccountGroup(AccountGroup accountGroup) {
     getDebitCreditNote().setAccountGroupId(accountGroup);
     this.accountGroup = accountGroup;
@@ -227,11 +227,11 @@ public class DebitCreditNoteView implements Serializable {
   public void setDebitCreditNoteSelected(DebitCreditNote[] debitCreditNoteSelected) {
     this.debitCreditNoteSelected = debitCreditNoteSelected;
   }
-  
+
   public boolean isTaxableDebitCreditNoteExist() {
     return taxableDebitCreditNoteExist;
   }
-  
+
   public void setTaxableDebitCreditNoteExist(boolean taxableDebitCreditNoteExist) {
     this.taxableDebitCreditNoteExist = taxableDebitCreditNoteExist;
   }
@@ -273,7 +273,7 @@ public class DebitCreditNoteView implements Serializable {
             getDebitCreditNote().setAccountingLedgerId(AccountingLedgerService.selectSupplierAccountingLedger(main, getAccount().getVendorId()));
             interState(getDebitCreditNote().getAccountingLedgerId());
             setDebitCreditNoteType(getDebitCreditNote().getIsInterstate(), getDebitCreditNote().getSezZone());
-            
+
           }
 //          boolean inter = (getDebitCreditNote().getIsInterstate() != null && SystemConstants.INTERSTATE.intValue() == getDebitCreditNote().getIsInterstate()) ? true : false;
 //          if (inter || (getDebitCreditNote().getSezZone() != null && getDebitCreditNote().getSezZone().intValue() == 1)) {
@@ -291,7 +291,7 @@ public class DebitCreditNoteView implements Serializable {
           //  setTaxCalculator(SystemRuntimeConfig.getTaxCalculator(getDebitCreditNote().getTaxProcessorId().getProcessorClass()));
           setDebitCreditNoteType(getDebitCreditNote().getIsInterstate(), getDebitCreditNote().getSezZone());
           getTaxCalculator().processDebitNoteCalculation(getDebitCreditNote(), getDebitCreditNoteItemList());
-          
+
           if (StringUtil.isEmpty(getDebitCreditNoteItemList())) {
             addNewDebitCreditNoteItem();
           }
@@ -325,7 +325,7 @@ public class DebitCreditNoteView implements Serializable {
     if (debitCreditNoteLazyModel == null) {
       debitCreditNoteLazyModel = new LazyDataModel<DebitCreditNote>() {
         private List<DebitCreditNote> list;
-        
+
         @Override
         public List<DebitCreditNote> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -348,12 +348,12 @@ public class DebitCreditNoteView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(DebitCreditNote debitCreditNote) {
           return debitCreditNote.getId();
         }
-        
+
         @Override
         public DebitCreditNote getRowData(String rowKey) {
           if (list != null) {
@@ -368,7 +368,7 @@ public class DebitCreditNoteView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "fin_debit_credit_note/";
   }
@@ -447,7 +447,7 @@ public class DebitCreditNoteView implements Serializable {
             DebitCreditNoteService.selectDebitCreditNoteInvoiceNo(main, getDebitCreditNote(), true);
             getDebitCreditNote().setStatusId(SystemConstants.DRAFT);
             DebitCreditNoteService.clone(main, getDebitCreditNote(), getDebitCreditNoteItemList());
-            
+
             break;
         }
         main.commit("success." + key);
@@ -478,11 +478,11 @@ public class DebitCreditNoteView implements Serializable {
         getTaxCalculator().processDebitNoteCalculation(debitCreditNote, debitCreditNoteItemList);
         debitCreditNoteItem = debitCreditNoteItemList.get(index);
         DebitCreditNoteItemService.insertOrUpdate(main, debitCreditNoteItem);
-        
+
         if (!isTaxableDebitCreditNoteExist() && debitCreditNoteItem.getTaxCodeId() != null) {
           setTaxableDebitCreditNoteExist(true);
         }
-        
+
         if (isNew || index == 0) {
           addNewDebitCreditNoteItem();
         }
@@ -521,7 +521,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public void actionDeleteDebitCreditNoteItem(MainView main, DebitCreditNoteItem debitCreditNoteItem) {
     try {
       if (debitCreditNoteItem != null && debitCreditNoteItem.getId() != null && debitCreditNoteItem.getId() > 0) {
@@ -544,7 +544,7 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
   public void updatePlatFormList(List<DebitCreditNotePlatform> list, DebitCreditNoteItem debitCreditNoteItem) {
     if (list.size() > 0) {
       Iterator<DebitCreditNotePlatform> it = list.iterator();
@@ -556,7 +556,7 @@ public class DebitCreditNoteView implements Serializable {
       }
     }
   }
-  
+
   public List<Product> productAuto(String filter) {
     MainView main = Jsf.getMain();
     try {
@@ -572,15 +572,15 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public List<ServiceCommodity> serviceAuto(String filter) {
     return ScmLookupExtView.lookupServiceCommodity(getDebitCreditNote().getCompanyId(), filter);
   }
-  
+
   public List<ProductCategory> categoryAuto(String filter) {
     return ScmLookupExtView.lookupProductCategoryAuto(filter);
   }
-  
+
   public List<SalesInvoiceItem> getSalesInvoiceList(MainView main, DebitCreditNoteItem debitCreditNoteItem) {
     try {
       if (isCustomerDebitCreditNote() && debitCreditNoteItem.getSalesInvoiceItemList() == null) {
@@ -589,7 +589,7 @@ public class DebitCreditNoteView implements Serializable {
           if (getDebitCreditNote().getAccountingLedgerId().isCustomer()) {
             debitCreditNoteItem.setSalesInvoiceItemList(DebitCreditNoteService.selectInvoiceByProductAndAccountGroupAndCustomer(main, debitCreditNoteItem.getProductId(), getDebitCreditNote().getAccountGroupId(), getDebitCreditNote().getAccountingLedgerId().getEntityId()));
           }
-          
+
         }
       }
       return debitCreditNoteItem.getSalesInvoiceItemList();
@@ -600,7 +600,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public List<ProductEntryDetail> getProductInvoiceList(MainView main, DebitCreditNoteItem debitCreditNoteItem) {
     try {
       if (isSupplierDebitCreditNote() || isSupplierSalesbill()) {
@@ -616,36 +616,36 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public void updateSalesInvoiceRef(DebitCreditNoteItem debitCreditNoteItem) {
     debitCreditNoteItem.setRefInvoiceNo(debitCreditNoteItem.getSalesInvoiceItemId() == null ? null : debitCreditNoteItem.getSalesInvoiceItemId().getSalesInvoiceId().getInvoiceNo());
     debitCreditNoteItem.setRefInvoiceDate(debitCreditNoteItem.getSalesInvoiceItemId() == null ? null : debitCreditNoteItem.getSalesInvoiceItemId().getSalesInvoiceId().getInvoiceDate());
   }
-  
+
   public void updateProductInvoiceRef(DebitCreditNoteItem debitCreditNoteItem) {
     debitCreditNoteItem.setRefInvoiceNo(debitCreditNoteItem.getProductEntryDetailId() == null ? null : debitCreditNoteItem.getProductEntryDetailId().getProductEntryId().getAccountInvoiceNo());
     debitCreditNoteItem.setRefInvoiceDate(debitCreditNoteItem.getProductEntryDetailId() == null ? null : debitCreditNoteItem.getProductEntryDetailId().getProductEntryId().getInvoiceDate());
   }
-  
+
   public void updateHsnCodeByProduct(DebitCreditNoteItem debitCreditNoteItem) {
     Product product = debitCreditNoteItem.getProductId();
     setHsnCode(debitCreditNoteItem, product.getProductName(), product.getHsnCode());
     debitCreditNoteItem.setProductId(product);
     debitCreditNoteItem.setRefInvoiceDate(null);
   }
-  
+
   public void updateHsnCodeByService(DebitCreditNoteItem debitCreditNoteItem) {
     ServiceCommodity serviceCommodity = debitCreditNoteItem.getServiceId();
     setHsnCode(debitCreditNoteItem, serviceCommodity.getTitle(), serviceCommodity.getHsnSacCode());
     debitCreditNoteItem.setServiceId(serviceCommodity);
   }
-  
+
   public void updateHsnCodeByCategory(DebitCreditNoteItem debitCreditNoteItem) {
     ProductCategory productCategory = debitCreditNoteItem.getProductCategoryId();
     setHsnCode(debitCreditNoteItem, productCategory.getTitle(), productCategory.getHsnCode());
     debitCreditNoteItem.setProductCategoryId(productCategory);
   }
-  
+
   private void setHsnCode(DebitCreditNoteItem debitCreditNoteItem, String title, String hsn) {
     debitCreditNoteItem.resetValues();
     debitCreditNoteItem.setTitle(title);
@@ -658,7 +658,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     debitCreditNoteItem.setInvoiceWise(getDebitCreditNote().getCompanyId().getCompanySettings().getInvoiceWise());
   }
-  
+
   public void resetToDraft(MainView main) {
     try {
       DebitCreditNoteService.resetToDraft(main, getDebitCreditNote());
@@ -669,38 +669,38 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
   public boolean isDraft() {
     return getDebitCreditNote() != null && getDebitCreditNote().getStatusId() != null && SystemConstants.DRAFT.equals(getDebitCreditNote().getStatusId());
   }
-  
+
   public boolean isConfirmed() {
     return getDebitCreditNote() != null && getDebitCreditNote().getStatusId() != null && SystemConstants.CONFIRMED.equals(getDebitCreditNote().getStatusId());
   }
-  
+
   public boolean isCustomerDebitCreditNote() {
     return (!StringUtil.isEmpty(getDebitCreditNote().getDebitCreditParty().toString()) && DebitCreditNoteService.CUSTOMER_DEBIT_CREDIT_NOTE.intValue() == getDebitCreditNote().getDebitCreditParty());
   }
-  
+
   public boolean isSupplierDebitCreditNote() {
     return (!StringUtil.isEmpty(getDebitCreditNote().getDebitCreditParty().toString()) && DebitCreditNoteService.SUPPLIER_DEBIT_CREDIT_NOTE.intValue() == getDebitCreditNote().getDebitCreditParty());
   }
-  
+
   public boolean isSupplierSalesbill() {
     return (!StringUtil.isEmpty(getDebitCreditNote().getDebitCreditParty().toString()) && DebitCreditNoteService.SUPPLIER_SALES_BILL.intValue() == getDebitCreditNote().getDebitCreditParty());
   }
-  
+
   public void taxableRateBlurEvent(DebitCreditNoteItem debitCreditNoteItem) {
     getTaxCalculator().processDebitNoteCalculation(getDebitCreditNote(), getDebitCreditNoteItemList());
   }
-  
+
   public void taxRateSelectEvent(DebitCreditNoteItem debitCreditNoteItem) {
     debitCreditNoteItem.setIgstAmount(null);
     debitCreditNoteItem.setSgstAmount(null);
     debitCreditNoteItem.setCgstAmount(null);
     getTaxCalculator().processDebitNoteCalculation(getDebitCreditNote(), getDebitCreditNoteItemList());
   }
-  
+
   public void taxableInvoiceChangeEvent() {
     if (SystemConstants.NON_TAXABLE_DEBIT_CREDIT_NOTE.equals(getDebitCreditNote().getTaxableInvoice())) {
       if (!StringUtil.isEmpty(getDebitCreditNoteItemList())) {
@@ -741,7 +741,7 @@ public class DebitCreditNoteView implements Serializable {
    */
   public List<TaxCode> lookupGstTaxCode(MainView main, DebitCreditNoteItem debitCreditNoteItem) {
     try {
-      
+
       List<TaxCode> codeList = new ArrayList<>();
       if (debitCreditNoteItem != null && debitCreditNoteItem.getProductId() != null) {
         if (isCustomerDebitCreditNote()) {
@@ -766,14 +766,14 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public List<Account> lookupAccount() {
     if (getAccountGroup() != null) {
       return ScmLookupExtView.lookupAccountByAccountGroup(getAccountGroup());
     }
     return null;
   }
-  
+
   public boolean isSalesDebitCreditNote() {
     if (getDebitCreditNote().getDebitCreditParty() != null && getDebitCreditNote().getDebitCreditParty() == SystemConstants.SALES_DEBIT_CREDIT_NOTE.intValue()) {
       List<Account> accountList = lookupAccount();
@@ -811,7 +811,7 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
   private void interState(AccountingLedger accountingLedger) {
     if (accountingLedger != null) {
       if (accountingLedger.getStateId() != null) {
@@ -828,7 +828,7 @@ public class DebitCreditNoteView implements Serializable {
       }
     }
   }
-  
+
   private void setDebitCreditNoteType(Integer interstate, Integer sezZone) {
     //  setInterstate(false);
     if (interstate.intValue() == 1 || sezZone.intValue() == 1) {
@@ -885,7 +885,7 @@ public class DebitCreditNoteView implements Serializable {
       Jsf.error(component, "netamount.required");
     }
   }
-  
+
   public void validateInvoice(FacesContext context, UIComponent component, Object value) throws ValidatorException {
     String strStatus = Jsf.getParameter("status");
     if (isSupplierDebitCreditNote() || isSupplierSalesbill()) {
@@ -895,7 +895,7 @@ public class DebitCreditNoteView implements Serializable {
       }
     }
   }
-  
+
   public void validateInvoiceDate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
     String strStatus = Jsf.getParameter("status");
     if (isSupplierDebitCreditNote() || isSupplierSalesbill()) {
@@ -907,13 +907,13 @@ public class DebitCreditNoteView implements Serializable {
           Jsf.error(component, "date.lte.today", null);
         }
       }
-      
+
       if (status != null && SystemConstants.CONFIRMED.equals(status) && value == null) {
         Jsf.error(component, "documentdate.required");
       }
     }
   }
-  
+
   private Calendar getNow() {
     Calendar now = Calendar.getInstance();
     now.set(Calendar.HOUR, 0);
@@ -922,7 +922,7 @@ public class DebitCreditNoteView implements Serializable {
     now.set(Calendar.HOUR_OF_DAY, 0);
     return now;
   }
-  
+
   public void actionSaveDebitCreditNote(MainView main) {
     try {
       DebitCreditNoteService.insertOrUpdate(main, debitCreditNote);
@@ -943,7 +943,7 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
   public boolean isPlatformDeletable(MainView main) {
     try {
       if (getDebitCreditNote().getConfirmedNetValue() != null && getDebitCreditNote().getConfirmedNetValue() > 0) {
@@ -956,7 +956,7 @@ public class DebitCreditNoteView implements Serializable {
       } else {
         return false;
       }
-      
+
     } catch (Throwable t) {
       main.rollback(t);
     } finally {
@@ -964,7 +964,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     return false;
   }
-  
+
   public void actionDeletePlatform(MainView main) {
     try {
       getDebitCreditNote().setConfirmedNetValue(null);
@@ -977,7 +977,7 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
   public void createPrintPortrait(String key) {
     getDebitCreditNote().setPrintType(SystemConstants.PRINT_PORTRAIT);
     if (SystemConstants.PDF_ITEXT.equals(key)) {
@@ -986,11 +986,11 @@ public class DebitCreditNoteView implements Serializable {
       Jsf.popupForm(getTaxCalculator().getDebitCreditNotePrint(), getDebitCreditNote());
     }
   }
-  
+
   public void ledgerPopup(AccountingLedger accountingLedger) {
     Jsf.popupForm(FileConstant.ACCOUNTING_LEDGER, accountingLedger, accountingLedger.getId());
   }
-  
+
   public void updateDocumentNoByAccount() {
     MainView main = Jsf.getMain();
     try {
@@ -1003,21 +1003,21 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
   public void openProduct() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       // opens a new form if id is null else edit
       Jsf.popupForm(FileConstant.PRODUCT, new Product(), null);
     }
   }
-  
+
   public void openServices() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       // opens a new form if id is null else edit
       Jsf.popupForm(FileConstant.SERVICES, new ServiceCommodity(), null);
     }
   }
-  
+
   public boolean isInvoiceWise() {
     if (getDebitCreditNote().getCompanyId().getCompanySettings().getInvoiceWise() != null) {
       invoiceWise = getDebitCreditNote().getCompanyId().getCompanySettings().getInvoiceWise() == SystemConstants.SHOW_INVOICE_WISE ? true : false;
@@ -1027,11 +1027,11 @@ public class DebitCreditNoteView implements Serializable {
     }
     return invoiceWise;
   }
-  
+
   public void setInvoiceWise(boolean invoiceWise) {
     this.invoiceWise = invoiceWise;
   }
-  
+
   public List<SalesInvoice> selectInvoiceAuto(String filter) {
     MainView main = Jsf.getMain();
     try {
@@ -1044,7 +1044,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public List<Product> selectProductList(MainView main) {
     try {
       if (getDebitCreditNote().getSalesInvoice() != null && isCustomerDebitCreditNote()) {
@@ -1059,7 +1059,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   public void updateLineItemByProduct(DebitCreditNoteItem debitCreditNoteItem) {
     if (isCustomerDebitCreditNote()) {
       debitCreditNoteItem.setServiceId(null);
@@ -1080,7 +1080,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     debitCreditNoteItem.setInvoiceWise(getDebitCreditNote().getCompanyId().getCompanySettings().getInvoiceWise());
   }
-  
+
   public List<ProductEntry> selectInvoiceBySupplierAuto(String filter) {
     MainView main = Jsf.getMain();
     try {
@@ -1092,7 +1092,7 @@ public class DebitCreditNoteView implements Serializable {
     }
     return null;
   }
-  
+
   private void setSupplierDebitCreditAccountGroup(MainView main) {
     try {
       if (isSupplierDebitCreditNote()) {
@@ -1106,5 +1106,5 @@ public class DebitCreditNoteView implements Serializable {
       main.close();
     }
   }
-  
+
 }

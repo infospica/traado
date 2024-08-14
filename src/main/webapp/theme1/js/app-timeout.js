@@ -21,8 +21,7 @@ function startDialogTimer(wCounter, returnPage, countDownDiv) {
     if (wCounter === 0) {
       clearInterval(handleDialog);
       window.location.href = returnPage;
-    }
-    else {
+    } else {
       wCounter -= reduce;
       e.innerHTML = wCounter;
     }
@@ -37,10 +36,9 @@ function startPageTimer(start, remaining, returnPage, timerDiv) {
   handleTimerPage = setInterval(function () {
     if (start === remaining) {
       clearInterval(handleTimerPage);
-      PF('timeoutDialog').show();  
+      PF('timeoutDialog').show();
       startDialogTimer(remaining, returnPage, timerDiv);
-    }
-    else {
+    } else {
       start -= reduce;
     }
   }, reduce * 1000);

@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.StatusService;
 
 /**
  * StatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Tue Jun 28 12:38:19 IST 2016 
+ * @version	1.0, Tue Jun 28 12:38:19 IST 2016
  */
-
-@Named(value="statusView")
+@Named(value = "statusView")
 @ViewScoped
-public class StatusView implements Serializable{
+public class StatusView implements Serializable {
 
   private transient Status status;	//Domain object/selected Domain.
   private transient LazyDataModel<Status> statusLazyModel; 	//For lazy loading datatable.
   private transient Status[] statusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public StatusView() {
     super();
   }
- 
+
   /**
    * Return Status.
+   *
    * @return Status.
-   */  
+   */
   public Status getStatus() {
-    if(status == null) {
+    if (status == null) {
       status = new Status();
     }
     return status;
-  }   
-  
+  }
+
   /**
    * Set Status.
+   *
    * @param status.
-   */   
+   */
   public void setStatus(Status status) {
     this.status = status;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class StatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create statusLazyModel.
+   *
    * @param main
    */
   private void loadStatusList(final MainView main) {
     if (statusLazyModel == null) {
       statusLazyModel = new LazyDataModel<Status>() {
-      private List<Status> list;      
-      @Override
-      public List<Status> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = StatusService.listPaged(main);
-          main.commit(statusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<Status> list;
+
+        @Override
+        public List<Status> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = StatusService.listPaged(main);
+            main.commit(statusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(Status status) {
-        return status.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(Status status) {
+          return status.getId();
+        }
+
+        @Override
         public Status getRowData(String rowKey) {
           if (list != null) {
             for (Status obj : list) {
@@ -136,11 +139,12 @@ public class StatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_status/";	
+    String SUB_FOLDER = "scm_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class StatusView implements Serializable{
    */
   public String cloneStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneStatus(main, "clone"); 
+    return saveOrCloneStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class StatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many Status.
    *
@@ -205,7 +208,7 @@ public class StatusView implements Serializable{
       } else {
         StatusService.deleteByPk(main, getStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class StatusView implements Serializable{
 
   /**
    * Return LazyDataModel of Status.
+   *
    * @return
    */
   public LazyDataModel<Status> getStatusLazyModel() {
     return statusLazyModel;
   }
 
- /**
-  * Return Status[].
-  * @return 
-  */
+  /**
+   * Return Status[].
+   *
+   * @return
+   */
   public Status[] getStatusSelected() {
     return statusSelected;
   }
-  
+
   /**
    * Set Status[].
-   * @param statusSelected 
+   *
+   * @param statusSelected
    */
   public void setStatusSelected(Status[] statusSelected) {
     this.statusSelected = statusSelected;
   }
- 
-
 
 }

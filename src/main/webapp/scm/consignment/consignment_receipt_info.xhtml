@@ -74,8 +74,8 @@
 
             <p:outputLabel value="#{lang.noOfInvoice}" for="noOfInvoice" />
             <h:panelGroup>
-                <p:inputNumber styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.noOfInvoice}" maxlength="10" id="noOfInvoice" 
-                               autocomplete="off" required="true" requiredMessage="#{lang.noOfInvoice} #{lang.isRequired}" maxValue="9999" minValue="1" decimalPlaces="0" />
+              <p:inputNumber styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.noOfInvoice}" maxlength="10" id="noOfInvoice" 
+                             autocomplete="off" required="true" requiredMessage="#{lang.noOfInvoice} #{lang.isRequired}" maxValue="9999" minValue="1" decimalPlaces="0" />
               <p:message for="noOfInvoice" display="text"/>
             </h:panelGroup> 
 
@@ -113,7 +113,7 @@
             <h:panelGroup>
               <p:inputNumber styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.totalExpenseAmount}" 
                              autocomplete="off" converterMessage="#{lang.lrAmount} #{lang.invalidNumber}" decimalPlaces="2" id="lrAmount" readonly="true"
-                            onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" />
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" />
               <p:message for="lrAmount" display="text"/>
             </h:panelGroup>            
 
@@ -265,14 +265,14 @@
             <f:setPropertyActionListener target="#{consignmentReceiptView.consignmentDetail}" value="#{consignmentReceiptVar}" />
           </p:commandLink>
         </p:column>
-        
+
         <p:column sortBy="#{consignmentReceiptVar.consignmentId.consignmentDate}" field="title">
           <f:facet name="header">
             <h:outputText value="#{lang.consignmentDate}" title="#{lang.consignmentDate}"/>
           </f:facet>
           <h:outputText value="#{appView.date(consignmentReceiptVar.consignmentId.consignmentDate)}" escape="false" />
         </p:column>
-        
+
         <p:column sortBy="#{consignmentReceiptVar.receiptNo}" field="receipt_note">
           <f:facet name="header">
             <h:outputText value="#{lang.lrNo}" title="#{lang.lrNo}"/>
@@ -293,7 +293,7 @@
           </f:facet>
           <h:outputText value="#{appView.display(consignmentReceiptVar.receiptNote)}" title="#{appView.title(consignmentReceiptVar.receiptNote)}" escape="false" />
         </p:column>
-         
+
         <p:column exportable="false" styleClass="w-60">
           <f:facet name="header">
             <h:outputText value="#{lang.expense}" title="#{lang.expense}"/>

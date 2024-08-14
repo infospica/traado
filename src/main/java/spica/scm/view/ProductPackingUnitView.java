@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -32,52 +27,56 @@ import spica.scm.domain.ProductUnit;
 
 /**
  * ProductPackingUnitView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Oct 19 11:15:18 IST 2016 
+ * @version	1.0, Wed Oct 19 11:15:18 IST 2016
  */
-
-@Named(value="productPackingUnitView")
+@Named(value = "productPackingUnitView")
 @ViewScoped
-public class ProductPackingUnitView implements Serializable{
+public class ProductPackingUnitView implements Serializable {
 
   private transient ProductPackingUnit productPackingUnit;	//Domain object/selected Domain.
   private transient LazyDataModel<ProductPackingUnit> productPackingUnitLazyModel; 	//For lazy loading datatable.
   private transient ProductPackingUnit[] productPackingUnitSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ProductPackingUnitView() {
     super();
   }
- 
+
   /**
    * Return ProductPackingUnit.
+   *
    * @return ProductPackingUnit.
-   */  
+   */
   public ProductPackingUnit getProductPackingUnit() {
-    if(productPackingUnit == null) {
+    if (productPackingUnit == null) {
       productPackingUnit = new ProductPackingUnit();
     }
     return productPackingUnit;
-  }   
-  
+  }
+
   /**
    * Set ProductPackingUnit.
+   *
    * @param productPackingUnit.
-   */   
+   */
   public void setProductPackingUnit(ProductPackingUnit productPackingUnit) {
     this.productPackingUnit = productPackingUnit;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchProductPackingUnit(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchProductPackingUnit(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -89,40 +88,44 @@ public class ProductPackingUnitView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create productPackingUnitLazyModel.
+   *
    * @param main
    */
   private void loadProductPackingUnitList(final MainView main) {
     if (productPackingUnitLazyModel == null) {
       productPackingUnitLazyModel = new LazyDataModel<ProductPackingUnit>() {
-      private List<ProductPackingUnit> list;      
-      @Override
-      public List<ProductPackingUnit> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ProductPackingUnitService.listPaged(main);
-          main.commit(productPackingUnitLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ProductPackingUnit> list;
+
+        @Override
+        public List<ProductPackingUnit> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ProductPackingUnitService.listPaged(main);
+            main.commit(productPackingUnitLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ProductPackingUnit productPackingUnit) {
-        return productPackingUnit.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ProductPackingUnit productPackingUnit) {
+          return productPackingUnit.getId();
+        }
+
+        @Override
         public ProductPackingUnit getRowData(String rowKey) {
           if (list != null) {
             for (ProductPackingUnit obj : list) {
@@ -138,11 +141,12 @@ public class ProductPackingUnitView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_product_packing_unit/";	
+    String SUB_FOLDER = "scm_product_packing_unit/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -158,7 +162,7 @@ public class ProductPackingUnitView implements Serializable{
    */
   public String cloneProductPackingUnit(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneProductPackingUnit(main, "clone"); 
+    return saveOrCloneProductPackingUnit(main, "clone");
   }
 
   /**
@@ -184,14 +188,13 @@ public class ProductPackingUnitView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ProductPackingUnit.
    *
@@ -207,7 +210,7 @@ public class ProductPackingUnitView implements Serializable{
       } else {
         ProductPackingUnitService.deleteByPk(main, getProductPackingUnit());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -221,44 +224,47 @@ public class ProductPackingUnitView implements Serializable{
 
   /**
    * Return LazyDataModel of ProductPackingUnit.
+   *
    * @return
    */
   public LazyDataModel<ProductPackingUnit> getProductPackingUnitLazyModel() {
     return productPackingUnitLazyModel;
   }
 
- /**
-  * Return ProductPackingUnit[].
-  * @return 
-  */
+  /**
+   * Return ProductPackingUnit[].
+   *
+   * @return
+   */
   public ProductPackingUnit[] getProductPackingUnitSelected() {
     return productPackingUnitSelected;
   }
-  
+
   /**
    * Set ProductPackingUnit[].
-   * @param productPackingUnitSelected 
+   *
+   * @param productPackingUnitSelected
    */
   public void setProductPackingUnitSelected(ProductPackingUnit[] productPackingUnitSelected) {
     this.productPackingUnitSelected = productPackingUnitSelected;
   }
- 
 
-
- /**
-  * ProductPacking autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.productPackingAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.productPackingAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * ProductPacking autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.productPackingAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.productPackingAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<ProductPacking> productPackingAuto(String filter) {
     return ScmLookupView.productPackingAuto(filter);
   }
+
   public List<ProductUnit> productUnitAuto(String filter) {
     return ScmLookupView.productUnitAuto(filter);
   }

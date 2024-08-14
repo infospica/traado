@@ -52,7 +52,7 @@ $.widget('custom.mcautocomplete', $.ui.autocomplete, {
     return result;
   }/*,
    _resizeMenu: function(ul,item){
-
+   
    }*/
 });
 

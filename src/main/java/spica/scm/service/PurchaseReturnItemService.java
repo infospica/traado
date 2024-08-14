@@ -267,7 +267,7 @@ public abstract class PurchaseReturnItemService {
             + "group by t1.id,t1.product_detail_id,t2.product_entry_id,t1.tax_code_id,t1.purchase_return_item_status_id,t1.value_mrp,t1.product_entry_detail_id, "
             + "t1.product_discount_value,t1.product_discount_perc,t1.product_discount_value_derived,t1.is_product_discount_in_percentage,t1.ref_sales_invoice_id,"
             + "t1.landing_price_per_piece_company,t1.is_tax_code_modified,t1.actual_landing_price_per_piece_company,t1.product_key,t1.value_rate,t1.actual_value_rate,"
-            + "t1.scheme_discount_value,t1.scheme_discount_percentage,t1.invoice_discount_value,t1.invoice_discount_percentage,t1.reference_no,t1.hsn_code,t1.reference_date " 
+            + "t1.scheme_discount_value,t1.scheme_discount_percentage,t1.invoice_discount_value,t1.invoice_discount_percentage,t1.reference_no,t1.hsn_code,t1.reference_date "
             + "ORDER BY t1.id", new Object[]{purchaseReturn.getId()});
 
     for (PurchaseReturnItemReplica purchaseReturnItemReplica : list) {

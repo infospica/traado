@@ -4,7 +4,7 @@
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.state}" />
     <ui:param name="ids" value="state" />
-   
+
     <ui:define name="navRight" >
       <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  onclick="closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
     </ui:define>

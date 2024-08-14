@@ -70,9 +70,9 @@
               schemeId: parseInt($('#productFreeSchemeId').val())
             });
             $('.popup', window.parent.document).find('#jsonExport').val(JSON.stringify(benefits));
-          }else{
+          } else {
             $('.popup', window.parent.document).find('#jsonExport').val('');
-          }          
+          }
           parent.popup.close('.popup.open');
         }
 

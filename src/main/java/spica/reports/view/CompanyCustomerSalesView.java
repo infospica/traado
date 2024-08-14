@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -51,7 +51,7 @@ import wawo.app.faces.Jsf;
 @Named(value = "companyCustomerSalesView")
 @ViewScoped
 public class CompanyCustomerSalesView implements Serializable {
-  
+
   private transient List<CompanyCustomerSales> companyCustomerSalesList;
   private transient List<CompanyCustomerSales> salesRegisterList;
   private transient FilterParameters filterParameters;
@@ -86,7 +86,7 @@ public class CompanyCustomerSalesView implements Serializable {
   private transient Double InvoiceAmountTotal;
   private transient Double mrp;
   private transient DecimalFormat df = new DecimalFormat("0.00");
-  
+
   public List<CompanyCustomerSales> getCompanyCustomerSalesList(MainView main) {
     if (StringUtil.isEmpty(companyCustomerSalesList)) {
       try {
@@ -136,10 +136,10 @@ public class CompanyCustomerSalesView implements Serializable {
             igst += list.getIgst() == null ? 0 : list.getIgst();
             cgst += list.getCgst() == null ? 0 : list.getCgst();
             sgst += list.getSgst() == null ? 0 : list.getSgst();
-            
+
           }
         }
-        
+
       } catch (Throwable t) {
         main.rollback(t, "error.select");
       } finally {
@@ -148,38 +148,38 @@ public class CompanyCustomerSalesView implements Serializable {
     }
     return companyCustomerSalesList;
   }
-  
+
   public void setCompanyCustomerSalesList(List<CompanyCustomerSales> companyCustomerSalesList) {
     if (getFilterParameters() != null && !getFilterParameters().isIncludeReturn()) {
       getFilterParameters().setIncludeSales(true);
     }
     this.companyCustomerSalesList = companyCustomerSalesList;
   }
-  
+
   public FilterParameters getFilterParameters() {
     if (filterParameters == null) {
       filterParameters = new FilterParameters();
     }
     return filterParameters;
   }
-  
+
   public void setFilterParameters(FilterParameters filterParameters) {
     this.filterParameters = filterParameters;
   }
-  
+
   public void applyFilter(ValueChangeEvent event) {
     companyCustomerSalesList = null;
     columnNames = null;
     selectedColumns = null;
-    
+
   }
-  
+
   public void submitForm() {
     applyFilter(null);
   }
-  
+
   public void applyColumnFilter(AjaxBehaviorEvent event) {
-    
+
     companyCustomerSalesRender.setRender(false);
     for (String selectedColumn : selectedColumns) {
       if (selectedColumn.equals("Invoice No")) {
@@ -266,13 +266,13 @@ public class CompanyCustomerSalesView implements Serializable {
         companyCustomerSalesRender.setNetAmount(true);
       }
     }
-    
+
   }
-  
+
   public boolean getRenValue() {
     return renValue;
   }
-  
+
   public List getReportNames() {
     if (reportNames == null) {
       reportNames = new ArrayList();
@@ -288,15 +288,15 @@ public class CompanyCustomerSalesView implements Serializable {
     }
     return reportNames;
   }
-  
+
   public String[] getSelectedColumns() {
     return selectedColumns;
   }
-  
+
   public void setSelectedColumns(String[] selectedColumns) {
     this.selectedColumns = selectedColumns;
   }
-  
+
   public List<String> getColumnNames() {
     if (columnNames == null) {
       columnNames = new ArrayList<String>();
@@ -305,12 +305,12 @@ public class CompanyCustomerSalesView implements Serializable {
       } else if ("1".equals(filterParameters.getReportType())) {
         columnNames.add("Invoice No");
         columnNames.add("Invoice Date");
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -326,24 +326,24 @@ public class CompanyCustomerSalesView implements Serializable {
       } else if ("2".equals(filterParameters.getReportType())) {
         columnNames.add("Invoice No");
         columnNames.add("Invoice Date");
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
-        
+
         columnNames.add("MFR Code");
         columnNames.add("Product Name");
         columnNames.add("HSN Code");
         columnNames.add("Pack Type");
         columnNames.add("Batch No");
         columnNames.add("Expiry date");
-        
+
         columnNames.add("Qty");
         columnNames.add("Qty Free");
         columnNames.add("MRP");
         columnNames.add("Rate");
         columnNames.add("PTS");
         columnNames.add("PTR");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -359,12 +359,12 @@ public class CompanyCustomerSalesView implements Serializable {
       } else if ("3".equals(filterParameters.getReportType())) {
         columnNames.add("Invoice No");
         columnNames.add("Invoice Date");
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -378,15 +378,15 @@ public class CompanyCustomerSalesView implements Serializable {
         columnNames.add("GST Amt.");
         columnNames.add("Bill Amt.");
       } else if ("4".equals(filterParameters.getReportType())) {
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Invoice No");
         columnNames.add("Invoice Date");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -400,26 +400,26 @@ public class CompanyCustomerSalesView implements Serializable {
         columnNames.add("GST Amt.");
         columnNames.add("Bill Amt.");
       } else if ("5".equals(filterParameters.getReportType())) {
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("MFR Code");
         columnNames.add("Product Name");
         columnNames.add("HSN Code");
         columnNames.add("Pack Type");
         columnNames.add("Batch No");
         columnNames.add("Expiry date");
-        
+
         columnNames.add("Qty");
         columnNames.add("Qty Free");
         columnNames.add("MRP");
         columnNames.add("Rate");
         columnNames.add("PTS");
         columnNames.add("PTR");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -433,10 +433,10 @@ public class CompanyCustomerSalesView implements Serializable {
         columnNames.add("GST Amt.");
         columnNames.add("Bill Amt.");
       } else if ("6".equals(filterParameters.getReportType())) {
-        
+
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -450,13 +450,13 @@ public class CompanyCustomerSalesView implements Serializable {
         columnNames.add("GST Amt.");
         columnNames.add("Bill Amt.");
       } else if ("7".equals(filterParameters.getReportType())) {
-        
+
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -470,27 +470,27 @@ public class CompanyCustomerSalesView implements Serializable {
         columnNames.add("GST Amt.");
         columnNames.add("Bill Amt.");
       } else if ("8".equals(filterParameters.getReportType())) {
-        
+
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
-        
+
         columnNames.add("MFR Code");
         columnNames.add("Product Name");
         columnNames.add("HSN Code");
         columnNames.add("Pack Type");
         columnNames.add("Batch No");
         columnNames.add("Expiry date");
-        
+
         columnNames.add("Qty");
         columnNames.add("Qty Free");
         columnNames.add("MRP");
         columnNames.add("Rate");
         columnNames.add("PTS");
         columnNames.add("PTR");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -506,12 +506,12 @@ public class CompanyCustomerSalesView implements Serializable {
       } else {
         columnNames.add("Invoice No");
         columnNames.add("Invoice Date");
-        
+
         columnNames.add("Customer Name");
         columnNames.add("GST No");
         columnNames.add("District Name");
         columnNames.add("Territory Name");
-        
+
         columnNames.add("Goods Value");
         columnNames.add("Scheme Discount");
         columnNames.add("Product Discount");
@@ -537,29 +537,29 @@ public class CompanyCustomerSalesView implements Serializable {
       selectedColumns = new String[columnNames.size()];
       selectedColumns = columnNames.toArray(selectedColumns);
     }
-    
+
     return columnNames;
   }
-  
+
   public void setColumnNames(List<String> columnNames) {
     this.columnNames = columnNames;
   }
-  
+
   public CompanyCustomerSalesRender getCompanyCustomerSalesRender() {
     return companyCustomerSalesRender;
   }
-  
+
   public void setCompanyCustomerSalesRender(CompanyCustomerSalesRender companyCustomerSalesRender) {
     this.companyCustomerSalesRender = companyCustomerSalesRender;
   }
-  
+
   public List<Customer> customerAuto(String filter) {
     if (filterParameters.getAccountGroup() != null && filterParameters.getAccountGroup().getId() != null) {
       return ScmLookupExtView.selectCustomerByAccountGroup(filterParameters.getAccountGroup(), filter);
     }
     return null;
   }
-  
+
   public List<Account> accountAuto(String filter) {
     if (filterParameters.getAccountGroup() != null && filterParameters.getAccountGroup().getId() != null) {
       MainView main = Jsf.getMain();
@@ -573,7 +573,7 @@ public class CompanyCustomerSalesView implements Serializable {
     }
     return null;
   }
-  
+
   public void accountGroupSelectEvent(SelectEvent event) {
     AccountGroup accountGroup = (AccountGroup) event.getObject();
     if (accountGroup != null) {
@@ -584,92 +584,92 @@ public class CompanyCustomerSalesView implements Serializable {
       }
     }
   }
-  
+
   public Double getGstAmt() {
     if (gstAmt == null) {
       gstAmt = 0.0;
     }
     return gstAmt;
   }
-  
+
   public void setGstAmt(Double gstAmt) {
     this.gstAmt = gstAmt;
   }
-  
+
   public Double getBillAmt() {
     if (billAmt == null) {
       billAmt = 0.0;
     }
     return billAmt;
   }
-  
+
   public void setBillAmt(Double billAmt) {
     this.billAmt = billAmt;
   }
-  
+
   public Double getTaxableAmt() {
     if (taxableAmt == null) {
       taxableAmt = 0.0;
     }
     return taxableAmt;
   }
-  
+
   public void setTaxableAmt(Double taxableAmt) {
     this.taxableAmt = taxableAmt;
   }
-  
+
   public Double getGoodsValue() {
     return goodsValue;
   }
-  
+
   public Double getSchemeDiscount() {
     return schemeDiscount;
   }
-  
+
   public Double getProductDiscount() {
     return productDiscount;
   }
-  
+
   public Double getInvoiceDiscount() {
     return invoiceDiscount;
   }
-  
+
   public Double getCashDiscount() {
     return cashDiscount;
   }
-  
+
   public Double getStateCess() {
     return stateCess;
   }
-  
+
   public Double getIgst() {
     return igst;
   }
-  
+
   public Double getCgst() {
     return cgst;
   }
-  
+
   public Double getSgst() {
     return sgst;
   }
-  
+
   public Double getQty() {
     return qty;
   }
-  
+
   public Double getMrp() {
     return mrp;
   }
-  
+
   public Double getFreeQty() {
     return freeQty;
   }
-  
+
   public void openSalesInvoicePopUp(Integer id) {
     Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getSalesInvoiceView().replaceFirst("/scm", ""), id, id);
   }
-  
+
   public AccountingTransactionDetailItem getAccountingTransactionDetailItem(Integer id) {
     AccountingTransactionDetailItem acc = new AccountingTransactionDetailItem();
     if (acc.getAccountingTransactionDetailId() == null) {
@@ -681,7 +681,7 @@ public class CompanyCustomerSalesView implements Serializable {
     acc.getAccountingTransactionDetailId().getAccountingTransactionId().setEntityId(id);
     return acc;
   }
-  
+
   public List<Brand> brandAuto(MainView main, String filter) {
     try {
       List<Brand> brandList = CompanyCustomerSalesService.brandList(main, UserRuntimeView.instance().getCompany(), filter);
@@ -696,7 +696,7 @@ public class CompanyCustomerSalesView implements Serializable {
     }
     return null;
   }
-  
+
   public void branSelectEvent() {
     if (filterParameters.getBrand() != null) {
       filterParameters.setAccountGroup(null);
@@ -704,7 +704,7 @@ public class CompanyCustomerSalesView implements Serializable {
       filterParameters.setCustomer(null);
     }
   }
-  
+
   public void export(MainView main) {
     try {
       createSalesReport(companyCustomerSalesList, salesRegisterList, filterParameters, UserRuntimeView.instance().getCompany());
@@ -714,7 +714,7 @@ public class CompanyCustomerSalesView implements Serializable {
       main.close();
     }
   }
-  
+
   private void createSalesReport(List<CompanyCustomerSales> companyCustomerSalesList, List<CompanyCustomerSales> salesRegisterList, FilterParameters filterParameters, Company company) throws IOException {
     String name = "SALES_";
     String[] arr = null;
@@ -784,7 +784,7 @@ public class CompanyCustomerSalesView implements Serializable {
       CellStyle styleNormalRightRedBold = ExcelUtil.styleRedBold(workbook, HorizontalAlignment.RIGHT);
       CellStyle styleNormalCenter = workbook.createCellStyle();
       styleNormalCenter.setAlignment(HorizontalAlignment.CENTER);
-      
+
       CellStyle colHead = ExcelUtil.styleBold(workbook, HorizontalAlignment.LEFT);
       colHead.setWrapText(true);
       colHead.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -814,7 +814,7 @@ public class CompanyCustomerSalesView implements Serializable {
           row = sheet.createRow(rowId++);
           row.setRowStyle(style);
           list.setSalesOrReturn(list.getSalesOrReturn() != null ? list.getSalesOrReturn() : 1);
-          
+
           if (!filterParameters.getReportType().equals("4")) {
             if (headerList.contains("INVOICE NO")) {
               cell = row.createCell(headerList.indexOf("INVOICE NO"));
@@ -846,7 +846,7 @@ public class CompanyCustomerSalesView implements Serializable {
               }
             }
           }
-          
+
           if (!filterParameters.getReportType().equals("7") || !filterParameters.getReportType().equals("8")) {
             if (headerList.contains("CUSTOMER NAME")) {
               cell = row.createCell(headerList.indexOf("CUSTOMER NAME"));
@@ -857,7 +857,7 @@ public class CompanyCustomerSalesView implements Serializable {
                 cell.setCellStyle(styleNormalRed);
               }
             }
-            
+
             if (headerList.contains("GST")) {
               cell = row.createCell(headerList.indexOf("GST"));
               cell.setCellValue(list.getGstNo());
@@ -868,7 +868,7 @@ public class CompanyCustomerSalesView implements Serializable {
               }
             }
           }
-          
+
           if (headerList.contains("DISTRICT")) {
             cell = row.createCell(headerList.indexOf("DISTRICT"));
             cell.setCellValue(list.getDistrictName());
@@ -878,7 +878,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("TERRITORY")) {
             cell = row.createCell(headerList.indexOf("TERRITORY"));
             cell.setCellValue(list.getTerritoryName());
@@ -888,7 +888,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (filterParameters.getReportType().equals("7") || filterParameters.getReportType().equals("8")) {
             if (headerList.contains("CUSTOMER NAME")) {
               cell = row.createCell(headerList.indexOf("CUSTOMER NAME"));
@@ -899,7 +899,7 @@ public class CompanyCustomerSalesView implements Serializable {
                 cell.setCellStyle(styleNormalRed);
               }
             }
-            
+
             if (headerList.contains("GST")) {
               cell = row.createCell(headerList.indexOf("GST"));
               cell.setCellValue(list.getGstNo());
@@ -910,7 +910,7 @@ public class CompanyCustomerSalesView implements Serializable {
               }
             }
           }
-          
+
           if (filterParameters.getReportType().equals("4")) {
             if (headerList.contains("INVOICE NO")) {
               cell = row.createCell(headerList.indexOf("INVOICE NO"));
@@ -962,7 +962,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("PRODUCT NAME")) {
             cell = row.createCell(headerList.indexOf("PRODUCT NAME"));
             cell.setCellValue(list.getProductName());
@@ -972,7 +972,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("HSN CODE")) {
             cell = row.createCell(headerList.indexOf("HSN CODE"));
             cell.setCellValue(list.getHsnCode());
@@ -982,7 +982,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("TAX %")) {
             cell = row.createCell(headerList.indexOf("TAX %"));
             cell.setCellValue(list.getTaxPerc());
@@ -992,7 +992,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("PACK TYPE")) {
             cell = row.createCell(headerList.indexOf("PACK TYPE"));
             cell.setCellValue(list.getPackType());
@@ -1002,7 +1002,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("BATCH")) {
             cell = row.createCell(headerList.indexOf("BATCH"));
             cell.setCellValue(list.getBatchNo());
@@ -1012,7 +1012,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("EXPIRY DATE")) {
             cell = row.createCell(headerList.indexOf("EXPIRY DATE"));
             if (list.getExpiryDate() != null) {
@@ -1024,7 +1024,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("QTY")) {
             cell = row.createCell(headerList.indexOf("QTY"));
             if (list.getQty() != null) {
@@ -1036,7 +1036,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("QTY FREE")) {
             cell = row.createCell(headerList.indexOf("QTY FREE"));
             if (list.getQtyFree() != null) {
@@ -1079,7 +1079,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("RATE")) {
             cell = row.createCell(headerList.indexOf("RATE"));
             if (list.getRate() != null) {
@@ -1091,7 +1091,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("PTS")) {
             cell = row.createCell(headerList.indexOf("PTS"));
             if (list.getValuePts() != null) {
@@ -1103,7 +1103,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("PTR")) {
             cell = row.createCell(headerList.indexOf("PTR"));
             if (list.getValuePtr() != null) {
@@ -1115,7 +1115,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRed);
             }
           }
-          
+
           if (headerList.contains("GOODS VALUE")) {
             cell = row.createCell(headerList.indexOf("GOODS VALUE"));
             if (list.getGoodsValue() != null) {
@@ -1127,7 +1127,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("SCHEME DISCOUNT")) {
             cell = row.createCell(headerList.indexOf("SCHEME DISCOUNT"));
             if (list.getSchemeDiscount() != null) {
@@ -1139,7 +1139,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("PRODUCT DISCOUNT")) {
             cell = row.createCell(headerList.indexOf("PRODUCT DISCOUNT"));
             if (list.getProductDiscount() != null) {
@@ -1151,7 +1151,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("INVOICE DISCOUNT")) {
             cell = row.createCell(headerList.indexOf("INVOICE DISCOUNT"));
             if (list.getInvoiceDiscount() != null) {
@@ -1163,7 +1163,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("CASH DISCOUNT")) {
             cell = row.createCell(headerList.indexOf("CASH DISCOUNT"));
             if (list.getCashDiscount() != null) {
@@ -1175,7 +1175,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("SALES VALUE")) {
             cell = row.createCell(headerList.indexOf("SALES VALUE"));
             if (list.getSalesValue() != null) {
@@ -1187,7 +1187,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRedBold);
             }
           }
-          
+
           if (headerList.contains("CESS")) {
             cell = row.createCell(headerList.indexOf("CESS"));
             if (list.getStateCess() != null) {
@@ -1199,7 +1199,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRedBold);
             }
           }
-          
+
           if (headerList.contains("IGST")) {
             cell = row.createCell(headerList.indexOf("IGST"));
             if (list.getIgst() != null) {
@@ -1211,7 +1211,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("CGST")) {
             cell = row.createCell(headerList.indexOf("CGST"));
             if (list.getCgst() != null) {
@@ -1223,7 +1223,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("SGST")) {
             cell = row.createCell(headerList.indexOf("SGST"));
             if (list.getSgst() != null) {
@@ -1257,7 +1257,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRedBold);
             }
           }
-          
+
           if (headerList.contains("SERVICE CESS")) {
             cell = row.createCell(headerList.indexOf("SERVICE CESS"));
             if (list.getServiceCessAmount() != null) {
@@ -1269,7 +1269,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRedBold);
             }
           }
-          
+
           if (headerList.contains("SERVICE IGST")) {
             cell = row.createCell(headerList.indexOf("SERVICE IGST"));
             if (list.getServiceIgst() != null) {
@@ -1281,7 +1281,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("SERVICE CGST")) {
             cell = row.createCell(headerList.indexOf("SERVICE CGST"));
             if (list.getServiceCgst() != null) {
@@ -1293,7 +1293,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("SERVICE SGST")) {
             cell = row.createCell(headerList.indexOf("SERVICE SGST"));
             if (list.getServiceSgst() != null) {
@@ -1316,7 +1316,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRedBold);
             }
           }
-          
+
           if (headerList.contains("INVOICE AMOUNT")) {
             cell = row.createCell(headerList.indexOf("INVOICE AMOUNT"));
             if (list.getInvoiceAmount() != null) {
@@ -1339,7 +1339,7 @@ public class CompanyCustomerSalesView implements Serializable {
               cell.setCellStyle(styleNormalRightRed);
             }
           }
-          
+
           if (headerList.contains("TCS NET AMOUNT")) {
             cell = row.createCell(headerList.indexOf("TCS NET AMOUNT"));
             if (list.getTcsNetAmount() != null) {
@@ -1381,66 +1381,66 @@ public class CompanyCustomerSalesView implements Serializable {
       }
       cell = row.createCell(headerList.indexOf("GOODS VALUE"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(goodsValue)));
-      
+
       cell = row.createCell(headerList.indexOf("SCHEME DISCOUNT"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(schemeDiscount)));
-      
+
       cell = row.createCell(headerList.indexOf("PRODUCT DISCOUNT"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(productDiscount)));
-      
+
       cell = row.createCell(headerList.indexOf("INVOICE DISCOUNT"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(invoiceDiscount)));
-      
+
       cell = row.createCell(headerList.indexOf("CASH DISCOUNT"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(cashDiscount)));
-      
+
       cell = row.createCell(headerList.indexOf("SALES VALUE"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(taxableAmt)));
-      
+
       cell = row.createCell(headerList.indexOf("CESS"));
       if (stateCess != null) {
         cell.setCellValue(Double.parseDouble(decimalFormat.format(stateCess)));
       }
-      
+
       cell = row.createCell(headerList.indexOf("IGST"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(igst)));
-      
+
       cell = row.createCell(headerList.indexOf("CGST"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(cgst)));
-      
+
       cell = row.createCell(headerList.indexOf("SGST"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(sgst)));
-      
+
       cell = row.createCell(headerList.indexOf("GST AMOUNT"));
       cell.setCellValue(Double.parseDouble(decimalFormat.format(gstAmt)));
-      
+
       if (headerList.contains("SERVICE TAXABLE VALUE")) {
         cell = row.createCell(headerList.indexOf("SERVICE TAXABLE VALUE"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(serviceTaxableTotal)));
-        
+
         cell = row.createCell(headerList.indexOf("SERVICE CESS"));
         if (serviceCessTotal != null) {
           cell.setCellValue(Double.parseDouble(decimalFormat.format(serviceCessTotal)));
         }
-        
+
         cell = row.createCell(headerList.indexOf("SERVICE IGST"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(serviceIgstTotal)));
-        
+
         cell = row.createCell(headerList.indexOf("SERVICE CGST"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(serviceCgstTotal)));
-        
+
         cell = row.createCell(headerList.indexOf("SERVICE SGST"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(serviceSgstTotal)));
-        
+
         cell = row.createCell(headerList.indexOf("SERVICE GST AMOUNT"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(serviceGstTotal)));
-        
+
         cell = row.createCell(headerList.indexOf("INVOICE AMOUNT"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(InvoiceAmountTotal)));
-        
+
         cell = row.createCell(headerList.indexOf("TCS APPLICABLE AMOUNT"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(tcsApplicabletotal)));
-        
+
         cell = row.createCell(headerList.indexOf("TCS NET AMOUNT"));
         cell.setCellValue(Double.parseDouble(decimalFormat.format(tcsNetTotal)));
       }
@@ -1449,7 +1449,7 @@ public class CompanyCustomerSalesView implements Serializable {
       ExcelUtil.write(name + ".xlsx", workbook);
     }
   }
-  
+
   public List<CompanyCustomerSales> getSalesRegisterList(MainView main) {
     if (StringUtil.isEmpty(salesRegisterList)) {
       try {
@@ -1519,7 +1519,7 @@ public class CompanyCustomerSalesView implements Serializable {
             serviceGstTotal += list.getServiceGstAmount() == null ? 0 : list.getServiceGstAmount();
           }
         }
-        
+
       } catch (Throwable t) {
         main.rollback(t, "error.select");
       } finally {
@@ -1528,49 +1528,49 @@ public class CompanyCustomerSalesView implements Serializable {
     }
     return salesRegisterList;
   }
-  
+
   public void setSalesRegisterList(List<CompanyCustomerSales> companyCustomerSalesList) {
     this.salesRegisterList = companyCustomerSalesList;
   }
-  
+
   public Double getServiceTaxableTotal() {
     return serviceTaxableTotal;
   }
-  
+
   public Double getServiceIgstTotal() {
     return serviceIgstTotal;
   }
-  
+
   public Double getServiceCgstTotal() {
     return serviceCgstTotal;
   }
-  
+
   public Double getServiceSgstTotal() {
     return serviceSgstTotal;
   }
-  
+
   public Double getServiceCessTotal() {
     return serviceCessTotal;
   }
-  
+
   public Double getTcsApplicabletotal() {
     return tcsApplicabletotal;
   }
-  
+
   public Double getTcsNetTotal() {
     return tcsNetTotal;
   }
-  
+
   public Double getInvoiceAmountTotal() {
     return InvoiceAmountTotal;
   }
-  
+
   public Double getServiceGstTotal() {
     return serviceGstTotal;
   }
-  
+
   public void setServiceGstTotal(Double serviceGstTotal) {
     this.serviceGstTotal = serviceGstTotal;
   }
-  
+
 }

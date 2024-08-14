@@ -522,11 +522,11 @@
       if (this.active) {
         if (direction === "first" || direction === "last") {
           next = this.active
-                  [ direction === "first" ? "prevAll" : "nextAll" ](".ui-menu-item")
+          [ direction === "first" ? "prevAll" : "nextAll" ](".ui-menu-item")
                   .eq(-1);
         } else {
           next = this.active
-                  [ direction + "All" ](".ui-menu-item")
+          [ direction + "All" ](".ui-menu-item")
                   .eq(0);
         }
       }
@@ -557,7 +557,7 @@
         this.focus(event, item);
       } else {
         this.focus(event, this.activeMenu.find(this.options.items)
-                [ !this.active ? "first" : "last" ]());
+        [ !this.active ? "first" : "last" ]());
       }
     },
     previousPage: function (event) {

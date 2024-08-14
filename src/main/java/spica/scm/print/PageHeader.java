@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.print;
 
@@ -30,7 +30,7 @@ public interface PageHeader {
 
   public PdfPTable setCompanyGST(Company company, List companyLicenseList);
 
-  public PdfPTable setBillInvoice(String billNumber, Date billDate, int creditDays, float[] column, boolean voucher)throws DocumentException;
+  public PdfPTable setBillInvoice(String billNumber, Date billDate, int creditDays, float[] column, boolean voucher) throws DocumentException;
 
   public PdfPTable setCustomerAddress(Customer customer, CustomerAddress customerAddress, boolean billTo);
 
@@ -38,7 +38,7 @@ public interface PageHeader {
 
   public PdfPTable setShipingAddress(CustomerAddress shippingAddress);
 
-  public PdfPTable setCarrierDetails(ConsignmentDetail consignmentdetail, String printType, boolean salesReturn, String debitNo, String debitNoteDate, String regNo)throws DocumentException;
+  public PdfPTable setCarrierDetails(ConsignmentDetail consignmentdetail, String printType, boolean salesReturn, String debitNo, String debitNoteDate, String regNo) throws DocumentException;
 
   public PdfPTable setGStInvoiceLabel(String label);
 

@@ -2,7 +2,7 @@
 
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
@@ -31,7 +31,7 @@
     </ui:define>
     <ui:define name="list">
       <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
-        <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+      <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
       <p:dataTable id="trialBalanceTable" widgetVar="trialBalanceWidget" var="trialBalanceVar" value="#{trialBalanceReportView.trialBalanceList}"                   
                    rows="#{main.pageData.pageSize}" rowKey="#{trialBalanceReportVar.id}" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                    rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
@@ -43,7 +43,7 @@
           </p:outputPanel>
         </f:facet>
         <p:column headerText="#{lang.ledger} " sortBy="#{trialBalanceVar.ledger}" filterBy="#{trialBalanceVar.ledger}" >
-            <p:commandLink  actionListener="#{popUpView.showLedgerBalance(trialBalanceVar.ledgerId)}" onclick="block();" oncomplete="unblock()">
+          <p:commandLink  actionListener="#{popUpView.showLedgerBalance(trialBalanceVar.ledgerId)}" onclick="block();" oncomplete="unblock()">
             <h:outputText value="#{trialBalanceVar.ledger}" />
           </p:commandLink>
         </p:column>

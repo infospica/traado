@@ -31,7 +31,6 @@ import spica.fin.service.ChequeEntryService;
 import spica.fin.view.AccountingMainView;
 import spica.scm.domain.Company;
 import spica.scm.domain.Country;
-import wawo.app.config.ViewType;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppPage;
@@ -416,7 +415,7 @@ public class CustomerView implements Serializable {
    * @return
    */
   public List<Company> companyAuto(String filter) {
-    return ScmLookupView.companyAuto(filter) ; 
+    return ScmLookupView.companyAuto(filter);
   }
 
   /**

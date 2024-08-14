@@ -8,7 +8,6 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -183,6 +182,7 @@ public abstract class ProdFreeQtySchemeRangeService {
 //      }
     }
   }
+
   public static final void deleteRangeBySchemeId(Main main, Integer schemeId) {
     AppService.deleteSql(main, ProdFreeQtySchemeRange.class, "delete from scm_prod_free_qty_scheme_range where product_free_qty_scheme_id = ?", new Object[]{schemeId});
   }

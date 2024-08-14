@@ -8,13 +8,11 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.Country;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -167,7 +165,8 @@ public abstract class CountryService {
   public static Country selectDefaultCountry(Main main) {
     return (Country) AppService.single(main, Country.class, "select * from scm_country where sort_order = ?", new Object[]{1});
   }
-/**
+
+  /**
    * Validate delete.
    *
    * @param main

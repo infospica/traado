@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import spica.scm.validate.CustomerPricelistIs;
 
 /**
  * CustomerPricelistService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:21 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:21 IST 2016
  */
+public abstract class CustomerPricelistService {
 
-public abstract class CustomerPricelistService {  
- 
- /**
+  /**
    * CustomerPricelist paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class CustomerPricelistService {
     sql.count("select count(scm_customer_pricelist.id) as total from scm_customer_pricelist scm_customer_pricelist "); //Count query
     sql.join("left outer join scm_customer scm_customer_pricelistcustomer_id on (scm_customer_pricelistcustomer_id.id = scm_customer_pricelist.customer_id) left outer join scm_status scm_customer_priceliststatus_id on (scm_customer_priceliststatus_id.id = scm_customer_pricelist.status_id)"); //Join Query
 
-    sql.string(new String[]{"scm_customer_pricelistcustomer_id.customer_name","scm_customer_priceliststatus_id.title","scm_customer_pricelist.created_by","scm_customer_pricelist.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_customer_pricelist.id","scm_customer_pricelist.account_group_price_list_id","scm_customer_pricelist.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_customer_pricelist.created_at","scm_customer_pricelist.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_customer_pricelistcustomer_id.customer_name", "scm_customer_priceliststatus_id.title", "scm_customer_pricelist.created_by", "scm_customer_pricelist.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_customer_pricelist.id", "scm_customer_pricelist.account_group_price_list_id", "scm_customer_pricelist.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_customer_pricelist.created_at", "scm_customer_pricelist.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of CustomerPricelist.
-  * @param main
-  * @return List of CustomerPricelist
-  */
+
+  /**
+   * Return List of CustomerPricelist.
+   *
+   * @param main
+   * @return List of CustomerPricelist
+   */
   public static final List<CustomerPricelist> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getCustomerPricelistSqlPaged(main));
+    return AppService.listPagedJpa(main, getCustomerPricelistSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class CustomerPricelistService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select CustomerPricelist by key.
-  * @param main
-  * @param customerPricelist
-  * @return CustomerPricelist
-  */
+  /**
+   * Select CustomerPricelist by key.
+   *
+   * @param main
+   * @param customerPricelist
+   * @return CustomerPricelist
+   */
   public static final CustomerPricelist selectByPk(Main main, CustomerPricelist customerPricelist) {
     return (CustomerPricelist) AppService.find(main, CustomerPricelist.class, customerPricelist.getId());
   }
 
- /**
-  * Insert CustomerPricelist.
-  * @param main
-  * @param customerPricelist
-  */
+  /**
+   * Insert CustomerPricelist.
+   *
+   * @param main
+   * @param customerPricelist
+   */
   public static final void insert(Main main, CustomerPricelist customerPricelist) {
     CustomerPricelistIs.insertAble(main, customerPricelist);  //Validating
     AppService.insert(main, customerPricelist);
 
   }
 
- /**
-  * Update CustomerPricelist by key.
-  * @param main
-  * @param customerPricelist
-  * @return CustomerPricelist
-  */
+  /**
+   * Update CustomerPricelist by key.
+   *
+   * @param main
+   * @param customerPricelist
+   * @return CustomerPricelist
+   */
   public static final CustomerPricelist updateByPk(Main main, CustomerPricelist customerPricelist) {
     CustomerPricelistIs.updateAble(main, customerPricelist); //Validating
     return (CustomerPricelist) AppService.update(main, customerPricelist);
@@ -106,8 +107,7 @@ public abstract class CustomerPricelistService {
   public static void insertOrUpdate(Main main, CustomerPricelist customerPricelist) {
     if (customerPricelist.getId() == null) {
       insert(main, customerPricelist);
-    }
-    else{
+    } else {
       updateByPk(main, customerPricelist);
     }
   }
@@ -123,21 +123,23 @@ public abstract class CustomerPricelistService {
     insert(main, customerPricelist);
   }
 
- /**
-  * Delete CustomerPricelist.
-  * @param main
-  * @param customerPricelist
-  */
+  /**
+   * Delete CustomerPricelist.
+   *
+   * @param main
+   * @param customerPricelist
+   */
   public static final void deleteByPk(Main main, CustomerPricelist customerPricelist) {
     CustomerPricelistIs.deleteAble(main, customerPricelist); //Validation
     AppService.delete(main, CustomerPricelist.class, customerPricelist.getId());
   }
-	
- /**
-  * Delete Array of CustomerPricelist.
-  * @param main
-  * @param customerPricelist
-  */
+
+  /**
+   * Delete Array of CustomerPricelist.
+   *
+   * @param main
+   * @param customerPricelist
+   */
   public static final void deleteByPkArray(Main main, CustomerPricelist[] customerPricelist) {
     for (CustomerPricelist e : customerPricelist) {
       deleteByPk(main, e);

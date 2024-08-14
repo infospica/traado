@@ -303,7 +303,7 @@ public class CustomerOutstandingView implements Serializable {
     MainView main = Jsf.getMain();
     List<District> districtList = new ArrayList<>();
     try {
-      if (getSalesAgent()!= null || getTerritory() != null) {
+      if (getSalesAgent() != null || getTerritory() != null) {
         districtList = CustomerOutstandingService.selectDistrict(main, getSalesAgent(), getTerritory());
       } else if (getAccountGroup() != null) {
         districtList = CustomerOutstandingService.selectDistrictByAccountGroup(main, getAccountGroup());
@@ -341,7 +341,6 @@ public class CustomerOutstandingView implements Serializable {
     }
     return null;
   }
-
 
   public void salesAgentSelectEvent(SelectEvent event) {
     SalesAgent salesAgent = (SalesAgent) event.getObject();

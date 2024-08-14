@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.view;
 
@@ -17,16 +17,13 @@ import spica.scm.domain.ServiceCommodity;
 import spica.scm.domain.Company;
 import spica.scm.domain.Product;
 import spica.scm.domain.ProductBatch;
-import spica.scm.domain.ProductEntryDetail;
 import spica.scm.domain.ProductMrpAdjustment;
 import spica.scm.domain.ProductMrpAdjustmentItem;
-import spica.scm.service.AccountService;
 import spica.scm.service.ProductBatchService;
 import spica.scm.service.ProductMrpAdjustmentItemService;
 import spica.scm.service.ProductMrpAdjustmentService;
 import spica.scm.service.ProductService;
 import spica.scm.util.CountryTaxRegimeUtil;
-import spica.scm.util.MathUtil;
 import spica.scm.util.ProductUtil;
 import spica.sys.SystemConstants;
 import spica.sys.UserRuntimeView;

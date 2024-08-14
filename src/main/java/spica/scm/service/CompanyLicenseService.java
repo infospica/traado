@@ -13,11 +13,8 @@ import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.CompanyLicense;
-import spica.scm.domain.Customer;
-import spica.scm.domain.CustomerLicense;
 import spica.scm.validate.CompanyLicenseIs;
 import spica.sys.UserRuntimeView;
-import wawo.app.faces.AppLookup;
 
 /**
  * CompanyLicenseService

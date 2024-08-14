@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.validators;
 
@@ -20,8 +20,9 @@ import wawo.entity.util.StringUtil;
  * @author java-3
  */
 @FacesValidator("spica.scm.validators.VatValidator")
-public class VatValidator implements Validator{
-   private static final String VAT_PATTERN = "[0-9]{11}[V]{1}";
+public class VatValidator implements Validator {
+
+  private static final String VAT_PATTERN = "[0-9]{11}[V]{1}";
 
   private final Pattern pattern;
   private Matcher matcher;

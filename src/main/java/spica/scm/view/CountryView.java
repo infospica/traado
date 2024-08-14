@@ -8,7 +8,6 @@
 package spica.scm.view;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
@@ -36,7 +35,7 @@ import spica.sys.UserRuntimeView;
 @Named(value = "countryView")
 @ViewScoped
 public class CountryView implements Serializable {
-  
+
   private transient Country country;	//Domain object/selected Domain.
   private transient LazyDataModel<Country> countryLazyModel; 	//For lazy loading datatable.
   private transient Country[] countrySelected;	 //Selected Domain Array
@@ -109,7 +108,7 @@ public class CountryView implements Serializable {
     if (countryLazyModel == null) {
       countryLazyModel = new LazyDataModel<Country>() {
         private List<Country> list;
-        
+
         @Override
         public List<Country> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -124,12 +123,12 @@ public class CountryView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(Country country) {
           return country.getId();
         }
-        
+
         @Override
         public Country getRowData(String rowKey) {
           if (list != null) {
@@ -144,7 +143,7 @@ public class CountryView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_country/";
   }
@@ -254,13 +253,13 @@ public class CountryView implements Serializable {
   public void setCountrySelected(Country[] countrySelected) {
     this.countrySelected = countrySelected;
   }
-  
+
   public void loadCurrency(MainView main) {
     currencyList = CurrencyService.loadCurrencyList(main);
   }
-  
+
   public List<Currency> getCurrencyList() {
     return currencyList;
   }
-  
+
 }

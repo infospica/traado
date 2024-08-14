@@ -34,7 +34,6 @@ import static spica.fin.service.LedgerExternalDataService.getDetailItemNew;
 import spica.constant.AccountingConstant;
 import spica.fin.domain.AccountExpenseDetail;
 import spica.fin.service.delete.AccountExpenseDetailService;
-import spica.fin.service.AccountingLedgerTransactionService;
 import spica.fin.service.ChequeEntryService;
 import spica.fin.service.LedgerExternalDataService;
 import spica.scm.domain.AccountGroup;
@@ -44,8 +43,6 @@ import spica.scm.view.ScmLookupExtView;
 import spica.scm.view.ScmLookupView;
 import spica.sys.FileConstant;
 import spica.sys.UserRuntimeView;
-import wawo.app.Main;
-import wawo.app.config.AppConfig;
 import wawo.app.faces.Jsf;
 import wawo.entity.util.UniqueCheck;
 

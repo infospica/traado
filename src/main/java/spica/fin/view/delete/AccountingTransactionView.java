@@ -15,11 +15,9 @@ import javax.inject.Named;
 import javax.servlet.http.Part;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import spica.fin.view.FinLookupView;
 import wawo.app.config.ViewType;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 

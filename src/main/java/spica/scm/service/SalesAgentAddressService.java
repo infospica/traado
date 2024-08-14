@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
@@ -17,13 +16,13 @@ import spica.scm.domain.SalesAgentAddress;
 
 /**
  * SalesAgentAddressService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Mar 30 12:35:28 IST 2016 
+ * @version	1.0, Wed Mar 30 12:35:28 IST 2016
  */
+public abstract class SalesAgentAddressService {
 
-public abstract class SalesAgentAddressService {  
- 
- /**
+  /**
    * SalesAgentAddress paginated query.
    *
    * @param main
@@ -35,12 +34,13 @@ public abstract class SalesAgentAddressService {
     sql.count("select count(scm_sales_agent_address.id) from scm_sales_agent_address scm_sales_agent_address "); //Count query
     sql.join("left outer join scm_sales_agent scm_sales_agent_addresssales_agent_id on (scm_sales_agent_addresssales_agent_id.id = scm_sales_agent_address.sales_agent_id) left outer join scm_address_type scm_sales_agent_addressaddress_type_id on (scm_sales_agent_addressaddress_type_id.id = scm_sales_agent_address.address_type_id) left outer join scm_country scm_sales_agent_addresscountry_id on (scm_sales_agent_addresscountry_id.id = scm_sales_agent_address.country_id) left outer join scm_state scm_sales_agent_addressstate_id on (scm_sales_agent_addressstate_id.id = scm_sales_agent_address.state_id) left outer join scm_district scm_sales_agent_addressdistrict_id on (scm_sales_agent_addressdistrict_id.id = scm_sales_agent_address.district_id)"); //Join Query
 
-    sql.string(new String[]{"scm_sales_agent_addresssales_agent_id.name","scm_sales_agent_addressaddress_type_id.title","scm_sales_agent_address.address","scm_sales_agent_addresscountry_id.country_name","scm_sales_agent_addressstate_id.state_name","scm_sales_agent_addressdistrict_id.district_name","scm_sales_agent_address.pin","scm_sales_agent_address.phone_1","scm_sales_agent_address.phone_2","scm_sales_agent_address.phone_3","scm_sales_agent_address.fax_1","scm_sales_agent_address.fax_2","scm_sales_agent_address.email","scm_sales_agent_address.created_by","scm_sales_agent_address.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_sales_agent_address.id","scm_sales_agent_address.territory_id","scm_sales_agent_address.sort_order","scm_sales_agent_address.status"}); //Number search or sort fields
-    sql.date(new String[]{"scm_sales_agent_address.created_at","scm_sales_agent_address.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_sales_agent_addresssales_agent_id.name", "scm_sales_agent_addressaddress_type_id.title", "scm_sales_agent_address.address", "scm_sales_agent_addresscountry_id.country_name", "scm_sales_agent_addressstate_id.state_name", "scm_sales_agent_addressdistrict_id.district_name", "scm_sales_agent_address.pin", "scm_sales_agent_address.phone_1", "scm_sales_agent_address.phone_2", "scm_sales_agent_address.phone_3", "scm_sales_agent_address.fax_1", "scm_sales_agent_address.fax_2", "scm_sales_agent_address.email", "scm_sales_agent_address.created_by", "scm_sales_agent_address.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_sales_agent_address.id", "scm_sales_agent_address.territory_id", "scm_sales_agent_address.sort_order", "scm_sales_agent_address.status"}); //Number search or sort fields
+    sql.date(new String[]{"scm_sales_agent_address.created_at", "scm_sales_agent_address.modified_at"});  //Date search or sort fields
     return sql;
   }
-	/**
+
+  /**
    * Return all sales agent address of a sales agent.
    *
    * @param main
@@ -56,13 +56,15 @@ public abstract class SalesAgentAddressService {
     sql.param(salesAgent.getId());
     return AppService.listAllJpa(main, sql);
   }
- /**
-  * Return List of SalesAgentAddress.
-  * @param main
-  * @return List of SalesAgentAddress
-  */
+
+  /**
+   * Return List of SalesAgentAddress.
+   *
+   * @param main
+   * @return List of SalesAgentAddress
+   */
   public static final List<SalesAgentAddress> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getSalesAgentAddressSqlPaged(main));
+    return AppService.listPagedJpa(main, getSalesAgentAddressSqlPaged(main));
   }
 
 //  /**
@@ -78,32 +80,34 @@ public abstract class SalesAgentAddressService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select SalesAgentAddress by key.
-  * @param main
-  * @param salesAgentAddress
-  * @return SalesAgentAddress
-  */
+  /**
+   * Select SalesAgentAddress by key.
+   *
+   * @param main
+   * @param salesAgentAddress
+   * @return SalesAgentAddress
+   */
   public static final SalesAgentAddress selectByPk(Main main, SalesAgentAddress salesAgentAddress) {
     return (SalesAgentAddress) AppService.find(main, SalesAgentAddress.class, salesAgentAddress.getId());
   }
 
- /**
-  * Insert SalesAgentAddress.
-  * @param main
-  * @param salesAgentAddress
-  */
+  /**
+   * Insert SalesAgentAddress.
+   *
+   * @param main
+   * @param salesAgentAddress
+   */
   public static final void insert(Main main, SalesAgentAddress salesAgentAddress) {
     AppService.insert(main, salesAgentAddress);
   }
 
- /**
-  * Update SalesAgentAddress by key.
-  * @param main
-  * @param salesAgentAddress
-  * @return SalesAgentAddress
-  */
+  /**
+   * Update SalesAgentAddress by key.
+   *
+   * @param main
+   * @param salesAgentAddress
+   * @return SalesAgentAddress
+   */
   public static final SalesAgentAddress updateByPk(Main main, SalesAgentAddress salesAgentAddress) {
     return (SalesAgentAddress) AppService.update(main, salesAgentAddress);
   }
@@ -118,16 +122,18 @@ public abstract class SalesAgentAddressService {
     if (salesAgentAddress.getId() == null) {
       insert(main, salesAgentAddress);
     } else {
-    updateByPk(main, salesAgentAddress);
+      updateByPk(main, salesAgentAddress);
     }
   }
-/**
- * Making default for newly added or updated if isdefault is checked  
- * @param main
- * @param salesAgentAddress 
- */
+
+  /**
+   * Making default for newly added or updated if isdefault is checked
+   *
+   * @param main
+   * @param salesAgentAddress
+   */
   public static void makeDefault(Main main, SalesAgentAddress salesAgentAddress) {
-    if (salesAgentAddress.getSortOrder()==0) {
+    if (salesAgentAddress.getSortOrder() == 0) {
       main.param(1);
       main.param(salesAgentAddress.getSalesAgentId().getId());
       main.param(salesAgentAddress.getId());
@@ -136,6 +142,7 @@ public abstract class SalesAgentAddressService {
       AppService.updateSql(main, SalesAgentAddress.class, "update scm_sales_agent_address set modified_at=?,modified_by=?,sort_order=? where sales_agent_id=? and id !=? and sort_order=? and address_type_id=?", false);
     }
   }
+
   /**
    * Clone and existing object
    *
@@ -147,20 +154,22 @@ public abstract class SalesAgentAddressService {
     insert(main, salesAgentAddress);
   }
 
- /**
-  * Delete SalesAgentAddress.
-  * @param main
-  * @param salesAgentAddress
-  */
+  /**
+   * Delete SalesAgentAddress.
+   *
+   * @param main
+   * @param salesAgentAddress
+   */
   public static final void deleteByPk(Main main, SalesAgentAddress salesAgentAddress) {
     AppService.delete(main, SalesAgentAddress.class, salesAgentAddress.getId());
   }
-	
- /**
-  * Delete Array of SalesAgentAddress.
-  * @param main
-  * @param salesAgentAddress
-  */
+
+  /**
+   * Delete Array of SalesAgentAddress.
+   *
+   * @param main
+   * @param salesAgentAddress
+   */
   public static final void deleteByPkArray(Main main, SalesAgentAddress[] salesAgentAddress) {
     for (SalesAgentAddress e : salesAgentAddress) {
       deleteByPk(main, e);

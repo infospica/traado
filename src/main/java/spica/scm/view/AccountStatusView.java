@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.AccountStatusService;
 
 /**
  * AccountStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Apr 07 11:31:23 IST 2016 
+ * @version	1.0, Thu Apr 07 11:31:23 IST 2016
  */
-
-@Named(value="accountStatusView")
+@Named(value = "accountStatusView")
 @ViewScoped
-public class AccountStatusView implements Serializable{
+public class AccountStatusView implements Serializable {
 
   private transient AccountStatus accountStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<AccountStatus> accountStatusLazyModel; 	//For lazy loading datatable.
   private transient AccountStatus[] accountStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public AccountStatusView() {
     super();
   }
- 
+
   /**
    * Return AccountStatus.
+   *
    * @return AccountStatus.
-   */  
+   */
   public AccountStatus getAccountStatus() {
-    if(accountStatus == null) {
+    if (accountStatus == null) {
       accountStatus = new AccountStatus();
     }
     return accountStatus;
-  }   
-  
+  }
+
   /**
    * Set AccountStatus.
+   *
    * @param accountStatus.
-   */   
+   */
   public void setAccountStatus(AccountStatus accountStatus) {
     this.accountStatus = accountStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchAccountStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchAccountStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class AccountStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create accountStatusLazyModel.
+   *
    * @param main
    */
   private void loadAccountStatusList(final MainView main) {
     if (accountStatusLazyModel == null) {
       accountStatusLazyModel = new LazyDataModel<AccountStatus>() {
-      private List<AccountStatus> list;      
-      @Override
-      public List<AccountStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = AccountStatusService.listPaged(main);
-          main.commit(accountStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<AccountStatus> list;
+
+        @Override
+        public List<AccountStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = AccountStatusService.listPaged(main);
+            main.commit(accountStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(AccountStatus accountStatus) {
-        return accountStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(AccountStatus accountStatus) {
+          return accountStatus.getId();
+        }
+
+        @Override
         public AccountStatus getRowData(String rowKey) {
           if (list != null) {
             for (AccountStatus obj : list) {
@@ -136,11 +139,12 @@ public class AccountStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_account_status/";	
+    String SUB_FOLDER = "scm_account_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class AccountStatusView implements Serializable{
    */
   public String cloneAccountStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneAccountStatus(main, "clone"); 
+    return saveOrCloneAccountStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class AccountStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error"+ key);
+      main.rollback(t, "error" + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many AccountStatus.
    *
@@ -205,7 +208,7 @@ public class AccountStatusView implements Serializable{
       } else {
         AccountStatusService.deleteByPk(main, getAccountStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class AccountStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of AccountStatus.
+   *
    * @return
    */
   public LazyDataModel<AccountStatus> getAccountStatusLazyModel() {
     return accountStatusLazyModel;
   }
 
- /**
-  * Return AccountStatus[].
-  * @return 
-  */
+  /**
+   * Return AccountStatus[].
+   *
+   * @return
+   */
   public AccountStatus[] getAccountStatusSelected() {
     return accountStatusSelected;
   }
-  
+
   /**
    * Set AccountStatus[].
-   * @param accountStatusSelected 
+   *
+   * @param accountStatusSelected
    */
   public void setAccountStatusSelected(AccountStatus[] accountStatusSelected) {
     this.accountStatusSelected = accountStatusSelected;
   }
- 
-
 
 }

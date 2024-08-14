@@ -260,7 +260,7 @@ public class PlatformSettlementView implements Serializable {
         PlatformSettlementItemService.insertOrUpdate(main, new PlatformSettlementItem(getPlatformSettlement(), balanceToPlatform));  // Part settled
 
         Platform p = new Platform(balanceToPlatform);
-       // p.setAccountId(balanceToPlatform.getAccountId());
+        // p.setAccountId(balanceToPlatform.getAccountId());
         //  p.setCreatedBy(balanceToPlatform.getCreatedBy());
 //        p.setCreditAmountRequired(balanceToPlatform.getCreditAmountRequired());
 //        p.setCustomerId(balanceToPlatform.getCustomerId());
@@ -268,12 +268,12 @@ public class PlatformSettlementView implements Serializable {
 //        p.setParentId(balanceToPlatform);
         p.setPlatformDescId(SystemRuntimeConfig.PLATFORM_SELF_ADJUST_DIFFERENCE);
         p.setSourceId(SystemRuntimeConfig.PLATFORM);
-     //   p.setDocumentNo(balanceToPlatform.getDocumentNo());
+        //   p.setDocumentNo(balanceToPlatform.getDocumentNo());
 //        p.setPlatformSettlementId(balanceToPlatform.getPlatformSettlementId());
-     //   p.setProductEntryDetailId(balanceToPlatform.getProductEntryDetailId());
-     //   p.setProductEntryId(balanceToPlatform.getProductEntryId());
-     //   p.setSalesInvoiceId(balanceToPlatform.getSalesInvoiceId());
-     //   p.setSalesInvoiceItemId(balanceToPlatform.getSalesInvoiceItemId());
+        //   p.setProductEntryDetailId(balanceToPlatform.getProductEntryDetailId());
+        //   p.setProductEntryId(balanceToPlatform.getProductEntryId());
+        //   p.setSalesInvoiceId(balanceToPlatform.getSalesInvoiceId());
+        //   p.setSalesInvoiceItemId(balanceToPlatform.getSalesInvoiceItemId());
 
         p.setStatusId(SystemRuntimeConfig.PLATFORM_STATUS_NEW);
         PlatformService.insertOrUpdate(main, p);
@@ -437,9 +437,10 @@ public class PlatformSettlementView implements Serializable {
   }
 
   public Double getDrBalance() {
-      return getParent().getTotalCredit() - getParent().getTotalDebit();
+    return getParent().getTotalCredit() - getParent().getTotalDebit();
   }
+
   public Double getCrBalance() {
-      return getParent().getTotalDebit() - getParent().getTotalCredit();
+    return getParent().getTotalDebit() - getParent().getTotalCredit();
   }
 }

@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.SalesReturnProdStatService;
 
 /**
  * SalesReturnProdStatView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon May 09 18:27:32 IST 2016 
+ * @version	1.0, Mon May 09 18:27:32 IST 2016
  */
-
-@Named(value="salesReturnProdStatView")
+@Named(value = "salesReturnProdStatView")
 @ViewScoped
-public class SalesReturnProdStatView implements Serializable{
+public class SalesReturnProdStatView implements Serializable {
 
   private transient SalesReturnProdStat salesReturnProdStat;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesReturnProdStat> salesReturnProdStatLazyModel; 	//For lazy loading datatable.
   private transient SalesReturnProdStat[] salesReturnProdStatSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public SalesReturnProdStatView() {
     super();
   }
- 
+
   /**
    * Return SalesReturnProdStat.
+   *
    * @return SalesReturnProdStat.
-   */  
+   */
   public SalesReturnProdStat getSalesReturnProdStat() {
-    if(salesReturnProdStat == null) {
+    if (salesReturnProdStat == null) {
       salesReturnProdStat = new SalesReturnProdStat();
     }
     return salesReturnProdStat;
-  }   
-  
+  }
+
   /**
    * Set SalesReturnProdStat.
+   *
    * @param salesReturnProdStat.
-   */   
+   */
   public void setSalesReturnProdStat(SalesReturnProdStat salesReturnProdStat) {
     this.salesReturnProdStat = salesReturnProdStat;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchSalesReturnProdStat(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchSalesReturnProdStat(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class SalesReturnProdStatView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create salesReturnProdStatLazyModel.
+   *
    * @param main
    */
   private void loadSalesReturnProdStatList(final MainView main) {
     if (salesReturnProdStatLazyModel == null) {
       salesReturnProdStatLazyModel = new LazyDataModel<SalesReturnProdStat>() {
-      private List<SalesReturnProdStat> list;      
-      @Override
-      public List<SalesReturnProdStat> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SalesReturnProdStatService.listPaged(main);
-          main.commit(salesReturnProdStatLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SalesReturnProdStat> list;
+
+        @Override
+        public List<SalesReturnProdStat> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SalesReturnProdStatService.listPaged(main);
+            main.commit(salesReturnProdStatLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SalesReturnProdStat salesReturnProdStat) {
-        return salesReturnProdStat.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SalesReturnProdStat salesReturnProdStat) {
+          return salesReturnProdStat.getId();
+        }
+
+        @Override
         public SalesReturnProdStat getRowData(String rowKey) {
           if (list != null) {
             for (SalesReturnProdStat obj : list) {
@@ -136,11 +139,12 @@ public class SalesReturnProdStatView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_sales_return_prod_stat/";	
+    String SUB_FOLDER = "scm_sales_return_prod_stat/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class SalesReturnProdStatView implements Serializable{
    */
   public String cloneSalesReturnProdStat(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneSalesReturnProdStat(main, "clone"); 
+    return saveOrCloneSalesReturnProdStat(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class SalesReturnProdStatView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many SalesReturnProdStat.
    *
@@ -205,7 +208,7 @@ public class SalesReturnProdStatView implements Serializable{
       } else {
         SalesReturnProdStatService.deleteByPk(main, getSalesReturnProdStat());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class SalesReturnProdStatView implements Serializable{
 
   /**
    * Return LazyDataModel of SalesReturnProdStat.
+   *
    * @return
    */
   public LazyDataModel<SalesReturnProdStat> getSalesReturnProdStatLazyModel() {
     return salesReturnProdStatLazyModel;
   }
 
- /**
-  * Return SalesReturnProdStat[].
-  * @return 
-  */
+  /**
+   * Return SalesReturnProdStat[].
+   *
+   * @return
+   */
   public SalesReturnProdStat[] getSalesReturnProdStatSelected() {
     return salesReturnProdStatSelected;
   }
-  
+
   /**
    * Set SalesReturnProdStat[].
-   * @param salesReturnProdStatSelected 
+   *
+   * @param salesReturnProdStatSelected
    */
   public void setSalesReturnProdStatSelected(SalesReturnProdStat[] salesReturnProdStatSelected) {
     this.salesReturnProdStatSelected = salesReturnProdStatSelected;
   }
- 
-
 
 }

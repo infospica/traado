@@ -7,7 +7,6 @@
  */
 package spica.fin.service;
 
-import java.util.Date;
 import java.util.List;
 import spica.scm.domain.AccountingFinancialYear;
 import spica.scm.domain.Company;
@@ -132,6 +131,5 @@ public abstract class AccountingFinancialYearService {
       deleteByPk(main, e);
     }
   }
-
 
 }

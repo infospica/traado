@@ -28,7 +28,6 @@ import spica.scm.domain.SalesAgentContract;
 import spica.scm.service.SalesAgentContractService;
 import spica.scm.domain.Company;
 import spica.sys.FileConstant;
-import wawo.app.config.AppConfig;
 import wawo.app.faces.Jsf;
 
 /**
@@ -283,6 +282,7 @@ public class SalesAgentContractView implements Serializable {
     }
   }
 //FIXME move these with fixed labels in xhtml
+
   public List<SelectItem> getListCommissionOn() {
     List<SelectItem> listYesNo = new ArrayList<>();
     SelectItem si1 = new SelectItem();
@@ -295,7 +295,7 @@ public class SalesAgentContractView implements Serializable {
     listYesNo.add(si2);
     return listYesNo;
   }
-  
+
   public List<SelectItem> getListCommissionValueType() {
     List<SelectItem> listYesNo = new ArrayList<>();
     SelectItem si1 = new SelectItem();
@@ -311,10 +311,10 @@ public class SalesAgentContractView implements Serializable {
 
   public void ajaxEventHandler(SelectEvent event) {
   }
-  
+
   public void ajaxBehaviorEventHandler(AjaxBehaviorEvent event) {
   }
-  
+
   public void salesAgentContractCommissionRangeListPopup(SalesAgentContract SalesAgentContract) {
     Jsf.popupList(FileConstant.SALES_AGENT_CONTRACT_COMMISSION_RANGE, SalesAgentContract);
   }

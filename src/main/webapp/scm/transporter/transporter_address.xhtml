@@ -13,11 +13,11 @@
                        oncomplete="parent.transporterAddressPopupReturned();closePopup();" 
                        icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
     </ui:define>
-    
+
     <ui:define name="deleteForm" >
       <p:commandButton action="#{transporterAddressView.deleteTransporterAddress(main)}" value="#{lang.delete}" onclick="wdgOff('transporterAddressWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
     </ui:define>
-    
+
     <ui:define name="menu1" >
       <p:menuitem actionListener="#{transporterAddressView.cloneTransporterAddress(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
     </ui:define>
@@ -109,12 +109,12 @@
       <p:outputLabel value="#{lang.phone1}" for="phone1" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.phone1}" maxlength="13" 
-                       required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone1" validator="wawo.WhiteSpaceValidator">
+                     required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone1" validator="wawo.WhiteSpaceValidator">
           <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
         </p:inputText>
         <p:message for="phone1" display="text"/>
       </h:panelGroup> 
-      
+
       <p:outputLabel value="#{lang.phone2}" for="phone2" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.phone2}" maxlength="13" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone2">
@@ -122,7 +122,7 @@
         </p:inputText>
         <p:message for="phone2" display="text"/>
       </h:panelGroup> 
-      
+
       <p:outputLabel value="#{lang.phone3}" for="phone3" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.phone3}" maxlength="13" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone3">
@@ -130,7 +130,7 @@
         </p:inputText>
         <p:message for="phone3" display="text"/>
       </h:panelGroup> 
-      
+
       <p:outputLabel value="#{lang.fax1}" for="fax1" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.fax1}" maxlength="13" id="fax1" >
@@ -138,7 +138,7 @@
         </p:inputText>
         <p:message for="fax1" display="text"/>
       </h:panelGroup> 
-      
+
       <p:outputLabel value="#{lang.fax2}" for="fax2" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.fax2}" maxlength="13" id="fax2">
@@ -146,7 +146,7 @@
         </p:inputText>
         <p:message for="fax2" display="text"/>
       </h:panelGroup>    
-      
+
       <p:outputLabel value="#{lang.email}" for="email" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.email}" maxlength="50" id="email" validator="wawo.EmailValidator"/>
@@ -161,13 +161,13 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{transporterAddressView.transporterAddress.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator=""/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator=""/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 
       <p:outputLabel value="#{lang.status}" for="transporterStatusId"/>
       <h:panelGroup>
-          <p:selectOneMenu value="#{transporterAddressView.transporterAddress.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+        <p:selectOneMenu value="#{transporterAddressView.transporterAddress.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
                          id="transporterStatusId">
           <f:selectItems value="#{transporterAddressView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
         </p:selectOneMenu>

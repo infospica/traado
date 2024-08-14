@@ -49,7 +49,7 @@ public class ViewRuntimeView extends SysDateView implements Serializable {
   private List<AccountGroup> accountGroupList;
   private UserAccountPreferences userAccountPreferences;
 
-  public User getAppUser(){
+  public User getAppUser() {
     return null;
   }
 
@@ -219,15 +219,16 @@ public class ViewRuntimeView extends SysDateView implements Serializable {
     }
     return null;
   }
-  
-public List<AccountGroup> accountGroupAutoAll(String filter) {
-   List<AccountGroup> list = accountGroupAuto(filter);
+
+  public List<AccountGroup> accountGroupAutoAll(String filter) {
+    List<AccountGroup> list = accountGroupAuto(filter);
     if (list != null || list.size() > 0) {
       list.add(0, new AccountGroup(0, "All"));
     }
     return list;
-  
-}
+
+  }
+
   public List<AccountGroup> accountGroupAuto(String filter) {
     if (getCompany() != null) {
       MainView main = Jsf.getMain();
@@ -442,7 +443,7 @@ public List<AccountGroup> accountGroupAutoAll(String filter) {
   }
 
   public Date getMaxEntryDate() {
-    return  SystemRuntimeConfig.getMaxEntryDate(getCompany());
+    return SystemRuntimeConfig.getMaxEntryDate(getCompany());
   }
- 
+
 }

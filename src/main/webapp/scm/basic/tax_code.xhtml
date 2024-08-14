@@ -72,7 +72,7 @@
       <p:outputLabel value="#{lang.tax} (#{lang.percentageSymbol})" for="percentage" />
       <h:panelGroup>
         <p:inputNumber value="#{taxCodeView.taxCode.ratePercentage}" converterMessage="#{lang.percentage} #{lang.invalidNumber}" decimalPlaces="3" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" maxlength="6" required="true" requiredMessage="#{lang.tax} #{lang.percentage} #{lang.isRequired}" 
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" maxlength="6" required="true" requiredMessage="#{lang.tax} #{lang.percentage} #{lang.isRequired}" 
                        id="percentage" symbolPosition="s"/>
         <p:message for="percentage" display="text"/>
       </h:panelGroup>
@@ -81,7 +81,7 @@
       <p:outputLabel value="#{lang.abatement} (#{lang.percentageSymbol})" for="abatement" />
       <h:panelGroup id="abatementPercentageDiv">
         <p:inputNumber value="#{taxCodeView.taxCode.abatementPercentage}" converterMessage="#{lang.abatementPercentage} #{lang.invalidNumber}" decimalPlaces="2" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" maxlength="5" id="abatement" symbolPosition="s"/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" maxlength="5" id="abatement" symbolPosition="s"/>
         <p:message for="abatement" display="text"/>
       </h:panelGroup>
 

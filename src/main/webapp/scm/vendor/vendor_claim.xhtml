@@ -23,7 +23,7 @@
     </ui:define>
 
     <ui:define name="navRight" >
-           <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
     </ui:define>
 
     <ui:define name="save" >
@@ -135,23 +135,23 @@
 
                 </p:column>
                 <p:column headerText="#{lang.tax} #{lang.rate} %" style="text-align:right;width:20%;">
-                    
+
                   <p:selectOneMenu  value="#{detail.accountingLedgerId}" converter="omnifaces.SelectItemsConverter" style="width:200px;"
-                                   rendered="#{(detail.claimType eq 1) or (detail.claimType eq 4) or (detail.claimType eq 5) }" filter="true" filterMatchMode="startsWith" >
+                                    rendered="#{(detail.claimType eq 1) or (detail.claimType eq 4) or (detail.claimType eq 5) }" filter="true" filterMatchMode="startsWith" >
                     <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.tax}" />
                     <f:selectItems value="#{vendorClaimView.getTaxCode(main,2)}" var="tax_out" itemLabel="#{tax_out.title}" itemValue="#{tax_out}"  />                    
                     <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType)}" update="claimTable taxSummationTable" />
                   </p:selectOneMenu>
 
                   <p:selectOneMenu  value="#{detail.accountingLedgerId}" converter="omnifaces.SelectItemsConverter" style="width:200px;"
-                                   rendered="#{(detail.claimType eq 3) or (detail.claimType eq 2) or (detail.claimType eq 6) }" filter="true" filterMatchMode="startsWith" >
+                                    rendered="#{(detail.claimType eq 3) or (detail.claimType eq 2) or (detail.claimType eq 6) }" filter="true" filterMatchMode="startsWith" >
                     <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.tax}" />
                     <f:selectItems value="#{vendorClaimView.getTaxCode(main,1)}" var="tax_in" itemLabel="#{tax_in.title}" itemValue="#{tax_in}" />
                     <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType)}" update="claimTable taxSummationTable"  />
                   </p:selectOneMenu>
 
                   <p:selectOneMenu  value="#{detail.accountingLedgerId}" converter="omnifaces.SelectItemsConverter" style="width:200px;"
-                                   rendered="#{(detail.claimType eq 7)}" filter="true" filterMatchMode="startsWith" >
+                                    rendered="#{(detail.claimType eq 7)}" filter="true" filterMatchMode="startsWith" >
                     <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.expense}" />
                     <f:selectItems value="#{vendorClaimView.getTaxCode(main,3)}" var="tax_in" itemLabel="#{tax_in.title}" itemValue="#{tax_in}" />
                     <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType)}"  update="claimTable taxSummationTable"  />

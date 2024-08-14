@@ -10,7 +10,6 @@ package spica.scm.service;
 import java.util.List;
 import spica.scm.domain.ServiceCommodity;
 import spica.scm.domain.Vendor;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -164,9 +163,8 @@ public abstract class VendorCommodityService {
       }
     }
   }
-  
-  
-public static void insertVendorCommodity(Main main, Vendor vendor, List<ServiceCommodity> commoditySelected) {
+
+  public static void insertVendorCommodity(Main main, Vendor vendor, List<ServiceCommodity> commoditySelected) {
     AppService.deleteSql(main, VendorCommodity.class, "delete from scm_vendor_commodity where vendor_id = ?", new Object[]{vendor.getId()});
     if (commoditySelected != null) {
       VendorCommodity VendorCommodity;

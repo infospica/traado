@@ -5,28 +5,25 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.LicenseType;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
 /**
  * LicenseTypeService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:21 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:21 IST 2016
  */
+public abstract class LicenseTypeService {
 
-public abstract class LicenseTypeService {  
- 
- /**
+  /**
    * LicenseType paginated query.
    *
    * @param main
@@ -38,19 +35,20 @@ public abstract class LicenseTypeService {
     sql.count("select count(scm_license_type.id) as total from scm_license_type scm_license_type"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_license_type.title","scm_license_type.created_by","scm_license_type.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_license_type.id","scm_license_type.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_license_type.created_at","scm_license_type.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_license_type.title", "scm_license_type.created_by", "scm_license_type.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_license_type.id", "scm_license_type.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_license_type.created_at", "scm_license_type.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of LicenseType.
-  * @param main
-  * @return List of LicenseType
-  */
+
+  /**
+   * Return List of LicenseType.
+   *
+   * @param main
+   * @return List of LicenseType
+   */
   public static final List<LicenseType> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getLicenseTypeSqlPaged(main));
+    return AppService.listPagedJpa(main, getLicenseTypeSqlPaged(main));
   }
 
 //  /**
@@ -66,34 +64,36 @@ public abstract class LicenseTypeService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select LicenseType by key.
-  * @param main
-  * @param licenseType
-  * @return LicenseType
-  */
+  /**
+   * Select LicenseType by key.
+   *
+   * @param main
+   * @param licenseType
+   * @return LicenseType
+   */
   public static final LicenseType selectByPk(Main main, LicenseType licenseType) {
     return (LicenseType) AppService.find(main, LicenseType.class, licenseType.getId());
   }
 
- /**
-  * Insert LicenseType.
-  * @param main
-  * @param licenseType
-  */
+  /**
+   * Insert LicenseType.
+   *
+   * @param main
+   * @param licenseType
+   */
   public static final void insert(Main main, LicenseType licenseType) {
     insertAble(main, licenseType);  //Validating
     AppService.insert(main, licenseType);
 
   }
 
- /**
-  * Update LicenseType by key.
-  * @param main
-  * @param licenseType
-  * @return LicenseType
-  */
+  /**
+   * Update LicenseType by key.
+   *
+   * @param main
+   * @param licenseType
+   * @return LicenseType
+   */
   public static final LicenseType updateByPk(Main main, LicenseType licenseType) {
     updateAble(main, licenseType); //Validating
     return (LicenseType) AppService.update(main, licenseType);
@@ -108,8 +108,7 @@ public abstract class LicenseTypeService {
   public static void insertOrUpdate(Main main, LicenseType licenseType) {
     if (licenseType.getId() == null) {
       insert(main, licenseType);
-    }
-    else{
+    } else {
       updateByPk(main, licenseType);
     }
   }
@@ -125,27 +124,29 @@ public abstract class LicenseTypeService {
     insert(main, licenseType);
   }
 
- /**
-  * Delete LicenseType.
-  * @param main
-  * @param licenseType
-  */
+  /**
+   * Delete LicenseType.
+   *
+   * @param main
+   * @param licenseType
+   */
   public static final void deleteByPk(Main main, LicenseType licenseType) {
     deleteAble(main, licenseType); //Validation
     AppService.delete(main, LicenseType.class, licenseType.getId());
   }
-	
- /**
-  * Delete Array of LicenseType.
-  * @param main
-  * @param licenseType
-  */
+
+  /**
+   * Delete Array of LicenseType.
+   *
+   * @param main
+   * @param licenseType
+   */
   public static final void deleteByPkArray(Main main, LicenseType[] licenseType) {
     for (LicenseType e : licenseType) {
       deleteByPk(main, e);
     }
   }
-  
+
   /**
    * Validate delete.
    *

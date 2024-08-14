@@ -13,17 +13,17 @@
     <ui:insert />
   </div>
   -->
-<!--  <ui:include src="com/confirmDialog.xhtml"/>-->
+  <!--  <ui:include src="com/confirmDialog.xhtml"/>-->
   <h:panelGroup id="#{ids}" styleClass="card"  layout="block" rendered="#{rendered eq null ? true : rendered}">
     <h:panelGroup layout="block" styleClass="bar-T header" rendered="#{not empty label}">  
       <div class="L"><p class="h5 head bold L">#{label}</p>
-<!--        <ui:insert name="reset" >
-          <h:commandButton  action="#{main.setViewType(main.viewType)}" rendered="#{(reset eq null ? true : reset) and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}" value="#{lang.reset}" immediate="true" onclick="toTop()" styleClass="btn btn-default" >
-            <f:ajax execute="@this" render="f1" resetValues="true"/>
-          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
-        </h:commandButton>
-        </ui:insert>-->
- 
+        <!--        <ui:insert name="reset" >
+                  <h:commandButton  action="#{main.setViewType(main.viewType)}" rendered="#{(reset eq null ? true : reset) and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}" value="#{lang.reset}" immediate="true" onclick="toTop()" styleClass="btn btn-default" >
+                    <f:ajax execute="@this" render="f1" resetValues="true"/>
+                  <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                </h:commandButton>
+                </ui:insert>-->
+
         <ui:insert name="menuleft" />
       </div>
     </h:panelGroup>

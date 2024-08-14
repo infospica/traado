@@ -7,22 +7,18 @@
  */
 package spica.fin.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import spica.fin.domain.AccountingLedger;
 import spica.fin.domain.AccountingTransaction;
 import spica.fin.domain.AccountingTransactionDetail;
 import spica.fin.domain.AccountingTransactionDetailItem;
 import spica.fin.domain.AccountingTransactionSettlement;
 import spica.scm.domain.Company;
 import spica.fin.common.FilterObjects;
-import spica.sys.UserRuntimeView;
 import wawo.app.Main;
 import wawo.app.common.AppService;
 import wawo.entity.core.SqlPage;
 import wawo.entity.core.UserMessageException;
-import wawo.entity.util.StringUtil;
 
 /**
  * AccountingTransactionDetailService

@@ -1,13 +1,13 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
   #{profileView.switchProfile(main, viewType)}
 
- <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.profile}" />
     <ui:param name="ids" value="profile" />
 
     <ui:define name="deleteList" >
       <p:commandButton action="#{profileView.deleteProfile(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('profileWidgetDelConf')" process="f1" update="f1" >
-	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
       </p:commandButton>
     </ui:define>
 
@@ -25,47 +25,47 @@
 
     <ui:define name="form">
 
-        <p:outputLabel value="#{lang.profileCode}" for="profileCode" />
-        <h:panelGroup><p:inputText styleClass="fw" value="#{profileView.profile.profileCode}" maxlength="200" id="profileCode" /><p:message for="profileCode" display="text"/></h:panelGroup>            
-       
-        <p:outputLabel value="#{lang.name}" for="name" />
-        <h:panelGroup><p:inputText styleClass="fw" value="#{profileView.profile.name}" maxlength="200" id="name" /><p:message for="name" display="text"/></h:panelGroup>
-        
-        <p:outputLabel value="#{lang.address1}" for="address1" />
-        <h:panelGroup><p:inputTextarea  styleClass="fw" value="#{profileView.profile.address1}" cols="100" rows="3" maxlength="500" id="address1" autoResize="false" />
-          <p:message for="address1" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.profileCode}" for="profileCode" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{profileView.profile.profileCode}" maxlength="200" id="profileCode" /><p:message for="profileCode" display="text"/></h:panelGroup>            
 
-        <p:outputLabel value="#{lang.address2}" for="address2" />
-        <h:panelGroup><p:inputTextarea  styleClass="fw" value="#{profileView.profile.address2}" cols="100" rows="3" maxlength="500" id="address2" autoResize="false" />
-          <p:message for="address2" display="text"/></h:panelGroup>
-        
-        <p:outputLabel value="#{lang.phone1}" for="phone1" />
-        <h:panelGroup>
-          <p:inputText styleClass="fw" value="#{profileView.profile.phone1}" maxlength="20" id="phone1" validatorMessage="#{lang.errorInvalidPhoneNo}">
-            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
-          </p:inputText>
-          <p:message for="phone1" display="text"/>
-        </h:panelGroup>            
-        
-        <p:outputLabel value="#{lang.phone2}" for="phone2" />
-        <h:panelGroup><p:inputText styleClass="fw" value="#{profileView.profile.phone2}" maxlength="20" id="phone2" /><p:message for="phone2" display="text"/></h:panelGroup>            
-        
-        <p:outputLabel value="#{lang.email}" for="email" />
-        <h:panelGroup>
-            <p:inputText styleClass="fw" value="#{profileView.profile.email}" maxlength="50" id="email" />
-            <p:message for="email" display="text"/>
-        </h:panelGroup>
+      <p:outputLabel value="#{lang.name}" for="name" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{profileView.profile.name}" maxlength="200" id="name" /><p:message for="name" display="text"/></h:panelGroup>
 
-        <p:outputLabel value="#{lang.status}" for="profileStatusId"/><h:panelGroup>
-          <p:autoComplete  value="#{profileView.profile.statusId}" completeMethod="#{profileView.statusAuto}" converter="wawo.LookupIntConverter"   
-                          id="profileStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" 
-                          queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
-            <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
+      <p:outputLabel value="#{lang.address1}" for="address1" />
+      <h:panelGroup><p:inputTextarea  styleClass="fw" value="#{profileView.profile.address1}" cols="100" rows="3" maxlength="500" id="address1" autoResize="false" />
+        <p:message for="address1" display="text"/></h:panelGroup>
+
+      <p:outputLabel value="#{lang.address2}" for="address2" />
+      <h:panelGroup><p:inputTextarea  styleClass="fw" value="#{profileView.profile.address2}" cols="100" rows="3" maxlength="500" id="address2" autoResize="false" />
+        <p:message for="address2" display="text"/></h:panelGroup>
+
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{profileView.profile.phone1}" maxlength="20" id="phone1" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup>            
+
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{profileView.profile.phone2}" maxlength="20" id="phone2" /><p:message for="phone2" display="text"/></h:panelGroup>            
+
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{profileView.profile.email}" maxlength="50" id="email" />
+        <p:message for="email" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.status}" for="profileStatusId"/><h:panelGroup>
+        <p:autoComplete  value="#{profileView.profile.statusId}" completeMethod="#{profileView.statusAuto}" converter="wawo.LookupIntConverter"   
+                         id="profileStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" 
+                         queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
         </p:autoComplete><p:message for="profileStatusId" display="text" /></h:panelGroup>            
-        
+
     </ui:define>
-    
+
     <ui:define name="after">
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
         <ui:define name="cby">#{appView.display(profileView.profile.createdBy)}</ui:define>
@@ -74,20 +74,20 @@
         <ui:define name="uat">#{appView.dateTime(profileView.profile.lastModifiedAt)}</ui:define>
       </ui:decorate>
     </ui:define>
-	
+
     <ui:define name="list">
       <p:dataTable id="profileTable" var="profileVar" widgetVar="profileWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-        lazy="true" value="#{profileView.profileLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{profileVar.id}"
-        rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
-        selection="#{profileView.profileSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+                   lazy="true" value="#{profileView.profileLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{profileVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{profileView.profileSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
         <p:column selectionMode="multiple" exportable="false" />
-       
+
         <p:column headerText="#{lang.profileCode}" sortBy="#{profileVar.profileCode}" field="profileCode" >
           <p:commandLink action="#{main.setViewType(editform)}" value="#{profileVar.profileCode}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
-        <f:setPropertyActionListener target="#{profileView.profile}" value="#{profileVar}" />
+            <f:setPropertyActionListener target="#{profileView.profile}" value="#{profileVar}" />
           </p:commandLink>
         </p:column>
-        
+
         <p:column headerText="#{lang.name}" sortBy="#{profileVar.name}" field="name"><h:outputText value="#{appView.display(profileVar.name)}" title="#{appView.title(profileVar.name)}" escape="false" /></p:column>
         <p:column headerText="#{lang.address1}" sortBy="#{profileVar.address1}" field="address_1"><h:outputText value="#{appView.display(profileVar.address1)}" title="#{appView.title(profileVar.address1)}" escape="false" /></p:column>
         <p:column headerText="#{lang.address2}" sortBy="#{profileVar.address2}" field="address_2"><h:outputText value="#{appView.display(profileVar.address2)}" title="#{appView.title(profileVar.address2)}" escape="false" /></p:column>

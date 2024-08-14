@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.CompanyReference;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -36,7 +35,7 @@ public abstract class CompanyReferenceDocService {
     sql.count("select count(scm_company_reference_doc.id) from scm_company_reference_doc scm_company_reference_doc "); //Count query
     sql.join("left outer join scm_company_reference scm_company_reference_doccompany_reference_id on (scm_company_reference_doccompany_reference_id.id = scm_company_reference_doc.company_reference_id)"); //Join Query
 
-    sql.string(new String[]{"scm_company_reference_doccompany_reference_id.reference_title", "scm_company_reference_doc.document_file_path","scm_company_reference_doc.document_title"}); //String search or sort fields
+    sql.string(new String[]{"scm_company_reference_doccompany_reference_id.reference_title", "scm_company_reference_doc.document_file_path", "scm_company_reference_doc.document_title"}); //String search or sort fields
     sql.number(new String[]{"scm_company_reference_doc.id"}); //Number search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;

@@ -64,7 +64,6 @@ import spica.scm.domain.SalesAgent;
 import spica.scm.domain.State;
 import spica.scm.domain.TradeProfile;
 import spica.scm.export.LineItemExport;
-import spica.scm.service.CompanyService;
 import spica.scm.service.CompanySettingsService;
 import spica.scm.service.CustomerService;
 import spica.scm.service.PlatformService;

@@ -25,7 +25,6 @@ import spica.scm.util.ProductUtil;
 import spica.scm.validate.ProductCategoryIs;
 import spica.sys.SystemConstants;
 import spica.sys.SystemRuntimeConfig;
-import wawo.entity.core.AppDb;
 
 /**
  * ProductCategoryService

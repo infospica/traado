@@ -7,729 +7,729 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:o="http://omnifaces.org/ui">
-  #{salesInvoiceView.switchSalesInvoice(main, viewType)}
+#{salesInvoiceView.switchSalesInvoice(main, viewType)}
 
-  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
-    <ui:param name="label" value="#{lang.salesInvoice} #{main.isEdit() ? '/' : ''} #{main.isEdit() ? salesInvoiceView.salesInvoice.invoiceNo : '' }" />
-    <ui:param name="ids" value="salesInvoice" />
-    <ui:param name="navLabel" value="#{main.isEdit() ? salesInvoiceView.salesInvoice.salesInvoiceStatusId.title : null}" />
-    <ui:param name="deleteListMenu" value="false" />
-    <ui:param name="pageBasic" value="false" />
-    <ui:param name="reset" value="true" />
-    <ui:param name="clone" value="false" />
-    <ui:param name="deleteFormMenu" value="true" />
-    <ui:param name="newForm" value="true" />
-    <ui:param name="more" value="#{salesInvoiceView.draft ? true : false}" />
-    <ui:param name="reset" value="false" />
+<ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:param name="label" value="#{lang.salesInvoice} #{main.isEdit() ? '/' : ''} #{main.isEdit() ? salesInvoiceView.salesInvoice.invoiceNo : '' }" />
+  <ui:param name="ids" value="salesInvoice" />
+  <ui:param name="navLabel" value="#{main.isEdit() ? salesInvoiceView.salesInvoice.salesInvoiceStatusId.title : null}" />
+  <ui:param name="deleteListMenu" value="false" />
+  <ui:param name="pageBasic" value="false" />
+  <ui:param name="reset" value="true" />
+  <ui:param name="clone" value="false" />
+  <ui:param name="deleteFormMenu" value="true" />
+  <ui:param name="newForm" value="true" />
+  <ui:param name="more" value="#{salesInvoiceView.draft ? true : false}" />
+  <ui:param name="reset" value="false" />
 
-    <ui:define name="deleteList" >
-      <p:commandButton action="#{salesInvoiceView.deleteSalesInvoice(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesInvoiceWidgetDelConf')" process="f1" update="f1" >
-        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
-      </p:commandButton>
-    </ui:define>
+  <ui:define name="deleteList" >
+    <p:commandButton action="#{salesInvoiceView.deleteSalesInvoice(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesInvoiceWidgetDelConf')" process="f1" update="f1" >
+      <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+    </p:commandButton>
+  </ui:define>
 
-    <ui:define name="deleteForm" >
-      <p:commandButton action="#{salesInvoiceView.deleteSalesInvoice(main)}" value="#{lang.delete}" onclick="wdgOff('salesInvoiceWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
-    </ui:define>
+  <ui:define name="deleteForm" >
+    <p:commandButton action="#{salesInvoiceView.deleteSalesInvoice(main)}" value="#{lang.delete}" onclick="wdgOff('salesInvoiceWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+  </ui:define>
 
-    <ui:define name="menu1" >
-    </ui:define>
+  <ui:define name="menu1" >
+  </ui:define>
 
-    <ui:define name="save" >
-      <h:commandButton action="#{salesInvoiceView.saveSalesInvoice(main,2)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
-                       rendered="#{main.isNew() or salesInvoiceView.draft}"  >
-        <f:ajax execute="f1" render="f1"  />
-      </h:commandButton>
+  <ui:define name="save" >
+    <h:commandButton action="#{salesInvoiceView.saveSalesInvoice(main,2)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
+                     rendered="#{main.isNew() or salesInvoiceView.draft}"  >
+      <f:ajax execute="f1" render="f1"  />
+    </h:commandButton>
 
-      <p:commandButton value="#{lang.proFormaInvoice}" process="@this" type="button"  rendered="#{main.edit and salesInvoiceView.draft}"
-                       styleClass="btn btn-primary" onclick="PF('confirmPerformaDlgVar').show();">
-      </p:commandButton>
+    <p:commandButton value="#{lang.proFormaInvoice}" process="@this" type="button"  rendered="#{main.edit and salesInvoiceView.draft}"
+                     styleClass="btn btn-primary" onclick="PF('confirmPerformaDlgVar').show();">
+    </p:commandButton>
 
-      <p:commandButton value="#{lang.cancelProforma}" process="f1" update="f1" rendered="#{salesInvoiceView.proforma}"
-                       action="#{salesInvoiceView.actionCancelProforma(main)}"
-                       styleClass="btn btn-danger">
-        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
-      </p:commandButton>
+    <p:commandButton value="#{lang.cancelProforma}" process="f1" update="f1" rendered="#{salesInvoiceView.proforma}"
+                     action="#{salesInvoiceView.actionCancelProforma(main)}"
+                     styleClass="btn btn-danger">
+      <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+    </p:commandButton>
 
-      <p:commandButton value="#{lang.extendProForma}" onclick="PF('confirmPerformaDlgVar').show();" type="button"
-                       rendered="#{salesInvoiceView.proformaEditable}" styleClass="btn btn-info">
-      </p:commandButton>
+    <p:commandButton value="#{lang.extendProForma}" onclick="PF('confirmPerformaDlgVar').show();" type="button"
+                     rendered="#{salesInvoiceView.proformaEditable}" styleClass="btn btn-info">
+    </p:commandButton>
 
-      <p:commandButton value="#{lang.mergeToInvoice}" process="f1" update="f1" styleClass="btn btn-info" action="#{salesInvoiceView.actionProformaToInvoice(main)}"
-                       rendered="#{salesInvoiceView.proformaEditable}">
-        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
-      </p:commandButton>
+    <p:commandButton value="#{lang.mergeToInvoice}" process="f1" update="f1" styleClass="btn btn-info" action="#{salesInvoiceView.actionProformaToInvoice(main)}"
+                     rendered="#{salesInvoiceView.proformaEditable}">
+      <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+    </p:commandButton>
 
-      <p:commandButton value="#{lang.save}" process="f1" update="f1" styleClass="btn btn-info" action="#{salesInvoiceView.saveSalesInvoice(main,3)}" rendered="#{salesInvoiceView.proformaToInvoice}">
-        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
-      </p:commandButton>
+    <p:commandButton value="#{lang.save}" process="f1" update="f1" styleClass="btn btn-info" action="#{salesInvoiceView.saveSalesInvoice(main,3)}" rendered="#{salesInvoiceView.proformaToInvoice}">
+      <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+    </p:commandButton>
 
-      <p:commandButton action="#{salesInvoiceView.saveSalesInvoice(main,1)}" value="#{lang.confirm}"  onclick="toTop()"
-                       process="f1" update="f1" rendered="#{main.edit and (salesInvoiceView.draft or salesInvoiceView.proformaToInvoice)}"
-                       styleClass="btn btn-warning">
-        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
-      </p:commandButton>
+    <p:commandButton action="#{salesInvoiceView.saveSalesInvoice(main,1)}" value="#{lang.confirm}"  onclick="toTop()"
+                     process="f1" update="f1" rendered="#{main.edit and (salesInvoiceView.draft or salesInvoiceView.proformaToInvoice)}"
+                     styleClass="btn btn-warning">
+      <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+    </p:commandButton>
 
-      <p:commandButton action="#{salesInvoiceView.actionSalesInvoicePrint(main)}" value="#{lang.print}" immediate="true"
-                       process="@this"  rendered="#{main.edit and (salesInvoiceView.draft)}"
-                       styleClass="btn btn-warning">
+    <p:commandButton action="#{salesInvoiceView.actionSalesInvoicePrint(main)}" value="#{lang.print}" immediate="true"
+                     process="@this"  rendered="#{main.edit and (salesInvoiceView.draft)}"
+                     styleClass="btn btn-warning">
 
-      </p:commandButton>
-    </ui:define>
+    </p:commandButton>
+  </ui:define>
 
-    <ui:define name="formRight" >
-      <h:commandButton id="printBtn" value="#{lang.print}" immediate="true" styleClass="btn btn-info" rendered="#{salesInvoiceView.isDraft() and main.edit}" onclick="printDiv('Invoice'); return false" >
-      </h:commandButton>
-      <h:panelGroup layout="block" styleClass="p-t-10" id="invoiceInfoDiv" rendered="#{main.isForm() and main.edit}">
-         Sale Invoice Number 
-        <h:outputText value="Sale Invoice " />
-        <h:panelGroup>
-          <p:outputLabel value="#{salesInvoiceView.salesInvoice.invoiceNo}"  />
-        </h:panelGroup>
-        <p:spacer width="5" />
-      </h:panelGroup>  
-      <p:dialog header="GST Invoice" height="600" width="1200" widgetVar="invoiceDlg"  dynamic="true">
-        <h:commandButton value="Print" onclick="printDiv('Invoice #{salesInvoiceView.salesInvoice.invoiceNo}');return false;" />
-        <div id='DivIdToPrint'>
-          <pre><br/>
- <h:outputText value="#{salesInvoiceView.salesInvoicePrint(main)}" escape="true"/>
-          </pre>
-        </div>
+  <ui:define name="formRight" >
+    <h:commandButton id="printBtn" value="#{lang.print}" immediate="true" styleClass="btn btn-info" rendered="#{salesInvoiceView.isDraft() and main.edit}" onclick="printDiv('Invoice'); return false" >
+    </h:commandButton>
+    <h:panelGroup layout="block" styleClass="p-t-10" id="invoiceInfoDiv" rendered="#{main.isForm() and main.edit}">
+       Sale Invoice Number 
+      <h:outputText value="Sale Invoice " />
+      <h:panelGroup>
+        <p:outputLabel value="#{salesInvoiceView.salesInvoice.invoiceNo}"  />
+      </h:panelGroup>
+      <p:spacer width="5" />
+    </h:panelGroup>  
+    <p:dialog header="GST Invoice" height="600" width="1200" widgetVar="invoiceDlg"  dynamic="true">
+      <h:commandButton value="Print" onclick="printDiv('Invoice #{salesInvoiceView.salesInvoice.invoiceNo}');return false;" />
+      <div id='DivIdToPrint'>
+        <pre><br/>
+<h:outputText value="#{salesInvoiceView.salesInvoicePrint(main)}" escape="true"/>
+        </pre>
+      </div>
 
-      </p:dialog>   <script>
-        //<![CDATA[
-        function printDiv(title) {
-          //    var divToPrint = document.getElementById('DivIdToPrint');
-          var newWin = window.open('#{request.contextPath}/scm/print/sales_invoice', title);
-          //  newWin.document.open();
-          //newWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
-          // newWin.document.close();
+    </p:dialog>   <script>
+      //<![CDATA[
+      function printDiv(title) {
+        //    var divToPrint = document.getElementById('DivIdToPrint');
+        var newWin = window.open('#{request.contextPath}/scm/print/sales_invoice', title);
+        //  newWin.document.open();
+        //newWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+        // newWin.document.close();
 //            setTimeout(function () {
 //              newWin.close();
 //            }, 10);
-        }
+      }
 
 //]]>
-      </script>
-    </ui:define>
+    </script>
+  </ui:define>
 
 
 
-    <ui:define name="afterForm">
-      <h:panelGroup id="salesAccountDetailDiv" layout="block" rendered="#{main.isForm()}">
-        <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
-                      columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+  <ui:define name="afterForm">
+    <h:panelGroup id="salesAccountDetailDiv" layout="block" rendered="#{main.isForm()}">
+      <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                    columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
 
-           Sales Order 
-          <p:outputLabel value="#{lang.salesOrder}" for="salesInvoiceSalesOrderId" rendered="#{salesInvoiceView.salesOrderReference}" />
-          <h:panelGroup rendered="#{salesInvoiceView.salesOrderReference}">
-            <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.salesOrderId}" styleClass="fw"
-                             required="true" requiredMessage="#{lang.salesOrder} #{lang.isRequired}"
-                             id="salesInvoiceSalesOrderId" converter="omnifaces.SelectItemsConverter">
-              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
-              <f:selectItems value="#{scmLookupView.salesOrder(main)}" var="e" itemValue="#{e}" itemLabel="#{e.orderNo}" />
-            </p:selectOneMenu>
-            <p:message for="salesInvoiceSalesOrderId" display="text" />
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value="" rendered="#{salesInvoiceView.salesOrderReference}"/>
-          <h:panelGroup rendered="#{salesInvoiceView.salesOrderReference}">
-          </h:panelGroup>
-
-           Account Group Vendor 
-          <p:outputLabel value="#{lang.accountGroup}" for="cbSalesInvoiceAccountGroupId" />
-          <h:panelGroup id="accountGroupDiv" >
-            <p:inputText id="txtSalesInvoiceAccountGroupId" value="#{salesInvoiceView.salesInvoice.accountGroupId.groupName}" readonly="true"  styleClass="fw" rendered="#{main.edit}" />
-            <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.accountGroupId}"  id="cbSalesInvoiceAccountGroupId" styleClass="fw"
-                             required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"  rendered="#{!main.edit}"
-                             converter="omnifaces.SelectItemsConverter">
-              <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
-              <f:selectItems value="#{salesInvoiceView.accountGroupByAccountOrSalesOrder()}" var="e" itemValue="#{e}" itemLabel="#{e.groupName}" />
-              <p:ajax event="itemSelect" immediate="true" update="priceListDiv customerDiv invoiceInfoDiv salesCreditDays invoiceNo" listener="#{salesInvoiceView.accountGroupSelectedEvent}" resetValues="true" />
-            </p:selectOneMenu>
-            <p:message for="cbSalesInvoiceAccountGroupId" display="text" />
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-           Account group price list 
-          <p:outputLabel value="#{lang.priceList}" for="salesInvoiceAccountGroupPriceListId" />
-          <h:panelGroup id="priceListDiv">
-            <p:inputText id="txtSalesInvoiceAccountGroupPriceListId" value="#{salesInvoiceView.salesInvoice.accountGroupPriceListId.title}"  readonly="true" styleClass="fw" rendered="#{main.edit}" />
-            <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.accountGroupPriceListId}"  id="salesInvoiceAccountGroupPriceListId"
-                             required="true" requiredMessage="#{lang.priceList} #{lang.isRequired}" rendered="#{!main.edit}"
-                             styleClass="fw" converter="omnifaces.SelectItemsConverter">
-              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
-              <f:selectItems value="#{salesInvoiceView.accountGroupPriceListByAccountGroup()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
-            </p:selectOneMenu>
-            <p:message for="salesInvoiceAccountGroupPriceListId" display="text" />
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-           Customer 
-          <p:outputLabel value="#{lang.customer}" for="salesInvoiceCustomerId"/>
-          <h:panelGroup id="customerDiv">
-            <p:inputText id="txtSalesInvoiceCustomerId" value="#{salesInvoiceView.salesInvoice.customerId.customerName}" readonly="true" styleClass="fw" rendered="#{main.edit}" />
-            <p:autoComplete value="#{salesInvoiceView.salesInvoice.customerId}" completeMethod="#{salesInvoiceView.customerAuto}" converter="wawo.LookupIntConverter"
-                            id="salesInvoiceCustomerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
-                            required="true" requiredMessage="#{lang.customer} #{lang.isRequired}" rendered="#{!main.edit}"
-                            cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
-                            style="position: relative" styleClass="fw"  >
-              <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
-              <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
-              <p:ajax event="itemSelect" listener="#{salesInvoiceView.customerSelectedEvent}" update="invoiceInfoDiv salesCreditDays customerAddressId"  />
-            </p:autoComplete>
-            <p:message for="salesInvoiceCustomerId" display="text" />
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-           Commodity 
-          <p:outputLabel value="#{lang.tax}" for="salesCommodity"/>
-          <h:panelGroup id="commodityDiv">
-            <p:inputText id="salesCommodity" value="#{salesInvoiceView.taxCode}" styleClass="fw" readonly="true" />
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-          <p:outputLabel value="#{lang.productType}" for="productProductTypeId" />
-          <h:panelGroup id="productTypeDiv">
-            <p:inputText id="productProductTypeId" value="#{salesInvoiceView.salesInvoice.productTypeId.title}" styleClass="fw" readonly="true" />
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-           Sales Credit Days 
-          <p:outputLabel value="#{lang.salesCreditDays}" for="salesCreditDays" />
-          <h:panelGroup>
-            <p:inputNumber value="#{salesInvoiceView.salesInvoice.salesCreditDays}" converterMessage="#{lang.salesCreditDays} #{lang.invalidNumber}" decimalPlaces="0"
-                           styleClass="fw" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="salesCreditDays" />
-            <p:message for="salesCreditDays" display="text"/>
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-           Vendor Sales Agent 
-          <p:outputLabel value="#{lang.vendor} #{lang.salesAgent}" for="vendorSalesAgentPersonProfileId" />
-          <h:panelGroup>
-            <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.vendorSalesAgentPersonProfileId}"  id="vendorSalesAgentPersonProfileId"
-                             styleClass="fw" converter="omnifaces.SelectItemsConverter">
-              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
-              <f:selectItems value="#{salesInvoiceView.lookupVendorSalesAgentPersonProfile()}" var="vc" itemValue="#{vc}" itemLabel="#{vc.userProfileId.name}" />
-            </p:selectOneMenu>
-            <p:message for="vendorSalesAgentPersonProfileId" display="text"/>
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-          <p:outputLabel value="#{lang.company} #{lang.address}" for="companyAddressId" />
-          <h:panelGroup>
-            <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.companyAddressId}"  id="companyAddressId"
-                             styleClass="fw" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.company} #{lang.address} #{lang.isRequired}" >
-              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
-              <f:selectItems value="#{salesInvoiceView.lookUpCompanyAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.addressTypeId.title}  #{e.address}  #{e.stateId.stateName}  #{e.districtId.districtName}  #{e.pin}" />
-            </p:selectOneMenu>
-            <p:message for="companyAddressId" display="text"/>
-          </h:panelGroup>
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-          <p:outputLabel value="#{lang.customer} #{lang.address}" for="customerAddressId" />
-          <h:panelGroup>
-            <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.customerAddressId}"  id="customerAddressId"
-                             styleClass="fw" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.customer} #{lang.address} #{lang.isRequired}">
-              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}"/>
-              <f:selectItems value="#{salesInvoiceView.lookUpCustomerAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.addressTypeId.title}  #{e.address}  #{e.stateId.stateName}  #{e.districtId.districtName}  #{e.pin}" />
-            </p:selectOneMenu>
-            <p:message for="customerAddressId" display="text"/>
-          </h:panelGroup>
-
-
-          Empty
-          <p:outputLabel value=""/>
-          <h:panelGroup>
-          </h:panelGroup>
-
-        </p:panelGrid>
-      </h:panelGroup>
-
-    </ui:define>
-    <ui:define name="after" >
-      <h:panelGroup layout="block" styleClass="card" rendered="#{main.isForm() and main.edit}">
-        <h:panelGroup layout="block" styleClass="table-responsive">
-          <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="invoiceDetailsDiv" columnClasses="#{sysRuntimeView.grid2}">
-            <f:facet name="header">
-              <p:row>
-                <p:column><p:outputLabel value="#{lang.invoiceNo}" for="invoiceNo" /></p:column>
-                <p:column><p:outputLabel value="#{lang.invoiceDate}" for="invoiceDate" /></p:column>
-                <p:column><p:outputLabel value="#{lang.discountValue}" for="invoiceAmountDiscountValue" /></p:column>
-                <p:column><p:outputLabel value="#{lang.discountPerc}" for="invoiceAmountDiscountPerc" /></p:column>
-                <p:column><p:outputLabel value="#{lang.freightCharges}" for="freightCharges" /></p:column>
-                <p:column><p:outputLabel value="#{lang.vat}" for="invoiceAmountVat" /></p:column>
-                <p:column><p:outputLabel value="#{lang.netAmount}" for="invoiceAmountNet" /></p:column>
-                <p:column><p:outputLabel value="#{lang.roundOff}" for="roundOff" /></p:column>
-                <p:column><p:outputLabel value="#{lang.invoiceAmount}" for="invoiceAmount" /></p:column>
-              </p:row>
-            </f:facet>
-
-            <p:row>
-               Invoice No 
-              <p:column>
-                <p:inputText value="#{salesInvoiceView.salesInvoice.invoiceNo}" readonly="true" maxlength="50" id="invoiceNo" styleClass="form-control prNum" />
-                <p:message for="invoiceNo" display="text" styleClass="fw" />
-              </p:column>
-
-               Invoice Date 
-              <p:column>
-                <p:calendar value="#{salesInvoiceView.salesInvoice.invoiceDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}"
-                            maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true" styleClass="test"/>
-                <p:message for="invoiceDate" display="text"/>
-              </p:column>
-
-               Invoice Discount value 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmountDiscount}" converterMessage="#{lang.invoiceAmountDiscount} #{lang.invalidNumber}"
-                               readonly="#{salesInvoiceView.salesInvoice.invoiceAmtDiscPercent ne null}"
-                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountDiscountValue" >
-                  <p:ajax event="blur" listener="#{salesInvoiceView.updateSalesInvoiceAmount}" update="salesProductTableDiv invoiceDetailsDiv invoiceAmountDiscountPerc" process="@this" />
-                </p:inputNumber>
-              </p:column>
-
-               Invoice Discount % 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmtDiscPercent}" converterMessage="#{lang.invoiceAmtDiscPercent} #{lang.invalidNumber}"
-                               readonly="#{salesInvoiceView.salesInvoice.invoiceAmountDiscount ne null}"
-                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountDiscountPerc" >
-                  <p:ajax event="blur" listener="#{salesInvoiceView.updateSalesInvoiceAmount}" update="salesProductTableDiv invoiceDetailsDiv invoiceAmountDiscountValue" process="@this" />
-                </p:inputNumber>
-              </p:column>
-
-               freight Rate 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.freightRate}" converterMessage="#{lang.freightRate} #{lang.invalidNumber}" decimalPlaces="2"
-                               onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="freightCharges" />
-                <p:message for="freightCharges" display="text"/>
-              </p:column>
-
-               Invoice VAT Amount 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmountVat}" converterMessage="#{lang.invoiceAmountVat} #{lang.invalidNumber}" decimalPlaces="2"
-                               readonly="true"
-                               onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountVat" />
-                <p:message for="invoiceAmountVat" display="text"/>
-              </p:column>
-
-               Invoice Amount Net 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmountNet}" converterMessage="#{lang.invoiceAmountNet} #{lang.invalidNumber}" decimalPlaces="2"
-                               readonly="true"
-                               onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountNet" />
-                <p:message for="invoiceAmountNet" display="text"/>
-              </p:column>
-
-               roundOff 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.roundOff}" converterMessage="#{lang.roundOff} #{lang.invalidNumber}" decimalPlaces="2"
-                               onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="0.99" minValue="-0.99" symbol="#{appView.currencySymbol} " maxlength="15" id="roundOff" >
-                  <p:ajax event="blur" listener="#{salesInvoiceView.updateSalesInvoiceAmount}" update="invoiceAmount" process="@this" />
-                </p:inputNumber>
-
-              </p:column>
-
-               Invoice Amount 
-              <p:column>
-                <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmount}" converterMessage="#{lang.invoiceAmount} #{lang.invalidNumber}" 
-                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " readonly="true" maxlength="15" id="invoiceAmount" />
-                <p:message for="invoiceAmount" display="text"/>
-              </p:column>
-            </p:row>
-          </p:panelGrid>
+         Sales Order 
+        <p:outputLabel value="#{lang.salesOrder}" for="salesInvoiceSalesOrderId" rendered="#{salesInvoiceView.salesOrderReference}" />
+        <h:panelGroup rendered="#{salesInvoiceView.salesOrderReference}">
+          <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.salesOrderId}" styleClass="fw"
+                           required="true" requiredMessage="#{lang.salesOrder} #{lang.isRequired}"
+                           id="salesInvoiceSalesOrderId" converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+            <f:selectItems value="#{scmLookupView.salesOrder(main)}" var="e" itemValue="#{e}" itemLabel="#{e.orderNo}" />
+          </p:selectOneMenu>
+          <p:message for="salesInvoiceSalesOrderId" display="text" />
         </h:panelGroup>
-      </h:panelGroup>
 
-      <style>
-        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
-        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+        Empty
+        <p:outputLabel value="" rendered="#{salesInvoiceView.salesOrderReference}"/>
+        <h:panelGroup rendered="#{salesInvoiceView.salesOrderReference}">
+        </h:panelGroup>
 
-        .bg-danger {
-          color: #fff;
-          background: #ef565a !important;
-        }
-      </style>
+         Account Group Vendor 
+        <p:outputLabel value="#{lang.accountGroup}" for="cbSalesInvoiceAccountGroupId" />
+        <h:panelGroup id="accountGroupDiv" >
+          <p:inputText id="txtSalesInvoiceAccountGroupId" value="#{salesInvoiceView.salesInvoice.accountGroupId.groupName}" readonly="true"  styleClass="fw" rendered="#{main.edit}" />
+          <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.accountGroupId}"  id="cbSalesInvoiceAccountGroupId" styleClass="fw"
+                           required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"  rendered="#{!main.edit}"
+                           converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+            <f:selectItems value="#{salesInvoiceView.accountGroupByAccountOrSalesOrder()}" var="e" itemValue="#{e}" itemLabel="#{e.groupName}" />
+            <p:ajax event="itemSelect" immediate="true" update="priceListDiv customerDiv invoiceInfoDiv salesCreditDays invoiceNo" listener="#{salesInvoiceView.accountGroupSelectedEvent}" resetValues="true" />
+          </p:selectOneMenu>
+          <p:message for="cbSalesInvoiceAccountGroupId" display="text" />
+        </h:panelGroup>
 
-      <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and main.edit}" pt:data-fast-input="true">
-        <p:remoteCommand actionListener="#{salesInvoiceView.actionInsertOrUpdateSalesInvoiceItem(main)}" process="f1" update="salesProductTableDiv"  name="saveSalesInvoiceItem" />
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
 
-        <h:panelGroup layout="block" id="salesProductTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
-          <p:dataTable var="salesItemVar" id="salesItemTable" widgetVar="salesItemTableVar" value="#{salesInvoiceView.salesInvoiceItemList}" rowIndexVar="rowIndex"
-                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
-            <p:column headerText="Sno" width="61" style="text-align: center;" >
-              <h:outputText value="#{rowIndex + 1}" />
-              <h:outputText rendered="#{salesItemVar.productStockStatus gt 0}" styleClass="fa fa-exclamation-triangle" style="color: #f00;" title="Insufficient quantity." value="" />
+         Account group price list 
+        <p:outputLabel value="#{lang.priceList}" for="salesInvoiceAccountGroupPriceListId" />
+        <h:panelGroup id="priceListDiv">
+          <p:inputText id="txtSalesInvoiceAccountGroupPriceListId" value="#{salesInvoiceView.salesInvoice.accountGroupPriceListId.title}"  readonly="true" styleClass="fw" rendered="#{main.edit}" />
+          <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.accountGroupPriceListId}"  id="salesInvoiceAccountGroupPriceListId"
+                           required="true" requiredMessage="#{lang.priceList} #{lang.isRequired}" rendered="#{!main.edit}"
+                           styleClass="fw" converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+            <f:selectItems value="#{salesInvoiceView.accountGroupPriceListByAccountGroup()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          </p:selectOneMenu>
+          <p:message for="salesInvoiceAccountGroupPriceListId" display="text" />
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+         Customer 
+        <p:outputLabel value="#{lang.customer}" for="salesInvoiceCustomerId"/>
+        <h:panelGroup id="customerDiv">
+          <p:inputText id="txtSalesInvoiceCustomerId" value="#{salesInvoiceView.salesInvoice.customerId.customerName}" readonly="true" styleClass="fw" rendered="#{main.edit}" />
+          <p:autoComplete value="#{salesInvoiceView.salesInvoice.customerId}" completeMethod="#{salesInvoiceView.customerAuto}" converter="wawo.LookupIntConverter"
+                          id="salesInvoiceCustomerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                          required="true" requiredMessage="#{lang.customer} #{lang.isRequired}" rendered="#{!main.edit}"
+                          cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                          style="position: relative" styleClass="fw"  >
+            <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+            <p:ajax event="itemSelect" listener="#{salesInvoiceView.customerSelectedEvent}" update="invoiceInfoDiv salesCreditDays customerAddressId"  />
+          </p:autoComplete>
+          <p:message for="salesInvoiceCustomerId" display="text" />
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+         Commodity 
+        <p:outputLabel value="#{lang.tax}" for="salesCommodity"/>
+        <h:panelGroup id="commodityDiv">
+          <p:inputText id="salesCommodity" value="#{salesInvoiceView.taxCode}" styleClass="fw" readonly="true" />
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.productType}" for="productProductTypeId" />
+        <h:panelGroup id="productTypeDiv">
+          <p:inputText id="productProductTypeId" value="#{salesInvoiceView.salesInvoice.productTypeId.title}" styleClass="fw" readonly="true" />
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+         Sales Credit Days 
+        <p:outputLabel value="#{lang.salesCreditDays}" for="salesCreditDays" />
+        <h:panelGroup>
+          <p:inputNumber value="#{salesInvoiceView.salesInvoice.salesCreditDays}" converterMessage="#{lang.salesCreditDays} #{lang.invalidNumber}" decimalPlaces="0"
+                         styleClass="fw" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="salesCreditDays" />
+          <p:message for="salesCreditDays" display="text"/>
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+         Vendor Sales Agent 
+        <p:outputLabel value="#{lang.vendor} #{lang.salesAgent}" for="vendorSalesAgentPersonProfileId" />
+        <h:panelGroup>
+          <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.vendorSalesAgentPersonProfileId}"  id="vendorSalesAgentPersonProfileId"
+                           styleClass="fw" converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+            <f:selectItems value="#{salesInvoiceView.lookupVendorSalesAgentPersonProfile()}" var="vc" itemValue="#{vc}" itemLabel="#{vc.userProfileId.name}" />
+          </p:selectOneMenu>
+          <p:message for="vendorSalesAgentPersonProfileId" display="text"/>
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.company} #{lang.address}" for="companyAddressId" />
+        <h:panelGroup>
+          <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.companyAddressId}"  id="companyAddressId"
+                           styleClass="fw" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.company} #{lang.address} #{lang.isRequired}" >
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+            <f:selectItems value="#{salesInvoiceView.lookUpCompanyAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.addressTypeId.title}  #{e.address}  #{e.stateId.stateName}  #{e.districtId.districtName}  #{e.pin}" />
+          </p:selectOneMenu>
+          <p:message for="companyAddressId" display="text"/>
+        </h:panelGroup>
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.customer} #{lang.address}" for="customerAddressId" />
+        <h:panelGroup>
+          <p:selectOneMenu value="#{salesInvoiceView.salesInvoice.customerAddressId}"  id="customerAddressId"
+                           styleClass="fw" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.customer} #{lang.address} #{lang.isRequired}">
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}"/>
+            <f:selectItems value="#{salesInvoiceView.lookUpCustomerAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.addressTypeId.title}  #{e.address}  #{e.stateId.stateName}  #{e.districtId.districtName}  #{e.pin}" />
+          </p:selectOneMenu>
+          <p:message for="customerAddressId" display="text"/>
+        </h:panelGroup>
+
+
+        Empty
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+      </p:panelGrid>
+    </h:panelGroup>
+
+  </ui:define>
+  <ui:define name="after" >
+    <h:panelGroup layout="block" styleClass="card" rendered="#{main.isForm() and main.edit}">
+      <h:panelGroup layout="block" styleClass="table-responsive">
+        <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="invoiceDetailsDiv" columnClasses="#{sysRuntimeView.grid2}">
+          <f:facet name="header">
+            <p:row>
+              <p:column><p:outputLabel value="#{lang.invoiceNo}" for="invoiceNo" /></p:column>
+              <p:column><p:outputLabel value="#{lang.invoiceDate}" for="invoiceDate" /></p:column>
+              <p:column><p:outputLabel value="#{lang.discountValue}" for="invoiceAmountDiscountValue" /></p:column>
+              <p:column><p:outputLabel value="#{lang.discountPerc}" for="invoiceAmountDiscountPerc" /></p:column>
+              <p:column><p:outputLabel value="#{lang.freightCharges}" for="freightCharges" /></p:column>
+              <p:column><p:outputLabel value="#{lang.vat}" for="invoiceAmountVat" /></p:column>
+              <p:column><p:outputLabel value="#{lang.netAmount}" for="invoiceAmountNet" /></p:column>
+              <p:column><p:outputLabel value="#{lang.roundOff}" for="roundOff" /></p:column>
+              <p:column><p:outputLabel value="#{lang.invoiceAmount}" for="invoiceAmount" /></p:column>
+            </p:row>
+          </f:facet>
+
+          <p:row>
+             Invoice No 
+            <p:column>
+              <p:inputText value="#{salesInvoiceView.salesInvoice.invoiceNo}" readonly="true" maxlength="50" id="invoiceNo" styleClass="form-control prNum" />
+              <p:message for="invoiceNo" display="text" styleClass="fw" />
             </p:column>
 
-             Product 
-            <p:column headerText="Product" width="200">
-              <p:autoComplete id="productId" styleClass="m-t-5" value="#{salesItemVar.product}" completeMethod="#{salesInvoiceView.completeProduct}"
-                              required="true" pt:data-control="material" pt:data-placeholder-label="false"
-                              converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative"
-                              cache="true" queryDelay="500" maxResults="50" title="#{salesItemVar.product.productName}"
-                              var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
-                <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
-                <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
-                <p:ajax event="itemSelect" update="@this,batchNo,expiryDate,valueMrp,ptsRate,valuePts,valuePtr,caseQty,peiceQty,boxQty,discValue,freeQty,valueSales,valueVat,totalRate,invoiceDetailsDiv productTypeDiv commodityDiv"
-                        listener="#{salesInvoiceView.updateCurrentRow(salesItemVar)}" />
-              </p:autoComplete>
+             Invoice Date 
+            <p:column>
+              <p:calendar value="#{salesInvoiceView.salesInvoice.invoiceDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}"
+                          maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true" styleClass="test"/>
+              <p:message for="invoiceDate" display="text"/>
             </p:column>
 
-             Batch 
-            <p:column headerText="Batch" width="170">
-              <h:panelGroup layout="block" id="batchNo" styleClass="m-t-10">
-                <p:selectOneMenu value="#{salesItemVar.productDetailSales}" styleClass="fw"  id="productDetailList" panelStyle="width:550px" var="batchVar"
-                                 required="true"
-                                 converter="omnifaces.SelectItemsConverter">
-                  <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" noSelectionOption="true" />
-                  <f:selectItems value="#{salesInvoiceView.selectProductDetailSales(main, salesItemVar.product, salesItemVar)}" var="e"
-                                 itemValue="#{e}" itemLabel="#{e.batchNo}" />
-                  <p:column headerText="Batch">
-                    <h:outputText value="#{batchVar.batchNo}" />
-                  </p:column>
-                  <p:column headerText="Exp. Date">
-                    <h:outputText value="#{batchVar.expiryDate}" />
-                  </p:column>
-                  <p:column headerText="Qty">
-                    <h:outputText value="#{batchVar.quantityAvailable}" />
-                  </p:column>
-                  <p:column headerText="Free Scheme">
-                    <h:outputText value="#{batchVar.freeQtySchemeId ne null ? batchVar.freeSchemeName : ''}" />
-                  </p:column>
-                  <p:column headerText="PTS">
-                    <h:outputText value="#{batchVar.pricelistPts}" />
-                  </p:column>
-                  <p:column headerText="MRP">
-                    <h:outputText value="#{batchVar.mrpValue}" />
-                  </p:column>
-                  <p:ajax event="itemSelect" process="batchNo" update="expiryDate,valueMrp,ptsRate,valuePts,valuePtr,caseQty,peiceQty,boxQty,discValue,freeQty,valueSales,valueVat,totalRate,invoiceDetailsDiv"
-                          listener="#{salesInvoiceView.updateProductDetails(salesItemVar)}" oncomplete="refreshDatatable();" >
-                  </p:ajax>
-                </p:selectOneMenu>
-              </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="Exp. Date">
-              <h:panelGroup layout="block" id="expiryDate" styleClass="m-t--10">
-                <p:inputText disabled="true" pt:data-control="material" pt:data-placeholder-label="false"  value="#{salesItemVar.productDetailSales.expiryDate}"  />
-              </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="">
-              <h:panelGroup layout="block" styleClass="flex" id="caseQtyCol">
-                <h:panelGroup layout="block" styleClass="cell w-100">
-                  <p:inputNumber id="caseQty" pt:data-control="material" value="#{salesItemVar.tertiaryQuantity}" autocomplete="off"
-                                 styleClass="m-t--10"
-                                 disabled="#{salesItemVar.productDetailSales.tertiaryPackId eq null}" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999.99" maxlength="6"
-                                 placeholder="#{salesItemVar.productDetailSales.tertiaryPackId eq null ? '' : salesItemVar.productDetailSales.tertiaryPacking.title}">
-                    <p:ajax event="blur" listener="#{salesInvoiceView.updateProductQuantity(main,salesItemVar,3)}" oncomplete="refreshDatatable();"
-                            update="boxQty,peiceQty,freeQty,discValue,valueSales,valueVat,totalRate,invoiceDetailsDiv" />
-                  </p:inputNumber>
-                </h:panelGroup>
-              </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="">
-              <h:panelGroup layout="block" styleClass="flex" id="boxQtyCol">
-                <h:panelGroup layout="block" styleClass="cell w-100">
-                  <p:inputNumber id="boxQty" pt:data-control="material" styleClass="m-t--10" value="#{salesItemVar.secondaryQuantity}" minValue="0.0"
-                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="99999.99" maxlength="6" autocomplete="off"
-                                 disabled="#{salesItemVar.productDetailSales.secondaryPackId eq null}"
-                                 placeholder="#{salesItemVar.productDetailSales.secondaryPackId eq null ? '' : salesItemVar.productDetailSales.secondaryPacking.title}" >
-                    <p:ajax event="blur" listener="#{salesInvoiceView.updateProductQuantity(main,salesItemVar,2)}" oncomplete="refreshDatatable();"
-                            update="caseQty,peiceQty,freeQty,discValue,valueSales,valueVat,totalRate,invoiceDetailsDiv" />
-                  </p:inputNumber>
-                </h:panelGroup>
-              </h:panelGroup>
-            </p:column>
-            <p:column headerText="Qty">
-              <h:panelGroup layout="block" styleClass="flex" id="peiceQtyCol">
-                <h:panelGroup layout="block" styleClass="cell w-100">
-                  <p:inputNumber id="peiceQty" pt:data-control="material" styleClass="m-t--10" value="#{salesItemVar.productQty}" size="10" autocomplete="off"
-                                 readonly="#{salesItemVar.productDetailSales.primaryPackId eq null}" minValue="0"
-                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="#{salesInvoiceView.salesInvoiceEditable ? salesItemVar.currentAvailableQty : salesItemVar.productQty}"
-                                 decimalPlaces="0" thousandSeparator=""
-                                 placeholder="#{salesItemVar.productDetailSales.primaryPackId eq null ? '' : salesItemVar.productDetailSales.primaryPacking.title}"
-                                 >
-                    <p:ajax event="blur" update="caseQty,boxQty,freeQty,discValue,valueSales,valueVat,totalRate,invoiceDetailsDiv"
-                            listener="#{salesInvoiceView.updateProductSalesValues(main,salesItemVar,1)}" oncomplete="refreshDatatable();" />
-                  </p:inputNumber>
-                </h:panelGroup>
-              </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="Free Qty">
-                <p:inputNumber id="freeQty" value="#{salesItemVar.productQtyFree}" size="10" autocomplete="off"  styleClass="m-t-5" decimalPlaces="0"
-                             onfocus="this.select()" inputStyleClass="text-right" maxValue="#{salesInvoiceView.salesInvoiceEditable  ? salesItemVar.currentAvailableFreeQty : salesItemVar.productQtyFree}" minValue="0" pt:data-control="material" pt:data-placeholder-label="false"
-                             readonly="#{salesItemVar.productDetailId eq null}">
-                <p:ajax event="blur" listener="#{salesInvoiceView.updateProductFreeQtyScheme(salesItemVar)}"
-                        update="caseQty,boxQty,peiceQty"
-                        oncomplete="refreshDatatable();" />
+             Invoice Discount value 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmountDiscount}" converterMessage="#{lang.invoiceAmountDiscount} #{lang.invalidNumber}"
+                             readonly="#{salesInvoiceView.salesInvoice.invoiceAmtDiscPercent ne null}"
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountDiscountValue" >
+                <p:ajax event="blur" listener="#{salesInvoiceView.updateSalesInvoiceAmount}" update="salesProductTableDiv invoiceDetailsDiv invoiceAmountDiscountPerc" process="@this" />
               </p:inputNumber>
             </p:column>
 
-            <p:column headerText="Disc.">
-              <div class="p-l-10 m-t-5">
-                <p:inputNumber id="discValue" value="#{salesItemVar.discProdPieceFixed}" size="6" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999"
-                               pt:data-control="material" pt:data-placeholder-label="false"
-                               autocomplete="off" >
-                  <p:ajax event="blur" update="totalRate" listener="#{salesInvoiceView.ajaxApplyLineDiscountValue(salesItemVar)}" />
-                </p:inputNumber>
-              </div>
+             Invoice Discount % 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmtDiscPercent}" converterMessage="#{lang.invoiceAmtDiscPercent} #{lang.invalidNumber}"
+                             readonly="#{salesInvoiceView.salesInvoice.invoiceAmountDiscount ne null}"
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountDiscountPerc" >
+                <p:ajax event="blur" listener="#{salesInvoiceView.updateSalesInvoiceAmount}" update="salesProductTableDiv invoiceDetailsDiv invoiceAmountDiscountValue" process="@this" />
+              </p:inputNumber>
             </p:column>
 
-            <p:column headerText="Rate" >
-              <div class="w-80 m-t--5">
-                <p:inputNumber id="ptsRate" value="#{salesItemVar.prodPieceSellingForced}" styleClass="submit_item fw" size="10" autocomplete="off"
-                               pt:data-control="material" pt:data-placeholder-label="false" required="true" >
-                  <p:ajax event="blur" update="salesProductTableDiv invoiceDetailsDiv"
-                          listener="#{salesInvoiceView.updateProductSalesValues(main,salesItemVar,0)}" oncomplete="refreshDatatable();" />
-                </p:inputNumber>
-              </div>
+             freight Rate 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.freightRate}" converterMessage="#{lang.freightRate} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="freightCharges" />
+              <p:message for="freightCharges" display="text"/>
             </p:column>
 
-            <p:column headerText="PTS" >
-              <div class="w-80 m-t--5">
-                <p:inputNumber id="valuePts" value="#{salesItemVar.valuePts}" styleClass="submit_item fw" size="10" autocomplete="off"
-                               pt:data-control="material" pt:data-placeholder-label="false" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right"
-                               required="true" />
-              </div>
+             Invoice VAT Amount 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmountVat}" converterMessage="#{lang.invoiceAmountVat} #{lang.invalidNumber}" decimalPlaces="2"
+                             readonly="true"
+                             onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountVat" />
+              <p:message for="invoiceAmountVat" display="text"/>
             </p:column>
 
-            <p:column headerText="PTR"  rendered="#{salesInvoiceView.medicineCommodity}">
-              <div class="w-80 m-t--5">
-                <p:inputNumber id="valuePtr" value="#{salesItemVar.valuePtr}" styleClass="submit_item fw" size="10" autocomplete="off"
-                               pt:data-control="material" pt:data-placeholder-label="false"
-                               required="true" />
-              </div>
+             Invoice Amount Net 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmountNet}" converterMessage="#{lang.invoiceAmountNet} #{lang.invalidNumber}" decimalPlaces="2"
+                             readonly="true"
+                             onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountNet" />
+              <p:message for="invoiceAmountNet" display="text"/>
             </p:column>
 
-            <p:column headerText="MRP" styleClass="p-t-5 p-b-10">
-              <p:inputText id="valueMrp" readonly="true"  value="#{salesItemVar.productDetailId.valueMrp}" styleClass="m-t-5"
-                           pt:data-control="material" pt:data-placeholder-label="false"
-                           />
+             roundOff 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.roundOff}" converterMessage="#{lang.roundOff} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="0.99" minValue="-0.99" symbol="#{appView.currencySymbol} " maxlength="15" id="roundOff" >
+                <p:ajax event="blur" listener="#{salesInvoiceView.updateSalesInvoiceAmount}" update="invoiceAmount" process="@this" />
+              </p:inputNumber>
+
             </p:column>
 
-            <p:column headerText="Sale Value" >
-              <p:inputText id="valueSales"  readonly="true" value="#{salesItemVar.valueSale}"
-                           pt:data-control="material" pt:data-placeholder-label="false"
-                           />
+             Invoice Amount 
+            <p:column>
+              <p:inputNumber value="#{salesInvoiceView.salesInvoice.invoiceAmount}" converterMessage="#{lang.invoiceAmount} #{lang.invalidNumber}" 
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " readonly="true" maxlength="15" id="invoiceAmount" />
+              <p:message for="invoiceAmount" display="text"/>
             </p:column>
-
-            <p:column headerText="Tax Value" >
-              <p:inputText id="valueVat"  readonly="true" value="#{salesItemVar.valueVat}"
-                           pt:data-control="material" pt:data-placeholder-label="false"
-                           />
-            </p:column>
-
-            <p:column headerText="Net Value" >
-              <p:inputText id="totalRate" readonly="true" value="#{salesItemVar.valueInvoice}"
-                           pt:data-control="material" pt:data-placeholder-label="false"
-                           />
-            </p:column>
-
-            <p:column headerText="" styleClass="p-t-20" rendered="#{salesInvoiceView.salesInvoiceEditable}">
-              <p:commandButton process="@this" value="" update="salesProductTableDiv,invoiceDetailsDiv" tabindex="-1" icon="fa fa-trash"
-                               actionListener="#{salesInvoiceView.actionDeleteSalesItem(main, salesItemVar)}">
-                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
-              </p:commandButton>
-              <p:commandButton process="@this" value="" update="salesProductTableDiv,invoiceDetailsDiv" tabindex="-1" icon="fa fa-undo"
-                               actionListener="#{salesInvoiceView.actionUndoDeleteSalesItem(salesItemVar)}" rendered="#{salesInvoiceView.isSalesInvoiceItemDeleted(salesItemVar)}">
-                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
-              </p:commandButton>
-            </p:column>
-          </p:dataTable>
-        </h:panelGroup>
-      </h:panelGroup>
-
-      <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm()}">
-        <p:panelGrid  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" >
-          <h:panelGroup>
-            <p:inputTextarea value="#{salesInvoiceView.salesInvoice.note}" placeholder="Note" cols="100" rows="3" maxlength="500" id="note" autoResize="false" styleClass="fw" />
-          </h:panelGroup>
+          </p:row>
         </p:panelGrid>
       </h:panelGroup>
+    </h:panelGroup>
 
-      <p:dialog header="Info" widgetVar="infoDlg" modal="true" height="100" resizable="false">
-        <h:outputText value="Selected product already exist in sales invoice." />
-        <p:commandButton type="button" onclick="PF('infoDlg').hide();" value="#{lang.ok}" />
-      </p:dialog>
+    <style>
+      .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+      .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
 
-      <p:dialog id="confirmPerformaDlg" widgetVar="confirmPerformaDlgVar" header="Confirm" resizable="false" showEffect="clip"
-                hideEffect="clip" closeOnEscape="true" modal="true" >
-        <h:panelGrid columns="2">
-          <p:outputLabel value="#{lang.confirmMessage}" rendered="#{!salesInvoiceView.proforma}" />
-          <p:outputLabel value="#{lang.proformaExtendConfirmMessage}" rendered="#{salesInvoiceView.proforma}" />
-          <h:panelGroup layout="block">
-          </h:panelGroup>
-          <p:outputLabel value="Pro-Forma Expires On - #{salesInvoiceView.salesInvoice.proformaExpiringAt}" rendered="#{salesInvoiceView.proforma}"  />
-          <h:panelGroup layout="block" rendered="#{salesInvoiceView.proforma}">
-          </h:panelGroup>
+      .bg-danger {
+        color: #fff;
+        background: #ef565a !important;
+      }
+    </style>
 
-          <p:outputLabel value="#{lang.extendProFormaFor}" for="expireDays" rendered="#{salesInvoiceView.proforma}" />
-          <p:outputLabel value="#{lang.keepProFormaFor}" for="expireDays" rendered="#{!salesInvoiceView.proforma}" />
-          <h:panelGroup layout="block">
-            <p:selectOneMenu value="#{salesInvoiceView.proformaExpireDays}" required="true" id="expireDays"
-                             converter="omnifaces.SelectItemsConverter">
-              <f:selectItem itemValue="#{1}" itemLabel="#{lang.oneDay}" />
-              <f:selectItem itemValue="#{2}" itemLabel="#{lang.twoDays}" />
-              <f:selectItem itemValue="#{3}" itemLabel="#{lang.threeDays}" />
-            </p:selectOneMenu>
-          </h:panelGroup>
-        </h:panelGrid>
+    <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and main.edit}" pt:data-fast-input="true">
+      <p:remoteCommand actionListener="#{salesInvoiceView.actionInsertOrUpdateSalesInvoiceItem(main)}" process="f1" update="salesProductTableDiv"  name="saveSalesInvoiceItem" />
 
-        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
-          <p:commandButton value="#{lang.yes}" rendered="#{!salesInvoiceView.proforma}" styleClass="btn btn-info"  process="f1" update="f1" action="#{salesInvoiceView.saveSalesInvoice(main,3)}" />
-          <p:commandButton value="#{lang.yes}" rendered="#{salesInvoiceView.proforma}" styleClass="btn btn-info"  process="f1" update="f1" action="#{salesInvoiceView.saveProformaExpiryDays(main)}" />
-          <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('confirmPerformaDlgVar').hide();" />
-        </div>
-      </p:dialog>
+      <h:panelGroup layout="block" id="salesProductTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
+        <p:dataTable var="salesItemVar" id="salesItemTable" widgetVar="salesItemTableVar" value="#{salesInvoiceView.salesInvoiceItemList}" rowIndexVar="rowIndex"
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
+          <p:column headerText="Sno" width="61" style="text-align: center;" >
+            <h:outputText value="#{rowIndex + 1}" />
+            <h:outputText rendered="#{salesItemVar.productStockStatus gt 0}" styleClass="fa fa-exclamation-triangle" style="color: #f00;" title="Insufficient quantity." value="" />
+          </p:column>
 
-      <script>
-        //<![CDATA[
-        function refreshDatatable() {
-          page.refresh();
-        }
+           Product 
+          <p:column headerText="Product" width="200">
+            <p:autoComplete id="productId" styleClass="m-t-5" value="#{salesItemVar.product}" completeMethod="#{salesInvoiceView.completeProduct}"
+                            required="true" pt:data-control="material" pt:data-placeholder-label="false"
+                            converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative"
+                            cache="true" queryDelay="500" maxResults="50" title="#{salesItemVar.product.productName}"
+                            var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+              <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+              <p:ajax event="itemSelect" update="@this,batchNo,expiryDate,valueMrp,ptsRate,valuePts,valuePtr,caseQty,peiceQty,boxQty,discValue,freeQty,valueSales,valueVat,totalRate,invoiceDetailsDiv productTypeDiv commodityDiv"
+                      listener="#{salesInvoiceView.updateCurrentRow(salesItemVar)}" />
+            </p:autoComplete>
+          </p:column>
 
-        function refreshRow() {
-          console.log('Refresh Row');
-        }
+           Batch 
+          <p:column headerText="Batch" width="170">
+            <h:panelGroup layout="block" id="batchNo" styleClass="m-t-10">
+              <p:selectOneMenu value="#{salesItemVar.productDetailSales}" styleClass="fw"  id="productDetailList" panelStyle="width:550px" var="batchVar"
+                               required="true"
+                               converter="omnifaces.SelectItemsConverter">
+                <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" noSelectionOption="true" />
+                <f:selectItems value="#{salesInvoiceView.selectProductDetailSales(main, salesItemVar.product, salesItemVar)}" var="e"
+                               itemValue="#{e}" itemLabel="#{e.batchNo}" />
+                <p:column headerText="Batch">
+                  <h:outputText value="#{batchVar.batchNo}" />
+                </p:column>
+                <p:column headerText="Exp. Date">
+                  <h:outputText value="#{batchVar.expiryDate}" />
+                </p:column>
+                <p:column headerText="Qty">
+                  <h:outputText value="#{batchVar.quantityAvailable}" />
+                </p:column>
+                <p:column headerText="Free Scheme">
+                  <h:outputText value="#{batchVar.freeQtySchemeId ne null ? batchVar.freeSchemeName : ''}" />
+                </p:column>
+                <p:column headerText="PTS">
+                  <h:outputText value="#{batchVar.pricelistPts}" />
+                </p:column>
+                <p:column headerText="MRP">
+                  <h:outputText value="#{batchVar.mrpValue}" />
+                </p:column>
+                <p:ajax event="itemSelect" process="batchNo" update="expiryDate,valueMrp,ptsRate,valuePts,valuePtr,caseQty,peiceQty,boxQty,discValue,freeQty,valueSales,valueVat,totalRate,invoiceDetailsDiv"
+                        listener="#{salesInvoiceView.updateProductDetails(salesItemVar)}" oncomplete="refreshDatatable();" >
+                </p:ajax>
+              </p:selectOneMenu>
+            </h:panelGroup>
+          </p:column>
 
-        function submitForm(params) {
-          saveSalesInvoiceItem([{name: 'rownumber', value: params[2]}]);
-          return false;
-        }
+          <p:column headerText="Exp. Date">
+            <h:panelGroup layout="block" id="expiryDate" styleClass="m-t--10">
+              <p:inputText disabled="true" pt:data-control="material" pt:data-placeholder-label="false"  value="#{salesItemVar.productDetailSales.expiryDate}"  />
+            </h:panelGroup>
+          </p:column>
 
-        $(document).ready(function (e) {
-          refreshDatatable();
-        });
-        //]]>
-      </script>
-    </ui:define>
+          <p:column headerText="">
+            <h:panelGroup layout="block" styleClass="flex" id="caseQtyCol">
+              <h:panelGroup layout="block" styleClass="cell w-100">
+                <p:inputNumber id="caseQty" pt:data-control="material" value="#{salesItemVar.tertiaryQuantity}" autocomplete="off"
+                               styleClass="m-t--10"
+                               disabled="#{salesItemVar.productDetailSales.tertiaryPackId eq null}" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999.99" maxlength="6"
+                               placeholder="#{salesItemVar.productDetailSales.tertiaryPackId eq null ? '' : salesItemVar.productDetailSales.tertiaryPacking.title}">
+                  <p:ajax event="blur" listener="#{salesInvoiceView.updateProductQuantity(main,salesItemVar,3)}" oncomplete="refreshDatatable();"
+                          update="boxQty,peiceQty,freeQty,discValue,valueSales,valueVat,totalRate,invoiceDetailsDiv" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </h:panelGroup>
+          </p:column>
 
-    <ui:define name="newList">
-      <h:commandButton action="#{salesInvoiceView.newSalesInvoice(main, 2)}" immediate="true" rendered="false" value="Sales Invoice - By Sales Order" styleClass="btn btn-info">
-        <f:ajax execute="f1" render="f1"/>
-      </h:commandButton>
+          <p:column headerText="">
+            <h:panelGroup layout="block" styleClass="flex" id="boxQtyCol">
+              <h:panelGroup layout="block" styleClass="cell w-100">
+                <p:inputNumber id="boxQty" pt:data-control="material" styleClass="m-t--10" value="#{salesItemVar.secondaryQuantity}" minValue="0.0"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="99999.99" maxlength="6" autocomplete="off"
+                               disabled="#{salesItemVar.productDetailSales.secondaryPackId eq null}"
+                               placeholder="#{salesItemVar.productDetailSales.secondaryPackId eq null ? '' : salesItemVar.productDetailSales.secondaryPacking.title}" >
+                  <p:ajax event="blur" listener="#{salesInvoiceView.updateProductQuantity(main,salesItemVar,2)}" oncomplete="refreshDatatable();"
+                          update="caseQty,peiceQty,freeQty,discValue,valueSales,valueVat,totalRate,invoiceDetailsDiv" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </h:panelGroup>
+          </p:column>
+          <p:column headerText="Qty">
+            <h:panelGroup layout="block" styleClass="flex" id="peiceQtyCol">
+              <h:panelGroup layout="block" styleClass="cell w-100">
+                <p:inputNumber id="peiceQty" pt:data-control="material" styleClass="m-t--10" value="#{salesItemVar.productQty}" size="10" autocomplete="off"
+                               readonly="#{salesItemVar.productDetailSales.primaryPackId eq null}" minValue="0"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="#{salesInvoiceView.salesInvoiceEditable ? salesItemVar.currentAvailableQty : salesItemVar.productQty}"
+                               decimalPlaces="0" thousandSeparator=""
+                               placeholder="#{salesItemVar.productDetailSales.primaryPackId eq null ? '' : salesItemVar.productDetailSales.primaryPacking.title}"
+                               >
+                  <p:ajax event="blur" update="caseQty,boxQty,freeQty,discValue,valueSales,valueVat,totalRate,invoiceDetailsDiv"
+                          listener="#{salesInvoiceView.updateProductSalesValues(main,salesItemVar,1)}" oncomplete="refreshDatatable();" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </h:panelGroup>
+          </p:column>
 
-      <h:commandButton action="#{salesInvoiceView.newSalesInvoice(main, 1)}" immediate="true" value="#{lang.newform}" styleClass="btn btn-info">
-        <f:ajax execute="f1" render="f1"/>
-      </h:commandButton>
-    </ui:define>
+          <p:column headerText="Free Qty">
+              <p:inputNumber id="freeQty" value="#{salesItemVar.productQtyFree}" size="10" autocomplete="off"  styleClass="m-t-5" decimalPlaces="0"
+                           onfocus="this.select()" inputStyleClass="text-right" maxValue="#{salesInvoiceView.salesInvoiceEditable  ? salesItemVar.currentAvailableFreeQty : salesItemVar.productQtyFree}" minValue="0" pt:data-control="material" pt:data-placeholder-label="false"
+                           readonly="#{salesItemVar.productDetailId eq null}">
+              <p:ajax event="blur" listener="#{salesInvoiceView.updateProductFreeQtyScheme(salesItemVar)}"
+                      update="caseQty,boxQty,peiceQty"
+                      oncomplete="refreshDatatable();" />
+            </p:inputNumber>
+          </p:column>
 
-    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
-      <p:selectOneMenu value="#{salesInvoiceView.salesInvoiceFilter}" >
-        <f:selectItem itemValue="#{null}" itemLabel="#{lang.all}" />
-        <f:selectItem itemValue="1" itemLabel="#{lang.confirmed}"   />
-        <f:selectItem itemValue="2" itemLabel="#{lang.draft}" />
-        <f:selectItem itemValue="3" itemLabel="#{lang.proforma}" />
-        <p:ajax update="salesInvoiceTable" />
-      </p:selectOneMenu>   
+          <p:column headerText="Disc.">
+            <div class="p-l-10 m-t-5">
+              <p:inputNumber id="discValue" value="#{salesItemVar.discProdPieceFixed}" size="6" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999"
+                             pt:data-control="material" pt:data-placeholder-label="false"
+                             autocomplete="off" >
+                <p:ajax event="blur" update="totalRate" listener="#{salesInvoiceView.ajaxApplyLineDiscountValue(salesItemVar)}" />
+              </p:inputNumber>
+            </div>
+          </p:column>
 
-    <ui:define name="list">
-      <p:dataTable id="salesInvoiceTable" var="salesInvoiceVar" widgetVar="salesInvoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-                   lazy="true" value="#{salesInvoiceView.salesInvoiceLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesInvoiceVar.id}"
-                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
-                   selection="#{salesInvoiceView.salesInvoiceSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
-        <p:column selectionMode="multiple" exportable="false" />
-         Invoice No 
-        <p:column sortBy="#{salesInvoiceVar.invoiceNo}" field="invoice_no">
-          <f:facet name="header">
-            <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}" escape="false" />
-          </f:facet>
-          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesInvoiceVar.invoiceNo)}" process="@this" update="f1" immediate="true"
-                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
-            <f:setPropertyActionListener target="#{salesInvoiceView.salesInvoice}" value="#{salesInvoiceVar}" />
-          </p:commandLink>
-          <h:outputText  title="#{appView.title(salesInvoiceVar.invoiceNo)}" escape="false" />
-        </p:column>
+          <p:column headerText="Rate" >
+            <div class="w-80 m-t--5">
+              <p:inputNumber id="ptsRate" value="#{salesItemVar.prodPieceSellingForced}" styleClass="submit_item fw" size="10" autocomplete="off"
+                             pt:data-control="material" pt:data-placeholder-label="false" required="true" >
+                <p:ajax event="blur" update="salesProductTableDiv invoiceDetailsDiv"
+                        listener="#{salesInvoiceView.updateProductSalesValues(main,salesItemVar,0)}" oncomplete="refreshDatatable();" />
+              </p:inputNumber>
+            </div>
+          </p:column>
 
-         Invoice Date 
-        <p:column sortBy="#{salesInvoiceVar.invoiceDate}" field="invoice_date" >
-          <f:facet name="header">
-            <h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}" escape="false" />
-          </f:facet>
-          <h:outputText value="#{appView.dateTime(salesInvoiceVar.invoiceDate)}" escape="false" />
-        </p:column>
+          <p:column headerText="PTS" >
+            <div class="w-80 m-t--5">
+              <p:inputNumber id="valuePts" value="#{salesItemVar.valuePts}" styleClass="submit_item fw" size="10" autocomplete="off"
+                             pt:data-control="material" pt:data-placeholder-label="false" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right"
+                             required="true" />
+            </div>
+          </p:column>
 
-         Invoice Amount Net 
-        <p:column sortBy="#{salesInvoiceVar.invoiceAmountNet}" field="invoice_amount_net" style="text-align: right">
-          <f:facet name="header">
-            <h:outputText value="#{lang.invoiceAmountNet}" title="#{lang.invoiceAmountNet}" escape="false" />
-          </f:facet>
-          <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountNet)}" escape="false" />
-        </p:column>
+          <p:column headerText="PTR"  rendered="#{salesInvoiceView.medicineCommodity}">
+            <div class="w-80 m-t--5">
+              <p:inputNumber id="valuePtr" value="#{salesItemVar.valuePtr}" styleClass="submit_item fw" size="10" autocomplete="off"
+                             pt:data-control="material" pt:data-placeholder-label="false"
+                             required="true" />
+            </div>
+          </p:column>
 
-         Invoice Amount Vat
-        <p:column sortBy="#{salesInvoiceVar.invoiceAmountVat}" field="invoice_amount_vat" style="text-align: right">
-          <f:facet name="header">
-            <h:outputText value="#{lang.invoiceAmountVat}" title="#{lang.invoiceAmountVat}" escape="false" />
-          </f:facet>
-          <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountVat)}" escape="false" />
-        </p:column>
+          <p:column headerText="MRP" styleClass="p-t-5 p-b-10">
+            <p:inputText id="valueMrp" readonly="true"  value="#{salesItemVar.productDetailId.valueMrp}" styleClass="m-t-5"
+                         pt:data-control="material" pt:data-placeholder-label="false"
+                         />
+          </p:column>
 
-         Invoice Amount 
-        <p:column sortBy="#{salesInvoiceVar.invoiceAmount}" field="invoice_amount" style="text-align: right">
-          <f:facet name="header">
-            <h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}" escape="false" />
-          </f:facet>
-          <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmount)}" escape="false" />
-        </p:column>
+          <p:column headerText="Sale Value" >
+            <p:inputText id="valueSales"  readonly="true" value="#{salesItemVar.valueSale}"
+                         pt:data-control="material" pt:data-placeholder-label="false"
+                         />
+          </p:column>
 
-         Status 
-        <p:column sortBy="#{salesInvoiceVar.salesInvoiceStatusId.title}" field="sales_invoice_status_id.title">
-          <f:facet name="header">
-            <h:outputText value="#{lang.status}" title="#{lang.status}" escape="false" />
-          </f:facet>
-          <h:outputText value="#{appView.display(salesInvoiceVar.salesInvoiceStatusId.title)}" title="#{appView.title(salesInvoiceVar.salesInvoiceStatusId.title)}" escape="false" />
-        </p:column>
+          <p:column headerText="Tax Value" >
+            <p:inputText id="valueVat"  readonly="true" value="#{salesItemVar.valueVat}"
+                         pt:data-control="material" pt:data-placeholder-label="false"
+                         />
+          </p:column>
 
-        <p:column headerText="#{lang.log}" exportable="false">
-          <f:facet name="header">
-            <h:outputText value="#{lang.log}" title="#{lang.log}" escape="false" />
-          </f:facet>
-          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
-            <ui:define name="cby">#{appView.display(salesInvoiceVar.createdBy)}</ui:define>
-            <ui:define name="cat">#{appView.dateTime(salesInvoiceVar.createdAt)}</ui:define>
-            <ui:define name="uby">#{appView.display(salesInvoiceVar.modifiedBy)}</ui:define>
-            <ui:define name="uat">#{appView.dateTime(salesInvoiceVar.modifiedAt)}</ui:define>
-            <ui:define name="id">#{appView.display(salesInvoiceVar.id)}</ui:define>
-          </ui:decorate>
-        </p:column>
-      </p:dataTable>
-    </ui:define>
-  </ui:decorate>
+          <p:column headerText="Net Value" >
+            <p:inputText id="totalRate" readonly="true" value="#{salesItemVar.valueInvoice}"
+                         pt:data-control="material" pt:data-placeholder-label="false"
+                         />
+          </p:column>
+
+          <p:column headerText="" styleClass="p-t-20" rendered="#{salesInvoiceView.salesInvoiceEditable}">
+            <p:commandButton process="@this" value="" update="salesProductTableDiv,invoiceDetailsDiv" tabindex="-1" icon="fa fa-trash"
+                             actionListener="#{salesInvoiceView.actionDeleteSalesItem(main, salesItemVar)}">
+              <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+            </p:commandButton>
+            <p:commandButton process="@this" value="" update="salesProductTableDiv,invoiceDetailsDiv" tabindex="-1" icon="fa fa-undo"
+                             actionListener="#{salesInvoiceView.actionUndoDeleteSalesItem(salesItemVar)}" rendered="#{salesInvoiceView.isSalesInvoiceItemDeleted(salesItemVar)}">
+              <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+            </p:commandButton>
+          </p:column>
+        </p:dataTable>
+      </h:panelGroup>
+    </h:panelGroup>
+
+    <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm()}">
+      <p:panelGrid  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" >
+        <h:panelGroup>
+          <p:inputTextarea value="#{salesInvoiceView.salesInvoice.note}" placeholder="Note" cols="100" rows="3" maxlength="500" id="note" autoResize="false" styleClass="fw" />
+        </h:panelGroup>
+      </p:panelGrid>
+    </h:panelGroup>
+
+    <p:dialog header="Info" widgetVar="infoDlg" modal="true" height="100" resizable="false">
+      <h:outputText value="Selected product already exist in sales invoice." />
+      <p:commandButton type="button" onclick="PF('infoDlg').hide();" value="#{lang.ok}" />
+    </p:dialog>
+
+    <p:dialog id="confirmPerformaDlg" widgetVar="confirmPerformaDlgVar" header="Confirm" resizable="false" showEffect="clip"
+              hideEffect="clip" closeOnEscape="true" modal="true" >
+      <h:panelGrid columns="2">
+        <p:outputLabel value="#{lang.confirmMessage}" rendered="#{!salesInvoiceView.proforma}" />
+        <p:outputLabel value="#{lang.proformaExtendConfirmMessage}" rendered="#{salesInvoiceView.proforma}" />
+        <h:panelGroup layout="block">
+        </h:panelGroup>
+        <p:outputLabel value="Pro-Forma Expires On - #{salesInvoiceView.salesInvoice.proformaExpiringAt}" rendered="#{salesInvoiceView.proforma}"  />
+        <h:panelGroup layout="block" rendered="#{salesInvoiceView.proforma}">
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.extendProFormaFor}" for="expireDays" rendered="#{salesInvoiceView.proforma}" />
+        <p:outputLabel value="#{lang.keepProFormaFor}" for="expireDays" rendered="#{!salesInvoiceView.proforma}" />
+        <h:panelGroup layout="block">
+          <p:selectOneMenu value="#{salesInvoiceView.proformaExpireDays}" required="true" id="expireDays"
+                           converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemValue="#{1}" itemLabel="#{lang.oneDay}" />
+            <f:selectItem itemValue="#{2}" itemLabel="#{lang.twoDays}" />
+            <f:selectItem itemValue="#{3}" itemLabel="#{lang.threeDays}" />
+          </p:selectOneMenu>
+        </h:panelGroup>
+      </h:panelGrid>
+
+      <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+        <p:commandButton value="#{lang.yes}" rendered="#{!salesInvoiceView.proforma}" styleClass="btn btn-info"  process="f1" update="f1" action="#{salesInvoiceView.saveSalesInvoice(main,3)}" />
+        <p:commandButton value="#{lang.yes}" rendered="#{salesInvoiceView.proforma}" styleClass="btn btn-info"  process="f1" update="f1" action="#{salesInvoiceView.saveProformaExpiryDays(main)}" />
+        <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('confirmPerformaDlgVar').hide();" />
+      </div>
+    </p:dialog>
+
+    <script>
+      //<![CDATA[
+      function refreshDatatable() {
+        page.refresh();
+      }
+
+      function refreshRow() {
+        console.log('Refresh Row');
+      }
+
+      function submitForm(params) {
+        saveSalesInvoiceItem([{name: 'rownumber', value: params[2]}]);
+        return false;
+      }
+
+      $(document).ready(function (e) {
+        refreshDatatable();
+      });
+      //]]>
+    </script>
+  </ui:define>
+
+  <ui:define name="newList">
+    <h:commandButton action="#{salesInvoiceView.newSalesInvoice(main, 2)}" immediate="true" rendered="false" value="Sales Invoice - By Sales Order" styleClass="btn btn-info">
+      <f:ajax execute="f1" render="f1"/>
+    </h:commandButton>
+
+    <h:commandButton action="#{salesInvoiceView.newSalesInvoice(main, 1)}" immediate="true" value="#{lang.newform}" styleClass="btn btn-info">
+      <f:ajax execute="f1" render="f1"/>
+    </h:commandButton>
+  </ui:define>
+
+  <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+    <p:selectOneMenu value="#{salesInvoiceView.salesInvoiceFilter}" >
+      <f:selectItem itemValue="#{null}" itemLabel="#{lang.all}" />
+      <f:selectItem itemValue="1" itemLabel="#{lang.confirmed}"   />
+      <f:selectItem itemValue="2" itemLabel="#{lang.draft}" />
+      <f:selectItem itemValue="3" itemLabel="#{lang.proforma}" />
+      <p:ajax update="salesInvoiceTable" />
+    </p:selectOneMenu>   
+
+  <ui:define name="list">
+    <p:dataTable id="salesInvoiceTable" var="salesInvoiceVar" widgetVar="salesInvoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                 lazy="true" value="#{salesInvoiceView.salesInvoiceLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesInvoiceVar.id}"
+                 rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                 selection="#{salesInvoiceView.salesInvoiceSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+      <p:column selectionMode="multiple" exportable="false" />
+       Invoice No 
+      <p:column sortBy="#{salesInvoiceVar.invoiceNo}" field="invoice_no">
+        <f:facet name="header">
+          <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}" escape="false" />
+        </f:facet>
+        <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesInvoiceVar.invoiceNo)}" process="@this" update="f1" immediate="true"
+                       onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <f:setPropertyActionListener target="#{salesInvoiceView.salesInvoice}" value="#{salesInvoiceVar}" />
+        </p:commandLink>
+        <h:outputText  title="#{appView.title(salesInvoiceVar.invoiceNo)}" escape="false" />
+      </p:column>
+
+       Invoice Date 
+      <p:column sortBy="#{salesInvoiceVar.invoiceDate}" field="invoice_date" >
+        <f:facet name="header">
+          <h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}" escape="false" />
+        </f:facet>
+        <h:outputText value="#{appView.dateTime(salesInvoiceVar.invoiceDate)}" escape="false" />
+      </p:column>
+
+       Invoice Amount Net 
+      <p:column sortBy="#{salesInvoiceVar.invoiceAmountNet}" field="invoice_amount_net" style="text-align: right">
+        <f:facet name="header">
+          <h:outputText value="#{lang.invoiceAmountNet}" title="#{lang.invoiceAmountNet}" escape="false" />
+        </f:facet>
+        <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountNet)}" escape="false" />
+      </p:column>
+
+       Invoice Amount Vat
+      <p:column sortBy="#{salesInvoiceVar.invoiceAmountVat}" field="invoice_amount_vat" style="text-align: right">
+        <f:facet name="header">
+          <h:outputText value="#{lang.invoiceAmountVat}" title="#{lang.invoiceAmountVat}" escape="false" />
+        </f:facet>
+        <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountVat)}" escape="false" />
+      </p:column>
+
+       Invoice Amount 
+      <p:column sortBy="#{salesInvoiceVar.invoiceAmount}" field="invoice_amount" style="text-align: right">
+        <f:facet name="header">
+          <h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}" escape="false" />
+        </f:facet>
+        <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmount)}" escape="false" />
+      </p:column>
+
+       Status 
+      <p:column sortBy="#{salesInvoiceVar.salesInvoiceStatusId.title}" field="sales_invoice_status_id.title">
+        <f:facet name="header">
+          <h:outputText value="#{lang.status}" title="#{lang.status}" escape="false" />
+        </f:facet>
+        <h:outputText value="#{appView.display(salesInvoiceVar.salesInvoiceStatusId.title)}" title="#{appView.title(salesInvoiceVar.salesInvoiceStatusId.title)}" escape="false" />
+      </p:column>
+
+      <p:column headerText="#{lang.log}" exportable="false">
+        <f:facet name="header">
+          <h:outputText value="#{lang.log}" title="#{lang.log}" escape="false" />
+        </f:facet>
+        <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+          <ui:define name="cby">#{appView.display(salesInvoiceVar.createdBy)}</ui:define>
+          <ui:define name="cat">#{appView.dateTime(salesInvoiceVar.createdAt)}</ui:define>
+          <ui:define name="uby">#{appView.display(salesInvoiceVar.modifiedBy)}</ui:define>
+          <ui:define name="uat">#{appView.dateTime(salesInvoiceVar.modifiedAt)}</ui:define>
+          <ui:define name="id">#{appView.display(salesInvoiceVar.id)}</ui:define>
+        </ui:decorate>
+      </p:column>
+    </p:dataTable>
+  </ui:define>
+</ui:decorate>
 </ui:composition>-->

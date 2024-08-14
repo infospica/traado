@@ -24,17 +24,17 @@
     </ui:define>   
 
     <ui:define name="form">   
-      
+
       <!--Title-->
       <p:outputLabel value="#{lang.title}" for="title" />
       <h:panelGroup><p:inputText styleClass="fw" value="#{salesOrderStatusView.salesOrderStatus.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text"/></h:panelGroup>
-      
+
       <!--sort Order-->
       <p:outputLabel value="#{lang.sortOrder}" for="proirity" />
       <h:panelGroup><p:inputNumber value="#{salesOrderStatusView.salesOrderStatus.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="proirity" /><p:message for="proirity" display="text"/></h:panelGroup>            
-    
+
     </ui:define>
-    
+
     <ui:define name="after">
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
         <ui:define name="cby">#{appView.display(salesOrderStatusView.salesOrderStatus.createdBy)}</ui:define>
@@ -43,7 +43,7 @@
         <ui:define name="uat">#{appView.dateTime(salesOrderStatusView.salesOrderStatus.modifiedAt)}</ui:define>
       </ui:decorate>
     </ui:define>
-    
+
     <ui:define name="list">
       <p:dataTable id="salesOrderStatusTable" var="salesOrderStatusVar" widgetVar="salesOrderStatusWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                    lazy="true" value="#{salesOrderStatusView.salesOrderStatusLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesOrderStatusVar.id}"

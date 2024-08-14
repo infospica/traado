@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,10 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -32,50 +26,54 @@ import spica.scm.domain.SalesInvoice;
 
 /**
  * SalesAgentCommissionReceiptDetailView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Dec 18 16:22:07 IST 2017 
+ * @version	1.0, Mon Dec 18 16:22:07 IST 2017
  */
-
-@Named(value="salesAgentCommissionReceiptDetailView")
+@Named(value = "salesAgentCommissionReceiptDetailView")
 @ViewScoped
-public class SalesAgentCommissionReceiptDetailView implements Serializable{
+public class SalesAgentCommissionReceiptDetailView implements Serializable {
 
   private transient SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesAgentCommissionReceiptDetail> salesAgentCommissionReceiptDetailLazyModel; 	//For lazy loading datatable.
   private transient SalesAgentCommissionReceiptDetail[] salesAgentCommissionReceiptDetailSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public SalesAgentCommissionReceiptDetailView() {
     super();
   }
- 
+
   /**
    * Return SalesAgentCommissionReceiptDetail.
+   *
    * @return SalesAgentCommissionReceiptDetail.
-   */  
+   */
   public SalesAgentCommissionReceiptDetail getSalesAgentCommissionReceiptDetail() {
-    if(salesAgentCommissionReceiptDetail == null) {
+    if (salesAgentCommissionReceiptDetail == null) {
       salesAgentCommissionReceiptDetail = new SalesAgentCommissionReceiptDetail();
     }
     return salesAgentCommissionReceiptDetail;
-  }   
-  
+  }
+
   /**
    * Set SalesAgentCommissionReceiptDetail.
+   *
    * @param salesAgentCommissionReceiptDetail.
-   */   
+   */
   public void setSalesAgentCommissionReceiptDetail(SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
     this.salesAgentCommissionReceiptDetail = salesAgentCommissionReceiptDetail;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchSalesAgentCommissionReceiptDetail(MainView main, String viewType) {
+  public String switchSalesAgentCommissionReceiptDetail(MainView main, String viewType) {
     if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
@@ -88,40 +86,44 @@ public class SalesAgentCommissionReceiptDetailView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create salesAgentCommissionReceiptDetailLazyModel.
+   *
    * @param main
    */
   private void loadSalesAgentCommissionReceiptDetailList(final MainView main) {
     if (salesAgentCommissionReceiptDetailLazyModel == null) {
       salesAgentCommissionReceiptDetailLazyModel = new LazyDataModel<SalesAgentCommissionReceiptDetail>() {
-      private List<SalesAgentCommissionReceiptDetail> list;      
-      @Override
-      public List<SalesAgentCommissionReceiptDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SalesAgentCommissionReceiptDetailService.listPaged(main);
-          main.commit(salesAgentCommissionReceiptDetailLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SalesAgentCommissionReceiptDetail> list;
+
+        @Override
+        public List<SalesAgentCommissionReceiptDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SalesAgentCommissionReceiptDetailService.listPaged(main);
+            main.commit(salesAgentCommissionReceiptDetailLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
-        return salesAgentCommissionReceiptDetail.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
+          return salesAgentCommissionReceiptDetail.getId();
+        }
+
+        @Override
         public SalesAgentCommissionReceiptDetail getRowData(String rowKey) {
           if (list != null) {
             for (SalesAgentCommissionReceiptDetail obj : list) {
@@ -137,11 +139,12 @@ public class SalesAgentCommissionReceiptDetailView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_sales_agent_commission_receipt_detail/";	
+    String SUB_FOLDER = "scm_sales_agent_commission_receipt_detail/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -157,7 +160,7 @@ public class SalesAgentCommissionReceiptDetailView implements Serializable{
    */
   public String cloneSalesAgentCommissionReceiptDetail(MainView main) {
     main.setViewType(ViewTypes.newform);
-    return saveOrCloneSalesAgentCommissionReceiptDetail(main, "clone"); 
+    return saveOrCloneSalesAgentCommissionReceiptDetail(main, "clone");
   }
 
   /**
@@ -183,14 +186,13 @@ public class SalesAgentCommissionReceiptDetailView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many SalesAgentCommissionReceiptDetail.
    *
@@ -206,7 +208,7 @@ public class SalesAgentCommissionReceiptDetailView implements Serializable{
       } else {
         SalesAgentCommissionReceiptDetailService.deleteByPk(main, getSalesAgentCommissionReceiptDetail());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (main.isEdit()){
+        if (main.isEdit()) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -220,55 +222,59 @@ public class SalesAgentCommissionReceiptDetailView implements Serializable{
 
   /**
    * Return LazyDataModel of SalesAgentCommissionReceiptDetail.
+   *
    * @return
    */
   public LazyDataModel<SalesAgentCommissionReceiptDetail> getSalesAgentCommissionReceiptDetailLazyModel() {
     return salesAgentCommissionReceiptDetailLazyModel;
   }
 
- /**
-  * Return SalesAgentCommissionReceiptDetail[].
-  * @return 
-  */
+  /**
+   * Return SalesAgentCommissionReceiptDetail[].
+   *
+   * @return
+   */
   public SalesAgentCommissionReceiptDetail[] getSalesAgentCommissionReceiptDetailSelected() {
     return salesAgentCommissionReceiptDetailSelected;
   }
-  
+
   /**
    * Set SalesAgentCommissionReceiptDetail[].
-   * @param salesAgentCommissionReceiptDetailSelected 
+   *
+   * @param salesAgentCommissionReceiptDetailSelected
    */
   public void setSalesAgentCommissionReceiptDetailSelected(SalesAgentCommissionReceiptDetail[] salesAgentCommissionReceiptDetailSelected) {
     this.salesAgentCommissionReceiptDetailSelected = salesAgentCommissionReceiptDetailSelected;
   }
- 
 
-
- /**
-  * SalesAgentCommissionReceipt autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.salesAgentCommissionReceiptAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.salesAgentCommissionReceiptAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * SalesAgentCommissionReceipt autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.salesAgentCommissionReceiptAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.salesAgentCommissionReceiptAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<SalesAgentCommissionReceipt> salesAgentCommissionReceiptAuto(String filter) {
     return ScmLookupView.salesAgentCommissionReceiptAuto(filter);
   }
- /**
-  * SalesInvoice autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.salesInvoiceAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.salesInvoiceAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+
+  /**
+   * SalesInvoice autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.salesInvoiceAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.salesInvoiceAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<SalesInvoice> salesInvoiceAuto(String filter) {
     return ScmLookupView.salesInvoiceAuto(filter);
   }

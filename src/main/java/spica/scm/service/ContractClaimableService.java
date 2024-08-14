@@ -160,13 +160,13 @@ public abstract class ContractClaimableService {
 
   public static final void selectInsertClaimableByContract(Main main, Integer activeContractId, Contract renewedContract) {
 
-    List<ContractClaimable> claimableList = AppService.list(main,  ContractClaimable.class, "select * from scm_contract_claimable where contract_id = ?", new Object[]{activeContractId});
+    List<ContractClaimable> claimableList = AppService.list(main, ContractClaimable.class, "select * from scm_contract_claimable where contract_id = ?", new Object[]{activeContractId});
     ContractClaimable cc;
     for (ContractClaimable claimable : claimableList) {
       cc = new ContractClaimable();
       cc.setClaimableId(claimable.getClaimableId());
       cc.setContractId(renewedContract);
-      insert(main, cc);      
+      insert(main, cc);
     }
   }
 }

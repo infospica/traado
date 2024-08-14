@@ -36,7 +36,7 @@
       <!-- Country Tax (Regime) -->
       <p:outputLabel value="#{lang.regime}" for="taxHeadCountryTaxId" />
       <h:panelGroup>
-          <p:selectOneMenu value="#{taxHeadView.taxHead.countryTaxRegimeId}"  id="taxHeadCountryTaxId" converter="omnifaces.SelectItemsConverter"
+        <p:selectOneMenu value="#{taxHeadView.taxHead.countryTaxRegimeId}"  id="taxHeadCountryTaxId" converter="omnifaces.SelectItemsConverter"
                          required="true" requiredMessage="#{lang.regime} #{lang.isRequired}" styleClass="fw">          
           <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
           <f:selectItems value="#{scmLookupView.countryTaxRegime(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
@@ -91,7 +91,7 @@
         </p:selectOneMenu>
         <p:message for="taxHeadStatusId" display="text" />
       </h:panelGroup>
-      
+
       <!--Applied Region-->
       <p:outputLabel value="#{lang.appliedRegion}" for="taxHeadAppliedRegion"/>
       <h:panelGroup>

@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.importer.view;
 
@@ -126,7 +126,7 @@ public class ImportProductView implements Serializable {
       XSSFDataValidation validation1 = (XSSFDataValidation) dvHelper.createValidation(dvConstraintBeneficiary, new CellRangeAddressList(1, 100, 0, 0));
       validation1.setShowErrorBox(true);
       importsheet.addValidationData(validation1);
-      ExcelUtil.write(name+".xlsx", workbook);
+      ExcelUtil.write(name + ".xlsx", workbook);
     } catch (Throwable t) {
       main.rollback(t, "error.import");
     } finally {

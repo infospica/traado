@@ -76,29 +76,29 @@ $brand-warning: #f0ad4e;
 $brand-danger:  $Clr5;
 
 $colorType:
-	"default"	#666	#fff,
-	"primary"	$brand-primary	#fff,
-	"success"	$brand-success	#fff,
-	"info"	$brand-info	#fff,
-	"warning"	#f0ad4e	#fff,
-	"danger"	darken($brand-danger,15%)	#fff
+"default"	#666	#fff,
+"primary"	$brand-primary	#fff,
+"success"	$brand-success	#fff,
+"info"	$brand-info	#fff,
+"warning"	#f0ad4e	#fff,
+"danger"	darken($brand-danger,15%)	#fff
 ;
 
 $bgColor:
-	"default"	#fff	$Txt,
-	"primary"	$brand-primary	#fff,
-	"success"	$brand-success	#fff,
-	"info"	$brand-info	#fff,
-	"warning"	#f0ad4e	#fff,
-	"danger"	darken($brand-danger,15%)	#fff
+"default"	#fff	$Txt,
+"primary"	$brand-primary	#fff,
+"success"	$brand-success	#fff,
+"info"	$brand-info	#fff,
+"warning"	#f0ad4e	#fff,
+"danger"	darken($brand-danger,15%)	#fff
 ;
 
 $alertColors:
-	"primary"	$brand-primary,
-	"success"	darken($brand-success,15%),
-	"info"	$brand-info,
-	"warning"	darken($brand-warning,15%),
-	"error"	darken($brand-danger,20%)
+"primary"	$brand-primary,
+"success"	darken($brand-success,15%),
+"info"	$brand-info,
+"warning"	darken($brand-warning,15%),
+"error"	darken($brand-danger,20%)
 ;
 
 $navbar-default-bg: $Clr1;

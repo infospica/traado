@@ -5,7 +5,7 @@
   #{stockAdjustmentView.switchStockAdjustment(main, viewType)}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
@@ -50,14 +50,14 @@
       </p:commandButton>
 
       <!-- Reset To Draft -->
-<!--      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
-      <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
-                       action="#{stockAdjustmentView.actionResetStockAdjustment(main)}"
-                       rendered="#{!stockAdjustmentView.draft and userRole.isRoot() and main.edit and !stockAdjustmentView.reverseEntry and stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE
-                                   and userRuntimeView.privilege.resetToDraft==true}" 
-                       >-->
+      <!--      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+            <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                             action="#{stockAdjustmentView.actionResetStockAdjustment(main)}"
+                             rendered="#{!stockAdjustmentView.draft and userRole.isRoot() and main.edit and !stockAdjustmentView.reverseEntry and stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE
+                  and userRuntimeView.privilege.resetToDraft==true}" 
+      >-->
 <!--        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
-      </p:commandButton>-->
+</p:commandButton>-->
       <!-- Up Coming Documet No -->
       <h:panelGroup id="nextDocNoDiv">
         <h:outputText  value="#{lang.next} #{lang.documentNo} #{lang.colon} " id="nextDocNoLabel"
@@ -198,8 +198,13 @@
     <ui:define name="after" >
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <style>
-        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
-        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+        .mDataTable td, .themeTable td, .dataTable td{
+          border-top:none;
+          border-bottom: none;
+        }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{
+          border: none;
+        }
 
         .bg-danger {
           color: #fff;

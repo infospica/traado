@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -32,18 +31,18 @@ import wawo.app.faces.Jsf;
 
 /**
  * TransporterContactView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:15 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:15 IST 2016
  */
-
-@Named(value="transporterContactView")
+@Named(value = "transporterContactView")
 @ViewScoped
-public class TransporterContactView implements Serializable{
+public class TransporterContactView implements Serializable {
 
   private transient TransporterContact transporterContact;	//Domain object/selected Domain.
   private transient LazyDataModel<TransporterContact> transporterContactLazyModel; 	//For lazy loading datatable.
   private transient TransporterContact[] transporterContactSelected;	 //Selected Domain Array
-  
+
   private Transporter parent;
 
   /**
@@ -54,10 +53,10 @@ public class TransporterContactView implements Serializable{
     parent = (Transporter) Jsf.dialogParent(Transporter.class);
     getTransporterContact().setId(Jsf.getParameterInt("id"));
   }
-  
+
   /**
    * Default Constructor.
-   */   
+   */
   public TransporterContactView() {
     super();
   }
@@ -68,36 +67,39 @@ public class TransporterContactView implements Serializable{
 
   public void setParent(Transporter parent) {
     this.parent = parent;
-  } 
-  
+  }
+
   /**
    * Return TransporterContact.
+   *
    * @return TransporterContact.
-   */  
+   */
   public TransporterContact getTransporterContact() {
-    if(transporterContact == null) {
+    if (transporterContact == null) {
       transporterContact = new TransporterContact();
     }
     return transporterContact;
-  }   
-  
+  }
+
   /**
    * Set TransporterContact.
+   *
    * @param transporterContact.
-   */   
+   */
   public void setTransporterContact(TransporterContact transporterContact) {
     this.transporterContact = transporterContact;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchTransporterContact(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchTransporterContact(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -110,40 +112,44 @@ public class TransporterContactView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
- 
+  }
+
   /**
    * Create transporterContactLazyModel.
+   *
    * @param main
    */
   private void loadTransporterContactList(final MainView main) {
     if (transporterContactLazyModel == null) {
       transporterContactLazyModel = new LazyDataModel<TransporterContact>() {
-      private List<TransporterContact> list;      
-      @Override
-      public List<TransporterContact> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = TransporterContactService.listPaged(main);
-          main.commit(transporterContactLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<TransporterContact> list;
+
+        @Override
+        public List<TransporterContact> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = TransporterContactService.listPaged(main);
+            main.commit(transporterContactLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(TransporterContact transporterContact) {
-        return transporterContact.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(TransporterContact transporterContact) {
+          return transporterContact.getId();
+        }
+
+        @Override
         public TransporterContact getRowData(String rowKey) {
           if (list != null) {
             for (TransporterContact obj : list) {
@@ -159,11 +165,12 @@ public class TransporterContactView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_transporter_contact/";	
+    String SUB_FOLDER = "scm_transporter_contact/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -179,7 +186,7 @@ public class TransporterContactView implements Serializable{
    */
   public String cloneTransporterContact(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneTransporterContact(main, "clone"); 
+    return saveOrCloneTransporterContact(main, "clone");
   }
 
   /**
@@ -206,14 +213,13 @@ public class TransporterContactView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error"+ key);
+      main.rollback(t, "error" + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many TransporterContact.
    *
@@ -229,7 +235,7 @@ public class TransporterContactView implements Serializable{
       } else {
         TransporterContactService.deleteByPk(main, getTransporterContact());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -243,68 +249,74 @@ public class TransporterContactView implements Serializable{
 
   /**
    * Return LazyDataModel of TransporterContact.
+   *
    * @return
    */
   public LazyDataModel<TransporterContact> getTransporterContactLazyModel() {
     return transporterContactLazyModel;
   }
 
- /**
-  * Return TransporterContact[].
-  * @return 
-  */
+  /**
+   * Return TransporterContact[].
+   *
+   * @return
+   */
   public TransporterContact[] getTransporterContactSelected() {
     return transporterContactSelected;
   }
-  
+
   /**
    * Set TransporterContact[].
-   * @param transporterContactSelected 
+   *
+   * @param transporterContactSelected
    */
   public void setTransporterContactSelected(TransporterContact[] transporterContactSelected) {
     this.transporterContactSelected = transporterContactSelected;
   }
- 
 
-
- /**
-  * Transporter autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.transporterAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.transporterAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * Transporter autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.transporterAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.transporterAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<Transporter> transporterAuto(String filter) {
     return ScmLookupView.transporterAuto(filter);
   }
- /**
-  * Designation autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.designationAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.designationAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+
+  /**
+   * Designation autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.designationAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.designationAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<Designation> designationAuto(String filter) {
     return ScmLookupView.designationAuto(filter);
   }
+
   /**
    * Calling back the dialogReturn method. Can pass an object back to the returning method.
    */
   public void transporterContactDialogClose() {
     Jsf.returnDialog(null);
   }
+
   public List<Status> statusAuto(String filter) {
     return ScmLookupView.statusAuto(filter);
   }
-  
+
   public void onRowEdit(TransporterContact transporterContact) {
     MainView main = Jsf.getMain();
     try {
@@ -316,7 +328,7 @@ public class TransporterContactView implements Serializable{
       main.close();
     }
   }
-  
+
   public List<Designation> selectDesignationByTransporterContext(MainView main) {
     try {
       return DesignationService.selectDesignationByTransporterContext(main);

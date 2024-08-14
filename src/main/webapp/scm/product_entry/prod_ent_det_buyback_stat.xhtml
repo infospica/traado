@@ -36,7 +36,7 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{prodEntDetBuybackStatView.prodEntDetBuybackStat.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
     </ui:define>
@@ -58,7 +58,7 @@
         <p:column selectionMode="multiple" exportable="false" />        
         <p:column sortBy="#{prodEntDetBuybackStatVar.title}" field="title">          
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(prodEntDetBuybackStatVar.title)}" process="@this" update="f1" 
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(prodEntDetBuybackStatVar.title)}" process="@this" update="f1" 
                          immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{prodEntDetBuybackStatView.prodEntDetBuybackStat}" value="#{prodEntDetBuybackStatVar}" />
           </p:commandLink>
@@ -68,7 +68,7 @@
           <h:outputText value="#{appView.number(prodEntDetBuybackStatVar.sortOrder)}" escape="false" />
         </p:column>-->
         <p:column exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(prodEntDetBuybackStatVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(prodEntDetBuybackStatVar.createdAt)}</ui:define>

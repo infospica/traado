@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.print;
 
@@ -119,7 +119,7 @@ public class PrintPurchaseReturn extends PdfUtil {
     if (purchaseReturn.getPrintType().equals(SystemConstants.PRINT_PORTRAIT) || companySettings.getLandScapeFormat().equals(SystemConstants.PRINT_MULTIPLE_LINE)) {
       if (isFirstRow()) {
         if (purchaseReturn.getPrintType().equals(SystemConstants.PRINT_PORTRAIT) && companySettings.getPrintBillTitlePosition().equals(SystemConstants.PRINT_BILL_TITLE_TOP)) {
-          PdfPCell cell = new PdfPCell(header.setPurchaseReturnLabel(purchaseReturn.getPurchaseReturnStockCat().getId(),purchaseReturn.getPurchaseReturnStatusId().getId()));
+          PdfPCell cell = new PdfPCell(header.setPurchaseReturnLabel(purchaseReturn.getPurchaseReturnStockCat().getId(), purchaseReturn.getPurchaseReturnStatusId().getId()));
           cell.setBackgroundColor(BaseColor.WHITE);
           cell.setBorder(0);
           cell.setPaddingBottom(4);
@@ -133,7 +133,7 @@ public class PrintPurchaseReturn extends PdfUtil {
       } else {
         if ((purchaseReturn.getPrintType().equals(SystemConstants.PRINT_PORTRAIT) && companySettings.getPrintBillTitlePosition().equals(SystemConstants.PRINT_BILL_TITLE_MIDDLE))
                 || purchaseReturn.getPrintType().equals(SystemConstants.PRINT_MULTIPLE_LINE)) {
-          table.addCell(header.setPurchaseReturnLabel(purchaseReturn.getPurchaseReturnStockCat().getId(),purchaseReturn.getPurchaseReturnStatusId().getId()));
+          table.addCell(header.setPurchaseReturnLabel(purchaseReturn.getPurchaseReturnStockCat().getId(), purchaseReturn.getPurchaseReturnStatusId().getId()));
         }
         tableMap.put(30f, header.setRecipientAddress(recipientAddress, true));
         tableMap.put(24f, header.setRecipientGST(recipientAddress, SystemConstants.PRINT_MULTIPLE_LINE));
@@ -143,7 +143,7 @@ public class PrintPurchaseReturn extends PdfUtil {
       }
     } else {
       if (companySettings.getLandScapeFormat().equals(SystemConstants.PRINT_SINGLE_LINE)) {
-        PdfPCell cell = new PdfPCell(header.setPurchaseReturnLabel(purchaseReturn.getPurchaseReturnStockCat().getId(),purchaseReturn.getPurchaseReturnStatusId().getId()));
+        PdfPCell cell = new PdfPCell(header.setPurchaseReturnLabel(purchaseReturn.getPurchaseReturnStockCat().getId(), purchaseReturn.getPurchaseReturnStatusId().getId()));
         cell.setBorder(0);
         table.addCell(cell);
         PdfPTable single = new PdfPTable(1);

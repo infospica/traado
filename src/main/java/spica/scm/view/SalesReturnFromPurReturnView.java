@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.view;
 
@@ -20,7 +20,6 @@ import spica.scm.common.ProductSummary;
 import spica.scm.domain.Company;
 import spica.scm.domain.Product;
 import spica.scm.domain.ProductBatch;
-import spica.scm.domain.ProductEntryDetail;
 import spica.scm.domain.PurchaseReturn;
 import spica.scm.domain.PurchaseReturnItemReplica;
 import spica.scm.domain.SalesInvoice;
@@ -183,9 +182,9 @@ public class SalesReturnFromPurReturnView implements Serializable {
               }
             }
             if (itemReplica.getRefSalesInvoiceId() != null) {
-              ProductSummary productSummary = SalesReturnFromPurReturnService.getProductSummaryForReturn(main, getCompany(),salesReturn.getAccountGroupId(), itemReplica);
+              ProductSummary productSummary = SalesReturnFromPurReturnService.getProductSummaryForReturn(main, getCompany(), salesReturn.getAccountGroupId(), itemReplica);
               if (productSummary != null && productSummary.getProductId() != null) {
-                salesReturnItem.setProductSummary(productSummary); 
+                salesReturnItem.setProductSummary(productSummary);
                 salesReturnItem.setProductBatchSummary(productSummary);
                 salesReturnItem.setProduct(ProductService.selectByPk(main, new Product(productSummary.getProductId())));
                 salesReturnItem.setHsnCode(productSummary.getHsnCode());

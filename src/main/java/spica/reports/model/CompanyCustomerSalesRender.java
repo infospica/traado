@@ -1,7 +1,6 @@
 package spica.reports.model;
 
 import java.io.Serializable;
-import spica.sys.UserRuntimeView;
 
 public class CompanyCustomerSalesRender implements Serializable {
 

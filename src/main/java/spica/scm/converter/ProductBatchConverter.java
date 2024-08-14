@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2015-2018 Infospica. All rights reserved.
+ * Copyright 2015-2024 Infospica. All rights reserved.
  * Use is subject to license terms.
  */
 package spica.scm.converter;
@@ -27,9 +27,9 @@ public class ProductBatchConverter implements Converter {
     SalesInvoiceItem salesInvoiceItem = (SalesInvoiceItem) Jsf.getAttribute("selectItem");
 
     if (salesInvoiceItem != null) {
-      if(salesInvoiceItem.getProductDetailSales() == null){
+      if (salesInvoiceItem.getProductDetailSales() == null) {
         return g(salesInvoiceItem, value);
-      }      
+      }
       if (!StringUtil.isEmpty(value) && salesInvoiceItem.getProductDetailSales().toString().equals(value)) {
         salesInvoiceItem.setProductHashChanged(Boolean.FALSE);
         return salesInvoiceItem.getProductDetailSales();
@@ -39,22 +39,22 @@ public class ProductBatchConverter implements Converter {
     }
     return null;
   }
-  
-  private Object g(SalesInvoiceItem salesInvoiceItem, String value){
-           salesInvoiceItem.setProductHashChanged(Boolean.TRUE);
-      if (!StringUtil.isEmpty(salesInvoiceItem.getProductDetailSalesList())) {
-        if (!StringUtil.isEmpty(value)) {
-          for (ProductDetailSales productDetails : salesInvoiceItem.getProductDetailSalesList()) {
-            if (value.equals(productDetails.getProductHash())) {
 
-              return productDetails;
-            }
+  private Object g(SalesInvoiceItem salesInvoiceItem, String value) {
+    salesInvoiceItem.setProductHashChanged(Boolean.TRUE);
+    if (!StringUtil.isEmpty(salesInvoiceItem.getProductDetailSalesList())) {
+      if (!StringUtil.isEmpty(value)) {
+        for (ProductDetailSales productDetails : salesInvoiceItem.getProductDetailSalesList()) {
+          if (value.equals(productDetails.getProductHash())) {
+
+            return productDetails;
           }
         }
-      } else {
-        return salesInvoiceItem.getProductDetailSales();
       }
-      return null;
+    } else {
+      return salesInvoiceItem.getProductDetailSales();
+    }
+    return null;
   }
 
   public String getAsString(FacesContext fc, UIComponent uic, Object value) {

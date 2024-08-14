@@ -9,24 +9,24 @@
   <ui:include src="com/nav.xhtml" />
   <div class="card" >
     <ui:include src="com/toolForm.xhtml" />
-  <ui:include src="com/toolList.xhtml" />
- 
+    <ui:include src="com/toolList.xhtml" />
+
     <ui:insert name="before"/>
-    
-    <!-- <h:panelGroup id="#{ids}F" styleClass="ui-fluid" rendered="#{main.isForm()}" style="background-color: white; padding-top: 10px;padding-bottom: 10px" layout="block">
-    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank ui-fluid" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"> -->
-      <ui:insert name="form"/>             
- <!--   </p:panelGrid>
-  </h:panelGroup>  -->
-  
-      <h:panelGroup id="#{ids}L" styleClass="bg-default" layout="block" rendered="#{main.isList()}">
-        <ui:insert name="list" />  
-      </h:panelGroup>
-  
+
+<!-- <h:panelGroup id="#{ids}F" styleClass="ui-fluid" rendered="#{main.isForm()}" style="background-color: white; padding-top: 10px;padding-bottom: 10px" layout="block">
+<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank ui-fluid" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"> -->
+    <ui:insert name="form"/>             
+    <!--   </p:panelGrid>
+     </h:panelGroup>  -->
+
+    <h:panelGroup id="#{ids}L" styleClass="bg-default" layout="block" rendered="#{main.isList()}">
+      <ui:insert name="list" />  
+    </h:panelGroup>
+
     <ui:insert name="after"/>
     <!--  </div>-->
-      <p:commandButton id="noSubmitF" process="@none" type="button" style="display:none"/>
-  <p:defaultCommand target="noSubmitF"/>
+    <p:commandButton id="noSubmitF" process="@none" type="button" style="display:none"/>
+    <p:defaultCommand target="noSubmitF"/>
   </div>
   <ui:include src="com/toolFooter.xhtml"/>
 </ui:composition>

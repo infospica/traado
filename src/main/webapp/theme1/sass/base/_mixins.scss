@@ -1,23 +1,23 @@
 @mixin new-font-face($font-family, $font-filename, $font-weight : normal, $font-style :normal, $font-stretch : normal){
-	@font-face {
-		font-family: '#{$font-family}';
-		src: url('#{$font-filename}.eot');
-		src: url('#{$font-filename}.eot?#iefix') format('embedded-opentype'),
-		url('#{$font-filename}.woff') format('woff'),
-		url('#{$font-filename}.ttf') format('truetype'),
-		url('#{$font-filename}.svg##{$font-family}') format('svg');
-		font-weight: $font-weight;
-		font-style: $font-style;
-		font-stretch: $font-stretch;
-	}
+  @font-face {
+    font-family: '#{$font-family}';
+    src: url('#{$font-filename}.eot');
+    src: url('#{$font-filename}.eot?#iefix') format('embedded-opentype'),
+      url('#{$font-filename}.woff') format('woff'),
+      url('#{$font-filename}.ttf') format('truetype'),
+      url('#{$font-filename}.svg##{$font-family}') format('svg');
+    font-weight: $font-weight;
+    font-style: $font-style;
+    font-stretch: $font-stretch;
+  }
 }
 
 /* -------- ANIMATIONS -------- */
 $vendor:
-	"-moz-",
-	"-webkit-",
-	"-ms-",
-	""
+"-moz-",
+"-webkit-",
+"-ms-",
+""
 ;
 
 ///*@mixin saveAnimation($animateName:"animationName") {
@@ -36,125 +36,131 @@ $vendor:
     // Output standard non-prefixed declaration
     #{$property}: $value;
   }
-}///* [EG] @include prefix((column-count: 3,column-gap: 1.5em,column-rule: 2px solid hotpink), webkit moz);
+}
+///* [EG] @include prefix((column-count: 3,column-gap: 1.5em,column-rule: 2px solid hotpink), webkit moz);
 //[copy]//  @include prefix(( X:X,X:X ), webkit moz);
 //*/
 
 @mixin animate($animateName, $duration:0.3s, $loop:1, $timing:ease-in) {
-	@each $prefix in $vendor {
-		#{$prefix}animation-name: $animateName;
-		#{$prefix}animation-iteration-count: $loop;
-		#{$prefix}animation-timing-function: $timing;
-		#{$prefix}animation-duration: $duration;
-	}
-}///*@include animate(slideUp, 0.3s, 1, ease-in);*/
+  @each $prefix in $vendor {
+    #{$prefix}animation-name: $animateName;
+    #{$prefix}animation-iteration-count: $loop;
+    #{$prefix}animation-timing-function: $timing;
+    #{$prefix}animation-duration: $duration;
+  }
+}
+///*@include animate(slideUp, 0.3s, 1, ease-in);*/
 
 @mixin border-radius($radius){
-	-moz-border-radius: #{$radius};
-	-o-border-radius: #{$radius};
-	-webkit-border-radius: #{$radius};
-	border-radius: #{$radius};
+  -moz-border-radius: #{$radius};
+  -o-border-radius: #{$radius};
+  -webkit-border-radius: #{$radius};
+  border-radius: #{$radius};
 }
 
 @mixin linear-gradient($fromColor, $toColor, $start:0%, $stop:100%) {
-	background-color: $fromColor;
-	background-image: -moz-linear-gradient(top, $fromColor $start, $toColor $stop);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop($start,$fromColor), color-stop($stop,$toColor));
-	background-image: -webkit-linear-gradient(top, $fromColor $start, $toColor $stop);
-	background-image: -o-linear-gradient(top, $fromColor $start, $toColor $stop);
-	background-image: -ms-linear-gradient(top, $fromColor $start, $toColor $stop);
-	background-image: linear-gradient(top, $fromColor $start, $toColor $stop);
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#{$fromColor}', EndColorStr='#{$toColor}');
-}///*@include linear-gradient(#000, #fff[, 0%, 100%])*/
+  background-color: $fromColor;
+  background-image: -moz-linear-gradient(top, $fromColor $start, $toColor $stop);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop($start,$fromColor), color-stop($stop,$toColor));
+  background-image: -webkit-linear-gradient(top, $fromColor $start, $toColor $stop);
+  background-image: -o-linear-gradient(top, $fromColor $start, $toColor $stop);
+  background-image: -ms-linear-gradient(top, $fromColor $start, $toColor $stop);
+  background-image: linear-gradient(top, $fromColor $start, $toColor $stop);
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#{$fromColor}', EndColorStr='#{$toColor}');
+}
+///*@include linear-gradient(#000, #fff[, 0%, 100%])*/
 @mixin h-gradient($fromColor, $toColor, $start:0%, $stop:100%) {
-	background: $fromColor; /* Old browsers */
-	background: -moz-linear-gradient(left, $fromColor $start, $toColor $stop); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right top, color-stop($start,$fromColor), color-stop($stop,$toColor)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left, $fromColor $start,$toColor $stop); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(left, $fromColor $start,$toColor $stop); /* Opera 11.10+ */
-	background: -ms-linear-gradient(left, $fromColor $start,$toColor $stop); /* IE10+ */
-	background: linear-gradient(to right, $fromColor $start,$toColor $stop); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$fromColor}', endColorstr='#{$toColor}',GradientType=1 ); /* IE6-9 */
+  background: $fromColor; /* Old browsers */
+  background: -moz-linear-gradient(left, $fromColor $start, $toColor $stop); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop($start,$fromColor), color-stop($stop,$toColor)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left, $fromColor $start,$toColor $stop); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left, $fromColor $start,$toColor $stop); /* Opera 11.10+ */
+  background: -ms-linear-gradient(left, $fromColor $start,$toColor $stop); /* IE10+ */
+  background: linear-gradient(to right, $fromColor $start,$toColor $stop); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$fromColor}', endColorstr='#{$toColor}',GradientType=1 ); /* IE6-9 */
 }
 
 @mixin strippedBG($deg, $start, $sdist, $end, $edist ){
-	background: -webkit-repeating-linear-gradient($deg, $start, $start $sdist, $end $sdist, $end $edist);
-	background: -moz-repeating-linear-gradient($deg, $start, $start $sdist, $end $sdist, $end $edist);
-	background: repeating-linear-gradient($deg, $start, $start $sdist, $end $sdist, $end $edist);
-}///*@include strippedBG(90deg, #2B2B2B, 2px, #323232, 4px);*/
+  background: -webkit-repeating-linear-gradient($deg, $start, $start $sdist, $end $sdist, $end $edist);
+  background: -moz-repeating-linear-gradient($deg, $start, $start $sdist, $end $sdist, $end $edist);
+  background: repeating-linear-gradient($deg, $start, $start $sdist, $end $sdist, $end $edist);
+}
+///*@include strippedBG(90deg, #2B2B2B, 2px, #323232, 4px);*/
 
 @mixin box-shadow($arguments){
-	-moz-box-shadow: #{$arguments};
-	-o-box-shadow: #{$arguments};
-	-webkit-box-shadow: #{$arguments};
-	box-shadow: #{$arguments};
-}///*@include box-shadow(inset -3px -2px 6px 0px rgba(0, 0, 0, 0.3));*/
+  -moz-box-shadow: #{$arguments};
+  -o-box-shadow: #{$arguments};
+  -webkit-box-shadow: #{$arguments};
+  box-shadow: #{$arguments};
+}
+///*@include box-shadow(inset -3px -2px 6px 0px rgba(0, 0, 0, 0.3));*/
 @mixin opacity($val){
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$val*100)";
-	filter: alpha(opacity=$val*100);
-	-o-opacity: $val;
-	-moz-opacity: $val;
-	-khtml-opacity: $val;
-	opacity: $val;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$val*100)";
+  filter: alpha(opacity=$val*100);
+  -o-opacity: $val;
+  -moz-opacity: $val;
+  -khtml-opacity: $val;
+  opacity: $val;
 }
 
 
 @mixin userSelect($val){
-	-webkit-touch-callout:$val;
-	-webkit-user-select:$val;
-	-khtml-user-select:$val;
-	-moz-user-select:$val;
-	-ms-user-select:$val;
-	user-select:$val;
+  -webkit-touch-callout:$val;
+  -webkit-user-select:$val;
+  -khtml-user-select:$val;
+  -moz-user-select:$val;
+  -ms-user-select:$val;
+  user-select:$val;
 }
 
 @mixin transform($val){
-	-webkit-transform: $val;
-	-o-transform: $val;
-	-ms-transform: $val;
-	transform: $val;
+  -webkit-transform: $val;
+  -o-transform: $val;
+  -ms-transform: $val;
+  transform: $val;
 }
 
 @mixin transition($val){
-	transition:#{$val};
-	-webkit-transition:#{$val};
-	-moz-transition:#{$val};
-	-o-transition:#{$val};
+  transition:#{$val};
+  -webkit-transition:#{$val};
+  -moz-transition:#{$val};
+  -o-transition:#{$val};
 }
 
 @mixin calc($op,$mgn:0, $pdg:$mgn, $width:100%){
-	@if $op=='-'{
-		margin:0 -#{$mgn};
-		padding:0 #{$pdg};
-		width: #{$width};
-	}@else{
-		margin:0 #{$mgn};
-		padding:0 #{$pdg};
-		width: #{$width};
-	}
+  @if $op=='-'{
+    margin:0 -#{$mgn};
+    padding:0 #{$pdg};
+    width: #{$width};
+  }
+  @else{
+    margin:0 #{$mgn};
+    padding:0 #{$pdg};
+    width: #{$width};
+  }
 }
 
 ///*Flex*/
 @mixin flex() {
-	display: -webkit-box;
-	display: -moz-box;
-	display: -ms-flexbox;
-	display: -webkit-flex;
-	display: flex;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 }
 @mixin flex($values) {
-	-webkit-box-flex: $values;
-	-moz-box-flex:  $values;
-	-webkit-flex:  $values;
-	-ms-flex:  $values;
-	flex:  $values;
+  -webkit-box-flex: $values;
+  -moz-box-flex:  $values;
+  -webkit-flex:  $values;
+  -ms-flex:  $values;
+  flex:  $values;
 }
 @mixin order($val) {
-	-webkit-box-ordinal-group: $val;
-	-moz-box-ordinal-group: $val;
-	-ms-flex-order: $val;
-	-webkit-order: $val;
-	order: $val;
+  -webkit-box-ordinal-group: $val;
+  -moz-box-ordinal-group: $val;
+  -ms-flex-order: $val;
+  -webkit-order: $val;
+  order: $val;
 }
 
 @mixin optional-at-root($sel) {
@@ -164,45 +170,47 @@ $vendor:
 }
 
 @function em($px, $base: $base-font-size) {
-    @return ($px / $base) * 1em;
+  @return ($px / $base) * 1em;
 }
 @function rem($px, $base: $base-font-size) {
-    @return ($px / $base) * 1rem;
+  @return ($px / $base) * 1rem;
 }
 
 @mixin animation($animate...) {
-    $max: length($animate);
-    $animations: '';
+  $max: length($animate);
+  $animations: '';
 
-    @for $i from 1 through $max {
-        $animations: #{$animations + nth($animate, $i)};
+  @for $i from 1 through $max {
+    $animations: #{$animations + nth($animate, $i)};
 
-        @if $i < $max {
-            $animations: #{$animations + ", "};
-        }
+    @if $i < $max {
+      $animations: #{$animations + ", "};
     }
-	@include prefix((
-		 animation: $animations
-	), webkit moz o );
-}//@include animation('animationName 1s 1'[, 'animationName2 1s 1 1s']);
+  }
+  @include prefix((
+  animation: $animations
+    ), webkit moz o );
+}
+//@include animation('animationName 1s 1'[, 'animationName2 1s 1 1s']);
 
 @mixin keyframes($animation-name) {
-    @-webkit-keyframes #{$animation-name} {
-        @content;
-    }
-    @-moz-keyframes #{$animation-name} {
-        @content;
-    }  
-    @-ms-keyframes #{$animation-name} {
-        @content;
-    }
-    @-o-keyframes #{$animation-name} {
-        @content;
-    }  
-    @keyframes #{$animation-name} {
-        @content;
-    }
-}//@include keyframes(animationName) {0% { x: x; }100% { x: x;} }
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @-ms-keyframes #{$animation-name} {
+    @content;
+  }
+  @-o-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+//@include keyframes(animationName) {0% { x: x; }100% { x: x;} }
 
 @mixin placeholder {
   @include optional-at-root('::-webkit-input-placeholder') {
@@ -220,52 +228,53 @@ $vendor:
   @include optional-at-root(':-ms-input-placeholder') {
     @content;
   }
-}//'} //[CodeColorHinting Hack]
+}
+//'} //[CodeColorHinting Hack]
 
 ///*Site based Mixins*/
 
 @mixin modify-breadcrumb( $hgt:40px,$bcBg:#fff,$arrow:15px ) {
-	li{
-		height:$hgt;
-		line-height: $hgt;
-		&:hover,&:focus{
-			a{
-				color:#fff;
-				background:$prColor;
-			}
-			&+li{
-				&:after{
-					border-left-color:$prColor;
-				}
-			}
-		}
-		
-		&+li{
-			&:after,
-			&:before{
-				border-top-width:$hgt/2;
-				border-left-width:$arrow;
-				border-bottom-width:$hgt/2;
-			}
-			&:after{
-				border-left-width:$arrow - 2;
-				border-left-color:$bcBg;
-			}
-		}
-		&.active{
-			color:#fff;
-			background:$prColor;
-			a{
-				color:#fff;
-				background:$prColor;
-			}
-			&+li{
-				&:after{
-					border-left-color:$prColor;
-				}
-			}
-		}
-	}
+  li{
+    height:$hgt;
+    line-height: $hgt;
+    &:hover,&:focus{
+      a{
+        color:#fff;
+        background:$prColor;
+      }
+      &+li{
+        &:after{
+          border-left-color:$prColor;
+        }
+      }
+    }
+
+    &+li{
+      &:after,
+        &:before{
+        border-top-width:$hgt/2;
+        border-left-width:$arrow;
+        border-bottom-width:$hgt/2;
+      }
+      &:after{
+        border-left-width:$arrow - 2;
+        border-left-color:$bcBg;
+      }
+    }
+    &.active{
+      color:#fff;
+      background:$prColor;
+      a{
+        color:#fff;
+        background:$prColor;
+      }
+      &+li{
+        &:after{
+          border-left-color:$prColor;
+        }
+      }
+    }
+  }
 }
 
 @import "flex";

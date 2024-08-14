@@ -2,7 +2,7 @@
   #{purchaseLedgerView.reset()}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <o:importConstants type="spica.constant.ReportConstant" />
@@ -134,7 +134,7 @@
         <p:column sortBy="#{row.supplierName}" field="supplier_name" filterBy="#{row.supplierName}" filterStyleClass="hidden">
           <f:facet name="header"><h:outputText value="#{lang.supplier}" title="#{lang.supplier}"/></f:facet>
           <h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
-          
+
         <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden"
                   rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
           <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>

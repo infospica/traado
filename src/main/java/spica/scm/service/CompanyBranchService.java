@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Company;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -31,15 +30,15 @@ public abstract class CompanyBranchService {
    * @return SqlPage
    */
   private static SqlPage getCompanyBranchSqlPaged(Main main) {
-      SqlPage sql = AppService.sqlPage("scm_company_branch", CompanyBranch.class, main);
+    SqlPage sql = AppService.sqlPage("scm_company_branch", CompanyBranch.class, main);
     sql.main("select scm_company_branch.id,scm_company_branch.company_id,scm_company_branch.branch_name,scm_company_branch.address,scm_company_branch.country_id,scm_company_branch.state_id,scm_company_branch.district_id,scm_company_branch.pin,scm_company_branch.territory_id,scm_company_branch.phone_1,scm_company_branch.phone_2,scm_company_branch.phone_3,scm_company_branch.fax_1,scm_company_branch.fax_2,scm_company_branch.email,scm_company_branch.sort_order,scm_company_branch.status_id,scm_company_branch.created_by,scm_company_branch.modified_by,scm_company_branch.created_at,scm_company_branch.modified_at from scm_company_branch scm_company_branch "); //Main query
     sql.count("select count(scm_company_branch.id) as total from scm_company_branch scm_company_branch "); //Count query
     sql.join("left outer join scm_company scm_company_branchcompany_id on (scm_company_branchcompany_id.id = scm_company_branch.company_id) left outer join scm_country scm_company_branchcountry_id on (scm_company_branchcountry_id.id = scm_company_branch.country_id) left outer join scm_state scm_company_branchstate_id on (scm_company_branchstate_id.id = scm_company_branch.state_id) left outer join scm_district scm_company_branchdistrict_id on (scm_company_branchdistrict_id.id = scm_company_branch.district_id) left outer join scm_territory scm_company_branchterritory_id on (scm_company_branchterritory_id.id = scm_company_branch.territory_id) left outer join scm_status scm_company_branchstatus_id on (scm_company_branchstatus_id.id = scm_company_branch.status_id)"); //Join Query
 
-    sql.string(new String[]{"scm_company_branchcompany_id.company_name","scm_company_branch.branch_name","scm_company_branch.address","scm_company_branchcountry_id.country_name","scm_company_branchstate_id.state_name","scm_company_branchdistrict_id.district_name","scm_company_branch.pin","scm_company_branchterritory_id.territory_name","scm_company_branch.phone_1","scm_company_branch.phone_2","scm_company_branch.phone_3","scm_company_branch.fax_1","scm_company_branch.fax_2","scm_company_branch.email","scm_company_branchstatus_id.title","scm_company_branch.created_by","scm_company_branch.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_company_branch.id","scm_company_branch.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_company_branch.created_at","scm_company_branch.modified_at"});  //Date search or sort fields
-      return sql;
+    sql.string(new String[]{"scm_company_branchcompany_id.company_name", "scm_company_branch.branch_name", "scm_company_branch.address", "scm_company_branchcountry_id.country_name", "scm_company_branchstate_id.state_name", "scm_company_branchdistrict_id.district_name", "scm_company_branch.pin", "scm_company_branchterritory_id.territory_name", "scm_company_branch.phone_1", "scm_company_branch.phone_2", "scm_company_branch.phone_3", "scm_company_branch.fax_1", "scm_company_branch.fax_2", "scm_company_branch.email", "scm_company_branchstatus_id.title", "scm_company_branch.created_by", "scm_company_branch.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_company_branch.id", "scm_company_branch.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_company_branch.created_at", "scm_company_branch.modified_at"});  //Date search or sort fields
+    return sql;
   }
 
   /**

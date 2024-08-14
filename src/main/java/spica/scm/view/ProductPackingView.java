@@ -287,9 +287,9 @@ public class ProductPackingView implements Serializable {
     return getProductPacking().getPackType() != null && getProductPacking().getPackType().getId() == 1;
 
   }
- 
+
   public List<ProductUnit> getUnitSelected() {
-     if (unitSelected == null) {
+    if (unitSelected == null) {
       unitSelected = ScmLookupView.productUnitAuto(null);
     }
     return unitSelected;

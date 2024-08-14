@@ -264,7 +264,7 @@ public class CountryTaxRegimeView implements Serializable {
   public List<Country> countryAuto(String filter) {
     return ScmLookupView.countryAuto(filter);
   }
-  
+
   public List<TaxProcessor> taxProcessorAuto(String filter) {
     return ScmLookupView.taxProcessorAuto(filter);
   }

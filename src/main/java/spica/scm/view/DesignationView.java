@@ -13,15 +13,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -39,11 +35,11 @@ import wawo.app.faces.Jsf;
 @Named(value = "designationView")
 @ViewScoped
 public class DesignationView implements Serializable {
-  
+
   private transient Designation designation;	//Domain object/selected Domain.
   private transient LazyDataModel<Designation> designationLazyModel; 	//For lazy loading datatable.
   private transient Designation[] designationSelected;	 //Selected Domain Array
-  
+
   @PostConstruct
   public void init() {
     Integer designationId = (Integer) Jsf.popupParentValue(Integer.class);
@@ -52,7 +48,7 @@ public class DesignationView implements Serializable {
 
   /**
    * Default Constructor.
-   */  
+   */
   public DesignationView() {
     super();
   }
@@ -61,7 +57,7 @@ public class DesignationView implements Serializable {
    * Return Designation.
    *
    * @return Designation.
-   */  
+   */
   public Designation getDesignation() {
     if (designation == null) {
       designation = new Designation();
@@ -73,7 +69,7 @@ public class DesignationView implements Serializable {
    * Set Designation.
    *
    * @param designation.
-   */  
+   */
   public void setDesignation(Designation designation) {
     this.designation = designation;
   }
@@ -114,8 +110,8 @@ public class DesignationView implements Serializable {
   private void loadDesignationList(final MainView main) {
     if (designationLazyModel == null) {
       designationLazyModel = new LazyDataModel<Designation>() {
-        private List<Designation> list;        
-        
+        private List<Designation> list;
+
         @Override
         public List<Designation> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -130,12 +126,12 @@ public class DesignationView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(Designation designation) {
           return designation.getId();
         }
-        
+
         @Override
         public Designation getRowData(String rowKey) {
           if (list != null) {
@@ -150,9 +146,9 @@ public class DesignationView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_designation/";    
+    String SUB_FOLDER = "scm_designation/";
   }
 
   /**
@@ -173,7 +169,7 @@ public class DesignationView implements Serializable {
    */
   public String cloneDesignation(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneDesignation(main, "clone");    
+    return saveOrCloneDesignation(main, "clone");
   }
 
   /**

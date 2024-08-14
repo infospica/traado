@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
@@ -62,7 +62,7 @@ public class SalesRateDifferenceService {
               + " AND scm_account.vendor_id =  scm_vendor.id AND scm_account.id = scm_product_detail.account_id\n"
               + " AND scm_sales_invoice_item.product_detail_id = scm_product_detail.id\n"
               + " AND scm_product_batch.product_id = scm_product.id\n"
-              + " AND scm_product_detail.product_batch_id = scm_product_batch.id\n" 
+              + " AND scm_product_detail.product_batch_id = scm_product_batch.id\n"
               + " AND scm_product.product_category_id = scm_product_category.id  \n"
               + " AND (scm_sales_invoice_item.value_prod_piece_selling - scm_sales_invoice_item.prod_piece_selling_forced >0 OR \n"
               + "	scm_sales_invoice_item.scheme_discount_derived - scm_sales_invoice_item.scheme_discount_actual > 0 OR\n"
@@ -107,7 +107,7 @@ public class SalesRateDifferenceService {
               + " AND scm_account.vendor_id =  scm_vendor.id AND scm_account.id = scm_product_detail.account_id\n"
               + " AND scm_sales_invoice_item.product_detail_id = scm_product_detail.id\n"
               + " AND scm_product_batch.product_id = scm_product.id\n"
-              + " AND scm_product_detail.product_batch_id = scm_product_batch.id\n" 
+              + " AND scm_product_detail.product_batch_id = scm_product_batch.id\n"
               + " AND scm_product.product_category_id = scm_product_category.id  \n"
               + " AND (scm_sales_invoice_item.value_prod_piece_selling - scm_sales_invoice_item.prod_piece_selling_forced >0 OR \n"
               + "	scm_sales_invoice_item.scheme_discount_derived - scm_sales_invoice_item.scheme_discount_actual > 0 OR\n"
@@ -116,7 +116,7 @@ public class SalesRateDifferenceService {
 
       sqlOrderBy = " ORDER BY UPPER(scm_vendor.vendor_name),scm_sales_invoice.invoice_date,scm_sales_invoice.invoice_no ";
 
-    } 
+    }
 
     ArrayList<Object> params = new ArrayList<>();
     params.add(SystemConstants.CONFIRMED);

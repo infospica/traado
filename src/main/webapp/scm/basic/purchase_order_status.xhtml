@@ -44,8 +44,8 @@
                    selection="#{purchaseOrderStatusView.purchaseOrderStatusSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{purchaseOrderStatusVar.title}" field="title" >
-           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseOrderStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseOrderStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{purchaseOrderStatusView.purchaseOrderStatus}" value="#{purchaseOrderStatusVar}" />
           </p:commandLink>
         </p:column>
@@ -53,7 +53,7 @@
           <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
           <h:outputText value="#{appView.number(purchaseOrderStatusVar.sortOrder)}" escape="false" /></p:column>-->
         <p:column  exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(purchaseOrderStatusVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(purchaseOrderStatusVar.createdAt)}</ui:define>

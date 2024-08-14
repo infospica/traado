@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.StockStatusService;
 
 /**
  * StockStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon May 09 18:27:32 IST 2016 
+ * @version	1.0, Mon May 09 18:27:32 IST 2016
  */
-
-@Named(value="stockStatusView")
+@Named(value = "stockStatusView")
 @ViewScoped
-public class StockStatusView implements Serializable{
+public class StockStatusView implements Serializable {
 
   private transient StockStatus stockStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<StockStatus> stockStatusLazyModel; 	//For lazy loading datatable.
   private transient StockStatus[] stockStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public StockStatusView() {
     super();
   }
- 
+
   /**
    * Return StockStatus.
+   *
    * @return StockStatus.
-   */  
+   */
   public StockStatus getStockStatus() {
-    if(stockStatus == null) {
+    if (stockStatus == null) {
       stockStatus = new StockStatus();
     }
     return stockStatus;
-  }   
-  
+  }
+
   /**
    * Set StockStatus.
+   *
    * @param stockStatus.
-   */   
+   */
   public void setStockStatus(StockStatus stockStatus) {
     this.stockStatus = stockStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchStockStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchStockStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class StockStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create stockStatusLazyModel.
+   *
    * @param main
    */
   private void loadStockStatusList(final MainView main) {
     if (stockStatusLazyModel == null) {
       stockStatusLazyModel = new LazyDataModel<StockStatus>() {
-      private List<StockStatus> list;      
-      @Override
-      public List<StockStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = StockStatusService.listPaged(main);
-          main.commit(stockStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<StockStatus> list;
+
+        @Override
+        public List<StockStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = StockStatusService.listPaged(main);
+            main.commit(stockStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(StockStatus stockStatus) {
-        return stockStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(StockStatus stockStatus) {
+          return stockStatus.getId();
+        }
+
+        @Override
         public StockStatus getRowData(String rowKey) {
           if (list != null) {
             for (StockStatus obj : list) {
@@ -136,11 +139,12 @@ public class StockStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_stock_status/";	
+    String SUB_FOLDER = "scm_stock_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class StockStatusView implements Serializable{
    */
   public String cloneStockStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneStockStatus(main, "clone"); 
+    return saveOrCloneStockStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class StockStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many StockStatus.
    *
@@ -205,7 +208,7 @@ public class StockStatusView implements Serializable{
       } else {
         StockStatusService.deleteByPk(main, getStockStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class StockStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of StockStatus.
+   *
    * @return
    */
   public LazyDataModel<StockStatus> getStockStatusLazyModel() {
     return stockStatusLazyModel;
   }
 
- /**
-  * Return StockStatus[].
-  * @return 
-  */
+  /**
+   * Return StockStatus[].
+   *
+   * @return
+   */
   public StockStatus[] getStockStatusSelected() {
     return stockStatusSelected;
   }
-  
+
   /**
    * Set StockStatus[].
-   * @param stockStatusSelected 
+   *
+   * @param stockStatusSelected
    */
   public void setStockStatusSelected(StockStatus[] stockStatusSelected) {
     this.stockStatusSelected = stockStatusSelected;
   }
- 
-
 
 }

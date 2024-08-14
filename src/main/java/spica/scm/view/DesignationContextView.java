@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -32,52 +27,56 @@ import spica.scm.domain.SystemContext;
 
 /**
  * DesignationContextView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Jun 17 17:57:40 IST 2016 
+ * @version	1.0, Fri Jun 17 17:57:40 IST 2016
  */
-
-@Named(value="designationContextView")
+@Named(value = "designationContextView")
 @ViewScoped
-public class DesignationContextView implements Serializable{
+public class DesignationContextView implements Serializable {
 
   private transient DesignationContext designationContext;	//Domain object/selected Domain.
   private transient LazyDataModel<DesignationContext> designationContextLazyModel; 	//For lazy loading datatable.
   private transient DesignationContext[] designationContextSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public DesignationContextView() {
     super();
   }
- 
+
   /**
    * Return DesignationContext.
+   *
    * @return DesignationContext.
-   */  
+   */
   public DesignationContext getDesignationContext() {
-    if(designationContext == null) {
+    if (designationContext == null) {
       designationContext = new DesignationContext();
     }
     return designationContext;
-  }   
-  
+  }
+
   /**
    * Set DesignationContext.
+   *
    * @param designationContext.
-   */   
+   */
   public void setDesignationContext(DesignationContext designationContext) {
     this.designationContext = designationContext;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchDesignationContext(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchDesignationContext(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -89,40 +88,44 @@ public class DesignationContextView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create designationContextLazyModel.
+   *
    * @param main
    */
   private void loadDesignationContextList(final MainView main) {
     if (designationContextLazyModel == null) {
       designationContextLazyModel = new LazyDataModel<DesignationContext>() {
-      private List<DesignationContext> list;      
-      @Override
-      public List<DesignationContext> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = DesignationContextService.listPaged(main);
-          main.commit(designationContextLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<DesignationContext> list;
+
+        @Override
+        public List<DesignationContext> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = DesignationContextService.listPaged(main);
+            main.commit(designationContextLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(DesignationContext designationContext) {
-        return designationContext.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(DesignationContext designationContext) {
+          return designationContext.getId();
+        }
+
+        @Override
         public DesignationContext getRowData(String rowKey) {
           if (list != null) {
             for (DesignationContext obj : list) {
@@ -138,11 +141,12 @@ public class DesignationContextView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_designation_context/";	
+    String SUB_FOLDER = "scm_designation_context/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -158,7 +162,7 @@ public class DesignationContextView implements Serializable{
    */
   public String cloneDesignationContext(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneDesignationContext(main, "clone"); 
+    return saveOrCloneDesignationContext(main, "clone");
   }
 
   /**
@@ -184,14 +188,13 @@ public class DesignationContextView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many DesignationContext.
    *
@@ -207,7 +210,7 @@ public class DesignationContextView implements Serializable{
       } else {
         DesignationContextService.deleteByPk(main, getDesignationContext());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -221,55 +224,59 @@ public class DesignationContextView implements Serializable{
 
   /**
    * Return LazyDataModel of DesignationContext.
+   *
    * @return
    */
   public LazyDataModel<DesignationContext> getDesignationContextLazyModel() {
     return designationContextLazyModel;
   }
 
- /**
-  * Return DesignationContext[].
-  * @return 
-  */
+  /**
+   * Return DesignationContext[].
+   *
+   * @return
+   */
   public DesignationContext[] getDesignationContextSelected() {
     return designationContextSelected;
   }
-  
+
   /**
    * Set DesignationContext[].
-   * @param designationContextSelected 
+   *
+   * @param designationContextSelected
    */
   public void setDesignationContextSelected(DesignationContext[] designationContextSelected) {
     this.designationContextSelected = designationContextSelected;
   }
- 
 
-
- /**
-  * Designation autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookup.designationAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookup.designationAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * Designation autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookup.designationAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookup.designationAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<Designation> designationAuto(String filter) {
     return ScmLookupView.designationAuto(filter);
   }
- /**
-  * SystemContext autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookup.systemContextAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookup.systemContextAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+
+  /**
+   * SystemContext autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookup.systemContextAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookup.systemContextAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<SystemContext> systemContextAuto(String filter) {
     return ScmLookupView.systemContextAuto(filter);
   }

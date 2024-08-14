@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.fin.service;
 
@@ -20,7 +20,6 @@ import spica.scm.domain.Customer;
 import spica.scm.domain.State;
 import spica.fin.domain.TaxCode;
 import spica.scm.domain.Transporter;
-import spica.scm.domain.UserProfile;
 import spica.scm.domain.Vendor;
 import spica.fin.common.LedgerObjects;
 import spica.scm.domain.SalesAgent;

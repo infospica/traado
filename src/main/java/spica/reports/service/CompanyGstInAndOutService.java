@@ -1,13 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import spica.constant.AccountingConstant;
@@ -17,7 +15,6 @@ import spica.reports.model.GstReport;
 import spica.reports.model.GstReportSummary;
 import spica.scm.domain.Company;
 import wawo.app.Main;
-import wawo.app.common.AppService;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppDb;
 
@@ -88,7 +85,7 @@ public abstract class CompanyGstInAndOutService {
             + "AND fad.accounting_transaction_id=fat.id\n"
             + "AND (fad.entry_date >= ?::date AND fad.entry_date <= ?::date )";
 
-    return AppDb.getList(main.dbConnector(), GstReport.class, sql, new Object[]{company.getId(),reportView.getLedgerCode(), taxType,
+    return AppDb.getList(main.dbConnector(), GstReport.class, sql, new Object[]{company.getId(), reportView.getLedgerCode(), taxType,
       reportView.getFromDate(), reportView.getToDate()});
 
   }

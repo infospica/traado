@@ -19,7 +19,6 @@ import spica.scm.domain.SalesReturnSplit;
 import spica.scm.domain.Vendor;
 import spica.scm.domain.VendorAddress;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 

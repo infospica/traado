@@ -1,138 +1,159 @@
 /* <-- icsFramework STYLE begins */
 
 $layout:
-	'B' 'Breadcrumb',
-	'F' 'Footer',
-	'H' 'Header',
-	'N' 'Navigation',
-	'T' 'Toolbar'
+'B' 'Breadcrumb',
+'F' 'Footer',
+'H' 'Header',
+'N' 'Navigation',
+'T' 'Toolbar'
 ;
 
 .inlineSpaceFix{
-	white-space: nowrap;
-	font-size: 0;	///* fix for spaces between inline block divs */
+  white-space: nowrap;
+  font-size: 0;
+  ///* fix for spaces between inline block divs */
 }
 
 .b{
-	$hgt:32px;
-	$bcBg:#fff;
-	$arrow:15px;
-	font-size:12px;
-	@extend .breadcrumb,.status !optional;
-	@include modify-breadcrumb($hgt,$bcBg,$arrow);
+  $hgt:32px;
+  $bcBg:#fff;
+  $arrow:15px;
+  font-size:12px;
+  @extend .breadcrumb,.status !optional;
+  @include modify-breadcrumb($hgt,$bcBg,$arrow);
 }
-.c{@extend .clearfix !optional;}
-.i{ @extend .simcon !optional; }
-.r{ @extend .row !optional; }
+.c{
+  @extend .clearfix !optional;
+}
+.i{
+  @extend .simcon !optional;
+}
+.r{
+  @extend .row !optional;
+}
 
 .spaced{
-	.btn{
-		&+.btn{margin-right:5px;}
-	}
+  .btn{
+    &+.btn{
+      margin-right:5px;
+    }
+  }
 }
 
 .C{
-	max-width: 50%;
-	position:relative;
-	text-align: center;
-	margin: 0 auto !important;
-	& > *{
-		display:inline-block !important;
-		vertical-align:middle !important;
-	}
-	@extend .ghostVcenter !optional;
+  max-width: 50%;
+  position:relative;
+  text-align: center;
+  margin: 0 auto !important;
+  & > *{
+    display:inline-block !important;
+    vertical-align:middle !important;
+  }
+  @extend .ghostVcenter !optional;
 }
 .L{
-	float:left;
-	margin-right:5px !important;
+  float:left;
+  margin-right:5px !important;
 }
-.R{ float:right; }
+.R{
+  float:right;
+}
 
 nav.C{
-	float:none;
-	&>li{
-		float:none;
-		font-size:14px;
-		display:inline-block;
-	}
-	@extend .inlineSpaceFix !optional;
+  float:none;
+  &>li{
+    float:none;
+    font-size:14px;
+    display:inline-block;
+  }
+  @extend .inlineSpaceFix !optional;
 }
 
 .bar{
-	@extend .clearfix !optional;
-	.h5{
-		margin-top:0;
-		margin-bottom:0;
-		font-family:$prFont;
-	}
-	.m,
-	nav{
-		@extend .nav,.navbar-nav !optional;
-		.btn{border:none;}
-		&.L{
-			@extend .navbar-left !optional;
-		}
-		&.R{
-			margin:0;
-			@extend .navbar-right !optional;
-		}
-		&.C{
-			float:none;
-			height: $navbar-height;
-			@extend .ghostVcenter !optional;
-		}
-	}
-	
-	.g,
-	&>ul{
-		padding: 5px 8px;
-		white-space: nowrap;
-		@extend .notaList,.ghostVcenter !optional;
-		li{
-			display:inline-block;
-			vertical-align: middle;
-			&+li{margin-left:5px;}
-			a{
-				display:block;
-				padding:6px;
-			}
-		}
-	}
-	
-	.container,.container-fluid{
-		nav.R{margin-right:-$navbar-padding-horizontal;}
-	}
-	
-	@each $bar in $layout{
-		&-#{nth($bar,1)}{
-			/* bar-#{nth($bar,2)} */
-			@extend .bar !optional;
-		}
-	}
-	
-	&-H{
-		margin:0;
-		padding:0;
-		@include border-radius(0);
-		@extend .navbar,.navbar-default !optional;
-	}
-	&-T{
-		@extend .toolBar !optional;
-		.g,
-		&>ul{
-			padding:0;
-			li{
-				a{ padding:6px 10px; }
-			}
-		}
-	}
-	
-	&-N{
-		padding:5px 10px;
-		.b{margin:-5px -10px;}
-	}
-	&-F{
-		background:$ClrF;
-	}
+  @extend .clearfix !optional;
+  .h5{
+    margin-top:0;
+    margin-bottom:0;
+    font-family:$prFont;
+  }
+  .m,
+  nav{
+    @extend .nav,.navbar-nav !optional;
+    .btn{
+      border:none;
+    }
+    &.L{
+      @extend .navbar-left !optional;
+    }
+    &.R{
+      margin:0;
+      @extend .navbar-right !optional;
+    }
+    &.C{
+      float:none;
+      height: $navbar-height;
+      @extend .ghostVcenter !optional;
+    }
+  }
+
+  .g,
+  &>ul{
+    padding: 5px 8px;
+    white-space: nowrap;
+    @extend .notaList,.ghostVcenter !optional;
+    li{
+      display:inline-block;
+      vertical-align: middle;
+      &+li{
+        margin-left:5px;
+      }
+      a{
+        display:block;
+        padding:6px;
+      }
+    }
+  }
+
+  .container,.container-fluid{
+    nav.R{
+      margin-right:-$navbar-padding-horizontal;
+    }
+  }
+
+  @each $bar in $layout{
+    &-#{nth($bar,1)}{
+      /* bar-#{nth($bar,2)} */
+      @extend .bar !optional;
+    }
+  }
+
+  &-H{
+    margin:0;
+    padding:0;
+    @include border-radius(0);
+    @extend .navbar,.navbar-default !optional;
+  }
+  &-T{
+    @extend .toolBar !optional;
+    .g,
+    &>ul{
+      padding:0;
+      li{
+        a{
+          padding:6px 10px;
+        }
+      }
+    }
+  }
+
+  &-N{
+    padding:5px 10px;
+    .b{
+      margin:-5px -10px;
+    }
+  }
+  &-F{
+    background:$ClrF;
+  }
 }
 /* icsFramework STYLE ends --> */

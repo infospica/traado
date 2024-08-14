@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.print;
 
@@ -19,30 +19,30 @@ import spica.scm.domain.SalesInvoice;
  */
 public interface PageFooter {
 
-  public PdfPTable setItemQty(int totalItem, String netQuantity, Integer boxNo, Double weight, Double sDisc, Double pDisc, Double creditSettlement) ;
+  public PdfPTable setItemQty(int totalItem, String netQuantity, Integer boxNo, Double weight, Double sDisc, Double pDisc, Double creditSettlement);
 
-  public PdfPTable setTotalItem(int totalItem) ;
+  public PdfPTable setTotalItem(int totalItem);
 
-  public PdfPTable setInterStateTaxation(List<InvoiceGroup> invoiceGroupList) ;
+  public PdfPTable setInterStateTaxation(List<InvoiceGroup> invoiceGroupList);
 
-  public PdfPTable setIntraStateTaxation(List<InvoiceGroup> invoiceGroupList) ;
+  public PdfPTable setIntraStateTaxation(List<InvoiceGroup> invoiceGroupList);
 
-  public PdfPTable setInterStateServiceTaxation(SalesInvoice salesInvoice) ;
+  public PdfPTable setInterStateServiceTaxation(SalesInvoice salesInvoice);
 
-  public PdfPTable setIntraStateServiceTaxation(SalesInvoice salesInvoice) ;
+  public PdfPTable setIntraStateServiceTaxation(SalesInvoice salesInvoice);
 
-  public PdfPTable setSalesServicesInvoiceTaxation(List<InvoiceGroup> invoiceGroupList, boolean isIntraState) ;
+  public PdfPTable setSalesServicesInvoiceTaxation(List<InvoiceGroup> invoiceGroupList, boolean isIntraState);
 
-  public PdfPTable setDebitCreidtNoteTaxation(List<InvoiceGroup> invoiceGroupList, Integer taxableInvoice, boolean intraState, Integer sezZone) ;
+  public PdfPTable setDebitCreidtNoteTaxation(List<InvoiceGroup> invoiceGroupList, Integer taxableInvoice, boolean intraState, Integer sezZone);
 
-  public PdfPTable setAmountWords(double invoiceAmount, int showManufacturer, List<Manufacture> manufactureList, String bank, String AccNo, String ifsc) ;
+  public PdfPTable setAmountWords(double invoiceAmount, int showManufacturer, List<Manufacture> manufactureList, String bank, String AccNo, String ifsc);
 
-  public PdfPTable setNote(String note) ;
+  public PdfPTable setNote(String note);
 
-  public PdfPTable setBillAmount(Map<String, String> billMap, boolean isSales) ;
+  public PdfPTable setBillAmount(Map<String, String> billMap, boolean isSales);
 
-  public PdfPTable setDeclaration(CompanySettings companySettings, String companyName, String districtName) ;
+  public PdfPTable setDeclaration(CompanySettings companySettings, String companyName, String districtName);
 
-  public PdfPTable setWebMail(String email, String web) ;
+  public PdfPTable setWebMail(String email, String web);
 
 }

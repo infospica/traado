@@ -17,7 +17,6 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import spica.scm.domain.Country;
 import spica.scm.domain.State;
-import wawo.app.config.ViewType;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppPage;
@@ -204,7 +203,7 @@ public class TaxCodeView implements Serializable {
       uploadFiles(); //File upload
       if (null != key) {
         switch (key) {
-          case "save":          
+          case "save":
             TaxCodeService.insertOrUpdate(main, getTaxCode());
             break;
           case "clone":

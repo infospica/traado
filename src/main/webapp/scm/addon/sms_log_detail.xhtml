@@ -45,14 +45,14 @@
           <h:panelGroup>
             <p:commandButton icon="fa fa-fw fa-trash" iconPos="left" styleClass="btn btn-info" value="Delete Log" title="Clear Log" 
                              actionListener="#{smsSummaryView.clearLogByDate(main)}" update="smsDetailListTable" >
-                <p:confirm header="Confirmation" message="Are you sure want to delete the all log between the selected days ?" icon="pi pi-exclamation-triangle" />
-              </p:commandButton>
+              <p:confirm header="Confirmation" message="Are you sure want to delete the all log between the selected days ?" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
           </h:panelGroup>
         </h:panelGrid>
-         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">           
-             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no btn btn-info" icon="fa fa-times" />
-             <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes btn btn-primary" icon="fa fa-check" />
-          </p:confirmDialog> 
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">           
+          <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no btn btn-info" icon="fa fa-times" />
+          <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes btn btn-primary" icon="fa fa-check" />
+        </p:confirmDialog> 
       </h:panelGroup>
     </ui:define>
     <ui:define name="navRight">
@@ -73,14 +73,14 @@
             </f:facet>
             <h:outputText value="#{index+1}" />
           </p:column>
-          
-           <p:column>
+
+          <p:column>
             <f:facet name="header">
               <h:outputText value="#{lang.recipient} #{lang.type}" />
             </f:facet>
-             <h:outputText value="#{logDetail.personType eq 3 ? lang.salesAgent : lang.customer}" />
+            <h:outputText value="#{logDetail.personType eq 3 ? lang.salesAgent : lang.customer}" />
           </p:column>
-          
+
           <p:column>
             <f:facet name="header">
               <h:outputText value="#{lang.recipient}" />
@@ -98,13 +98,13 @@
             <f:facet name="header">
               <h:outputText value="#{lang.message}" />
             </f:facet>           
-              <h:outputText value="#{logDetail.message}" />           
+            <h:outputText value="#{logDetail.message}" />           
           </p:column>
-           <p:column style="text-align:left;white-space: normal;"  styleClass="w-420 wrap" >
+          <p:column style="text-align:left;white-space: normal;"  styleClass="w-420 wrap" >
             <f:facet name="header">
               <h:outputText value="#{lang.response}" />
             </f:facet>            
-              <h:outputText value="#{logDetail.response}" />           
+            <h:outputText value="#{logDetail.response}" />           
           </p:column>
           <p:column>
             <f:facet name="header">

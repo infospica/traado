@@ -47,15 +47,12 @@ import spica.fin.service.AccountingLedgerService;
 import spica.fin.service.AccountingTransactionService;
 import spica.sys.FileConstant;
 import spica.sys.UserRuntimeView;
-import wawo.app.config.AppConfig;
 import wawo.app.faces.Jsf;
 import spica.constant.AccountingConstant;
 import spica.fin.domain.TaxCode;
-import spica.scm.service.AccountService;
 import spica.scm.tax.TaxCalculator;
 import spica.scm.view.ScmLookupExtView;
 import spica.scm.view.ScmLookupView;
-import spica.sys.SystemConstants;
 import spica.sys.UserRuntimeService;
 import wawo.app.common.AppService;
 

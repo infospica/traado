@@ -13,7 +13,6 @@ import spica.fin.domain.DebitCreditNote;
 import spica.fin.domain.DebitCreditNoteItem;
 import spica.fin.domain.DebitCreditNotePlatform;
 import spica.scm.domain.Platform;
-import spica.scm.service.PlatformService;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;

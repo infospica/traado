@@ -7,13 +7,11 @@
  */
 package spica.fin.service;
 
-import java.util.Calendar;
 import java.util.List;
 import spica.fin.domain.AccountingPrefix;
 import spica.fin.domain.AccountingTransaction;
 import spica.fin.domain.AccountingVoucherType;
 import spica.scm.domain.Company;
-import spica.sys.UserRuntimeView;
 import spica.sys.common.DocumentNumberGen;
 import wawo.app.Main;
 import wawo.app.common.AppService;
@@ -41,7 +39,7 @@ public abstract class AccountingPrefixService {
             + "fin_accounting_prefix.modified_by,fin_accounting_prefix.modified_at,fin_accounting_prefix.voucher_type_id,fin_accounting_prefix.company_id from fin_accounting_prefix fin_accounting_prefix "); //Main query
     sql.count("select count(fin_accounting_prefix.id) as total from fin_accounting_prefix fin_accounting_prefix "); //Count query
     sql.join("left outer join fin_accounting_voucher_type t2 on (t2.id = fin_accounting_prefix.voucher_type_id) ");
-          //  + "left outer join scm_company t3 on (t3.id = fin_accounting_prefix.company_id)"); //Join Query
+    //  + "left outer join scm_company t3 on (t3.id = fin_accounting_prefix.company_id)"); //Join Query
 
     sql.string(new String[]{"fin_accounting_prefix.doc_prefix", "t2.title", "fin_accounting_prefix.created_by", "fin_accounting_prefix.modified_by"}); //String search or sort fields
     sql.number(new String[]{"fin_accounting_prefix.id", "fin_accounting_prefix.doc_number_counter", "fin_accounting_prefix.padding", "fin_accounting_prefix.year_sequence", "fin_accounting_prefix.year_padding", "fin_accounting_prefix.sort_order", "fin_accounting_prefix.status_id"}); //Numeric search or sort fields
@@ -60,7 +58,7 @@ public abstract class AccountingPrefixService {
       SqlPage sql = getFinAccountingPrefixSqlPaged(main);
       sql.cond("where fin_accounting_prefix.company_id = ? and financial_year_id = ?");
       sql.param(company.getId());
-        sql.param(company.getCurrentFinancialYear().getId());
+      sql.param(company.getCurrentFinancialYear().getId());
       return AppService.listPagedJpa(main, getFinAccountingPrefixSqlPaged(main));
     }
     return null;
@@ -171,30 +169,30 @@ public abstract class AccountingPrefixService {
   }
 
   public static String getPrefixOnSave(Main main, AccountingTransaction at, Company company) {
-    return getPrefix(main, at,  true);
+    return getPrefix(main, at, true);
   }
 
   private static String getPrefix(Main main, AccountingTransaction tran, boolean onSave) {
     String sql = "select * from fin_accounting_prefix where voucher_type_id = ? and company_id = ? and financial_year_id=?";
     //   String sql = "select * from fin_accounting_prefix where voucher_type_id = ? and company_id = ?";
-  //  String sqlUpdate = "update fin_accounting_prefix set modified_by=?, modified_at=?, doc_number_counter = (doc_number_counter + 1) where voucher_type_id = ? and company_id = ? ";
+    //  String sqlUpdate = "update fin_accounting_prefix set modified_by=?, modified_at=?, doc_number_counter = (doc_number_counter + 1) where voucher_type_id = ? and company_id = ? ";
     AccountingPrefix prefix = null;
     main.clear();
     main.param(tran.getVoucherTypeId().getId());
     main.param(tran.getCompanyId().getId());
-       main.param(tran.getCompanyId().getCurrentFinancialYear().getId());
+    main.param(tran.getCompanyId().getCurrentFinancialYear().getId());
     //int finMonth = wawo.entity.util.DateUtil.getMonth(company.getCurrentFinancialYear().getStartDate());
     if (onSave) {
-      prefix = (AccountingPrefix) AppService.single(main, AccountingPrefix.class, sql, main.getParamData().toArray());  
-      if(prefix == null){
+      prefix = (AccountingPrefix) AppService.single(main, AccountingPrefix.class, sql, main.getParamData().toArray());
+      if (prefix == null) {
         throw new UserMessageException("define.accounting.prefix", new String[]{tran.getCompanyId().getCurrentFinancialYear().getTitle()});
       }
       String documentNoChanged = DocumentNumberGen.getPrefixLiteral(prefix, tran.getCompanyId().getCurrentFinancialYear().getStartDate());
-   //   AppService.updateSql(main, AccountingPrefix.class, sqlUpdate, true);
+      //   AppService.updateSql(main, AccountingPrefix.class, sqlUpdate, true);
       if (tran.getDocumentNumber() != null && tran.getDocumentNumber().equals(documentNoChanged)) {
         return tran.getDocumentNumber();
-      } else { 
-        prefix.setDocNumberCounter(prefix.getDocNumberCounter()+1);
+      } else {
+        prefix.setDocNumberCounter(prefix.getDocNumberCounter() + 1);
         AppService.update(main, prefix);
         return documentNoChanged;
       }
@@ -203,7 +201,7 @@ public abstract class AccountingPrefixService {
       if (prefix == null) {
         throw new UserMessageException("define.accounting.prefix", new String[]{tran.getCompanyId().getCurrentFinancialYear().getTitle()});
       }
-      return "TMP/"+DocumentNumberGen.getPrefixLiteral(prefix, tran.getCompanyId().getCurrentFinancialYear().getStartDate());
+      return "TMP/" + DocumentNumberGen.getPrefixLiteral(prefix, tran.getCompanyId().getCurrentFinancialYear().getStartDate());
     }
   }
 
@@ -238,7 +236,7 @@ public abstract class AccountingPrefixService {
     prefix.setFinancialYearId(company.getCurrentFinancialYear());
     return prefix;
   }
-  
+
   /**
    * Validate delete.
    *

@@ -1,14 +1,13 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.service;
 
 import java.util.Date;
 import java.util.List;
 import spica.fin.domain.SmsLog;
-import spica.reports.model.FilterParameters;
 import spica.scm.domain.CompanySettings;
 import spica.sys.domain.SmsProvider;
 import wawo.app.Main;
@@ -37,16 +36,16 @@ public abstract class SmsUsageService {
 
   }
 
-   public static void deleteAllLogByCompanyId(Main main,Integer companyId){
+  public static void deleteAllLogByCompanyId(Main main, Integer companyId) {
     String sql = "delete from scm_sms_log where company_id = ? ";
-    AppService.deleteSql(main,  SmsLog.class, sql, new Object[]{companyId});
+    AppService.deleteSql(main, SmsLog.class, sql, new Object[]{companyId});
   }
-  
-  public static void deleteAllLogByCompanyAndDate(Main main,Integer companyId,Date fromDate,Date toDate){
+
+  public static void deleteAllLogByCompanyAndDate(Main main, Integer companyId, Date fromDate, Date toDate) {
     String sql = "delete from scm_sms_log where company_id = ? and created_at::date >=?::date and created_at::date <= ?::date";
-    AppService.deleteSql(main,  SmsLog.class, sql, new Object[]{companyId, fromDate, toDate});
+    AppService.deleteSql(main, SmsLog.class, sql, new Object[]{companyId, fromDate, toDate});
   }
-  
+
   public static List loadSmsProviders(Main main) {
     SqlPage sql = AppService.sqlPage("sys_sms_provider", SmsProvider.class, main);
     sql.main("select * from sys_sms_provider");
@@ -60,6 +59,5 @@ public abstract class SmsUsageService {
       AppService.update(main, smsProvider);
     }
   }
-  
-  
+
 }

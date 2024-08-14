@@ -12,7 +12,6 @@ import java.util.List;
 import spica.constant.AccountingConstant;
 import spica.fin.domain.AccountingLedger;
 import spica.fin.domain.AccountingTransaction;
-import spica.fin.domain.AccountingTransactionDetailItem;
 import spica.fin.domain.DebitCreditNote;
 import spica.scm.domain.ProductEntry;
 import spica.scm.domain.PurchaseReturn;
@@ -120,7 +119,7 @@ public abstract class TradeOutstandingService {
 //    return AppService.list(main, TradeOutstandingTax.class, sqlTaxList, new Object[]{at.getAccountingEntityTypeId().getId(), at.getEntityId()});
 //  }
   private static final Double sumTotal(Main main, String sql, AccountingTransaction tran) {
-    return (Double) AppService.countDouble(main,  sql, new Object[]{tran.getAccountingEntityTypeId().getId(), tran.getEntityId()});
+    return (Double) AppService.countDouble(main, sql, new Object[]{tran.getAccountingEntityTypeId().getId(), tran.getEntityId()});
   }
 
   public static List<TradeOutstanding> selectOutstandingByOpeningLedger(Main main, AccountingLedger ledger) {

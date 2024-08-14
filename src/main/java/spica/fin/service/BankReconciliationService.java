@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.fin.service;
 
@@ -65,7 +65,7 @@ public class BankReconciliationService {
         main.param(status);
       } else { //dishounoured
         sql += " and (tran.bank_status = ?)";
-      }      
+      }
       main.param(status);
     }
 

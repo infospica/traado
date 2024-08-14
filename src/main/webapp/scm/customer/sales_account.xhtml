@@ -77,7 +77,7 @@
       <h:panelGroup>
         <p:inputNumber value="#{salesAccountView.salesAccount.salesCreditAmount}" converterMessage="#{lang.salesCreditAmount} #{lang.invalidNumber}" decimalPlaces="2" 
                        styleClass="fw" autocomplete="off"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="salesCreditAmount" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="salesCreditAmount" />
         <p:message for="salesCreditAmount" display="text"/>
       </h:panelGroup>
 
@@ -86,7 +86,7 @@
       <h:panelGroup>
         <p:inputNumber value="#{salesAccountView.salesAccount.salesCreditDays}" converterMessage="#{lang.salesCreditDays} #{lang.invalidNumber}" decimalPlaces="0" 
                        styleClass="fw" autocomplete="off" required="true" requiredMessage="#{lang.salesCreditDays} #{lang.isRequired}"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="salesCreditDays" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="salesCreditDays" />
         <p:message for="salesCreditDays" display="text"/>
       </h:panelGroup>
 
@@ -95,7 +95,7 @@
       <h:panelGroup>
         <p:inputNumber value="#{salesAccountView.salesAccount.outstandingBillLimitCnt}" converterMessage="#{lang.outstandingBillLimitCnt} #{lang.invalidNumber}" 
                        decimalPlaces="0" styleClass="fw" autocomplete="off"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="outstandingBillLimitCnt"/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="outstandingBillLimitCnt"/>
         <p:message for="outstandingBillLimitCnt" display="text"/>
       </h:panelGroup>
 
@@ -103,7 +103,7 @@
       <h:panelGroup>
         <p:inputNumber value="#{salesAccountView.salesAccount.outstandingBillLimitAmt}" converterMessage="#{lang.outstandingBillLimitAmt} #{lang.invalidNumber}" 
                        decimalPlaces="2" styleClass="fw" autocomplete="off"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="outstandingBillLimitAmt" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="outstandingBillLimitAmt" />
         <p:message for="outstandingBillLimitAmt" display="text"/>
       </h:panelGroup>   
     </ui:define>

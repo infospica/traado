@@ -1,12 +1,14 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
-  <style>.vtop{vertical-align: top;}</style>
+  <style>.vtop{
+      vertical-align: top;
+    }</style>
 
   <p:panelGrid columns="2" columnClasses="vtop #{sysRuntimeView.getGrid2()} vtop" id="tradingGrid" styleClass="noBorder" >
     <p:dataTable id="tradingaccountTableEx" var="row" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                  value="#{tradingaccountView.getTradingaccountExpenseList()}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
                  rowsPerPageTemplate="#{AccountingConstant.PAGE_SIZE},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
                  rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
-        <p:column  headerText="#{lang.particulars}" style="text-wrap:break-word;">
+      <p:column  headerText="#{lang.particulars}" style="text-wrap:break-word;">
         <h:outputText value="#{row.title}" title="#{row.title}" escape="false" rendered="#{row.ledgerId eq null}" />
         <p:commandLink value="#{row.title}" title="#{row.title}" actionListener="#{popUpView.showLedgerBalance(row.ledgerId)}" onclick="block();" oncomplete="unblock()" process="@this" immediate="true" rendered="#{row.ledgerId ne null}" />
       </p:column>   
@@ -14,7 +16,7 @@
         <h:outputText value="#{appView.decimal(row.openingBalance)}" />
       </p:column>-->
       <p:column styleClass="text-right">
-          <h:outputText value="#{appView.decimal(row.totalAmount)}" escape="false" rendered="#{row.trtype eq 'dr' or row.trtype eq 'cr'}" /></p:column>
+        <h:outputText value="#{appView.decimal(row.totalAmount)}" escape="false" rendered="#{row.trtype eq 'dr' or row.trtype eq 'cr'}" /></p:column>
       <p:column headerText="#{lang.amount}" style="text-align: right">
         <h:outputText value="#{row.trtype eq 'dr'?appView.decimal(row.debit):appView.decimal(row.totalAmount)}" escape="false" rendered="#{row.ledgerId ne 1001}" />
       </p:column>

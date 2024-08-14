@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.common.StockAdjustmentDetail;
-import spica.scm.domain.Account;
 import spica.scm.domain.StockMovement;
 import wawo.app.common.AppService;
 import wawo.app.Main;
@@ -18,7 +17,6 @@ import spica.scm.domain.StockMovementItem;
 import spica.scm.domain.StockNonSaleable;
 import spica.scm.domain.StockSaleable;
 import spica.scm.validate.StockMovementItemIs;
-import spica.scm.view.ScmLookupSql;
 import spica.sys.SystemConstants;
 
 /**
@@ -173,7 +171,7 @@ public abstract class StockMovementItemService {
     } else {
       list = AppService.list(main, StockMovementItem.class, "select * from scm_stock_movement_item where stock_movement_id = ?", new Object[]{stockMovement.getId()});
       for (StockMovementItem item : list) {
-        stockAdjustmentDetail = StockMovementService.selectStockAdjustmentDetailByProductDetail(main,stockMovement, item.getProductDetailId());
+        stockAdjustmentDetail = StockMovementService.selectStockAdjustmentDetailByProductDetail(main, stockMovement, item.getProductDetailId());
         if (stockAdjustmentDetail != null) {
           item.setQuantityPurchased(stockAdjustmentDetail.getQuantityIn());
           item.setQuantityAvailable(stockAdjustmentDetail.getQuantitySaleable());
@@ -187,7 +185,7 @@ public abstract class StockMovementItemService {
   public static List<StockMovementItem> getStockMovementItemForExpiry(Main main, StockMovement stockMovement) {
     return AppService.list(main, StockMovementItem.class, "select * from scm_stock_movement_item where stock_movement_id=?", new Object[]{stockMovement.getId()});
   }
-  
+
 //    public static Account getAccountById(Main main, Integer accountId) {
 //    Account account = (Account) AppService.single(main, Account.class, ScmLookupSql.ACCOUNT_BYID, new Object[]{accountId});
 //    return account;

@@ -51,7 +51,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{consignmentTypeVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentTypeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" 
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentTypeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" 
                          oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{consignmentTypeView.consignmentType}" value="#{consignmentTypeVar}" />
           </p:commandLink>

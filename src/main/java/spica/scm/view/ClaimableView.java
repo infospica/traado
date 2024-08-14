@@ -13,15 +13,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -134,9 +130,9 @@ public class ClaimableView implements Serializable {
         public List<Claimable> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
             AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-            if(contract != null && contract.getId() != null){
+            if (contract != null && contract.getId() != null) {
               list = ClaimableService.listPagedNotInContract(main, contract); //passing the parent to exclude from select list which are already selected
-            }else{
+            } else {
               list = ClaimableService.listPaged(main);
             }
             main.commit(claimableLazyModel, first, pageSize);

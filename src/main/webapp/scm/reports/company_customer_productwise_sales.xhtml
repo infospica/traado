@@ -2,7 +2,7 @@
   #{companyCustomerProductwiseSalesView.reset()}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
@@ -125,8 +125,8 @@
           <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
         <p:column headerText="#{lang.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden" style="display: none" exportable="true">
           <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
-        
-        <!--<p:column headerText="#{lang.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>-->
+
+<!--<p:column headerText="#{lang.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>-->
         <p:column headerText="#{lang.productName}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
         <p:column headerText="#{lang.hsnCode}" sortBy="#{row.hsnCode}"  filterBy="#{row.hsnCode}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
         <p:column headerText="#{lang.packing}" sortBy="#{row.packing}"  filterBy="#{row.packing}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.packing)}" title="#{appView.title(row.packing)}" escape="false" /></p:column>

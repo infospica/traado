@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.SystemContextService;
 
 /**
  * SystemContextView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Jun 17 17:57:40 IST 2016 
+ * @version	1.0, Fri Jun 17 17:57:40 IST 2016
  */
-
-@Named(value="systemContextView")
+@Named(value = "systemContextView")
 @ViewScoped
-public class SystemContextView implements Serializable{
+public class SystemContextView implements Serializable {
 
   private transient SystemContext systemContext;	//Domain object/selected Domain.
   private transient LazyDataModel<SystemContext> systemContextLazyModel; 	//For lazy loading datatable.
   private transient SystemContext[] systemContextSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public SystemContextView() {
     super();
   }
- 
+
   /**
    * Return SystemContext.
+   *
    * @return SystemContext.
-   */  
+   */
   public SystemContext getSystemContext() {
-    if(systemContext == null) {
+    if (systemContext == null) {
       systemContext = new SystemContext();
     }
     return systemContext;
-  }   
-  
+  }
+
   /**
    * Set SystemContext.
+   *
    * @param systemContext.
-   */   
+   */
   public void setSystemContext(SystemContext systemContext) {
     this.systemContext = systemContext;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchSystemContext(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchSystemContext(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class SystemContextView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create systemContextLazyModel.
+   *
    * @param main
    */
   private void loadSystemContextList(final MainView main) {
     if (systemContextLazyModel == null) {
       systemContextLazyModel = new LazyDataModel<SystemContext>() {
-      private List<SystemContext> list;      
-      @Override
-      public List<SystemContext> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SystemContextService.listPaged(main);
-          main.commit(systemContextLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SystemContext> list;
+
+        @Override
+        public List<SystemContext> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SystemContextService.listPaged(main);
+            main.commit(systemContextLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SystemContext systemContext) {
-        return systemContext.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SystemContext systemContext) {
+          return systemContext.getId();
+        }
+
+        @Override
         public SystemContext getRowData(String rowKey) {
           if (list != null) {
             for (SystemContext obj : list) {
@@ -136,11 +139,12 @@ public class SystemContextView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_system_context/";	
+    String SUB_FOLDER = "scm_system_context/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class SystemContextView implements Serializable{
    */
   public String cloneSystemContext(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneSystemContext(main, "clone"); 
+    return saveOrCloneSystemContext(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class SystemContextView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many SystemContext.
    *
@@ -205,7 +208,7 @@ public class SystemContextView implements Serializable{
       } else {
         SystemContextService.deleteByPk(main, getSystemContext());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class SystemContextView implements Serializable{
 
   /**
    * Return LazyDataModel of SystemContext.
+   *
    * @return
    */
   public LazyDataModel<SystemContext> getSystemContextLazyModel() {
     return systemContextLazyModel;
   }
 
- /**
-  * Return SystemContext[].
-  * @return 
-  */
+  /**
+   * Return SystemContext[].
+   *
+   * @return
+   */
   public SystemContext[] getSystemContextSelected() {
     return systemContextSelected;
   }
-  
+
   /**
    * Set SystemContext[].
-   * @param systemContextSelected 
+   *
+   * @param systemContextSelected
    */
   public void setSystemContextSelected(SystemContext[] systemContextSelected) {
     this.systemContextSelected = systemContextSelected;
   }
- 
-
 
 }

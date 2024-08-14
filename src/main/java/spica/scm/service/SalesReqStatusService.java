@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * SalesReqStatusService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon May 09 18:27:36 IST 2016 
+ * @version	1.0, Mon May 09 18:27:36 IST 2016
  */
+public abstract class SalesReqStatusService {
 
-public abstract class SalesReqStatusService {  
- 
- /**
+  /**
    * SalesReqStatus paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class SalesReqStatusService {
     sql.count("select count(scm_sales_req_status.id) from scm_sales_req_status scm_sales_req_status"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_sales_req_status.title","scm_sales_req_status.created_by","scm_sales_req_status.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_sales_req_status.id","scm_sales_req_status.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_sales_req_status.created_at","scm_sales_req_status.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_sales_req_status.title", "scm_sales_req_status.created_by", "scm_sales_req_status.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_sales_req_status.id", "scm_sales_req_status.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_sales_req_status.created_at", "scm_sales_req_status.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of SalesReqStatus.
-  * @param main
-  * @return List of SalesReqStatus
-  */
+
+  /**
+   * Return List of SalesReqStatus.
+   *
+   * @param main
+   * @return List of SalesReqStatus
+   */
   public static final List<SalesReqStatus> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getSalesReqStatusSqlPaged(main));
+    return AppService.listPagedJpa(main, getSalesReqStatusSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class SalesReqStatusService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select SalesReqStatus by key.
-  * @param main
-  * @param salesReqStatus
-  * @return SalesReqStatus
-  */
+  /**
+   * Select SalesReqStatus by key.
+   *
+   * @param main
+   * @param salesReqStatus
+   * @return SalesReqStatus
+   */
   public static final SalesReqStatus selectByPk(Main main, SalesReqStatus salesReqStatus) {
     return (SalesReqStatus) AppService.find(main, SalesReqStatus.class, salesReqStatus.getId());
   }
 
- /**
-  * Insert SalesReqStatus.
-  * @param main
-  * @param salesReqStatus
-  */
+  /**
+   * Insert SalesReqStatus.
+   *
+   * @param main
+   * @param salesReqStatus
+   */
   public static final void insert(Main main, SalesReqStatus salesReqStatus) {
     insertAble(main, salesReqStatus);  //Validating
     AppService.insert(main, salesReqStatus);
 
   }
 
- /**
-  * Update SalesReqStatus by key.
-  * @param main
-  * @param salesReqStatus
-  * @return SalesReqStatus
-  */
+  /**
+   * Update SalesReqStatus by key.
+   *
+   * @param main
+   * @param salesReqStatus
+   * @return SalesReqStatus
+   */
   public static final SalesReqStatus updateByPk(Main main, SalesReqStatus salesReqStatus) {
     updateAble(main, salesReqStatus); //Validating
     return (SalesReqStatus) AppService.update(main, salesReqStatus);
@@ -106,9 +107,8 @@ public abstract class SalesReqStatusService {
   public static void insertOrUpdate(Main main, SalesReqStatus salesReqStatus) {
     if (salesReqStatus.getId() == null) {
       insert(main, salesReqStatus);
-    }
-    else{
-        updateByPk(main, salesReqStatus);
+    } else {
+      updateByPk(main, salesReqStatus);
     }
   }
 
@@ -123,26 +123,29 @@ public abstract class SalesReqStatusService {
     insert(main, salesReqStatus);
   }
 
- /**
-  * Delete SalesReqStatus.
-  * @param main
-  * @param salesReqStatus
-  */
+  /**
+   * Delete SalesReqStatus.
+   *
+   * @param main
+   * @param salesReqStatus
+   */
   public static final void deleteByPk(Main main, SalesReqStatus salesReqStatus) {
     deleteAble(main, salesReqStatus); //Validation
     AppService.delete(main, SalesReqStatus.class, salesReqStatus.getId());
   }
-	
- /**
-  * Delete Array of SalesReqStatus.
-  * @param main
-  * @param salesReqStatus
-  */
+
+  /**
+   * Delete Array of SalesReqStatus.
+   *
+   * @param main
+   * @param salesReqStatus
+   */
   public static final void deleteByPkArray(Main main, SalesReqStatus[] salesReqStatus) {
     for (SalesReqStatus e : salesReqStatus) {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

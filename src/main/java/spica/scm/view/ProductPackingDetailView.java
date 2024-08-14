@@ -16,7 +16,6 @@ import javax.inject.Named;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import spica.scm.common.ProductPackingUnits;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppPage;
@@ -26,7 +25,6 @@ import spica.scm.domain.ProductPackingDetail;
 import spica.scm.service.ProductPackingDetailService;
 import spica.scm.domain.ProductPacking;
 import spica.sys.SystemConstants;
-import wawo.app.config.AppConfig;
 import wawo.app.faces.Jsf;
 
 /**
@@ -38,18 +36,18 @@ import wawo.app.faces.Jsf;
 @Named(value = "productPackingDetailView")
 @ViewScoped
 public class ProductPackingDetailView implements Serializable {
-  
+
   private transient ProductPackingDetail productPackingDetail;	//Domain object/selected Domain.
   private transient LazyDataModel<ProductPackingDetail> productPackingDetailLazyModel; 	//For lazy loading datatable.
   private transient ProductPackingDetail[] productPackingDetailSelected;	 //Selected Domain Array
   private transient List<ProductPacking> primaryProductPackingList;
   private transient List<ProductPacking> secondaryProductPackingList;
   private transient List<ProductPacking> tertiaryProductPackingList;
-  
+
   private String primaryPackTitle;
   private String secondaryPackTitle;
   private String tertiaryPackTitle;
-  
+
   String tertiaryQty = "";
   String secondaryQty = "";
 
@@ -107,76 +105,76 @@ public class ProductPackingDetailView implements Serializable {
   public void setProductPackingDetailSelected(ProductPackingDetail[] productPackingDetailSelected) {
     this.productPackingDetailSelected = productPackingDetailSelected;
   }
-  
+
   public List<ProductPacking> getPrimaryProductPackingList() {
     if (StringUtil.isEmpty(primaryProductPackingList)) {
       primaryProductPackingList = ScmLookupExtView.lookupProductPacking(SystemConstants.PRODUCT_PACKING_PRIMARY);
     }
     return primaryProductPackingList;
   }
-  
+
   public void setPrimaryProductPackingList(List<ProductPacking> primaryProductPackingList) {
     this.primaryProductPackingList = primaryProductPackingList;
   }
-  
+
   public List<ProductPacking> getSecondaryProductPackingList() {
     if (StringUtil.isEmpty(secondaryProductPackingList)) {
       secondaryProductPackingList = ScmLookupExtView.lookupProductPacking(SystemConstants.PRODUCT_PACKING_SECONDARY);
     }
     return secondaryProductPackingList;
   }
-  
+
   public void setSecondaryProductPackingList(List<ProductPacking> secondaryProductPackingList) {
     this.secondaryProductPackingList = secondaryProductPackingList;
   }
-  
+
   public List<ProductPacking> getTertiaryProductPackingList() {
     if (StringUtil.isEmpty(tertiaryProductPackingList)) {
       tertiaryProductPackingList = ScmLookupExtView.lookupProductPacking(SystemConstants.PRODUCT_PACKING_TERTIARY);
     }
     return tertiaryProductPackingList;
   }
-  
+
   public void setTertiaryProductPackingList(List<ProductPacking> tertiaryProductPackingList) {
     this.tertiaryProductPackingList = tertiaryProductPackingList;
   }
-  
+
   public String getPrimaryPackTitle() {
     return primaryPackTitle;
   }
-  
+
   public void setPrimaryPackTitle(String primaryPackTitle) {
     this.primaryPackTitle = primaryPackTitle;
   }
-  
+
   public String getSecondaryPackTitle() {
     return secondaryPackTitle;
   }
-  
+
   public void setSecondaryPackTitle(String secondaryPackTitle) {
     this.secondaryPackTitle = secondaryPackTitle;
   }
-  
+
   public String getTertiaryPackTitle() {
     return tertiaryPackTitle;
   }
-  
+
   public void setTertiaryPackTitle(String tertiaryPackTitle) {
     this.tertiaryPackTitle = tertiaryPackTitle;
   }
-  
+
   public String getTertiaryQty() {
     return tertiaryQty;
   }
-  
+
   public void setTertiaryQty(String tertiaryQty) {
     this.tertiaryQty = tertiaryQty;
   }
-  
+
   public String getSecondaryQty() {
     return secondaryQty;
   }
-  
+
   public void setSecondaryQty(String secondaryQty) {
     this.secondaryQty = secondaryQty;
   }
@@ -217,7 +215,7 @@ public class ProductPackingDetailView implements Serializable {
     if (productPackingDetailLazyModel == null) {
       productPackingDetailLazyModel = new LazyDataModel<ProductPackingDetail>() {
         private List<ProductPackingDetail> list;
-        
+
         @Override
         public List<ProductPackingDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -232,12 +230,12 @@ public class ProductPackingDetailView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(ProductPackingDetail productPackingDetail) {
           return productPackingDetail.getId();
         }
-        
+
         @Override
         public ProductPackingDetail getRowData(String rowKey) {
           if (list != null) {
@@ -252,7 +250,7 @@ public class ProductPackingDetailView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_product_packing_detail/";
   }
@@ -359,35 +357,35 @@ public class ProductPackingDetailView implements Serializable {
   public List<ProductPacking> productPackingAuto(String filter) {
     return ScmLookupView.productPackingAuto(filter);
   }
-  
+
   public boolean isStripPrimaryPacking() {
     return getProductPackingDetail() != null && getProductPackingDetail().getPackPrimary() != null && getProductPackingDetail().getPackPrimary().getId().equals(SystemConstants.PRODUCT_PACKING_STRIP);
   }
-  
+
   public boolean isTwoDimension() {
     return (getProductPackingDetail() != null && getProductPackingDetail().getPackPrimaryDimension() != null && getProductPackingDetail().getPackPrimaryDimension().equals(SystemConstants.TWO_DIMENSION));
   }
-  
+
   public boolean isThreeDimension() {
     return (getProductPackingDetail() != null && getProductPackingDetail().getPackPrimaryDimension() != null && getProductPackingDetail().getPackPrimaryDimension().equals(SystemConstants.THREE_DIMENSION));
   }
-  
+
   public boolean isOneDimension() {
     return (getProductPackingDetail() != null && getProductPackingDetail().getPackPrimaryDimension() != null && getProductPackingDetail().getPackPrimaryDimension().equals(SystemConstants.ONE_DIMENSION));
   }
-  
+
   public boolean isSecondaryPackingRequired() {
     return (isTwoDimension() || isThreeDimension() || hasTertiaryPacking() || hasSecondaryPacking());
   }
-  
+
   public boolean hasTertiaryPacking() {
     return (getProductPackingDetail() != null && getProductPackingDetail().getPackTertiary() != null && getProductPackingDetail().getPackTertiary().getId() != null);
   }
-  
+
   public boolean hasSecondaryPacking() {
     return (getProductPackingDetail() != null && getProductPackingDetail().getPackSecondary() != null && getProductPackingDetail().getPackSecondary().getId() != null);
   }
-  
+
   public void primaryPackSelectEvent(SelectEvent event) {
     ProductPacking productPacking = (ProductPacking) event.getObject();
     setPrimaryPackTitle(null);
@@ -405,7 +403,7 @@ public class ProductPackingDetailView implements Serializable {
     }
     getProductPackingDetail().setTitle(getProductPackingInfo(getProductPackingDetail()));
   }
-  
+
   public void secondaryPackSelectEvent(SelectEvent event) {
     ProductPacking productPacking = (ProductPacking) event.getObject();
     setSecondaryPackTitle(null);
@@ -420,7 +418,7 @@ public class ProductPackingDetailView implements Serializable {
     }
     getProductPackingDetail().setTitle(getProductPackingInfo(getProductPackingDetail()));
   }
-  
+
   public void tertiaryPackSelectEvent(SelectEvent event) {
     ProductPacking productPacking = (ProductPacking) event.getObject();
     setTertiaryPackTitle("");
@@ -433,7 +431,7 @@ public class ProductPackingDetailView implements Serializable {
     }
     updatePackingTitle();
   }
-  
+
   public void packDimensionSelectEvent(SelectEvent event) {
     getProductPackingDetail().setPackTertiarySecondaryQty(null);
     getProductPackingDetail().setPackSecondaryPrimaryQty(null);
@@ -455,7 +453,7 @@ public class ProductPackingDetailView implements Serializable {
     }
     updatePackingTitle();
   }
-  
+
   public void onChangeSecondaryPrimaryQty(ValueChangeEvent event) {
     getProductPackingDetail().setPackSecondaryPrimaryQty((Integer) event.getNewValue());
     MainView main = Jsf.getMain();
@@ -467,22 +465,22 @@ public class ProductPackingDetailView implements Serializable {
       main.close();
     }
   }
-  
+
   private void setUnitVal(MainView main) {
     if (getProductPackingDetail().getPackSecondaryPrimaryQty() != null && getProductPackingDetail().getPackPrimaryDimension() != null && getProductPackingDetail().getPackPrimaryDimension() == 3 && getProductPackingDetail().getPrimaryDimensionGroupQty() != null) {
       if (getProductPackingDetail().getPackSecondaryPrimaryQty() % getProductPackingDetail().getPrimaryDimensionGroupQty() == 0) {
         getProductPackingDetail().setPrimaryDimensionUnitQty(getProductPackingDetail().getPackSecondaryPrimaryQty() / getProductPackingDetail().getPrimaryDimensionGroupQty());
-      } else {        
+      } else {
         getProductPackingDetail().setPrimaryDimensionUnitQty(null);
         main.error("error.division");
       }
     }
-    
+
     if (getProductPackingDetail().getPackSecondaryPrimaryQty() != null && getProductPackingDetail().getPackPrimaryDimension() != null && getProductPackingDetail().getPackPrimaryDimension() == 2) {
       getProductPackingDetail().setPrimaryDimensionUnitQty(getProductPackingDetail().getPackSecondaryPrimaryQty());
     }
   }
-  
+
   private String getProductPackingInfo(ProductPackingDetail productPackingDetail) {
     StringBuilder packing = new StringBuilder();
     if (productPackingDetail != null) {
@@ -515,9 +513,9 @@ public class ProductPackingDetailView implements Serializable {
     }
     return packing.toString();
   }
-  
+
   public void updatePackingTitle() {
     getProductPackingDetail().setTitle(getProductPackingInfo(getProductPackingDetail()));
   }
-  
+
 }

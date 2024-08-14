@@ -233,7 +233,7 @@ public class ServicesView implements Serializable {
             getCommodity().setCompanyId(getCompany());
             CommodityService.insertOrUpdate(main, getCommodity());
             break;
-          case "clone":    
+          case "clone":
             CommodityService.clone(main, getCommodity());
             break;
         }

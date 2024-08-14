@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.view;
 
@@ -9,12 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import spica.fin.domain.TaxCode;
 import spica.scm.common.ConsignmentRate;
 import spica.scm.domain.AccountGroup;
@@ -84,7 +80,7 @@ public class SalesReturnSplitView implements Serializable {
       try {
         main.setViewType(viewType);
         if (main.isEdit() && !main.hasError()) {
-        //  setSalesReturnSplitPageTitle();
+          //  setSalesReturnSplitPageTitle();
           setSalesReturnSplit((SalesReturnSplit) SalesReturnSplitService.selectByPk(main, getSalesReturnSplit()));
           getSalesReturnSplit().setDecimalPrecision(getAccountGroup().getCustomerDecimalPrecision() == null ? 2 : getAccountGroup().getCustomerDecimalPrecision());
           getSalesReturnSplit().setBusinessArea(SalesInvoiceUtil.getSalesMode(getCompany(), getSalesReturnSplit().getCustomerId()));
@@ -152,7 +148,6 @@ public class SalesReturnSplitView implements Serializable {
 //      setPageTitle("Sales Return - Saleable");
 //    }
 //  }
-
   private List<TaxCode> lookupGstTaxCode() {
     if (taxCodeList == null) {
       taxCodeList = ScmLookupExtView.lookupGstTaxCode(UserRuntimeView.instance().getCompany());
@@ -174,6 +169,7 @@ public class SalesReturnSplitView implements Serializable {
     }
   }
 //FIXME main not required
+
   public void printLandscape(MainView main) {
     CompanySettings settings = UserRuntimeView.instance().getCompany().getCompanySettings();
     if (settings.getLandScapeFormat().equals(SystemConstants.PRINT_SINGLE_LINE)) {
@@ -215,7 +211,6 @@ public class SalesReturnSplitView implements Serializable {
 //  public void setPageTitle(String pageTitle) {
 //    this.pageTitle = pageTitle;
 //  }
-
   public SalesReturn getSalesReturn() {
     return salesReturn;
   }

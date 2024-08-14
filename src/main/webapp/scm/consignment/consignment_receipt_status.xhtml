@@ -52,24 +52,24 @@
 
     <ui:define name="list">
       <p:dataTable id="consignmentReceiptStatusTable" var="consignmentReceiptStatusVar" widgetVar="consignmentReceiptStatusWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-        lazy="true" value="#{consignmentReceiptStatusView.consignmentReceiptStatusLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{consignmentReceiptStatusVar.id}"
-        rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
-        selection="#{consignmentReceiptStatusView.consignmentReceiptStatusSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+                   lazy="true" value="#{consignmentReceiptStatusView.consignmentReceiptStatusLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{consignmentReceiptStatusVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{consignmentReceiptStatusView.consignmentReceiptStatusSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
         <p:column selectionMode="multiple" exportable="false" />
-        
+
         <p:column  sortBy="#{consignmentReceiptStatusVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentReceiptStatusVar.title}" process="@this" update="f1" immediate="true" 
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentReceiptStatusVar.title}" process="@this" update="f1" immediate="true" 
                          onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{consignmentReceiptStatusView.consignmentReceiptStatus}" value="#{consignmentReceiptStatusVar}" />
           </p:commandLink>
         </p:column>
-        
+
 <!--        <p:column  sortBy="#{consignmentReceiptStatusVar.sortOrder}" field="sort_order" style="text-align: right">
-          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
-          <h:outputText value="#{appView.number(consignmentReceiptStatusVar.sortOrder)}" escape="false" />
-        </p:column>-->
-        
+  <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+  <h:outputText value="#{appView.number(consignmentReceiptStatusVar.sortOrder)}" escape="false" />
+</p:column>-->
+
         <p:column exportable="false">
           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
@@ -80,7 +80,7 @@
             <ui:define name="id">#{appView.display(consignmentReceiptStatusVar.id)}</ui:define>
           </ui:decorate>
         </p:column> 
-      
+
       </p:dataTable> 	
     </ui:define>   
   </ui:decorate>

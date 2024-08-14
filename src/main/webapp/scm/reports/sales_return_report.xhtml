@@ -2,7 +2,7 @@
   #{salesReturnReportView.setSalesReturnReportList(null)}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <p:importConstants type="spica.constant.ReportConstant" />
@@ -229,7 +229,7 @@
           </p:column>
           <p:column headerText="#{lang.regno}"  sortBy="#{row.regNo}"  filterBy="#{row.regNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.regNo)}" title="#{appView.title(row.regNo)}" escape="false" /></p:column>
           <p:column headerText="#{lang.entryDate}" rendered="#{salesReturnReportView.companyCustomerSalesRender.entryDate}" sortBy="#{row.entryDate}"  filterBy="#{row.entryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
-<p:column headerText="#{lang.regno}" sortBy="#{row.regNo}" filterBy="#{row.regNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.regNo)}" title="#{appView.title(row.regNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.regno}" sortBy="#{row.regNo}" filterBy="#{row.regNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.regNo)}" title="#{appView.title(row.regNo)}" escape="false" /></p:column>
           <p:column headerText="#{lang.customerName}" rendered="#{salesReturnReportView.companyCustomerSalesRender.customerName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
           <p:column headerText="#{lang.gstNo}" rendered="#{salesReturnReportView.companyCustomerSalesRender.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
 

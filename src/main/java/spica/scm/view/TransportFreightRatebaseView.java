@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.TransportFreightRatebaseService;
 
 /**
  * TransportFreightRatebaseView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:15 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:15 IST 2016
  */
-
-@Named(value="transportFreightRatebaseView")
+@Named(value = "transportFreightRatebaseView")
 @ViewScoped
-public class TransportFreightRatebaseView implements Serializable{
+public class TransportFreightRatebaseView implements Serializable {
 
   private transient TransportFreightRatebase transportFreightRatebase;	//Domain object/selected Domain.
   private transient LazyDataModel<TransportFreightRatebase> transportFreightRatebaseLazyModel; 	//For lazy loading datatable.
   private transient TransportFreightRatebase[] transportFreightRatebaseSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public TransportFreightRatebaseView() {
     super();
   }
- 
+
   /**
    * Return TransportFreightRatebase.
+   *
    * @return TransportFreightRatebase.
-   */  
+   */
   public TransportFreightRatebase getTransportFreightRatebase() {
-    if(transportFreightRatebase == null) {
+    if (transportFreightRatebase == null) {
       transportFreightRatebase = new TransportFreightRatebase();
     }
     return transportFreightRatebase;
-  }   
-  
+  }
+
   /**
    * Set TransportFreightRatebase.
+   *
    * @param transportFreightRatebase.
-   */   
+   */
   public void setTransportFreightRatebase(TransportFreightRatebase transportFreightRatebase) {
     this.transportFreightRatebase = transportFreightRatebase;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchTransportFreightRatebase(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchTransportFreightRatebase(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class TransportFreightRatebaseView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create transportFreightRatebaseLazyModel.
+   *
    * @param main
    */
   private void loadTransportFreightRatebaseList(final MainView main) {
     if (transportFreightRatebaseLazyModel == null) {
       transportFreightRatebaseLazyModel = new LazyDataModel<TransportFreightRatebase>() {
-      private List<TransportFreightRatebase> list;      
-      @Override
-      public List<TransportFreightRatebase> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = TransportFreightRatebaseService.listPaged(main);
-          main.commit(transportFreightRatebaseLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<TransportFreightRatebase> list;
+
+        @Override
+        public List<TransportFreightRatebase> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = TransportFreightRatebaseService.listPaged(main);
+            main.commit(transportFreightRatebaseLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(TransportFreightRatebase transportFreightRatebase) {
-        return transportFreightRatebase.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(TransportFreightRatebase transportFreightRatebase) {
+          return transportFreightRatebase.getId();
+        }
+
+        @Override
         public TransportFreightRatebase getRowData(String rowKey) {
           if (list != null) {
             for (TransportFreightRatebase obj : list) {
@@ -136,11 +139,12 @@ public class TransportFreightRatebaseView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_transport_freight_ratebase/";	
+    String SUB_FOLDER = "scm_transport_freight_ratebase/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class TransportFreightRatebaseView implements Serializable{
    */
   public String cloneTransportFreightRatebase(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneTransportFreightRatebase(main, "clone"); 
+    return saveOrCloneTransportFreightRatebase(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class TransportFreightRatebaseView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many TransportFreightRatebase.
    *
@@ -205,7 +208,7 @@ public class TransportFreightRatebaseView implements Serializable{
       } else {
         TransportFreightRatebaseService.deleteByPk(main, getTransportFreightRatebase());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class TransportFreightRatebaseView implements Serializable{
 
   /**
    * Return LazyDataModel of TransportFreightRatebase.
+   *
    * @return
    */
   public LazyDataModel<TransportFreightRatebase> getTransportFreightRatebaseLazyModel() {
     return transportFreightRatebaseLazyModel;
   }
 
- /**
-  * Return TransportFreightRatebase[].
-  * @return 
-  */
+  /**
+   * Return TransportFreightRatebase[].
+   *
+   * @return
+   */
   public TransportFreightRatebase[] getTransportFreightRatebaseSelected() {
     return transportFreightRatebaseSelected;
   }
-  
+
   /**
    * Set TransportFreightRatebase[].
-   * @param transportFreightRatebaseSelected 
+   *
+   * @param transportFreightRatebaseSelected
    */
   public void setTransportFreightRatebaseSelected(TransportFreightRatebase[] transportFreightRatebaseSelected) {
     this.transportFreightRatebaseSelected = transportFreightRatebaseSelected;
   }
- 
-
 
 }

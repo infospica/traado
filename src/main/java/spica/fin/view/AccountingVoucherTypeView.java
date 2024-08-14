@@ -12,21 +12,15 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import spica.fin.domain.AccountingPrefix;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
 import spica.fin.domain.AccountingVoucherType;
-import spica.scm.domain.Company;
 import spica.fin.service.AccountingPrefixService;
 import spica.fin.service.AccountingVoucherTypeService;
 import spica.sys.UserRuntimeView;
@@ -40,7 +34,7 @@ import spica.sys.UserRuntimeView;
 @Named(value = "accountingVoucherTypeView")
 @ViewScoped
 public class AccountingVoucherTypeView implements Serializable {
-  
+
   private transient AccountingVoucherType accountingVoucherType;	//Domain object/selected Domain.
   private transient AccountingPrefix finAccountingPrefix;
   private transient LazyDataModel<AccountingVoucherType> accountingVoucherTypeLazyModel; 	//For lazy loading datatable.
@@ -64,7 +58,7 @@ public class AccountingVoucherTypeView implements Serializable {
     }
     return accountingVoucherType;
   }
-  
+
   public AccountingPrefix getFinAccountingPrefix() {
     if (finAccountingPrefix == null) {
       finAccountingPrefix = new AccountingPrefix();
@@ -124,7 +118,7 @@ public class AccountingVoucherTypeView implements Serializable {
     if (accountingVoucherTypeLazyModel == null) {
       accountingVoucherTypeLazyModel = new LazyDataModel<AccountingVoucherType>() {
         private List<AccountingVoucherType> list;
-        
+
         @Override
         public List<AccountingVoucherType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -139,12 +133,12 @@ public class AccountingVoucherTypeView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(AccountingVoucherType accountingVoucherType) {
           return accountingVoucherType.getId();
         }
-        
+
         @Override
         public AccountingVoucherType getRowData(String rowKey) {
           if (list != null) {
@@ -159,7 +153,7 @@ public class AccountingVoucherTypeView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "fin_accounting_voucher_type/";
   }
@@ -270,5 +264,5 @@ public class AccountingVoucherTypeView implements Serializable {
   public void setAccountingVoucherTypeSelected(AccountingVoucherType[] accountingVoucherTypeSelected) {
     this.accountingVoucherTypeSelected = accountingVoucherTypeSelected;
   }
-  
+
 }

@@ -15,7 +15,6 @@ import wawo.entity.core.SqlPage;
 import spica.scm.domain.SalesOrderReference;
 import spica.scm.domain.SalesReq;
 import spica.scm.validate.SalesOrderReferenceIs;
-import wawo.app.faces.MainView;
 
 /**
  * SalesOrderReferenceService

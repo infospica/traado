@@ -9,7 +9,7 @@
     <ui:param name="subLabel" value="#{main.isEdit() ? appView.display(vendorBankView.vendorBank.bankId.name) : lang.bank}" />   
     <ui:param name="ids" value="vendorBank" />
     <ui:param name="labelOnly" value="#{true}" />
-    
+
     <ui:define name="navRight" >      
       <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{vendorBankView.vendorBankContactDialogClose}"
                        oncomplete="parent.vendorBankNewDialogReturned();closePopup();" 
@@ -42,10 +42,10 @@
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{vendorBankView.vendorBank.accountNo}" maxlength="18" required="true" requiredMessage="#{lang.accountNumber} #{lang.isRequired}" 
                      id="accountNumber" validator="wawo.WhiteSpaceValidator">
-          
+
           <f:validateRegex pattern="^[0-9 ]+$" />
         </p:inputText>
-          <p:message for="accountNumber" display="text"/>
+        <p:message for="accountNumber" display="text"/>
       </h:panelGroup>
 
       <!--account Type-->
@@ -107,13 +107,13 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{vendorBankView.vendorBank.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" autocomplete="off"/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" autocomplete="off"/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 
       <p:outputLabel value="#{lang.status}" for="statusId"/>
       <h:panelGroup>
-          <p:selectOneMenu value="#{vendorBankView.vendorBank.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+        <p:selectOneMenu value="#{vendorBankView.vendorBank.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
                          id="statusId">
           <f:selectItems value="#{vendorBankView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
         </p:selectOneMenu>

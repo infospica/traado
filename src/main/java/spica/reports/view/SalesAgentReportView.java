@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -66,7 +66,7 @@ public class SalesAgentReportView implements Serializable {
   private transient Double productDiscount;
   private transient Double invoiceDiscount;
   private transient Double cashDiscount;
- // private transient DecimalFormat df = new DecimalFormat("0.00");
+  // private transient DecimalFormat df = new DecimalFormat("0.00");
   private transient Company company;
   private String agentName;
   private transient Double salesValue;
@@ -812,7 +812,7 @@ public class SalesAgentReportView implements Serializable {
 
   public List<CompanyCustomerSales> getDailyReport() {
     if (filterParameters.getSalesAgent() != null && filterParameters.getToDate() != null) {
-       MainView main = Jsf.getMain();
+      MainView main = Jsf.getMain();
       try {
         if (StringUtil.isEmpty(dailyReport)) {
           companyCustomerSalesRender = new CompanyCustomerSalesRender();

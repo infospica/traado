@@ -54,7 +54,7 @@ public class VendorBankContactView implements Serializable {
     parent = (VendorBank) Jsf.popupParentValue(VendorBank.class);
     getVendorBankContact().setId(Jsf.getParameterInt("id"));
   }
-  
+
   /**
    * Default Constructor.
    */
@@ -103,7 +103,7 @@ public class VendorBankContactView implements Serializable {
     if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
-         getVendorBankContact().setVendorBankId(parent);
+        getVendorBankContact().setVendorBankId(parent);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
           getVendorBankContact().reset();
           getVendorBankContact().setVendorBankId(parent);
@@ -120,7 +120,6 @@ public class VendorBankContactView implements Serializable {
     }
     return null;
   }
-  
 
   /**
    * Create vendorBankContactLazyModel.
@@ -331,11 +330,11 @@ public class VendorBankContactView implements Serializable {
   public void vendorBankContactDialogClose() {
     Jsf.popupClose(parent);
   }
-  
+
   public List<Status> statusAuto(String filter) {
     return ScmLookupView.statusAuto(filter);
   }
-  
+
   public List<Designation> selectDesignationByVendorContext(MainView main) {
     try {
       return DesignationService.selectDesignationByVendorContext(main);

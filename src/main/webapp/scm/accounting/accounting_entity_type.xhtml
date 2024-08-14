@@ -1,13 +1,13 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
   #{accountingEntityTypeView.switchAccountingEntityType(main, viewType)}
 
- <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.accountingEntityType}" />
     <ui:param name="ids" value="accountingEntityType" />
 
     <ui:define name="deleteList" >
       <p:commandButton action="#{accountingEntityTypeView.deleteAccountingEntityType(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountingEntityTypeWidgetDelConf')" process="f1" update="f1" >
-	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
       </p:commandButton>
     </ui:define>
 
@@ -24,43 +24,43 @@
     </ui:define>   
 
     <ui:define name="form">            
-        <p:outputLabel value="#{lang.entityType}" for="title" />
-        <h:panelGroup><p:inputText value="#{accountingEntityTypeView.accountingEntityType.title}" maxlength="20" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text" styleClass="fw" /></h:panelGroup>
-         <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
-        <h:panelGroup>
-          <p:inputNumber value="#{accountingEntityTypeView.accountingEntityType.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
-          <p:message for="sortOrder" display="text"/>
-        </h:panelGroup>   
+      <p:outputLabel value="#{lang.entityType}" for="title" />
+      <h:panelGroup><p:inputText value="#{accountingEntityTypeView.accountingEntityType.title}" maxlength="20" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountingEntityTypeView.accountingEntityType.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>   
     </ui:define>
-    
+
     <ui:define name="after">
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
         <ui:define name="id">#{appView.display(accountingEntityTypeView.accountingEntityType.id)}</ui:define>
       </ui:decorate>
     </ui:define>
-	
+
     <ui:define name="list">
       <p:dataTable id="accountingEntityTypeTable" var="accountingEntityTypeVar" widgetVar="accountingEntityTypeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-        lazy="true" value="#{accountingEntityTypeView.accountingEntityTypeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountingEntityTypeVar.id}"
-        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
-        selection="#{accountingEntityTypeView.accountingEntityTypeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+                   lazy="true" value="#{accountingEntityTypeView.accountingEntityTypeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountingEntityTypeVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{accountingEntityTypeView.accountingEntityTypeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
         <p:column selectionMode="multiple" exportable="false" />
         <p:column headerText="#{lang.entityType}" sortBy="#{accountingEntityTypeVar.id}" field="fin_accounting_entity_type.id" >
-            <f:facet name="header"><h:outputText value="#{lang.entityType}" title="#{lang.entityType}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.entityType}" title="#{lang.entityType}"/></f:facet>
           <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(accountingEntityTypeVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
-        <f:setPropertyActionListener target="#{accountingEntityTypeView.accountingEntityType}" value="#{accountingEntityTypeVar}" />
+            <f:setPropertyActionListener target="#{accountingEntityTypeView.accountingEntityType}" value="#{accountingEntityTypeVar}" />
           </p:commandLink>
         </p:column>
-        
+
         <p:column  sortBy="#{accountingEntityTypeVar.sortOrder}" field="fin_accounting_entity_type.sort_order" style="text-align: left">
           <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
           <h:outputText value="#{appView.number(accountingEntityTypeVar.sortOrder)}" escape="false" />
         </p:column>  
-        
+
         <p:column exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
-           <ui:define name="id">#{appView.display(accountingEntityTypeVar.id)}</ui:define>
+            <ui:define name="id">#{appView.display(accountingEntityTypeVar.id)}</ui:define>
           </ui:decorate>
         </p:column>
       </p:dataTable> 	

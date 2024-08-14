@@ -51,7 +51,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column  sortBy="#{productStatusVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{productStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{productStatusView.productStatus}" value="#{productStatusVar}" />
           </p:commandLink>
         </p:column>
@@ -60,7 +60,7 @@
           <h:outputText value="#{appView.number(productStatusVar.sortOrder)}" escape="false" /></p:column>-->
         <!--//<p:column headerText="#{lang.displayColor}" sortBy="#{productStatusVar.displayColor}" field="display_color"><h:outputText styleClass="label" style="background-color: ##{productStatusVar.displayColor}" value="#{appView.display(productStatusVar.title)}" title="#{appView.title(productStatusVar.title)}" escape="false" /></p:column>-->
 
-          <p:column exportable="false">
+        <p:column exportable="false">
           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(productStatusVar.createdBy)}</ui:define>

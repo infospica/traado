@@ -11,28 +11,28 @@
           <div class="R">-->
     <p:commandButton id="infoBtn" styleClass="btn btn-default"  type="button" icon="fa fa-info"  />
     <p:overlayPanel for="infoBtn" hideEffect="fade" showEvent="click" hideEvent="mouseout" at="right"  >
-          <table class="infoTable" style="width:250px" >
-            <ui:fragment rendered="#{log eq null ? true : log}">
-              <tr><th>#{lang.createdBy} </th><td><ui:insert name="cby"/></td></tr>
-              <tr><th>#{lang.createdAt} </th><td><ui:insert name="cat"/></td></tr>
-              <tr><th>#{lang.updatedBy} </th><td><ui:insert name="uby"/></td></tr>
-              <tr><th>#{lang.updatedAt} </th><td><ui:insert name="uat"/></td></tr>
-              <tr><th>#{lang.id} </th><td><ui:insert name="id"/></td></tr>
-            </ui:fragment>
-            <ui:fragment rendered="#{cnf eq null ? false : cnf}">
-              <tr><th>#{lang.confirmedBy} </th><td><ui:insert name="coby"/></td></tr>
-              <tr><th>#{lang.confirmedAt} </th><td><ui:insert name="coat"/></td></tr>
-              <ui:fragment rendered="#{desp eq null ? false : desp}">
-                <tr><th>#{lang.despatchedAt} </th><td><ui:insert name="dby"/></td></tr>
-                <tr><th>#{lang.deliveredAt} </th><td><ui:insert name="dat"/></td></tr>
-              </ui:fragment>
-            </ui:fragment>
-          </table>
-        </p:overlayPanel>
-        <ui:insert name="version">
-        </ui:insert>
-        <!--      </div>
-            </div>-->
+      <table class="infoTable" style="width:250px" >
+        <ui:fragment rendered="#{log eq null ? true : log}">
+          <tr><th>#{lang.createdBy} </th><td><ui:insert name="cby"/></td></tr>
+          <tr><th>#{lang.createdAt} </th><td><ui:insert name="cat"/></td></tr>
+          <tr><th>#{lang.updatedBy} </th><td><ui:insert name="uby"/></td></tr>
+          <tr><th>#{lang.updatedAt} </th><td><ui:insert name="uat"/></td></tr>
+          <tr><th>#{lang.id} </th><td><ui:insert name="id"/></td></tr>
+        </ui:fragment>
+        <ui:fragment rendered="#{cnf eq null ? false : cnf}">
+          <tr><th>#{lang.confirmedBy} </th><td><ui:insert name="coby"/></td></tr>
+          <tr><th>#{lang.confirmedAt} </th><td><ui:insert name="coat"/></td></tr>
+          <ui:fragment rendered="#{desp eq null ? false : desp}">
+            <tr><th>#{lang.despatchedAt} </th><td><ui:insert name="dby"/></td></tr>
+            <tr><th>#{lang.deliveredAt} </th><td><ui:insert name="dat"/></td></tr>
+          </ui:fragment>
+        </ui:fragment>
+      </table>
+    </p:overlayPanel>
+    <ui:insert name="version">
+    </ui:insert>
+    <!--      </div>
+        </div>-->
   </h:panelGroup>
 
 </ui:composition>

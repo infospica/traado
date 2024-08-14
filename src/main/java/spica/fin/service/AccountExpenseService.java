@@ -22,8 +22,6 @@ import spica.scm.domain.Company;
 import spica.scm.domain.Consignment;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
-import wawo.entity.core.UserMessageException;
 
 /**
  * AccountExpenseService

@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.validators;
 
@@ -18,17 +18,16 @@ import wawo.app.faces.Jsf;
  * @author sujesh
  */
 @FacesValidator("spica.scm.validators.PasswordValidator")
-public class PasswordValidator implements Validator{
-  
-    
+public class PasswordValidator implements Validator {
+
   @Override
   public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-       String confirmPassword = (String) value;
+    String confirmPassword = (String) value;
     UIInput passwordInput = (UIInput) component.findComponent("newPassword");
     String password = (String) passwordInput.getLocalValue();
-        if (password == null || confirmPassword == null || !password.equals(confirmPassword)) {
-          Jsf.error(component,"error.password.missmatch");
-               
+    if (password == null || confirmPassword == null || !password.equals(confirmPassword)) {
+      Jsf.error(component, "error.password.missmatch");
+
     }
   }
 }

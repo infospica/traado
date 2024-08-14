@@ -45,7 +45,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{purchaseReqStatusVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseReqStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseReqStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{purchaseReqStatusView.purchaseReqStatus}" value="#{purchaseReqStatusVar}" />
           </p:commandLink>
         </p:column>
@@ -54,7 +54,7 @@
           <h:outputText value="#{appView.number(purchaseReqStatusVar.sortOrder)}" escape="false" />
         </p:column>-->
         <p:column exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(purchaseReqStatusVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(purchaseReqStatusVar.createdAt)}</ui:define>

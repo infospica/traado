@@ -13,10 +13,10 @@ function fillTable(table, data) {
    *	fillTable('#shipmentPlan',jsonVar,'<input type="text" class="form-control" value="','">');
    */
   var vArgs = Array.prototype.slice.call(arguments, 2),
-    i = 0,
-    t = 0,
-    row = $("<tr />"),
-    key;
+          i = 0,
+          t = 0,
+          row = $("<tr />"),
+          key;
   for (i = 0; i < data.length; i += 1) {
     row = $("<tr />");
     $(table).append(row);
@@ -117,12 +117,12 @@ var page = {
     "use strict";
     page.getRatio();
     var hh = $('.header .navbar').outerHeight(),
-      fh = $('footer.footer').outerHeight();
+            fh = $('footer.footer').outerHeight();
     var hgt = h - (hh + fh + 20);
 
     $('.sidebar > .fwhFixer').css('min-height', hgt);
-    $('.layout').css('height', h-fh);
-    
+    $('.layout').css('height', h - fh);
+
     $('.page').css('min-height', h - fh);
 
     $('.pageContent').css('min-height', (hgt - (hh - 20)));

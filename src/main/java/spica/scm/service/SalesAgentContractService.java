@@ -15,7 +15,6 @@ import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.SalesAgentContract;
-import spica.scm.domain.UserProfile;
 import spica.scm.validate.SalesAgentContractIs;
 import wawo.app.faces.MainView;
 

@@ -8,14 +8,12 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.Designation;
 import spica.scm.validate.ValidateUtil;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -189,7 +187,8 @@ public abstract class DesignationService {
   public static final List<Designation> selectDesignationSalesAgent(MainView main, int id) {
     return AppService.list(main, Designation.class, "select id,title from scm_designation where id=?", new Object[]{14});
   }
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main

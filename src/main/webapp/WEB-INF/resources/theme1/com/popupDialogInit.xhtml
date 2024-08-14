@@ -7,12 +7,17 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:o="http://omnifaces.org/ui"
                 >
-  
-<!--  <o:importConstants type="spica.sys.FileConstant" />-->  
+
+  <!--  <o:importConstants type="spica.sys.FileConstant" />-->  
   <script>
-$(document).ready(function () {
-try {  popup.init(); page.refresh();}catch(err) {  console.log(err.message); }
-});
+    $(document).ready(function () {
+      try {
+        popup.init();
+        page.refresh();
+      } catch (err) {
+        console.log(err.message);
+      }
+    });
 
   </script>
 </ui:composition>

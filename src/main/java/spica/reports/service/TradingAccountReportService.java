@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
@@ -29,11 +29,11 @@ public class TradingAccountReportService {
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(financialYear.getStartDate());
     params.add(calendar.get(Calendar.DAY_OF_MONTH));
-    params.add(calendar.get(Calendar.MONTH)+1);
+    params.add(calendar.get(Calendar.MONTH) + 1);
     params.add(calendar.get(Calendar.YEAR));
     calendar.setTime(financialYear.getEndDate());
     params.add(calendar.get(Calendar.DAY_OF_MONTH));
-    params.add(calendar.get(Calendar.MONTH)+1);
+    params.add(calendar.get(Calendar.MONTH) + 1);
     params.add(calendar.get(Calendar.YEAR));
     params.add(reportType);
     return AppDb.getList(main.dbConnector(), TradingAccountReport.class, sql, params.toArray());

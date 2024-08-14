@@ -37,7 +37,7 @@
       <p:outputLabel value="#{lang.tradeLevel}" for="tradeLevel" />
       <h:panelGroup>
         <p:inputNumber value="#{tradeProfileView.tradeProfile.tradeLevel}" converterMessage="#{lang.tradeLevel} #{lang.invalidNumber}" decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="tradeLevel" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="tradeLevel" />
         <p:message for="tradeLevel" display="text"/>
       </h:panelGroup>
 
@@ -45,7 +45,7 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{tradeProfileView.tradeProfile.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator=""
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 
@@ -68,7 +68,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column  sortBy="#{tradeProfileVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{tradeProfileVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{tradeProfileVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{tradeProfileView.tradeProfile}" value="#{tradeProfileVar}" />
           </p:commandLink>
         </p:column>

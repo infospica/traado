@@ -3,7 +3,7 @@
   #{trialBalanceReportView.reset()}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
@@ -117,7 +117,7 @@
           </f:facet>
         </p:column>
         <p:column headerText="#{lang.closing} #{lang.balance}" sortBy="#{trialBalanceReportVar.balance}" filterBy="#{trialBalanceReportVar.balance}" style="text-align: right;">
-         <h:outputText value="#{appView.decimal(trialBalanceReportVar.balance)}" styleClass="label" style="background-color: #{trialBalanceReportVar.balance gt -1 ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}" escape="false" />
+          <h:outputText value="#{appView.decimal(trialBalanceReportVar.balance)}" styleClass="label" style="background-color: #{trialBalanceReportVar.balance gt -1 ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}" escape="false" />
           <f:facet name="footer">           
             <h:outputText value="#{appView.decimal(trialBalanceReportView.totBalance)}" />            
           </f:facet>

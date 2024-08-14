@@ -8,11 +8,7 @@
 package spica.scm.service;
 
 import java.util.List;
-import spica.scm.common.ProductDetailSales;
 import spica.scm.domain.Account;
-import spica.scm.domain.AccountGroup;
-import spica.scm.domain.AccountGroupPriceList;
-import spica.scm.domain.Product;
 import spica.scm.domain.ProductBatch;
 import wawo.app.common.AppService;
 import wawo.app.Main;
@@ -21,8 +17,6 @@ import spica.scm.domain.ProductDetail;
 import spica.scm.domain.ProductPreset;
 import spica.scm.validate.ProductDetailIs;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
-import wawo.entity.util.StringUtil;
 
 /**
  * ProductDetailService

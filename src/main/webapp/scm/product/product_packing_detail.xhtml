@@ -5,7 +5,7 @@
     <ui:param name="label" value="#{lang.productPacking}" />
     <ui:param name="ids" value="productPackingDetail" />
     <ui:param name="pageBasic" value="false" />
-    
+
     <ui:define name="navRight" >
       <p:commandButton rendered="#{main.popup}" process="@this" immediate="true"  oncomplete="parent.productPackingPopupReturn(); closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
     </ui:define>
@@ -29,7 +29,7 @@
         <f:ajax execute="f1" render="f1"  />
       </h:commandButton>
     </ui:define>   
-    
+
     <ui:define name="form">
     </ui:define>
 
@@ -43,7 +43,7 @@
               <h:panelGroup layout="block" styleClass="col-md-9 ">
                 <h:panelGroup layout="block" styleClass="flex">
                   <h:panelGroup layout="block" styleClass="cell-0" id="primaryPackingDiv">
-                      <p:selectOneMenu value="#{productPackingDetailView.productPackingDetail.packPrimary}"
+                    <p:selectOneMenu value="#{productPackingDetailView.productPackingDetail.packPrimary}"
                                      required="true" requiredMessage="#{lang.primaryPacking} #{lang.isRequired}"
                                      id="productPrimaryPacking" converter="omnifaces.SelectItemsConverter" styleClass="w-120" title="#{lang.packPrimary}">
                       <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />

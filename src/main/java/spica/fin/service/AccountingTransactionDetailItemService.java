@@ -10,7 +10,6 @@ package spica.fin.service;
 import java.util.List;
 import spica.constant.AccountingConstant;
 import spica.fin.common.FilterObjects;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -81,11 +80,11 @@ public abstract class AccountingTransactionDetailItemService {
       main.param(cheqEntryId);
     }
     return (List<AccountingTransactionDetailItem>) AppService.list(main, AccountingTransactionDetailItem.class,
-      "select * from fin_accounting_transaction_detail_item t1, fin_accounting_transaction_detail t2, fin_accounting_transaction t3 "
-      + "where t2.id=t1.accounting_transaction_detail_id and t3.id = t2.accounting_transaction_id and t1.record_type=? and t2.accounting_ledger_id=? and (t1.status=? or t1.status=?) "
-      + accountGrpCond
-      + "order by t2.entry_date, t1.document_type_id",
-      main.getParamData().toArray());
+            "select * from fin_accounting_transaction_detail_item t1, fin_accounting_transaction_detail t2, fin_accounting_transaction t3 "
+            + "where t2.id=t1.accounting_transaction_detail_id and t3.id = t2.accounting_transaction_id and t1.record_type=? and t2.accounting_ledger_id=? and (t1.status=? or t1.status=?) "
+            + accountGrpCond
+            + "order by t2.entry_date, t1.document_type_id",
+            main.getParamData().toArray());
   }
 
   /**
@@ -110,11 +109,11 @@ public abstract class AccountingTransactionDetailItemService {
       main.param(cheqEntryId);
     }
     return (List<AccountingTransactionDetailItem>) AppService.list(main, AccountingTransactionDetailItem.class,
-      "select * from fin_accounting_transaction_detail_item t1, fin_accounting_transaction_detail t2, fin_accounting_transaction t3 "
-      + "where t2.id=t1.accounting_transaction_detail_id and t3.id = t2.accounting_transaction_id and t1.record_type = ? and t2.accounting_ledger_id = ? and (t1.status = ? or t1.status = ?) "
-      + accountGrpCond
-      + "order by t2.entry_date, t1.document_type_id",
-      main.getParamData().toArray());
+            "select * from fin_accounting_transaction_detail_item t1, fin_accounting_transaction_detail t2, fin_accounting_transaction t3 "
+            + "where t2.id=t1.accounting_transaction_detail_id and t3.id = t2.accounting_transaction_id and t1.record_type = ? and t2.accounting_ledger_id = ? and (t1.status = ? or t1.status = ?) "
+            + accountGrpCond
+            + "order by t2.entry_date, t1.document_type_id",
+            main.getParamData().toArray());
   }
 
   public static final List<AccountingTransactionDetailItem> selectByTransactionDetail(Main main, int accountingTransactionDetailId) {

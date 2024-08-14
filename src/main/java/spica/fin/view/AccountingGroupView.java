@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import spica.fin.domain.AccountingGroup;
@@ -23,7 +22,6 @@ import spica.fin.view.FinLookupView;
 import spica.fin.service.AccountingLedgerService;
 import spica.sys.FileConstant;
 import spica.sys.UserRuntimeView;
-import wawo.app.config.AppConfig;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
@@ -62,7 +60,7 @@ public class AccountingGroupView implements Serializable {
     if (accountingGroup == null) {
       accountingGroup = new AccountingGroup();
     }
-    if(accountingGroup.getCompanyId() == null){
+    if (accountingGroup.getCompanyId() == null) {
       accountingGroup.setCompanyId(UserRuntimeView.instance().getCompany().getId());
     }
     return accountingGroup;
@@ -95,7 +93,7 @@ public class AccountingGroupView implements Serializable {
           setAccountingGroup((AccountingGroup) AccountingGroupService.selectByPk(main, getAccountingGroup()));
           main.getPageData().reset();
         } else if (ViewTypes.isList(viewType)) {
-           getAccountingGroup().setCompanyId(null);
+          getAccountingGroup().setCompanyId(null);
           loadAccountingGroupList(main);
         }
       } catch (Throwable t) {

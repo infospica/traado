@@ -31,7 +31,6 @@ import spica.sys.FileConstant;
 import spica.sys.SystemConstants;
 import spica.sys.SystemRuntimeConfig;
 import spica.sys.UserRuntimeView;
-import wawo.app.config.AppConfig;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;

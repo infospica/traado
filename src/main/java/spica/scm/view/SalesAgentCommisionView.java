@@ -10,18 +10,12 @@ package spica.scm.view;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -32,7 +26,6 @@ import spica.scm.domain.SalesInvoice;
 import spica.scm.domain.Contract;
 import spica.scm.service.UserProfileService;
 import spica.sys.UserRuntimeView;
-import wawo.app.faces.Jsf;
 
 /**
  * SalesAgentCommisionView
@@ -43,7 +36,7 @@ import wawo.app.faces.Jsf;
 @Named(value = "salesAgentCommisionView")
 @ViewScoped
 public class SalesAgentCommisionView implements Serializable {
-  
+
   private transient SalesAgentCommision salesAgentCommision;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesAgentCommision> salesAgentCommisionLazyModel; 	//For lazy loading datatable.
   private transient SalesAgentCommision[] salesAgentCommisionSelected;	 //Selected Domain Array
@@ -92,7 +85,7 @@ public class SalesAgentCommisionView implements Serializable {
     //this.main = main;
     selectedMonth = UserRuntimeView.instance().getCurrentMonth();
     selectedYear = UserRuntimeView.instance().getCurrentYear();
-    
+
     if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
@@ -122,7 +115,7 @@ public class SalesAgentCommisionView implements Serializable {
     if (salesAgentCommisionLazyModel == null) {
       salesAgentCommisionLazyModel = new LazyDataModel<SalesAgentCommision>() {
         private List<SalesAgentCommision> list;
-        
+
         @Override
         public List<SalesAgentCommision> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -143,12 +136,12 @@ public class SalesAgentCommisionView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(SalesAgentCommision salesAgentCommision) {
           return salesAgentCommision.getId();
         }
-        
+
         @Override
         public SalesAgentCommision getRowData(String rowKey) {
           if (list != null) {
@@ -163,7 +156,7 @@ public class SalesAgentCommisionView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_sales_agent_commision/";
   }
@@ -249,9 +242,11 @@ public class SalesAgentCommisionView implements Serializable {
   public void calculatePayableValue(SalesAgentCommision salesAgentCommision) {
     salesAgentCommision.setPayableValue(salesAgentCommision.getPayablePercent() * salesAgentCommision.getSalesInvoiceId().getInvoiceAmount() / 100);
   }
+
   public void calculatePayablePercent(SalesAgentCommision salesAgentCommision) {
-    salesAgentCommision.setPayablePercent(salesAgentCommision.getPayableValue()/ salesAgentCommision.getSalesInvoiceId().getInvoiceAmount() * 100);
+    salesAgentCommision.setPayablePercent(salesAgentCommision.getPayableValue() / salesAgentCommision.getSalesInvoiceId().getInvoiceAmount() * 100);
   }
+
   /**
    * Return LazyDataModel of SalesAgentCommision.
    *
@@ -326,29 +321,29 @@ public class SalesAgentCommisionView implements Serializable {
   public List<Contract> scmContractAuto(String filter) {
     return ScmLookupView.contractAuto(filter);
   }
-  
+
   public List<UserProfile> getUserProfileList(MainView main) {
     userProfileList = UserProfileService.listPagedBySalesAgent(main, UserRuntimeView.instance().getCompany());
     userProfile = userProfileList.get(0);
     return userProfileList;
   }
-  
+
   public void setUserProfileList(List<UserProfile> userProfileList) {
     this.userProfileList = userProfileList;
   }
-  
+
   public int getSelectedYear() {
     return selectedYear;
   }
-  
+
   public void setSelectedYear(int selectedYear) {
     this.selectedYear = selectedYear;
   }
-  
+
   public int getSelectedMonth() {
     return selectedMonth;
   }
-  
+
   public void setSelectedMonth(int selectedMonth) {
     this.selectedMonth = selectedMonth;
   }
@@ -360,5 +355,5 @@ public class SalesAgentCommisionView implements Serializable {
   public void setTotal(Double total) {
     this.total = total;
   }
-  
+
 }

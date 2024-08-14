@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.ProdEntDetBuybackStatService;
 
 /**
  * ProdEntDetBuybackStatView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Sep 08 18:33:15 IST 2016 
+ * @version	1.0, Thu Sep 08 18:33:15 IST 2016
  */
-
-@Named(value="prodEntDetBuybackStatView")
+@Named(value = "prodEntDetBuybackStatView")
 @ViewScoped
-public class ProdEntDetBuybackStatView implements Serializable{
+public class ProdEntDetBuybackStatView implements Serializable {
 
   private transient ProdEntDetBuybackStat prodEntDetBuybackStat;	//Domain object/selected Domain.
   private transient LazyDataModel<ProdEntDetBuybackStat> prodEntDetBuybackStatLazyModel; 	//For lazy loading datatable.
   private transient ProdEntDetBuybackStat[] prodEntDetBuybackStatSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ProdEntDetBuybackStatView() {
     super();
   }
- 
+
   /**
    * Return ProdEntDetBuybackStat.
+   *
    * @return ProdEntDetBuybackStat.
-   */  
+   */
   public ProdEntDetBuybackStat getProdEntDetBuybackStat() {
-    if(prodEntDetBuybackStat == null) {
+    if (prodEntDetBuybackStat == null) {
       prodEntDetBuybackStat = new ProdEntDetBuybackStat();
     }
     return prodEntDetBuybackStat;
-  }   
-  
+  }
+
   /**
    * Set ProdEntDetBuybackStat.
+   *
    * @param prodEntDetBuybackStat.
-   */   
+   */
   public void setProdEntDetBuybackStat(ProdEntDetBuybackStat prodEntDetBuybackStat) {
     this.prodEntDetBuybackStat = prodEntDetBuybackStat;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchProdEntDetBuybackStat(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchProdEntDetBuybackStat(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class ProdEntDetBuybackStatView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create prodEntDetBuybackStatLazyModel.
+   *
    * @param main
    */
   private void loadProdEntDetBuybackStatList(final MainView main) {
     if (prodEntDetBuybackStatLazyModel == null) {
       prodEntDetBuybackStatLazyModel = new LazyDataModel<ProdEntDetBuybackStat>() {
-      private List<ProdEntDetBuybackStat> list;      
-      @Override
-      public List<ProdEntDetBuybackStat> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ProdEntDetBuybackStatService.listPaged(main);
-          main.commit(prodEntDetBuybackStatLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ProdEntDetBuybackStat> list;
+
+        @Override
+        public List<ProdEntDetBuybackStat> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ProdEntDetBuybackStatService.listPaged(main);
+            main.commit(prodEntDetBuybackStatLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ProdEntDetBuybackStat prodEntDetBuybackStat) {
-        return prodEntDetBuybackStat.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ProdEntDetBuybackStat prodEntDetBuybackStat) {
+          return prodEntDetBuybackStat.getId();
+        }
+
+        @Override
         public ProdEntDetBuybackStat getRowData(String rowKey) {
           if (list != null) {
             for (ProdEntDetBuybackStat obj : list) {
@@ -136,11 +139,12 @@ public class ProdEntDetBuybackStatView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_prod_ent_det_buyback_stat/";	
+    String SUB_FOLDER = "scm_prod_ent_det_buyback_stat/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class ProdEntDetBuybackStatView implements Serializable{
    */
   public String cloneProdEntDetBuybackStat(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneProdEntDetBuybackStat(main, "clone"); 
+    return saveOrCloneProdEntDetBuybackStat(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class ProdEntDetBuybackStatView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ProdEntDetBuybackStat.
    *
@@ -205,7 +208,7 @@ public class ProdEntDetBuybackStatView implements Serializable{
       } else {
         ProdEntDetBuybackStatService.deleteByPk(main, getProdEntDetBuybackStat());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class ProdEntDetBuybackStatView implements Serializable{
 
   /**
    * Return LazyDataModel of ProdEntDetBuybackStat.
+   *
    * @return
    */
   public LazyDataModel<ProdEntDetBuybackStat> getProdEntDetBuybackStatLazyModel() {
     return prodEntDetBuybackStatLazyModel;
   }
 
- /**
-  * Return ProdEntDetBuybackStat[].
-  * @return 
-  */
+  /**
+   * Return ProdEntDetBuybackStat[].
+   *
+   * @return
+   */
   public ProdEntDetBuybackStat[] getProdEntDetBuybackStatSelected() {
     return prodEntDetBuybackStatSelected;
   }
-  
+
   /**
    * Set ProdEntDetBuybackStat[].
-   * @param prodEntDetBuybackStatSelected 
+   *
+   * @param prodEntDetBuybackStatSelected
    */
   public void setProdEntDetBuybackStatSelected(ProdEntDetBuybackStat[] prodEntDetBuybackStatSelected) {
     this.prodEntDetBuybackStatSelected = prodEntDetBuybackStatSelected;
   }
- 
-
 
 }

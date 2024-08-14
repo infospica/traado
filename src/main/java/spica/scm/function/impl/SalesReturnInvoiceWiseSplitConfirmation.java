@@ -1,17 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.function.impl;
 
 import java.util.List;
-import spica.scm.domain.SalesInvoice;
 import spica.scm.domain.SalesReturn;
 import spica.scm.domain.SalesReturnItem;
 import spica.scm.domain.SalesReturnSplit;
 import spica.scm.function.SalesReturnConfirmation;
-import spica.scm.service.PlatformService;
 import spica.scm.service.SalesReturnItemService;
 import spica.scm.service.SalesReturnService;
 import spica.scm.service.SalesReturnSplitService;

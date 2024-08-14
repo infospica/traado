@@ -76,7 +76,7 @@
         <p:column headerText="#{lang.batchNo}" sortBy="#{productPricelistVar.purchaseEntryDetailId.batchNo}" field="purchase_entry_detail_id.batch_no"><h:outputText value="#{appView.display(productPricelistVar.purchaseEntryDetailId.batchNo)}" title="#{appView.title(productPricelistVar.purchaseEntryDetailId.batchNo)}" escape="false" /></p:column>
         <p:column headerText="#{lang.title}" sortBy="#{productPricelistVar.accountGroupPriceListId.title}" field="account_group_price_list_id.title"><h:outputText value="#{appView.display(productPricelistVar.accountGroupPriceListId.title)}" title="#{appView.title(productPricelistVar.accountGroupPriceListId.title)}" escape="false" /></p:column>
         <p:column headerText="#{lang.valuePtsPerProdPieceSell}" sortBy="#{productPricelistVar.valuePtsPerProdPieceSell}" field="value_pts_per_prod_piece_sell" style="text-align: right"><h:outputText value="#{appView.decimal(productPricelistVar.valuePtsPerProdPieceSell)}" escape="false" /></p:column>
-        </p:dataTable> 	
+      </p:dataTable> 	
     </ui:define>   
   </ui:decorate>
 </ui:composition>

@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -12,8 +12,6 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import spica.reports.model.CompanyCustomerSales;
 import spica.reports.model.FilterParameters;
-import spica.reports.model.Gst1Report;
-import spica.reports.service.Gst1ReportService;
 import spica.reports.service.TcsReportService;
 import spica.scm.domain.AccountGroup;
 import spica.scm.domain.Company;
@@ -97,6 +95,7 @@ public class TcsReportView implements Serializable {
     }
     return company;
   }
+
   public void export(MainView main) {
     try {
       ExcelSheet.createCustomerWiseTcsReport(getTcsReportList(main), getCompany(), getFilterParameters());
@@ -107,6 +106,7 @@ public class TcsReportView implements Serializable {
     }
 
   }
+
   public void setCompany(Company company) {
     this.company = company;
   }

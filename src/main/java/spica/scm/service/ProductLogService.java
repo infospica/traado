@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -83,7 +83,7 @@ public abstract class ProductLogService {
   public static final void insert(Main main, ProductLog productLog) {
     //ProductLogIs.insertAble(main, productLog);  //Validating
     AppService.insert(main, productLog);
-    
+
   }
 
   /**
@@ -145,7 +145,7 @@ public abstract class ProductLogService {
       deleteByPk(main, e);
     }
   }
-  
+
   public static final void insertProductLog(Main main, Product product) {
     insert(main, new ProductLog(product));
   }

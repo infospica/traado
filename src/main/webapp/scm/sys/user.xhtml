@@ -131,7 +131,7 @@
           <p:ajax event="itemUnselect" process="accountListId" immediate="true" listener="#{userView.onAccountUnSelect}" />
         </p:autoComplete><p:message for="accountId" display="text" />
       </h:panelGroup>
-      
+
       <p:outputLabel value="#{lang.send} #{lang.notification}" for="notifyId" rendered="#{main.isNew()}"/>
       <h:panelGroup rendered="#{main.isNew()}" >
         <p:selectOneRadio value="#{userView.notify}" id="notifyId">
@@ -140,7 +140,7 @@
         </p:selectOneRadio>
         <p:message for="notifyId" />
       </h:panelGroup> 
-      
+
       <h:outputLabel value="#{lang.login} cred." />
       <p:outputLabel value="#{userView.user.login}" />
 

@@ -15,7 +15,6 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.fin.domain.TaxCode;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 

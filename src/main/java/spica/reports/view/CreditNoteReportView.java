@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -151,11 +151,12 @@ public class CreditNoteReportView implements Serializable {
     filterParameters.setAccount(null);
     reset();
   }
-  
+
   public void filterChangeEvent(ValueChangeEvent event) {
     reset();
   }
-   public String getType() {
+
+  public String getType() {
     if (type == null) {
       type = ReportConstant.SALES;
     }
@@ -165,5 +166,5 @@ public class CreditNoteReportView implements Serializable {
   public void setType(String type) {
     this.type = type;
   }
-  
+
 }

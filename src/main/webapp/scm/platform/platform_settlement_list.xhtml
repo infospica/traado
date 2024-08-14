@@ -4,8 +4,8 @@
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.platformSettlement}" />
     <ui:param name="ids" value="platformSettlement" />
- <ui:define name="newList" >
-      </ui:define>
+    <ui:define name="newList" >
+    </ui:define>
     <ui:define name="deleteList" >
       <p:commandButton action="#{platformSettlementView.deletePlatformSettlement(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('platformSettlementWidgetDelConf')" process="f1" update="f1" >
         <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
@@ -25,10 +25,10 @@
     </ui:define>   
 
     <ui:define name="form">
-        </ui:define>
+    </ui:define>
 
     <ui:define name="list">
-      <script>function platformPopupReturned(){}</script>
+      <script>function platformPopupReturned() {}</script>
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <p:dataTable id="platformSettlementTable" var="platformSettlementVar" widgetVar="platformSettlementWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                    lazy="true" value="#{platformSettlementView.platformSettlementLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{platformSettlementVar.id}" 

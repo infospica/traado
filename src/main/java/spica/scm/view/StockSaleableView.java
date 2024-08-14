@@ -5,39 +5,21 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypes;
-import wawo.app.faces.MainView;
-import wawo.entity.core.AppPage;
-import wawo.entity.util.StringUtil;
-
-import spica.scm.domain.StockSaleable;
-import spica.scm.service.StockSaleableService;
-import spica.scm.domain.ProductDetail;
-import spica.scm.domain.Account;
-import spica.scm.domain.StockStatus;
-import spica.scm.domain.SalesOrderDetails;
-import spica.scm.domain.PurchaseReturn;
 
 /**
  * StockSaleableView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed May 25 15:59:57 IST 2016 
+ * @version	1.0, Wed May 25 15:59:57 IST 2016
  */
-
-@Named(value="stockSaleableView")
+@Named(value = "stockSaleableView")
 @ViewScoped
-public class StockSaleableView implements Serializable{
+public class StockSaleableView implements Serializable {
 
 //  private transient StockSaleable stockSaleable;	//Domain object/selected Domain.
 //  private transient LazyDataModel<StockSaleable> stockSaleableLazyModel; 	//For lazy loading datatable.

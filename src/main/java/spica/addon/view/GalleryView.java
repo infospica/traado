@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.view;
 
@@ -100,7 +100,7 @@ public class GalleryView implements Serializable {
         }
       }
     } catch (Throwable t) {
-       main.rollback(t, "error.select");
+      main.rollback(t, "error.select");
     } finally {
       main.close();
     }

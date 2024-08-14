@@ -15,7 +15,6 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.TradeProfile;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -178,6 +177,7 @@ public abstract class TradeProfileService {
     List<CustomerTradeProfile> tradeProfileList = main.em().list(CustomerTradeProfile.class, "select * from scm_customer_trade_profile scm_customer_trade_profile where scm_customer_trade_profile.customer_id=?", new Object[]{customer.getId()});
     return tradeProfileList;
   }
+
   /**
    * Validate delete.
    *

@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * TaxProcessorService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Jul 24 18:06:26 IST 2017 
+ * @version	1.0, Mon Jul 24 18:06:26 IST 2017
  */
+public abstract class TaxProcessorService {
 
-public abstract class TaxProcessorService {  
- 
- /**
+  /**
    * TaxProcessor paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class TaxProcessorService {
     sql.count("select count(scm_tax_processor.id) as total from scm_tax_processor scm_tax_processor "); //Count query
     sql.join("left outer join scm_status scm_tax_processorstatus_id on (scm_tax_processorstatus_id.id = scm_tax_processor.status_id)"); //Join Query
 
-    sql.string(new String[]{"scm_tax_processor.processor_class","scm_tax_processor.description","scm_tax_processor.created_by","scm_tax_processor.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_tax_processor.id","scm_tax_processorcountry_tax_regime_id.regime"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_tax_processor.created_at","scm_tax_processor.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_tax_processor.processor_class", "scm_tax_processor.description", "scm_tax_processor.created_by", "scm_tax_processor.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_tax_processor.id", "scm_tax_processorcountry_tax_regime_id.regime"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_tax_processor.created_at", "scm_tax_processor.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of TaxProcessor.
-  * @param main
-  * @return List of TaxProcessor
-  */
+
+  /**
+   * Return List of TaxProcessor.
+   *
+   * @param main
+   * @return List of TaxProcessor
+   */
   public static final List<TaxProcessor> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getTaxProcessorSqlPaged(main));
+    return AppService.listPagedJpa(main, getTaxProcessorSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class TaxProcessorService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select TaxProcessor by key.
-  * @param main
-  * @param taxProcessor
-  * @return TaxProcessor
-  */
+  /**
+   * Select TaxProcessor by key.
+   *
+   * @param main
+   * @param taxProcessor
+   * @return TaxProcessor
+   */
   public static final TaxProcessor selectByPk(Main main, TaxProcessor taxProcessor) {
     return (TaxProcessor) AppService.find(main, TaxProcessor.class, taxProcessor.getId());
   }
 
- /**
-  * Insert TaxProcessor.
-  * @param main
-  * @param taxProcessor
-  */
+  /**
+   * Insert TaxProcessor.
+   *
+   * @param main
+   * @param taxProcessor
+   */
   public static final void insert(Main main, TaxProcessor taxProcessor) {
     insertAble(main, taxProcessor);  //Validating
     AppService.insert(main, taxProcessor);
 
   }
 
- /**
-  * Update TaxProcessor by key.
-  * @param main
-  * @param taxProcessor
-  * @return TaxProcessor
-  */
+  /**
+   * Update TaxProcessor by key.
+   *
+   * @param main
+   * @param taxProcessor
+   * @return TaxProcessor
+   */
   public static final TaxProcessor updateByPk(Main main, TaxProcessor taxProcessor) {
     updateAble(main, taxProcessor); //Validating
     return (TaxProcessor) AppService.update(main, taxProcessor);
@@ -106,8 +107,7 @@ public abstract class TaxProcessorService {
   public static void insertOrUpdate(Main main, TaxProcessor taxProcessor) {
     if (taxProcessor.getId() == null) {
       insert(main, taxProcessor);
-    }
-    else{
+    } else {
       updateByPk(main, taxProcessor);
     }
   }
@@ -123,27 +123,29 @@ public abstract class TaxProcessorService {
     insert(main, taxProcessor);
   }
 
- /**
-  * Delete TaxProcessor.
-  * @param main
-  * @param taxProcessor
-  */
+  /**
+   * Delete TaxProcessor.
+   *
+   * @param main
+   * @param taxProcessor
+   */
   public static final void deleteByPk(Main main, TaxProcessor taxProcessor) {
     deleteAble(main, taxProcessor); //Validation
     AppService.delete(main, TaxProcessor.class, taxProcessor.getId());
   }
-	
- /**
-  * Delete Array of TaxProcessor.
-  * @param main
-  * @param taxProcessor
-  */
+
+  /**
+   * Delete Array of TaxProcessor.
+   *
+   * @param main
+   * @param taxProcessor
+   */
   public static final void deleteByPkArray(Main main, TaxProcessor[] taxProcessor) {
     for (TaxProcessor e : taxProcessor) {
       deleteByPk(main, e);
     }
   }
-  
+
   /**
    * Validate delete.
    *

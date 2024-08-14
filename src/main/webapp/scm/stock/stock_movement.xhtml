@@ -12,7 +12,7 @@
     <ui:param name="reset" value="false" />
 
     <ui:define name="navRight" >
-           <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
     </ui:define>
 
     <ui:define name="deleteList" >
@@ -179,8 +179,13 @@
     <ui:define name="after" >
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <style>
-        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
-        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+        .mDataTable td, .themeTable td, .dataTable td{
+          border-top:none;
+          border-bottom: none;
+        }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{
+          border: none;
+        }
 
         .bg-danger {
           color: #fff;

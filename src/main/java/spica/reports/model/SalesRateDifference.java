@@ -1,9 +1,6 @@
 package spica.reports.model;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Calendar;
-import spica.sys.UserRuntimeView;
 
 public class SalesRateDifference implements Serializable {
 

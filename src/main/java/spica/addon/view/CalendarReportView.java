@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.view;
 
@@ -21,7 +21,6 @@ import spica.constant.ReportConstant;
 import spica.addon.model.CalendarReport;
 import spica.reports.model.FilterParameters;
 import spica.addon.service.CalendarReportService;
-import spica.scm.domain.Company;
 import spica.sys.SystemConstants;
 import spica.sys.UserRuntimeView;
 import wawo.app.faces.Jsf;
@@ -61,22 +60,22 @@ public class CalendarReportView implements Serializable {
   private void getCalendarElements() {
     if (lazyEventModel != null) {
       MainView main = Jsf.getMain();
-      try{
-      calendarReportList = CalendarReportService.selectCalendarReportByType(main, UserRuntimeView.instance().getCompany().getId(), getFilterParameters());
-      if (calendarReportList != null) {
-        for (CalendarReport report : calendarReportList) {
-          String partyName = report.getAmount() == null ? report.getPartyName() : report.getPartyName() + "(" + report.getAmount() + ")";
-          DefaultScheduleEvent obj = new DefaultScheduleEvent(partyName, report.getDate(), report.getDate(), report);
-          obj.setDescription(partyName);
-          if (report.getStatus() == SystemConstants.DRAFT) {
-            obj.setStyleClass("draft");
-          } else {
-            obj.setStyleClass("confirm");
+      try {
+        calendarReportList = CalendarReportService.selectCalendarReportByType(main, UserRuntimeView.instance().getCompany().getId(), getFilterParameters());
+        if (calendarReportList != null) {
+          for (CalendarReport report : calendarReportList) {
+            String partyName = report.getAmount() == null ? report.getPartyName() : report.getPartyName() + "(" + report.getAmount() + ")";
+            DefaultScheduleEvent obj = new DefaultScheduleEvent(partyName, report.getDate(), report.getDate(), report);
+            obj.setDescription(partyName);
+            if (report.getStatus() == SystemConstants.DRAFT) {
+              obj.setStyleClass("draft");
+            } else {
+              obj.setStyleClass("confirm");
+            }
+            lazyEventModel.addEvent(obj);
           }
-          lazyEventModel.addEvent(obj);
         }
-      }
-        } catch (Throwable t) {
+      } catch (Throwable t) {
         main.rollback(t, "error.select");
       } finally {
         main.close();
@@ -117,17 +116,17 @@ public class CalendarReportView implements Serializable {
     CalendarReport report = (CalendarReport) event.getData();
     if (filterParameters.getFilterType().equals(ReportConstant.SALES)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getSalesInvoiceView().replaceFirst("/scm", ""), report.getId(), report.getId());
-    }else if (filterParameters.getFilterType().equals(ReportConstant.SALES_ORDER)){
+    } else if (filterParameters.getFilterType().equals(ReportConstant.SALES_ORDER)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getSalesOrderView().replaceFirst("/scm", ""), report.getId(), report.getId());
-    }else if (filterParameters.getFilterType().equals(ReportConstant.SALES_RETURN)){
+    } else if (filterParameters.getFilterType().equals(ReportConstant.SALES_RETURN)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getSalesReturnView().replaceFirst("/scm", ""), report.getId(), report.getId());
-    } else if (filterParameters.getFilterType().equals(ReportConstant.PURCHASE_ENTRY)){
+    } else if (filterParameters.getFilterType().equals(ReportConstant.PURCHASE_ENTRY)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getProductEntryView().replaceFirst("/scm", ""), report.getId(), report.getId());
-    } else if (filterParameters.getFilterType().equals(ReportConstant.PURCHASE_ORDER)){
+    } else if (filterParameters.getFilterType().equals(ReportConstant.PURCHASE_ORDER)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getPurchaseOrderView().replaceFirst("/scm", ""), report.getId(), report.getId());
-    }else if (filterParameters.getFilterType().equals(ReportConstant.PURCHASE_RETURN)) {
+    } else if (filterParameters.getFilterType().equals(ReportConstant.PURCHASE_RETURN)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getPurchaseReturnView().replaceFirst("/scm", ""), report.getId(), report.getId());
-    }else if (filterParameters.getFilterType().equals(ReportConstant.SALES_SERVICE)) {
+    } else if (filterParameters.getFilterType().equals(ReportConstant.SALES_SERVICE)) {
       Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getSalesServiceInvoiceView().replaceFirst("/scm", ""), report.getId(), report.getId());
     }
   }

@@ -236,290 +236,298 @@ var dataTable = {
 };
 
 var kb = {
-	ESC: 27,
-	TAB: 9,
-	ENTER: 13,
-	UP: 38,
-	DOWN: 40,
-	LEFT: 37,
-	RIGHT: 39
+  ESC: 27,
+  TAB: 9,
+  ENTER: 13,
+  UP: 38,
+  DOWN: 40,
+  LEFT: 37,
+  RIGHT: 39
 };
 /*! dataTable.js */
 var autoCombo = {
-	single: function (selector) {
-		"use strict";
-		/*
-		SYNTAX
-			autoCombo.single('.selectorName',
-				{
-					'selector':'.optSelectorName1',
-					'src': SourceArray1
-				},
-				{
-					'selector':'.optSelectorName2',
-					'src': SourceArray2
-				}
-				...
-			);
-		*/
-		var ob = selector,
-			i = 0,
-			vArgs = Array.prototype.slice.call(arguments, 1);
+  single: function (selector) {
+    "use strict";
+    /*
+     SYNTAX
+     autoCombo.single('.selectorName',
+     {
+     'selector':'.optSelectorName1',
+     'src': SourceArray1
+     },
+     {
+     'selector':'.optSelectorName2',
+     'src': SourceArray2
+     }
+     ...
+     );
+     */
+    var ob = selector,
+            i = 0,
+            vArgs = Array.prototype.slice.call(arguments, 1);
 
-		$(ob).autocomplete({
-			delay: 0,
-			minLength: 0,
-			source: [],
-			autoFocus: true,
-			open: function (event, ui) {
+    $(ob).autocomplete({
+      delay: 0,
+      minLength: 0,
+      source: [],
+      autoFocus: true,
+      open: function (event, ui) {
 
-				$(this).attr('aria-open', true);
-				if ($(this).is('[data-create]')) {
-					$('.ui-autocomplete').append('<li tabindex="-1" class="link"><a data-toggle="modal" data-target="#' + $(this).data('create') + '" href="javascript:;">Create \'<span aria-creating=""></span>\'</a></li>');
-					$(this).keyup(function () { $('.ui-autocomplete').find('[aria-creating]').html($(this).val()); });
-				}
-			},
-			close: function () {
-				$(this).attr('aria-open', false);
-			},
-			response: function (event, ui) {
-				if ($(this).is('[data-create]')) {
-					if (!ui.content.length) {
-						ui.content.push({ "label": 'Create or Edit: "' + $(this).val() + '"', "value": 'Create or Edit' });
-						//console.log(ui.content)
-						//$("#message").text("No results found");
-					} else {
-						//console.log(ui.content)
-						ui.content.pop();
-						ui.content.push({ "label": 'Create or Edit: "' + $(this).val() + '"', "value": 'Create or Edit' });
-						$("#message").empty();
-					}
-				}
-			},
-			change: function (event, ui) {
-				if (ui.item === null) {
-					$(this).val((ui.item ? ui.item.id : ''));
-				}
-			},
-			select: function () {
-				//$(this).trigger('change');
-				dataTable.select(this);
-			}
-		});
+        $(this).attr('aria-open', true);
+        if ($(this).is('[data-create]')) {
+          $('.ui-autocomplete').append('<li tabindex="-1" class="link"><a data-toggle="modal" data-target="#' + $(this).data('create') + '" href="javascript:;">Create \'<span aria-creating=""></span>\'</a></li>');
+          $(this).keyup(function () {
+            $('.ui-autocomplete').find('[aria-creating]').html($(this).val());
+          });
+        }
+      },
+      close: function () {
+        $(this).attr('aria-open', false);
+      },
+      response: function (event, ui) {
+        if ($(this).is('[data-create]')) {
+          if (!ui.content.length) {
+            ui.content.push({"label": 'Create or Edit: "' + $(this).val() + '"', "value": 'Create or Edit'});
+            //console.log(ui.content)
+            //$("#message").text("No results found");
+          } else {
+            //console.log(ui.content)
+            ui.content.pop();
+            ui.content.push({"label": 'Create or Edit: "' + $(this).val() + '"', "value": 'Create or Edit'});
+            $("#message").empty();
+          }
+        }
+      },
+      change: function (event, ui) {
+        if (ui.item === null) {
+          $(this).val((ui.item ? ui.item.id : ''));
+        }
+      },
+      select: function () {
+        //$(this).trigger('change');
+        dataTable.select(this);
+      }
+    });
 
-		for (i = 0; i < vArgs.length; i += 1) {
-			$(ob + vArgs[i].selector).autocomplete({
-				source: vArgs[i].src
-			});
-		}
-	},
-	multiColumn: function (selector) {
-		"use strict";
-		/*
-		SYNTAX
-			autoCombo.multiColumn('.selectorName',
-				{
-					'selector':'.optSelectorName1',
-					'src': SourceArray1
-				},
-				{
-					'selector':'.optSelectorName2',
-					'src': SourceArray2
-				}
-				...
-			);
-		*/
-		var ob = selector,
-			i = 0,
-			vArgs = Array.prototype.slice.call(arguments, 1);
+    for (i = 0; i < vArgs.length; i += 1) {
+      $(ob + vArgs[i].selector).autocomplete({
+        source: vArgs[i].src
+      });
+    }
+  },
+  multiColumn: function (selector) {
+    "use strict";
+    /*
+     SYNTAX
+     autoCombo.multiColumn('.selectorName',
+     {
+     'selector':'.optSelectorName1',
+     'src': SourceArray1
+     },
+     {
+     'selector':'.optSelectorName2',
+     'src': SourceArray2
+     }
+     ...
+     );
+     */
+    var ob = selector,
+            i = 0,
+            vArgs = Array.prototype.slice.call(arguments, 1);
 
-		$(ob).mcautocomplete({
-			delay: 2,
-			minLength: 0,
-			showHeader: true,
-			columns: [],
-			source: [],
-			autoFocus: true,
-			open: function () {
-				$(this).attr('aria-open', true);
-				if ($(this).is('[data-create]')) {
-					$('.ui-autocomplete').append('<li tabindex="-1" class="link"><a data-toggle="modal" data-target="#' + $(this).data('create') + '" href="javascript:;">Create \'<span aria-creating=""></span>\'</a></li>');
-					$(this).keyup(function () { $('.ui-autocomplete').find('[aria-creating]').html($(this).val()); });
-				}
-				var wid = 20;
-				$('.ui-menu:visible .ui-widget-header > span').each(function () { wid += $(this).width(); });
-				$('.ui-menu:visible').width(wid + 18);
-			},
-			close: function () {
-				$(this).attr('aria-open', false);
-			},
-			response: function (event, ui) {
-				if ($(this).is('[data-create]')) {
-					if (!ui.content.length) {
-						ui.content.push({ "label": 'Create / Edit: "' + $(this).val() + '"', "value": $(this).val() })
-						//console.log(ui.content)
-						//$("#message").text("No results found");
-					} else {
-						ui.content.pop();
-						ui.content.push({ "label": 'Create / Edit: "' + $(this).val() + '"', "value": $(this).val() })
-						//$("#message").empty();
-					}
-				}
-			},
-			select: function (event, ui) {
-				// Sets the input to the 'Make' column when item is selected.
+    $(ob).mcautocomplete({
+      delay: 2,
+      minLength: 0,
+      showHeader: true,
+      columns: [],
+      source: [],
+      autoFocus: true,
+      open: function () {
+        $(this).attr('aria-open', true);
+        if ($(this).is('[data-create]')) {
+          $('.ui-autocomplete').append('<li tabindex="-1" class="link"><a data-toggle="modal" data-target="#' + $(this).data('create') + '" href="javascript:;">Create \'<span aria-creating=""></span>\'</a></li>');
+          $(this).keyup(function () {
+            $('.ui-autocomplete').find('[aria-creating]').html($(this).val());
+          });
+        }
+        var wid = 20;
+        $('.ui-menu:visible .ui-widget-header > span').each(function () {
+          wid += $(this).width();
+        });
+        $('.ui-menu:visible').width(wid + 18);
+      },
+      close: function () {
+        $(this).attr('aria-open', false);
+      },
+      response: function (event, ui) {
+        if ($(this).is('[data-create]')) {
+          if (!ui.content.length) {
+            ui.content.push({"label": 'Create / Edit: "' + $(this).val() + '"', "value": $(this).val()})
+            //console.log(ui.content)
+            //$("#message").text("No results found");
+          } else {
+            ui.content.pop();
+            ui.content.push({"label": 'Create / Edit: "' + $(this).val() + '"', "value": $(this).val()})
+            //$("#message").empty();
+          }
+        }
+      },
+      select: function (event, ui) {
+        // Sets the input to the 'Make' column when item is selected.
 
-				//console.log(this.value, ui.item.label, ui.item.label === /Create \/ Edit:/)
+        //console.log(this.value, ui.item.label, ui.item.label === /Create \/ Edit:/)
 
-				//ui.item.label = (this.value === /Create \/ Edit:/)? ui.item.label: this.value;
-				
-				var o = dataTable.findPos(this), fiEvent,
-					r = o[1];
+        //ui.item.label = (this.value === /Create \/ Edit:/)? ui.item.label: this.value;
 
-				this.value = (ui.item ? ui.item.label : '');
+        var o = dataTable.findPos(this), fiEvent,
+                r = o[1];
 
-				fiEvent = $.Event('mcautocombo.selecting');
-				$(document).trigger(fiEvent, [this, ui]);
-				if (fiEvent.isDefaultPrevented() === true) { return true; }
+        this.value = (ui.item ? ui.item.label : '');
 
-				
-				//Needs to Manage with "mcautocombo.selecting" event_Trigger
+        fiEvent = $.Event('mcautocombo.selecting');
+        $(document).trigger(fiEvent, [this, ui]);
+        if (fiEvent.isDefaultPrevented() === true) {
+          return true;
+        }
 
-				fiEvent = $.Event('mcautocombo.selected');
-				$(this).trigger(fiEvent, [this, ui]);
-				$(this).trigger('change');
-				//if (fiEvent.isDefaultPrevented() === true) { return true; }
 
-				//reInitList(this, '#packed_r' + r);
-				return false;
-			},
-			change: function (event, ui) {
-				var r = dataTable.findPos(this),
-					arg = $(this).attr('data-update');
-				r = r[1];
-				if ($(this).val() !== $(this).attr('data-value')) {
-					$(dataTable.makeId('pdetailid', r)).val('');
-					switch (arg) {
-						case 'server':
-						case 'primary':
-							$(this).addClass('text-primary');
-							break;
-						case 'client':
-						case 'danger':
-							$(this).addClass('text-danger');
-							popup.open('#' + $(this).attr('data-dialog'), 768, 600, {
-								units: 'px',
-								xsource: $(this).attr('data-url'),
-								setText: 'Create Product',
-								setDataFocus: $(this).data('focus')
-							});
-							break;
-						case 'prProductDialog':
-							$(this).addClass('text-danger');
-							prProductDialog($(this));
-							break;
-						default:
-							$(this).removeClass('text-primary').removeClass('text-danger');
-							break;
-					}
-					$(this).addClass('text-primary');
-				} else {
-					$(dataTable.makeId('pdetailid', r)).val($(dataTable.makeId('pdetailid', r)).attr('data-value'));
-					$(this).removeClass('text-danger');
-					$(this).removeClass('text-primary');
-				}
-			}
-		});
+        //Needs to Manage with "mcautocombo.selecting" event_Trigger
 
-		for (i = 0; i < vArgs.length; i += 1) {
-			$(ob + vArgs[i].selector).mcautocomplete({
-				columns: vArgs[i].columns,
-				source: vArgs[i].src
-			});
-		}
-	}
+        fiEvent = $.Event('mcautocombo.selected');
+        $(this).trigger(fiEvent, [this, ui]);
+        $(this).trigger('change');
+        //if (fiEvent.isDefaultPrevented() === true) { return true; }
+
+        //reInitList(this, '#packed_r' + r);
+        return false;
+      },
+      change: function (event, ui) {
+        var r = dataTable.findPos(this),
+                arg = $(this).attr('data-update');
+        r = r[1];
+        if ($(this).val() !== $(this).attr('data-value')) {
+          $(dataTable.makeId('pdetailid', r)).val('');
+          switch (arg) {
+            case 'server':
+            case 'primary':
+              $(this).addClass('text-primary');
+              break;
+            case 'client':
+            case 'danger':
+              $(this).addClass('text-danger');
+              popup.open('#' + $(this).attr('data-dialog'), 768, 600, {
+                units: 'px',
+                xsource: $(this).attr('data-url'),
+                setText: 'Create Product',
+                setDataFocus: $(this).data('focus')
+              });
+              break;
+            case 'prProductDialog':
+              $(this).addClass('text-danger');
+              prProductDialog($(this));
+              break;
+            default:
+              $(this).removeClass('text-primary').removeClass('text-danger');
+              break;
+          }
+          $(this).addClass('text-primary');
+        } else {
+          $(dataTable.makeId('pdetailid', r)).val($(dataTable.makeId('pdetailid', r)).attr('data-value'));
+          $(this).removeClass('text-danger');
+          $(this).removeClass('text-primary');
+        }
+      }
+    });
+
+    for (i = 0; i < vArgs.length; i += 1) {
+      $(ob + vArgs[i].selector).mcautocomplete({
+        columns: vArgs[i].columns,
+        source: vArgs[i].src
+      });
+    }
+  }
 };
 
 function valRound(n, r) {
-	"use strict";
-	r = Math.pow(10, parseInt(r, 10));
-	r = (isNaN(r)) ? 100 : r;
-	n = parseFloat(n);
-	n = (isNaN(n)) ? 0 : n;
-	n = $.isNumeric(n) ? Math.round(n * r) / r : n;
-	return n;
+  "use strict";
+  r = Math.pow(10, parseInt(r, 10));
+  r = (isNaN(r)) ? 100 : r;
+  n = parseFloat(n);
+  n = (isNaN(n)) ? 0 : n;
+  n = $.isNumeric(n) ? Math.round(n * r) / r : n;
+  return n;
 }
 
 /* DataTable */
 $(function () {
-	"use strict";
-	dataTable.init();
-	//$('.pack').mask('099X099X099');
+  "use strict";
+  dataTable.init();
+  //$('.pack').mask('099X099X099');
 
-	$('body').on('click', '.datepicker', function () {
-		$(this).datepicker();
-	});
+  $('body').on('click', '.datepicker', function () {
+    $(this).datepicker();
+  });
 
-	$(document).on('change focus', 'input[type="text"],.form-control', function () {
-		var v = $(this).val();
-		v = (isNaN(v)) ? '' : v;
-		//$(this).val($.isNumeric($(this).val()) ? Math.round(v * 100) / 100 : $(this).val());
-		historyView(this);
-	});
+  $(document).on('change focus', 'input[type="text"],.form-control', function () {
+    var v = $(this).val();
+    v = (isNaN(v)) ? '' : v;
+    //$(this).val($.isNumeric($(this).val()) ? Math.round(v * 100) / 100 : $(this).val());
+    historyView(this);
+  });
 
-	$('.dataTable').on('change focus', '.form-control', function () {
-		var v = $(this).val();
-		v = (isNaN(v)) ? '' : v;
-		//$(this).val($.isNumeric($(this).val()) ? Math.round(v * 100) / 100 : $(this).val());
+  $('.dataTable').on('change focus', '.form-control', function () {
+    var v = $(this).val();
+    v = (isNaN(v)) ? '' : v;
+    //$(this).val($.isNumeric($(this).val()) ? Math.round(v * 100) / 100 : $(this).val());
 
-		dataTable.refresh(this);
-		$(dataTable.makeId('disc', dataTable.findPos($(this))[1])).val($('#spDisc').val());
+    dataTable.refresh(this);
+    $(dataTable.makeId('disc', dataTable.findPos($(this))[1])).val($('#spDisc').val());
 
-		$('[aria-table-sort="true"]').trigger("update");
-	});
+    $('[aria-table-sort="true"]').trigger("update");
+  });
 
-	$('.dataTable').on('change focus', '.qty.form-control', function () {
-		if ($(this).val() === '' || $(this).val() <= 0) {
-			$(this).val(1);
-			$(this).select();
-		}
-		$(dataTable.makeId('free', dataTable.findPos(this)[1])).trigger('change');
-	});
-	$('.dataTable').on('change focus', '.free.form-control', function () {
-		if ($(this).val() === '') {
-			$(this).val(0);
-		}
-	});
-	/*setTimeout(function(){
-		loadJson('invoice','.dataTable');
-	},2000);*/
-	$(document).on('keydown', 'body', function (e) {
-		switch (e.which) {
-			case kb.ESC:
-				$('.historyBoard').hide();
-				$('.spotlightSearch').hide();
-				break;
-			case kb.ENTER:
-				$('.spotlightSearch').hide();
-				break;
-			case 192:
-				e.preventDefault();
-				$('.spotlightSearch').show();
-				break;
-			default:
-				//console.log(e.which)
-				break;
-		}
-	});
+  $('.dataTable').on('change focus', '.qty.form-control', function () {
+    if ($(this).val() === '' || $(this).val() <= 0) {
+      $(this).val(1);
+      $(this).select();
+    }
+    $(dataTable.makeId('free', dataTable.findPos(this)[1])).trigger('change');
+  });
+  $('.dataTable').on('change focus', '.free.form-control', function () {
+    if ($(this).val() === '') {
+      $(this).val(0);
+    }
+  });
+  /*setTimeout(function(){
+   loadJson('invoice','.dataTable');
+   },2000);*/
+  $(document).on('keydown', 'body', function (e) {
+    switch (e.which) {
+      case kb.ESC:
+        $('.historyBoard').hide();
+        $('.spotlightSearch').hide();
+        break;
+      case kb.ENTER:
+        $('.spotlightSearch').hide();
+        break;
+      case 192:
+        e.preventDefault();
+        $('.spotlightSearch').show();
+        break;
+      default:
+        //console.log(e.which)
+        break;
+    }
+  });
 });
 
 function historyView(ob) {
-	"use strict";
-	if (!($(ob).is('[data-history]'))) {
-		$('.historyBoard').hide();
-		//$('#'+$(ob).data('history')+'-history').hide();
-	} else {
-		$('.historyBoard').hide();
-		$('#' + $(ob).data('history') + '-history').show();
-	}
+  "use strict";
+  if (!($(ob).is('[data-history]'))) {
+    $('.historyBoard').hide();
+    //$('#'+$(ob).data('history')+'-history').hide();
+  } else {
+    $('.historyBoard').hide();
+    $('#' + $(ob).data('history') + '-history').show();
+  }
 }

@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.SalesReqStatusService;
 
 /**
  * SalesReqStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon May 09 18:27:32 IST 2016 
+ * @version	1.0, Mon May 09 18:27:32 IST 2016
  */
-
-@Named(value="salesReqStatusView")
+@Named(value = "salesReqStatusView")
 @ViewScoped
-public class SalesReqStatusView implements Serializable{
+public class SalesReqStatusView implements Serializable {
 
   private transient SalesReqStatus salesReqStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesReqStatus> salesReqStatusLazyModel; 	//For lazy loading datatable.
   private transient SalesReqStatus[] salesReqStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public SalesReqStatusView() {
     super();
   }
- 
+
   /**
    * Return SalesReqStatus.
+   *
    * @return SalesReqStatus.
-   */  
+   */
   public SalesReqStatus getSalesReqStatus() {
-    if(salesReqStatus == null) {
+    if (salesReqStatus == null) {
       salesReqStatus = new SalesReqStatus();
     }
     return salesReqStatus;
-  }   
-  
+  }
+
   /**
    * Set SalesReqStatus.
+   *
    * @param salesReqStatus.
-   */   
+   */
   public void setSalesReqStatus(SalesReqStatus salesReqStatus) {
     this.salesReqStatus = salesReqStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchSalesReqStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchSalesReqStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class SalesReqStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create salesReqStatusLazyModel.
+   *
    * @param main
    */
   private void loadSalesReqStatusList(final MainView main) {
     if (salesReqStatusLazyModel == null) {
       salesReqStatusLazyModel = new LazyDataModel<SalesReqStatus>() {
-      private List<SalesReqStatus> list;      
-      @Override
-      public List<SalesReqStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SalesReqStatusService.listPaged(main);
-          main.commit(salesReqStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SalesReqStatus> list;
+
+        @Override
+        public List<SalesReqStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SalesReqStatusService.listPaged(main);
+            main.commit(salesReqStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SalesReqStatus salesReqStatus) {
-        return salesReqStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SalesReqStatus salesReqStatus) {
+          return salesReqStatus.getId();
+        }
+
+        @Override
         public SalesReqStatus getRowData(String rowKey) {
           if (list != null) {
             for (SalesReqStatus obj : list) {
@@ -136,11 +139,12 @@ public class SalesReqStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_sales_req_status/";	
+    String SUB_FOLDER = "scm_sales_req_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class SalesReqStatusView implements Serializable{
    */
   public String cloneSalesReqStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneSalesReqStatus(main, "clone"); 
+    return saveOrCloneSalesReqStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class SalesReqStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many SalesReqStatus.
    *
@@ -205,7 +208,7 @@ public class SalesReqStatusView implements Serializable{
       } else {
         SalesReqStatusService.deleteByPk(main, getSalesReqStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class SalesReqStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of SalesReqStatus.
+   *
    * @return
    */
   public LazyDataModel<SalesReqStatus> getSalesReqStatusLazyModel() {
     return salesReqStatusLazyModel;
   }
 
- /**
-  * Return SalesReqStatus[].
-  * @return 
-  */
+  /**
+   * Return SalesReqStatus[].
+   *
+   * @return
+   */
   public SalesReqStatus[] getSalesReqStatusSelected() {
     return salesReqStatusSelected;
   }
-  
+
   /**
    * Set SalesReqStatus[].
-   * @param salesReqStatusSelected 
+   *
+   * @param salesReqStatusSelected
    */
   public void setSalesReqStatusSelected(SalesReqStatus[] salesReqStatusSelected) {
     this.salesReqStatusSelected = salesReqStatusSelected;
   }
- 
-
 
 }

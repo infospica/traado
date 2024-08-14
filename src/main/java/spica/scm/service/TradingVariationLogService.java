@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Account;
-import spica.scm.domain.Platform;
 import spica.scm.domain.PlatformDescription;
 import spica.scm.domain.PlatformSource;
 import spica.scm.domain.ProductEntry;
@@ -29,7 +28,6 @@ import spica.sys.SystemRuntimeConfig;
  */
 public abstract class TradingVariationLogService {
 
-  
   //FIXME many repetivive queries
   /**
    * TradingVariationLog paginated query.
@@ -55,7 +53,8 @@ public abstract class TradingVariationLogService {
     sql.date(new String[]{"t1.created_at", "t1.modified_at"});  //Date search or sort fields
     return sql;
   }
-    private static SqlPage getTradingVariation(Main main) {
+
+  private static SqlPage getTradingVariation(Main main) {
     SqlPage sql = AppService.sqlPage("scm_trading_variation_log", TradingVariationLog.class, main);
     sql.main("select scm_trading_variation_log.id,scm_trading_variation_log.document_no,scm_trading_variation_log.entry_date,scm_trading_variation_log.source_id,scm_trading_variation_log.product_detail_id, "
             + "scm_trading_variation_log.account_id,scm_trading_variation_log.platform_desc_id,"
@@ -63,19 +62,20 @@ public abstract class TradingVariationLogService {
             + "scm_trading_variation_log.created_by,scm_trading_variation_log.modified_by,scm_trading_variation_log.created_at,scm_trading_variation_log.modified_at \n"
             + "from scm_trading_variation_log scm_trading_variation_log "); //Main query
     sql.count("select count(scm_trading_variation_log.id) as total from scm_trading_variation_log scm_trading_variation_log "); //Count query
-    sql.join( "left outer join scm_platform_source scm_trading_variation_logsource_id on (scm_trading_variation_logsource_id.id = scm_trading_variation_log.source_id) "
+    sql.join("left outer join scm_platform_source scm_trading_variation_logsource_id on (scm_trading_variation_logsource_id.id = scm_trading_variation_log.source_id) "
             + "left outer join scm_platform_description scm_trading_variation_logplatform_desc_id on (scm_trading_variation_logplatform_desc_id.id = scm_trading_variation_log.platform_desc_id) "
             + "left outer join scm_account scm_trading_variation_logaccount_id on (scm_trading_variation_logaccount_id.id = scm_trading_variation_log.account_id) "
             + "left outer join scm_product_entry scm_trading_variation_logproduct_entry_id on (scm_trading_variation_logproduct_entry_id.id = scm_trading_variation_log.product_entry_id) "
             + "left outer join scm_product_entry_detail scm_trading_variation_logproduct_entry_detail_id on (scm_trading_variation_logproduct_entry_detail_id.id = scm_trading_variation_log.product_entry_detail_id) "
             + "left outer join scm_product_detail scm_product_detail on (scm_product_detail.id = scm_trading_variation_log.product_detail_id) ");
-           
-    sql.string(new String[]{"scm_trading_variation_log.document_no", "scm_trading_variation_logplatform_desc_id.title", "scm_trading_variation_logaccount_id.account_code",  "scm_trading_variation_logproduct_entry_id.invoice_no",  "scm_trading_variation_log.created_by", "scm_trading_variation_log.modified_by"}); //String search or sort fields
+
+    sql.string(new String[]{"scm_trading_variation_log.document_no", "scm_trading_variation_logplatform_desc_id.title", "scm_trading_variation_logaccount_id.account_code", "scm_trading_variation_logproduct_entry_id.invoice_no", "scm_trading_variation_log.created_by", "scm_trading_variation_log.modified_by"}); //String search or sort fields
     sql.number(new String[]{"scm_trading_variation_log.id", "scm_trading_variation_log.credit_amount_required", "scm_trading_variation_log.debit_amount_required", "scm_trading_variation_logproduct_entry_detail_id.product_quantity"}); //Numeric search or sort fields
     sql.date(new String[]{"scm_trading_variation_log.entry_date", "scm_trading_variation_log.created_at", "scm_trading_variation_log.modified_at"});  //Date search or sort fields
     return sql;
   }
-    private static SqlPage getTradingVariationSummary(Main main) {
+
+  private static SqlPage getTradingVariationSummary(Main main) {
     SqlPage sql = AppService.sqlPage("scm_trading_variation_log", TradingVariationLog.class, main);
     sql.main("select distinct on (scm_trading_variation_log.platform_desc_id) scm_trading_variation_log.platform_desc_id,scm_trading_variation_log.id,scm_trading_variation_log.document_no,scm_trading_variation_log.product_detail_id,scm_trading_variation_log.entry_date, "
             + "scm_trading_variation_log.source_id,sum(scm_trading_variation_log.credit_amount_required) OVER (PARTITION BY scm_trading_variation_log.platform_desc_id) credit_amount_required,\n"
@@ -84,19 +84,20 @@ public abstract class TradingVariationLogService {
             + "scm_trading_variation_log.created_by,scm_trading_variation_log.modified_by,scm_trading_variation_log.created_at,scm_trading_variation_log.modified_at \n"
             + "from scm_trading_variation_log scm_trading_variation_log "); //Main query
     sql.count("select count(scm_trading_variation_log.id) as total from scm_trading_variation_log scm_trading_variation_log "); //Count query
-    sql.join( "left outer join scm_platform_source scm_trading_variation_logsource_id on (scm_trading_variation_logsource_id.id = scm_trading_variation_log.source_id) "
+    sql.join("left outer join scm_platform_source scm_trading_variation_logsource_id on (scm_trading_variation_logsource_id.id = scm_trading_variation_log.source_id) "
             + "left outer join scm_platform_description scm_trading_variation_logplatform_desc_id on (scm_trading_variation_logplatform_desc_id.id = scm_trading_variation_log.platform_desc_id) "
             + "left outer join scm_account scm_trading_variation_logaccount_id on (scm_trading_variation_logaccount_id.id = scm_trading_variation_log.account_id) "
             + "left outer join scm_product_entry scm_trading_variation_logproduct_entry_id on (scm_trading_variation_logproduct_entry_id.id = scm_trading_variation_log.product_entry_id) "
             + "left outer join scm_product_entry_detail scm_trading_variation_logproduct_entry_detail_id on (scm_trading_variation_logproduct_entry_detail_id.id = scm_trading_variation_log.product_entry_detail_id) "
             + "left outer join scm_product_detail scm_product_detail on (scm_product_detail.id = scm_trading_variation_log.product_detail_id) ");
-           
-    sql.string(new String[]{"scm_trading_variation_log.document_no", "scm_trading_variation_logplatform_desc_id.title", "scm_trading_variation_logaccount_id.account_code",  "scm_trading_variation_logproduct_entry_id.invoice_no",  "scm_trading_variation_log.created_by", "scm_trading_variation_log.modified_by"}); //String search or sort fields
+
+    sql.string(new String[]{"scm_trading_variation_log.document_no", "scm_trading_variation_logplatform_desc_id.title", "scm_trading_variation_logaccount_id.account_code", "scm_trading_variation_logproduct_entry_id.invoice_no", "scm_trading_variation_log.created_by", "scm_trading_variation_log.modified_by"}); //String search or sort fields
     sql.number(new String[]{"scm_trading_variation_log.id", "scm_trading_variation_log.credit_amount_required", "scm_trading_variation_log.debit_amount_required", "scm_trading_variation_logproduct_entry_detail_id.product_quantity"}); //Numeric search or sort fields
     sql.date(new String[]{"scm_trading_variation_log.entry_date", "scm_trading_variation_log.created_at", "scm_trading_variation_log.modified_at"});  //Date search or sort fields
     return sql;
   }
-    private static SqlPage getTradingVariationSummary1(Main main) {
+
+  private static SqlPage getTradingVariationSummary1(Main main) {
     SqlPage sql = AppService.sqlPage("scm_trading_variation_log", TradingVariationLog.class, main);
     sql.main("select distinct on (scm_trading_variation_log.platform_desc_id) scm_trading_variation_log.platform_desc_id,scm_trading_variation_log.id,scm_trading_variation_log.document_no,scm_trading_variation_log.product_detail_id,scm_trading_variation_log.entry_date, "
             + "scm_trading_variation_log.source_id,sum(scm_trading_variation_log.credit_amount_required) OVER (PARTITION BY scm_trading_variation_log.platform_desc_id) credit_amount_required,\n"
@@ -105,18 +106,19 @@ public abstract class TradingVariationLogService {
             + "scm_trading_variation_log.created_by,scm_trading_variation_log.modified_by,scm_trading_variation_log.created_at,scm_trading_variation_log.modified_at \n"
             + "from scm_trading_variation_log scm_trading_variation_log "); //Main query
     sql.count("select count(scm_trading_variation_log.id) as total from scm_trading_variation_log scm_trading_variation_log "); //Count query
-    sql.join( "left outer join scm_platform_source scm_trading_variation_logsource_id on (scm_trading_variation_logsource_id.id = scm_trading_variation_log.source_id) "
+    sql.join("left outer join scm_platform_source scm_trading_variation_logsource_id on (scm_trading_variation_logsource_id.id = scm_trading_variation_log.source_id) "
             + "left outer join scm_platform_description scm_trading_variation_logplatform_desc_id on (scm_trading_variation_logplatform_desc_id.id = scm_trading_variation_log.platform_desc_id) "
             + "left outer join scm_account scm_trading_variation_logaccount_id on (scm_trading_variation_logaccount_id.id = scm_trading_variation_log.account_id) "
             + "left outer join scm_product_entry scm_trading_variation_logproduct_entry_id on (scm_trading_variation_logproduct_entry_id.id = scm_trading_variation_log.product_entry_id) "
             + "left outer join scm_product_entry_detail scm_trading_variation_logproduct_entry_detail_id on (scm_trading_variation_logproduct_entry_detail_id.id = scm_trading_variation_log.product_entry_detail_id) "
             + "left outer join scm_product_detail scm_product_detail on (scm_product_detail.id = scm_trading_variation_log.product_detail_id) ");
-           
-    sql.string(new String[]{"scm_trading_variation_log.document_no", "scm_trading_variation_logplatform_desc_id.title", "scm_trading_variation_logaccount_id.account_code",  "scm_trading_variation_logproduct_entry_id.invoice_no",  "scm_trading_variation_log.created_by", "scm_trading_variation_log.modified_by"}); //String search or sort fields
+
+    sql.string(new String[]{"scm_trading_variation_log.document_no", "scm_trading_variation_logplatform_desc_id.title", "scm_trading_variation_logaccount_id.account_code", "scm_trading_variation_logproduct_entry_id.invoice_no", "scm_trading_variation_log.created_by", "scm_trading_variation_log.modified_by"}); //String search or sort fields
     sql.number(new String[]{"scm_trading_variation_log.id", "scm_trading_variation_log.credit_amount_required", "scm_trading_variation_log.debit_amount_required", "scm_trading_variation_logproduct_entry_detail_id.product_quantity"}); //Numeric search or sort fields
     sql.date(new String[]{"scm_trading_variation_log.entry_date", "scm_trading_variation_log.created_at", "scm_trading_variation_log.modified_at"});  //Date search or sort fields
     return sql;
   }
+
   /**
    * Return List of TradingVariationLog.
    *

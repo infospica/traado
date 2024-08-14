@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.PurchaseCreditOnService;
 
 /**
  * PurchaseCreditOnView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Apr 07 11:31:23 IST 2016 
+ * @version	1.0, Thu Apr 07 11:31:23 IST 2016
  */
-
-@Named(value="purchaseCreditOnView")
+@Named(value = "purchaseCreditOnView")
 @ViewScoped
-public class PurchaseCreditOnView implements Serializable{
+public class PurchaseCreditOnView implements Serializable {
 
   private transient PurchaseCreditOn purchaseCreditOn;	//Domain object/selected Domain.
   private transient LazyDataModel<PurchaseCreditOn> purchaseCreditOnLazyModel; 	//For lazy loading datatable.
   private transient PurchaseCreditOn[] purchaseCreditOnSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public PurchaseCreditOnView() {
     super();
   }
- 
+
   /**
    * Return PurchaseCreditOn.
+   *
    * @return PurchaseCreditOn.
-   */  
+   */
   public PurchaseCreditOn getPurchaseCreditOn() {
-    if(purchaseCreditOn == null) {
+    if (purchaseCreditOn == null) {
       purchaseCreditOn = new PurchaseCreditOn();
     }
     return purchaseCreditOn;
-  }   
-  
+  }
+
   /**
    * Set PurchaseCreditOn.
+   *
    * @param purchaseCreditOn.
-   */   
+   */
   public void setPurchaseCreditOn(PurchaseCreditOn purchaseCreditOn) {
     this.purchaseCreditOn = purchaseCreditOn;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchPurchaseCreditOn(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchPurchaseCreditOn(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class PurchaseCreditOnView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create purchaseCreditOnLazyModel.
+   *
    * @param main
    */
   private void loadPurchaseCreditOnList(final MainView main) {
     if (purchaseCreditOnLazyModel == null) {
       purchaseCreditOnLazyModel = new LazyDataModel<PurchaseCreditOn>() {
-      private List<PurchaseCreditOn> list;      
-      @Override
-      public List<PurchaseCreditOn> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = PurchaseCreditOnService.listPaged(main);
-          main.commit(purchaseCreditOnLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<PurchaseCreditOn> list;
+
+        @Override
+        public List<PurchaseCreditOn> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = PurchaseCreditOnService.listPaged(main);
+            main.commit(purchaseCreditOnLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(PurchaseCreditOn purchaseCreditOn) {
-        return purchaseCreditOn.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(PurchaseCreditOn purchaseCreditOn) {
+          return purchaseCreditOn.getId();
+        }
+
+        @Override
         public PurchaseCreditOn getRowData(String rowKey) {
           if (list != null) {
             for (PurchaseCreditOn obj : list) {
@@ -136,11 +139,12 @@ public class PurchaseCreditOnView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_purchase_credit_on/";	
+    String SUB_FOLDER = "scm_purchase_credit_on/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class PurchaseCreditOnView implements Serializable{
    */
   public String clonePurchaseCreditOn(MainView main) {
     main.setViewType("newform");
-    return saveOrClonePurchaseCreditOn(main, "clone"); 
+    return saveOrClonePurchaseCreditOn(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class PurchaseCreditOnView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error"+ key);
+      main.rollback(t, "error" + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many PurchaseCreditOn.
    *
@@ -205,7 +208,7 @@ public class PurchaseCreditOnView implements Serializable{
       } else {
         PurchaseCreditOnService.deleteByPk(main, getPurchaseCreditOn());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class PurchaseCreditOnView implements Serializable{
 
   /**
    * Return LazyDataModel of PurchaseCreditOn.
+   *
    * @return
    */
   public LazyDataModel<PurchaseCreditOn> getPurchaseCreditOnLazyModel() {
     return purchaseCreditOnLazyModel;
   }
 
- /**
-  * Return PurchaseCreditOn[].
-  * @return 
-  */
+  /**
+   * Return PurchaseCreditOn[].
+   *
+   * @return
+   */
   public PurchaseCreditOn[] getPurchaseCreditOnSelected() {
     return purchaseCreditOnSelected;
   }
-  
+
   /**
    * Set PurchaseCreditOn[].
-   * @param purchaseCreditOnSelected 
+   *
+   * @param purchaseCreditOnSelected
    */
   public void setPurchaseCreditOnSelected(PurchaseCreditOn[] purchaseCreditOnSelected) {
     this.purchaseCreditOnSelected = purchaseCreditOnSelected;
   }
- 
-
 
 }

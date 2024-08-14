@@ -323,6 +323,7 @@ public abstract class AccountService {
       AppService.update(main, account);
     }
   }
+
   public static Account selectById(Main main, Integer accountId) {
     return (Account) AppService.single(main, Account.class, ScmLookupSql.ACCOUNT_BYID, new Object[]{accountId});
   }

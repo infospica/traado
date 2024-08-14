@@ -3734,8 +3734,8 @@
               soffseth = ista && that._hasScroll(pr[0], "left") ? 0 : that.sizeDiff.height,
               soffsetw = ista ? 0 : that.sizeDiff.width,
               style = {width: (that.size.width - soffsetw), height: (that.size.height - soffseth)},
-      left = (parseInt(that.element.css("left"), 10) +
-              (that.position.left - that.originalPosition.left)) || null,
+              left = (parseInt(that.element.css("left"), 10) +
+                      (that.position.left - that.originalPosition.left)) || null,
               top = (parseInt(that.element.css("top"), 10) +
                       (that.position.top - that.originalPosition.top)) || null;
 
@@ -3839,7 +3839,7 @@
                 top: 0,
                 left: 0
               },
-      ce = that.containerElement,
+              ce = that.containerElement,
               continueResize = true;
 
       if (ce[ 0 ] !== document && (/static/).test(ce.css("position"))) {
@@ -6731,11 +6731,11 @@
       if (this.active) {
         if (direction === "first" || direction === "last") {
           next = this.active
-                  [ direction === "first" ? "prevAll" : "nextAll" ](".ui-menu-item")
+          [ direction === "first" ? "prevAll" : "nextAll" ](".ui-menu-item")
                   .eq(-1);
         } else {
           next = this.active
-                  [ direction + "All" ](".ui-menu-item")
+          [ direction + "All" ](".ui-menu-item")
                   .eq(0);
         }
       }
@@ -6766,7 +6766,7 @@
         this.focus(event, item);
       } else {
         this.focus(event, this.activeMenu.find(this.options.items)
-                [ !this.active ? "first" : "last" ]());
+        [ !this.active ? "first" : "last" ]());
       }
     },
     previousPage: function (event) {
@@ -8250,8 +8250,7 @@
     _getInst: function (target) {
       try {
         return $.data(target, "datepicker");
-      }
-      catch (err) {
+      } catch (err) {
         throw "Missing instance data for this datepicker";
       }
     },
@@ -8483,8 +8482,7 @@
             $.datepicker._updateAlternate(inst);
             $.datepicker._updateDatepicker(inst);
           }
-        }
-        catch (err) {
+        } catch (err) {
         }
       }
       return true;
@@ -9255,8 +9253,7 @@
                 try {
                   return $.datepicker.parseDate($.datepicker._get(inst, "dateFormat"),
                           offset, $.datepicker._getFormatConfig(inst));
-                }
-                catch (e) {
+                } catch (e) {
                   // Ignore
                 }
 
@@ -11569,7 +11566,7 @@
     },
     _mouseDrag: function (event) {
       var position = {x: event.pageX, y: event.pageY},
-      normValue = this._normValueFromMouse(position);
+              normValue = this._normValueFromMouse(position);
 
       this._slide(event, this._handleIndex, normValue);
 
@@ -13274,18 +13271,18 @@
                         tab: tab,
                         panel: panel
                       },
-              complete = function (jqXHR, status) {
-                if (status === "abort") {
-                  that.panels.stop(false, true);
-                }
+                      complete = function (jqXHR, status) {
+                        if (status === "abort") {
+                          that.panels.stop(false, true);
+                        }
 
-                tab.removeClass("ui-tabs-loading");
-                panel.removeAttr("aria-busy");
+                        tab.removeClass("ui-tabs-loading");
+                        panel.removeAttr("aria-busy");
 
-                if (jqXHR === that.xhr) {
-                  delete that.xhr;
-                }
-              };
+                        if (jqXHR === that.xhr) {
+                          delete that.xhr;
+                        }
+                      };
 
               // not remote
               if (this._isLocal(anchor[ 0 ])) {
@@ -13907,20 +13904,20 @@
                 }
               }
             },
-    propTypes = {
-      "byte": {
-        floor: true,
-        max: 255
-      },
-      "percent": {
-        max: 1
-      },
-      "degrees": {
-        mod: 360,
-        floor: true
-      }
-    },
-    support = color.support = {},
+            propTypes = {
+              "byte": {
+                floor: true,
+                max: 255
+              },
+              "percent": {
+                max: 1
+              },
+              "degrees": {
+                mod: 360,
+                floor: true
+              }
+            },
+            support = color.support = {},
             // element for support tests
             supportElem = jQuery("<p>")[ 0 ],
             // colors = jQuery.Color.names
@@ -14746,7 +14743,7 @@
           height: element.outerHeight(true),
           "float": element.css("float")
         },
-        wrapper = $("<div></div>")
+                wrapper = $("<div></div>")
                 .addClass("ui-effects-wrapper")
                 .css({
                   fontSize: "100%",
@@ -14760,7 +14757,7 @@
                   width: element.width(),
                   height: element.height()
                 },
-        active = document.activeElement;
+                active = document.activeElement;
 
         // support: Firefox
         // Firefox incorrectly exposes anonymous content
@@ -15334,7 +15331,7 @@
             animation = {
               opacity: show ? 1 : 0
             },
-    distance;
+            distance;
 
     // Adjust
     $.effects.save(el, props);
@@ -15855,10 +15852,10 @@
               outerHeight: el.outerHeight(),
               outerWidth: el.outerWidth()
             },
-    factor = {
-      y: direction !== "horizontal" ? (percent / 100) : 1,
-      x: direction !== "vertical" ? (percent / 100) : 1
-    };
+            factor = {
+              y: direction !== "horizontal" ? (percent / 100) : 1,
+              x: direction !== "vertical" ? (percent / 100) : 1
+            };
 
     // We are going to pass this effect to the size effect:
     options.effect = "size";
@@ -16164,7 +16161,7 @@
               height: target.innerHeight(),
               width: target.innerWidth()
             },
-    startPosition = elem.offset(),
+            startPosition = elem.offset(),
             transfer = $("<div class='ui-effects-transfer'></div>")
             .appendTo(document.body)
             .addClass(o.className)

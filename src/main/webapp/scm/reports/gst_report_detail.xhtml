@@ -43,7 +43,7 @@
         <p:column sortBy="#{row.document}" field="document" filterBy="#{row.document}" filterStyleClass="hidden">
           <f:facet name="header"><h:outputText value="#{lang.document}" title="#{lang.document}"/></f:facet>
           <!--<p:commandLink actionListener="#{gstReportDetailView.showDetails(main,row.transactionid,row.detailid)}">-->
-            <h:outputText value="#{appView.display(row.document)}" title="#{appView.title(row.document)}" escape="false" />
+          <h:outputText value="#{appView.display(row.document)}" title="#{appView.title(row.document)}" escape="false" />
           <!--</p:commandLink>-->
         </p:column>
 <!--        <p:column sortBy="#{row.ledgercode}" field="ledgercode" filterBy="#{row.ledgercode}" filterStyleClass="hidden">

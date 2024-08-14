@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.view;
 
@@ -13,7 +13,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import spica.constant.ScmConstant;
 import spica.scm.domain.DocumentStore;
 import spica.scm.export.ExcelUtil;
 import spica.sys.SystemConstants;
@@ -34,7 +33,6 @@ public class DocumentDownloader extends HttpServlet {
    * @param request servlet request
    * @param response servlet response
    */
-
   protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
     AppEm em = null;
     try {

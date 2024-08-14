@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -24,51 +23,55 @@ import wawo.app.faces.Jsf;
 
 /**
  * ConsignmentReceiptDetailView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Jul 22 10:57:43 IST 2016 
+ * @version	1.0, Fri Jul 22 10:57:43 IST 2016
  */
-
-@Named(value="consignmentReceiptDetailView")
+@Named(value = "consignmentReceiptDetailView")
 @ViewScoped
-public class ConsignmentReceiptDetailView implements Serializable{
+public class ConsignmentReceiptDetailView implements Serializable {
 
   private transient ConsignmentReceiptDetail consignmentReceiptDetail;	//Domain object/selected Domain.
 //  private transient LazyDataModel<ConsignmentReceiptDetail> consignmentReceiptDetailLazyModel; 	//For lazy loading datatable.
 //  private transient ConsignmentReceiptDetail[] consignmentReceiptDetailSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ConsignmentReceiptDetailView() {
     super();
   }
- 
+
   /**
    * Return ConsignmentReceiptDetail.
+   *
    * @return ConsignmentReceiptDetail.
-   */  
+   */
   public ConsignmentReceiptDetail getConsignmentReceiptDetail() {
-    if(consignmentReceiptDetail == null) {
+    if (consignmentReceiptDetail == null) {
       consignmentReceiptDetail = new ConsignmentReceiptDetail();
     }
     return consignmentReceiptDetail;
-  }   
-  
+  }
+
   /**
    * Set ConsignmentReceiptDetail.
+   *
    * @param consignmentReceiptDetail.
-   */   
+   */
   public void setConsignmentReceiptDetail(ConsignmentReceiptDetail consignmentReceiptDetail) {
     this.consignmentReceiptDetail = consignmentReceiptDetail;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchConsignmentReceiptDetail(MainView main, String viewType) {
-   //this.main = main;
+  public String switchConsignmentReceiptDetail(MainView main, String viewType) {
+    //this.main = main;
 //   if (!StringUtil.isEmpty(viewType)) {
 //      try {
 //        main.setViewType(viewType);
@@ -86,20 +89,21 @@ public class ConsignmentReceiptDetailView implements Serializable{
 //      }
 //    }
     return null;
-  } 
- private ConsignmentCommodity parent;
- @PostConstruct
+  }
+  private ConsignmentCommodity parent;
+
+  @PostConstruct
   public void init() {
     MainView main = Jsf.getMain();
     try {
-       parent = (ConsignmentCommodity) Jsf.popupParentValue(ConsignmentCommodity.class);
+      parent = (ConsignmentCommodity) Jsf.popupParentValue(ConsignmentCommodity.class);
       if (parent != null) {
-        consignmentReceiptDetail= ConsignmentCommodityService.receiptPlanDetails(main, parent);
-        if(consignmentReceiptDetail==null){
+        consignmentReceiptDetail = ConsignmentCommodityService.receiptPlanDetails(main, parent);
+        if (consignmentReceiptDetail == null) {
           getConsignmentReceiptDetail().setConsignmentCommodityId(parent);
-           main.setViewType(ViewTypes.newform);
-        } else{
-           main.setViewType(ViewTypes.editform);
+          main.setViewType(ViewTypes.newform);
+        } else {
+          main.setViewType(ViewTypes.editform);
         }
       }
     } catch (Throwable t) {
@@ -108,10 +112,10 @@ public class ConsignmentReceiptDetailView implements Serializable{
       main.close();
     }
   }
-  
-  
+
   /**
    * Create consignmentReceiptDetailLazyModel.
+   *
    * @param main
    */
 //  private void loadConsignmentReceiptDetailList(final MainView main) {
@@ -154,14 +158,16 @@ public class ConsignmentReceiptDetailView implements Serializable{
 //  private void uploadFiles() {
 //    String SUB_FOLDER = "scm_consignment_receipt_detail/";	
 //  }
-   public void saveConsignmentReceiptDetailClose(MainView main) {
+  public void saveConsignmentReceiptDetailClose(MainView main) {
     saveConsignmentReceiptDetail(main);
-     consignmentReceiptDetailPopupClose();
-     Jsf.execute("parent.consignmentCommodityPopupReturned()");
-     Jsf.execute("closePopup()");
+    consignmentReceiptDetailPopupClose();
+    Jsf.execute("parent.consignmentCommodityPopupReturned()");
+    Jsf.execute("closePopup()");
   }
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -177,7 +183,7 @@ public class ConsignmentReceiptDetailView implements Serializable{
    */
   public String cloneConsignmentReceiptDetail(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneConsignmentReceiptDetail(main, "clone"); 
+    return saveOrCloneConsignmentReceiptDetail(main, "clone");
   }
 
   /**
@@ -203,14 +209,13 @@ public class ConsignmentReceiptDetailView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ConsignmentReceiptDetail.
    *
@@ -261,23 +266,23 @@ public class ConsignmentReceiptDetailView implements Serializable{
 //  public void setConsignmentReceiptDetailSelected(ConsignmentReceiptDetail[] consignmentReceiptDetailSelected) {
 //    this.consignmentReceiptDetailSelected = consignmentReceiptDetailSelected;
 //  }
- 
- /**
-  * ConsignmentCommodity autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookup.consignmentCommodityAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookup.consignmentCommodityAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * ConsignmentCommodity autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookup.consignmentCommodityAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookup.consignmentCommodityAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<ConsignmentCommodity> consignmentCommodityAuto(String filter) {
     return ScmLookupView.consignmentCommodityAuto(filter);
   }
-  
+
   public void consignmentReceiptDetailPopupClose() {
-    Jsf.popupReturn(parent,null);
+    Jsf.popupReturn(parent, null);
   }
 }

@@ -11,17 +11,13 @@ import java.util.List;
 import spica.constant.AccountingConstant;
 import spica.fin.domain.AccountingLedger;
 import spica.fin.domain.AccountingTransaction;
-import spica.fin.domain.DebitCreditNote;
 import spica.fin.domain.TaxCode;
-import spica.scm.domain.Account;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.fin.domain.VendorClaim;
 import spica.fin.domain.VendorClaimDetail;
 import spica.fin.domain.VendorClaimHeader;
-import static spica.fin.service.DebitCreditNoteService.updateByPk;
-import static spica.fin.service.DebitCreditNoteService.updateDebitCreditNoteAccountGroupDocPrefix;
 import spica.reports.model.FilterParameters;
 import spica.scm.common.VendorClaimObjectDetail;
 import spica.scm.domain.AccountGroupDocPrefix;
@@ -30,10 +26,8 @@ import spica.scm.domain.Contract;
 import spica.scm.domain.ContractCommiByRange;
 import spica.scm.domain.Platform;
 import spica.scm.service.AccountGroupDocPrefixService;
-import static spica.scm.service.AccountGroupDocPrefixService.insertOrUpdate;
 import spica.scm.service.PrefixTypeService;
 import spica.sys.SystemConstants;
-import spica.sys.UserRuntimeView;
 import spica.sys.common.DocumentNumberGen;
 import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
@@ -451,10 +445,10 @@ public abstract class VendorClaimService {
     return nextSequence;
   }
 
-  public static AccountingLedger getAccountingLedgerByTaxCodeAndLedgerCode(Main main,Integer companyId,Integer parentId,Integer taxCodeId,String ledgerCode) {
+  public static AccountingLedger getAccountingLedgerByTaxCodeAndLedgerCode(Main main, Integer companyId, Integer parentId, Integer taxCodeId, String ledgerCode) {
     String sql = "select * from fin_accounting_ledger where entity_id = (select id from scm_tax_code where parent_id=? and id not in(?)) "
             + "and company_id=? and ledger_code=? ";
-    return (AccountingLedger) AppService.single(main, AccountingLedger.class, sql, new Object[]{parentId,taxCodeId,companyId,ledgerCode});
+    return (AccountingLedger) AppService.single(main, AccountingLedger.class, sql, new Object[]{parentId, taxCodeId, companyId, ledgerCode});
 
   }
 }

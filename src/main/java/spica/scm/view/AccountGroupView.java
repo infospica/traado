@@ -29,7 +29,6 @@ import spica.scm.domain.AccountGroupPriceList;
 import spica.scm.domain.Brand;
 import spica.scm.domain.Company;
 import spica.scm.domain.PrefixType;
-import spica.scm.domain.Product;
 import spica.scm.domain.Status;
 import spica.scm.service.AccountGroupBrandsService;
 import spica.scm.service.AccountGroupDocPrefixService;

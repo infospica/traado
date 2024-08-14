@@ -10,24 +10,24 @@
 
 
   #{salesReturnPrintView.salesReturnSplitPrint(main)}
-  
+
   <br />
-    <button type="button" class="export-pdf" id="btnExportToPDF" >Pdf</button>
+  <button type="button" class="export-pdf" id="btnExportToPDF" >Pdf</button>
   <br/>
-  
+
   <div class="print invoice content-wrapper"  style="background-color: white;margin: 5px;width:560px;line-height: 1.1em;"></div>
-  
+
   <p:commandButton  id="print" actionListener="#{salesReturnPrintView.printIText(main)}" ajax="false" />
-     
+
   <div class="loading" ></div>
 
   <script>
-  
+
     $(document).ready(function () {
-    
-     $('#print').trigger('click');
+
+      $('#print').trigger('click');
 
     });
-    </script>
- 
+  </script>
+
 </ui:composition>

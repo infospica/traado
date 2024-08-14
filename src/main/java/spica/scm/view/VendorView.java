@@ -27,7 +27,6 @@ import spica.scm.common.SelectItem;
 import spica.scm.domain.AccountStatus;
 import spica.scm.domain.AddressType;
 import spica.scm.domain.ServiceCommodity;
-import spica.scm.domain.Company;
 import spica.scm.domain.Country;
 import spica.scm.domain.District;
 import spica.scm.domain.Brand;
@@ -77,7 +76,7 @@ import wawo.entity.util.StringUtil;
 @Named(value = "vendorView")
 @ViewScoped
 public class VendorView implements Serializable {
-  
+
   private transient Vendor vendor;	//Domain object/selected Domain.
   private transient LazyDataModel<Vendor> vendorLazyModel; 	//For lazy loading datatable.
   private transient Vendor[] vendorSelected;	 //Selected Domain Array
@@ -99,7 +98,7 @@ public class VendorView implements Serializable {
   private transient List<Brand> brandList;
   private transient Brand brand;
   private transient Boolean removableFlag;
-  
+
   @PostConstruct
   public void init() {
     Integer id = (Integer) Jsf.popupParentValue(Integer.class);
@@ -129,22 +128,22 @@ public class VendorView implements Serializable {
     }
     return vendor;
   }
-  
+
   public VendorAddress getVendorRegAddress() {
     if (vendorRegAddress == null) {
       vendorRegAddress = new VendorAddress();
     }
     return vendorRegAddress;
   }
-  
+
   public void setVendorRegAddress(VendorAddress vendorRegAddress) {
     this.vendorRegAddress = vendorRegAddress;
   }
-  
+
   public boolean isManufacturer() {
     return manufacturer;
   }
-  
+
   public void setManufacturer(boolean manufacturer) {
     this.manufacturer = manufacturer;
   }
@@ -157,7 +156,7 @@ public class VendorView implements Serializable {
   public void setVendor(Vendor vendor) {
     this.vendor = vendor;
   }
-  
+
   public Manufacture getManufacture() {
     if (manufacture == null) {
       manufacture = new Manufacture();
@@ -165,50 +164,50 @@ public class VendorView implements Serializable {
     manufacture.setCompanyId(getVendor().getCompanyId());
     return manufacture;
   }
-  
+
   public void setManufacture(Manufacture manufacture) {
     this.manufacture = manufacture;
   }
-  
+
   public boolean isRenderPrimaryVendor() {
     return renderPrimaryVendor;
   }
-  
+
   public void setRenderPrimaryVendor(boolean renderPrimaryVendor) {
     this.renderPrimaryVendor = renderPrimaryVendor;
   }
-  
+
   public boolean isEditable() {
     return editable;
   }
-  
+
   public void setEditable(boolean editable) {
     this.editable = editable;
   }
-  
+
   public boolean isAccountExist() {
     return accountExist;
   }
-  
+
   public void setAccountExist(boolean accountExist) {
     this.accountExist = accountExist;
   }
-  
+
   public Brand getDefaultBrand() {
     return defaultBrand;
   }
-  
+
   public void setDefaultBrand(Brand defaultBrand) {
     this.defaultBrand = defaultBrand;
   }
-  
+
   public List<Brand> getBrandList() {
     if (brandList == null) {
       brandList = new ArrayList<>();
     }
     return brandList;
   }
-  
+
   public void setBrandList(List<Brand> brandList) {
     this.brandList = brandList;
     if (getRemovableFlag() != null && !getRemovableFlag()) {
@@ -219,19 +218,19 @@ public class VendorView implements Serializable {
     }
     setBrand(null);
   }
-  
+
   public Brand getBrand() {
     return brand;
   }
-  
+
   public void setBrand(Brand brand) {
     this.brand = brand;
   }
-  
+
   public Boolean getRemovableFlag() {
     return removableFlag;
   }
-  
+
   public void setRemovableFlag(Boolean removableFlag) {
     this.removableFlag = removableFlag;
   }
@@ -305,7 +304,7 @@ public class VendorView implements Serializable {
       getVendor().setSupplierGroupId(null);
     }
   }
-  
+
   public boolean isSecondaryVendor() {
     boolean rvalue = false;
     if (getVendor() != null && getVendor().getVendorType() != null) {
@@ -323,7 +322,7 @@ public class VendorView implements Serializable {
     List<ServiceCommodity> list = null;
     if (getVendor().getCompanyId() != null) {
       list = ScmLookupExtView.lookupCommodityByCountryAndCompany(getVendor().getCompanyId());
-      
+
       if (main.isEdit() && !StringUtil.isEmpty(getCommodityList())) {
         for (ServiceCommodity com : getCommodityList()) {
           for (ServiceCommodity comm : list) {
@@ -337,7 +336,7 @@ public class VendorView implements Serializable {
     }
     return list;
   }
-  
+
   public String actionUpdateVendorView() {
     return null;
   }
@@ -427,7 +426,7 @@ public class VendorView implements Serializable {
     if (vendorLazyModel == null) {
       vendorLazyModel = new LazyDataModel<Vendor>() {
         private List<Vendor> list;
-        
+
         @Override
         public List<Vendor> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -444,12 +443,12 @@ public class VendorView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(Vendor vendor) {
           return vendor.getId();
         }
-        
+
         @Override
         public Vendor getRowData(String rowKey) {
           if (list != null) {
@@ -464,7 +463,7 @@ public class VendorView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_vendor/";
   }
@@ -505,7 +504,7 @@ public class VendorView implements Serializable {
           case "save":
             if (getVendor().getVendorType().equals(VendorService.VENDOR_TYPE_PRIMARY)) {
               getVendor().setVendorId(null);
-            }            
+            }
             if (getVendorRegAddress() != null) {
               getVendor().setVendorAddress(getVendorRegAddress().getAddress());
               getVendor().setVendorPin(getVendorRegAddress().getPin());
@@ -514,9 +513,9 @@ public class VendorView implements Serializable {
               getVendor().setIsManufacturer(VendorService.IS_MANUFACTURER);
             }
             VendorService.insertOrUpdate(main, getVendor());
-            
+
             VendorCommodityService.insertVendorCommodity(main, getVendor(), getCommodityList());
-            
+
             if (getVendorRegAddress() != null && getVendorRegAddress().getId() == null) {
               AddressType addressType = new AddressType();
               addressType.setId(AddressTypeService.REGISTERED_ADDRESS);
@@ -533,13 +532,13 @@ public class VendorView implements Serializable {
               getVendorRegAddress().setStateId(getVendor().getStateId());
             }
             VendorAddressService.insertOrUpdate(main, getVendorRegAddress());
-            
+
             if (getVendor().getIsManufacturer() != null && getVendor().getIsManufacturer() == VendorService.IS_MANUFACTURER) {
               ManufactureService.insertOrUpdateVendorAsManufacturer(main, getManufacture(), getVendor(), getVendorRegAddress());
             }
-            
+
             SupplierBrandService.insertOrUpdate(main, getVendor(), getBrandList());
-            
+
             break;
           case "clone":
             VendorService.clone(main, getVendor());
@@ -631,14 +630,14 @@ public class VendorView implements Serializable {
     }
     return null;
   }
-  
+
   public List<District> districtAuto(String filter) {
     if (getVendor().getStateId() != null && getVendor().getStateId().getId() != null) {
       return ScmLookupExtView.addressDistrictAuto(getVendor().getStateId().getId(), filter);
     }
     return null;
   }
-  
+
   public List<VendorLicense> getVendorLicenseList(MainView main) {
     if (vendorLicenseList == null) {
       try {
@@ -651,7 +650,7 @@ public class VendorView implements Serializable {
     }
     return vendorLicenseList;
   }
-  
+
   public void setVendorLicenseList(List<VendorLicense> vendorLicenseList) {
     this.vendorLicenseList = vendorLicenseList;
   }
@@ -672,7 +671,7 @@ public class VendorView implements Serializable {
         main.close();
       }
     }
-    
+
     return vendorAddressList;
   }
 
@@ -692,7 +691,7 @@ public class VendorView implements Serializable {
         main.close();
       }
     }
-    
+
     return vendorContactList;
   }
 
@@ -714,16 +713,16 @@ public class VendorView implements Serializable {
     }
     return vendorBankList;
   }
-  
+
   public void vendorCommoditySelectDialog() {
     Jsf.popupList(FileConstant.VENDOR_COMMODITY, getVendor());
   }
-  
+
   public void vendorCommodityDialogReturn() {
     Jsf.closeDialog(getVendor());
     setCommodityList(null); // Reset to null to fetch updated list
   }
-  
+
   public String deleteVendorCommodity(MainView main, ServiceCommodity commodity) {
     try {
       VendorCommodityService.deleteVendorCommodityRelation(main, commodity, getVendor());
@@ -853,36 +852,36 @@ public class VendorView implements Serializable {
   public void vendorLicenseDialogReturn() {
     vendorLicenseList = null; // Reset to null to fetch updated list
   }
-  
+
   public void userProfileNewDialog(int k) {
     Jsf.popupList(FileConstant.USER_PROFILE, getVendor());
   }
-  
+
   public void userProfileNewPopup(int k) {
     getVendor().setFlag(k);
     Jsf.popupList(FileConstant.USER_PROFILE, getVendor());
   }
-  
+
   public int getActiveIndex() {
     return activeIndex;
   }
-  
+
   public void setActiveIndex(int activeIndex) {
     this.activeIndex = activeIndex;
   }
-  
+
   public Integer getPinLength() {
     return pinLength;
   }
-  
+
   public void setPinLength(Integer pinLength) {
     this.pinLength = pinLength;
   }
-  
+
   public Integer getPinValue() {
     return pinValue;
   }
-  
+
   public void setPinValue(Integer pinValue) {
     this.pinValue = pinValue;
   }
@@ -917,15 +916,15 @@ public class VendorView implements Serializable {
   public List<AccountStatus> accountStatusAuto(String filter) {
     return ScmLookupView.accountStatusAuto(filter);
   }
-  
+
   public void setCommodityList(List<ServiceCommodity> commodityList) {
     this.commodityList = commodityList;
   }
-  
+
   public List<ServiceCommodity> getCommodityList() {
     return commodityList;
   }
-  
+
   public String deleteVendorContact(MainView main, VendorContact vendorContact) {
     if (vendorContact.getId() == null) {
       vendorContactList.remove(vendorContact);
@@ -942,13 +941,13 @@ public class VendorView implements Serializable {
     }
     return null;
   }
-  
+
   private List<VendorSalesAgent> salesAgentList;
-  
+
   public void vendorSalesAgentPopupReturned() {
     salesAgentList = null; // Reset to null to fetch updated list
   }
-  
+
   public List<VendorSalesAgent> getVendorSalesAgentList(MainView main) {
     if (salesAgentList == null) {
       try {
@@ -961,7 +960,7 @@ public class VendorView implements Serializable {
     }
     return salesAgentList;
   }
-  
+
   public String deleteVendorSalesAgent(MainView main, VendorSalesAgent vendorSalesAgent) {
     if (vendorSalesAgent.getId() == null) {
       salesAgentList.remove(vendorSalesAgent);
@@ -1007,7 +1006,7 @@ public class VendorView implements Serializable {
       getVendorRegAddress().setDistrictId(null);
     }
   }
-  
+
   private void updateStateAndPan(MainView main, String gstin) {
     if (AppUtil.isValidGstin(gstin)) {
       getVendor().setPanNo(gstin.substring(2, 12));
@@ -1088,13 +1087,13 @@ public class VendorView implements Serializable {
       getVendorRegAddress().setDistrictId(null);
     }
   }
-  
+
   public void openCommodityPopup() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.COMMODITY, new ServiceCommodity(), null); // opens a new form if id is null else edit
     }
   }
-  
+
   public List<SupplierGroup> lookupSupplierGroupByCompany() {
     List<SupplierGroup> list = null;
     if (getVendor().getCompanyId() != null) {
@@ -1102,7 +1101,7 @@ public class VendorView implements Serializable {
     }
     return list;
   }
-  
+
   public void openManufacturerPopup() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.MANUFACTURER, getManufacture(), getManufacture() == null ? null : getManufacture().getId());
@@ -1202,31 +1201,31 @@ public class VendorView implements Serializable {
       Jsf.popupForm(FileConstant.BASIC_COUNTRY, new District()); // opens a new form if id is null else edit
     }
   }
-  
+
   public void stateOpen() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.BASIC_STATE, new State()); // opens a new form if id is null else edit
     }
   }
-  
+
   public void districtOpen() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.BASIC_DISTRICT, new District()); // opens a new form if id is null else edit
     }
   }
-  
+
   public void supplierGroupOpen() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.SUPPLIER_GROUP, new SupplierGroup()); // opens a new form if id is null else edit
     }
   }
-  
+
   public void brandOpen() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.BASIC_BRAND, new Brand()); // opens a new form if id is null else edit
     }
   }
-  
+
   public List<SupplierGroup> supplierGroupAuto(String filter) {
     return ScmLookupExtView.supplierGroupAutoByComapny(getVendor().getCompanyId(), filter);
   }

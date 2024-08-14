@@ -3,82 +3,82 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://xmlns.jcp.org/jsf/core">
-  #{accountGroupPriceListView.switchAccountGroupPriceList(main, main.viewType)}        
-  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
-    <ui:param name="label" value="#{accountGroupPriceListView.accountGroup.groupName} / #{lang.priceList}" />
-    <ui:param name="ids" value="accountGroupPriceList" />          
-    <ui:define name="more" />  
-    <ui:define name="navRight" >      
-      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" 
-                       oncomplete="parent.accountGroupPriceListReturned();closePopup()" 
-                       actionListener="#{accountGroupPriceListView.accountGroupPriceListDialogClose}"
-                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
-    </ui:define>
+#{accountGroupPriceListView.switchAccountGroupPriceList(main, main.viewType)}        
+<ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:param name="label" value="#{accountGroupPriceListView.accountGroup.groupName} / #{lang.priceList}" />
+  <ui:param name="ids" value="accountGroupPriceList" />          
+  <ui:define name="more" />  
+  <ui:define name="navRight" >      
+    <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" 
+                     oncomplete="parent.accountGroupPriceListReturned();closePopup()" 
+                     actionListener="#{accountGroupPriceListView.accountGroupPriceListDialogClose}"
+                     icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+  </ui:define>
 
-    <ui:define name="deleteList" >
-      <p:commandButton action="#{accountGroupPriceListView.deleteAccountGroupPriceList(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountGroupPriceListWidgetDelConf')" process="f1" update="f1" >
-        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
-      </p:commandButton>
-    </ui:define>
+  <ui:define name="deleteList" >
+    <p:commandButton action="#{accountGroupPriceListView.deleteAccountGroupPriceList(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountGroupPriceListWidgetDelConf')" process="f1" update="f1" >
+      <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+    </p:commandButton>
+  </ui:define>
 
-    <ui:define name="menu1" >
-      <p:menuitem actionListener="#{accountGroupPriceListView.cloneAccountGroupPriceList(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
-    </ui:define>
+  <ui:define name="menu1" >
+    <p:menuitem actionListener="#{accountGroupPriceListView.cloneAccountGroupPriceList(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+  </ui:define>
 
-    <ui:define name="deleteForm" >
-      <p:commandButton action="#{accountGroupPriceListView.deleteAccountGroupPriceList(main)}" value="#{lang.delete}" onclick="wdgOff('accountGroupPriceListWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
-    </ui:define>    
+  <ui:define name="deleteForm" >
+    <p:commandButton action="#{accountGroupPriceListView.deleteAccountGroupPriceList(main)}" value="#{lang.delete}" onclick="wdgOff('accountGroupPriceListWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+  </ui:define>    
 
-    <ui:define name="newList" >
-      <p:commandButton action="#{accountGroupPriceListView.actionNewAccountPriceList}" title="#{lang.add}" onclick="toTop()" rendered="#{main.isList()}" 
-                       icon="fa fa-plus" iconPos="left" styleClass="btn btn-info" update="f1" process="f1">
-        <f:ajax execute="f1" render="f1"  />
-      </p:commandButton>
-    </ui:define>
+  <ui:define name="newList" >
+    <p:commandButton action="#{accountGroupPriceListView.actionNewAccountPriceList}" title="#{lang.add}" onclick="toTop()" rendered="#{main.isList()}" 
+                     icon="fa fa-plus" iconPos="left" styleClass="btn btn-info" update="f1" process="f1">
+      <f:ajax execute="f1" render="f1"  />
+    </p:commandButton>
+  </ui:define>
 
-    <ui:define name="list">
-      <p:dataTable id="accountGroupPriceListTable" var="accountGroupPriceListVar" widgetVar="accountGroupPriceListWidget" 
-                   tableStyleClass="mDataTable mDataTable-center fw editLinks"
-                   value="#{accountGroupPriceListView.getListAccountGroupPriceList(main)}" rows="#{main.pageData.pageSize}" 
-                   rowKey="#{accountGroupPriceListVar.id}"   
-                   rowHover="true" reflow="true" editable="true">
+  <ui:define name="list">
+    <p:dataTable id="accountGroupPriceListTable" var="accountGroupPriceListVar" widgetVar="accountGroupPriceListWidget" 
+                 tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                 value="#{accountGroupPriceListView.getListAccountGroupPriceList(main)}" rows="#{main.pageData.pageSize}" 
+                 rowKey="#{accountGroupPriceListVar.id}"   
+                 rowHover="true" reflow="true" editable="true">
 
-        <p:ajax event="rowEdit" listener="#{accountGroupPriceListView.onAccountGroupPriceListRowEdit}" update="@this" />
-       
-        <p:column headerText="#{lang.title}" sortBy="#{accountGroupPriceListVar.title}" field="title">
-          <p:cellEditor>
-            <f:facet name="output">
-              <h:outputText value="#{appView.display(accountGroupPriceListVar.title)}" title="#{appView.title(accountGroupPriceListVar.title)}" escape="false" />
-            </f:facet>
-            <f:facet name="input">
-              <p:inputText value="#{accountGroupPriceListVar.title}" required="true" requiredMessage="" style="width:100%" />
-            </f:facet>
-          </p:cellEditor>
-        </p:column>
+      <p:ajax event="rowEdit" listener="#{accountGroupPriceListView.onAccountGroupPriceListRowEdit}" update="@this" />
+     
+      <p:column headerText="#{lang.title}" sortBy="#{accountGroupPriceListVar.title}" field="title">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(accountGroupPriceListVar.title)}" title="#{appView.title(accountGroupPriceListVar.title)}" escape="false" />
+          </f:facet>
+          <f:facet name="input">
+            <p:inputText value="#{accountGroupPriceListVar.title}" required="true" requiredMessage="" style="width:100%" />
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
 
-        <p:column headerText="#{lang.sortOrder}" sortBy="#{accountGroupPriceListVar.sortOrder}" field="sort_order" style="text-align: right">
-          <p:cellEditor>
-            <f:facet name="output">
-              <h:outputText value="#{appView.number(accountGroupPriceListVar.sortOrder)}" escape="false" />
-            </f:facet>
-            <f:facet name="input">
-                <p:inputNumber value="#{accountGroupPriceListVar.sortOrder}" style="width:100%" thousandSeparator="" decimalPlaces="0" />
-            </f:facet>
-          </p:cellEditor>
-        </p:column>              
-        <p:column headerText="#{lang.remove}">
-          <p:commandButton action="#{accountGroupPriceListView.deleteAccountGroupPriceList(main, accountGroupPriceListVar)}"  rendered="#{accountGroupPriceListVar.isDefault eq 0}" value=""
-                           partialSubmit="true" process="@this"
-                           update="f1" title="#{lang.delete}" icon="fa fa-times" >      
-            <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
-          </p:commandButton>
-        </p:column>
-        
-         <p:column headerText="" styleClass="C" style="width:50px;">
-          <p:rowEditor />
-        </p:column>
-        
-      </p:dataTable> 	
-    </ui:define>          
-  </ui:decorate>
+      <p:column headerText="#{lang.sortOrder}" sortBy="#{accountGroupPriceListVar.sortOrder}" field="sort_order" style="text-align: right">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.number(accountGroupPriceListVar.sortOrder)}" escape="false" />
+          </f:facet>
+          <f:facet name="input">
+              <p:inputNumber value="#{accountGroupPriceListVar.sortOrder}" style="width:100%" thousandSeparator="" decimalPlaces="0" />
+          </f:facet>
+        </p:cellEditor>
+      </p:column>              
+      <p:column headerText="#{lang.remove}">
+        <p:commandButton action="#{accountGroupPriceListView.deleteAccountGroupPriceList(main, accountGroupPriceListVar)}"  rendered="#{accountGroupPriceListVar.isDefault eq 0}" value=""
+                         partialSubmit="true" process="@this"
+                         update="f1" title="#{lang.delete}" icon="fa fa-times" >      
+          <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+        </p:commandButton>
+      </p:column>
+      
+       <p:column headerText="" styleClass="C" style="width:50px;">
+        <p:rowEditor />
+      </p:column>
+      
+    </p:dataTable> 	
+  </ui:define>          
+</ui:decorate>
 </ui:composition>-->

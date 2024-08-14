@@ -15,8 +15,6 @@ import wawo.entity.core.SqlPage;
 import spica.scm.domain.State;
 import spica.scm.domain.Territory;
 import spica.scm.validate.ValidateUtil;
-import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -111,13 +109,13 @@ public abstract class StateService {
    * @param state
    */
   public static void insertOrUpdate(Main main, State state) {
-    if (state.getId() == null) {      
+    if (state.getId() == null) {
       insert(main, state);
-    } else {           
+    } else {
       updateByPk(main, state);
     }
   }
-  
+
   private static void toUpperNameAndCode(State state) {
     state.setStateName(state.getStateName().toUpperCase());
     state.setStateCode(state.getStateCode().toUpperCase());
@@ -172,7 +170,8 @@ public abstract class StateService {
   public static State selectStateByStateCodeAndCountry(Main main, Country countryId, String stateCode) {
     return (State) AppService.single(main, State.class, "select * from scm_state where country_id = ? and state_code = ?", new Object[]{countryId.getId(), stateCode});
   }
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main
@@ -182,6 +181,7 @@ public abstract class StateService {
   private static final void deleteAble(Main main, State state) throws UserMessageException {
 
   }
+
   /**
    * Validate insert.
    *

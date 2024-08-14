@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Transporter;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -51,6 +50,7 @@ public abstract class TransporterAddressService {
   public static final List<TransporterAddress> listPaged(Main main) {
     return AppService.listPagedJpa(main, getTransporterAddressSqlPaged(main));
   }
+
   public static final TransporterAddress selectTransporterRegisteredAddress(Main main, Transporter transporter) {
     return (TransporterAddress) AppService.single(main, TransporterAddress.class, "select * from scm_transporter_address where transporter_id = ? and address_type_id = ?", new Object[]{transporter.getId(), AddressTypeService.REGISTERED_ADDRESS});
   }
@@ -67,6 +67,7 @@ public abstract class TransporterAddressService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
+
   /**
    * Select TransporterAddress by key.
    *

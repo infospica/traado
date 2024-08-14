@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import spica.scm.validate.ProductPresetStatusIs;
 
 /**
  * ProductPresetStatusService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Tue Sep 20 15:27:15 IST 2016 
+ * @version	1.0, Tue Sep 20 15:27:15 IST 2016
  */
+public abstract class ProductPresetStatusService {
 
-public abstract class ProductPresetStatusService {  
- 
- /**
+  /**
    * ProductPresetStatus paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class ProductPresetStatusService {
     sql.count("select count(scm_product_preset_status.id) as total from scm_product_preset_status scm_product_preset_status"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_product_preset_status.title","scm_product_preset_status.display_color","scm_product_preset_status.created_by","scm_product_preset_status.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_product_preset_status.id","scm_product_preset_status.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_product_preset_status.created_at","scm_product_preset_status.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_product_preset_status.title", "scm_product_preset_status.display_color", "scm_product_preset_status.created_by", "scm_product_preset_status.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_product_preset_status.id", "scm_product_preset_status.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_product_preset_status.created_at", "scm_product_preset_status.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of ProductPresetStatus.
-  * @param main
-  * @return List of ProductPresetStatus
-  */
+
+  /**
+   * Return List of ProductPresetStatus.
+   *
+   * @param main
+   * @return List of ProductPresetStatus
+   */
   public static final List<ProductPresetStatus> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getProductPresetStatusSqlPaged(main));
+    return AppService.listPagedJpa(main, getProductPresetStatusSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class ProductPresetStatusService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select ProductPresetStatus by key.
-  * @param main
-  * @param productPresetStatus
-  * @return ProductPresetStatus
-  */
+  /**
+   * Select ProductPresetStatus by key.
+   *
+   * @param main
+   * @param productPresetStatus
+   * @return ProductPresetStatus
+   */
   public static final ProductPresetStatus selectByPk(Main main, ProductPresetStatus productPresetStatus) {
     return (ProductPresetStatus) AppService.find(main, ProductPresetStatus.class, productPresetStatus.getId());
   }
 
- /**
-  * Insert ProductPresetStatus.
-  * @param main
-  * @param productPresetStatus
-  */
+  /**
+   * Insert ProductPresetStatus.
+   *
+   * @param main
+   * @param productPresetStatus
+   */
   public static final void insert(Main main, ProductPresetStatus productPresetStatus) {
     ProductPresetStatusIs.insertAble(main, productPresetStatus);  //Validating
     AppService.insert(main, productPresetStatus);
 
   }
 
- /**
-  * Update ProductPresetStatus by key.
-  * @param main
-  * @param productPresetStatus
-  * @return ProductPresetStatus
-  */
+  /**
+   * Update ProductPresetStatus by key.
+   *
+   * @param main
+   * @param productPresetStatus
+   * @return ProductPresetStatus
+   */
   public static final ProductPresetStatus updateByPk(Main main, ProductPresetStatus productPresetStatus) {
     ProductPresetStatusIs.updateAble(main, productPresetStatus); //Validating
     return (ProductPresetStatus) AppService.update(main, productPresetStatus);
@@ -106,8 +107,7 @@ public abstract class ProductPresetStatusService {
   public static void insertOrUpdate(Main main, ProductPresetStatus productPresetStatus) {
     if (productPresetStatus.getId() == null) {
       insert(main, productPresetStatus);
-    }
-    else{
+    } else {
       updateByPk(main, productPresetStatus);
     }
   }
@@ -123,21 +123,23 @@ public abstract class ProductPresetStatusService {
     insert(main, productPresetStatus);
   }
 
- /**
-  * Delete ProductPresetStatus.
-  * @param main
-  * @param productPresetStatus
-  */
+  /**
+   * Delete ProductPresetStatus.
+   *
+   * @param main
+   * @param productPresetStatus
+   */
   public static final void deleteByPk(Main main, ProductPresetStatus productPresetStatus) {
     ProductPresetStatusIs.deleteAble(main, productPresetStatus); //Validation
     AppService.delete(main, ProductPresetStatus.class, productPresetStatus.getId());
   }
-	
- /**
-  * Delete Array of ProductPresetStatus.
-  * @param main
-  * @param productPresetStatus
-  */
+
+  /**
+   * Delete Array of ProductPresetStatus.
+   *
+   * @param main
+   * @param productPresetStatus
+   */
   public static final void deleteByPkArray(Main main, ProductPresetStatus[] productPresetStatus) {
     for (ProductPresetStatus e : productPresetStatus) {
       deleteByPk(main, e);

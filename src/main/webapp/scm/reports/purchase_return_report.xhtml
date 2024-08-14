@@ -2,7 +2,7 @@
   #{purchaseReturnReportView.setPurchaseReturnReportList(null)}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <o:importConstants type="spica.constant.ReportConstant" />
@@ -107,7 +107,7 @@
               <h:outputText value="#{appView.decimal(purchaseReturnReportView.goodsValue)}" />
             </f:facet>
           </p:column>
-          
+
           <p:column headerText="#{lang.igst}"  sortBy="#{row.igst}" style="text-align: right" 
                     filterBy="#{row.igst}" filterStyleClass="hidden">
             <h:outputText value="#{appView.decimal(row.igst)}" rendered="#{!(row.cgst gt 0)}" escape="false" />

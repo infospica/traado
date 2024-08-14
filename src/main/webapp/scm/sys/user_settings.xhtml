@@ -97,7 +97,7 @@
           </div>
 
         </p:tab>
-  
+
         <!-- Preference menu list -->
         <p:tab  title="#{lang.preference}" >
 
@@ -109,17 +109,17 @@
                   <p:commandButton value="#{lang.save}" action="#{userRuntimeView.actionEditProfile(main)}" styleClass="btn btn-primary" oncomplete="parent.location.reload();"  />
                 </ui:define>
                 <h:panelGrid columns="2" style="text-align: left;">
-                <p:outputLabel for="console" value="Theme:" style="width:125px" />
-                <p:selectOneMenu id="console" style="width:120px" value="#{userRuntimeView.appUser.userProfileId.theme}">
-                  <f:selectItem itemLabel="current Theme" itemValue="all.min.css" />
-<!--                  <f:selectItem itemLabel="Dark" itemValue="all.min_dark.css" />
-                  <f:selectItem itemLabel="Red" itemValue="all.min_red.css" />
-                  <f:selectItem itemLabel="Purple" itemValue="all.min_purple.css" />-->
-                </p:selectOneMenu>
-                  
-                <h:outputLabel value="Prefered Menu" style="width:125px" />
-                <p:inputSwitch value="#{userRuntimeView.appUser.userProfileId.preferedMenu}" />        
-                  
+                  <p:outputLabel for="console" value="Theme:" style="width:125px" />
+                  <p:selectOneMenu id="console" style="width:120px" value="#{userRuntimeView.appUser.userProfileId.theme}">
+                    <f:selectItem itemLabel="current Theme" itemValue="all.min.css" />
+                    <!--                  <f:selectItem itemLabel="Dark" itemValue="all.min_dark.css" />
+                                      <f:selectItem itemLabel="Red" itemValue="all.min_red.css" />
+                                      <f:selectItem itemLabel="Purple" itemValue="all.min_purple.css" />-->
+                  </p:selectOneMenu>
+
+                  <h:outputLabel value="Prefered Menu" style="width:125px" />
+                  <p:inputSwitch value="#{userRuntimeView.appUser.userProfileId.preferedMenu}" />        
+
                 </h:panelGrid>
               </ui:decorate>
             </p:panel>
@@ -128,7 +128,7 @@
         </p:tab>
         <p:tab title="#{lang.email} #{lang.configuration}" >
           <div style="background-color: #FFF;padding:25px;">
-            
+
           </div>
         </p:tab>
       </p:tabView>

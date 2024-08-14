@@ -1,74 +1,92 @@
 /*animations Page <--BEGINS */
 @include keyframes(slideUpOut) {
-	0%	{
-		@include prefix((
-			transform: translateY(0%)
-		), moz ms webkit );
-		margin-bottom:0px;
-	}
-    100%{
-		@include prefix((
-			transform: translateY(-100%)
-		), moz ms webkit );
-		margin-bottom:-60px;
-	}
+  0%	{
+    @include prefix((
+    transform: translateY(0%)
+      ), moz ms webkit );
+    margin-bottom:0px;
+  }
+  100%{
+    @include prefix((
+    transform: translateY(-100%)
+      ), moz ms webkit );
+    margin-bottom:-60px;
+  }
 }
 
 @-moz-keyframes fade-out{
-    0% {opacity :1;}
-	80% {opacity :1;}
-    100% {opacity :0;}
+  0% {
+    opacity :1;
+  }
+  80% {
+    opacity :1;
+  }
+  100% {
+    opacity :0;
+  }
 }
 @-webkit-keyframes fade-out{
-    0% {opacity :1;}
-	80% {opacity :1;}
-    100% {opacity :0;}
+  0% {
+    opacity :1;
+  }
+  80% {
+    opacity :1;
+  }
+  100% {
+    opacity :0;
+  }
 }
 @keyframes fade-out{
-    0% {opacity :1;}
-	80% {opacity :1;}
-    100% {opacity :0;}
+  0% {
+    opacity :1;
+  }
+  80% {
+    opacity :1;
+  }
+  100% {
+    opacity :0;
+  }
 }
 
 @include keyframes(bounce) {
-	0% {
-		@include prefix((
-			transform: translateY(-100%)
-		), moz ms webkit );
-	}
-	50% {
-		@include prefix((
-			transform: translateY(0%)
-		), moz ms webkit );
-	}
-	70% {
-		@include prefix((
-			transform: translateY(-10%)
-		), moz ms webkit );
-	}
-	80% {
-		@include prefix((
-			transform: translateY(0%)
-		), moz ms webkit );
-	}
-	90% {
-		@include prefix((
-			transform: translateY(-2%)
-		), moz ms webkit );
-	}
-	100% {
-		@include prefix((
-			transform: translateY(0%)
-		), moz ms webkit );
-	}
+  0% {
+    @include prefix((
+    transform: translateY(-100%)
+      ), moz ms webkit );
+  }
+  50% {
+    @include prefix((
+    transform: translateY(0%)
+      ), moz ms webkit );
+  }
+  70% {
+    @include prefix((
+    transform: translateY(-10%)
+      ), moz ms webkit );
+  }
+  80% {
+    @include prefix((
+    transform: translateY(0%)
+      ), moz ms webkit );
+  }
+  90% {
+    @include prefix((
+    transform: translateY(-2%)
+      ), moz ms webkit );
+  }
+  100% {
+    @include prefix((
+    transform: translateY(0%)
+      ), moz ms webkit );
+  }
 }
 
 .bounce{
-	animation-fill-mode: forwards;
-	@include animation('bounce 500ms 1');
+  animation-fill-mode: forwards;
+  @include animation('bounce 500ms 1');
 }
 .slideUpOut{
-	animation-fill-mode: forwards;
-	@include animation('slideUpOut 500ms 1');
+  animation-fill-mode: forwards;
+  @include animation('slideUpOut 500ms 1');
 }
 /* ENDS--> animations Page*/

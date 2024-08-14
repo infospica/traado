@@ -99,7 +99,7 @@ public class UserProfileView implements Serializable {
   private transient AccountGroup accountGroup;
   private transient Territory territory;
   private Integer notify = 0;
-  
+
   public List<Company> getCompanySelected1() {
     return companySelected1;
   }
@@ -452,7 +452,6 @@ public class UserProfileView implements Serializable {
    * @param main
    * @return the page to display.
    */
-  
   public String saveUserProfile(MainView main) {
     return saveOrCloneUserProfile(main, "save");
   }
@@ -549,13 +548,13 @@ public class UserProfileView implements Serializable {
           }
 
           if (loginVal != 0) {
-            if (user.getId() == null) {              
+            if (user.getId() == null) {
               Status st = new Status();
               st.setId(1);
               user.setStatusId(st);
               user.setUserProfileId(getUserProfile());
             }
-            UserService.insertOrUpdate(main, user, roleSelected, companySelected1, accountList, 0, notify==1);
+            UserService.insertOrUpdate(main, user, roleSelected, companySelected1, accountList, 0, notify == 1);
           } else if (loginVal == 0) {
             UserService.deleteUserLogin(main, getUserProfile().getUserCode());
           }

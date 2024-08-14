@@ -119,8 +119,8 @@ public abstract class CompanyService {
 
   public static final Company selectById(Main main, Integer id) {
     Company c = (Company) AppService.find(main, Company.class, id);
-    if(c!=null){
-     c.setCompanySettings(CompanySettingsService.selectIfNull(main, c));
+    if (c != null) {
+      c.setCompanySettings(CompanySettingsService.selectIfNull(main, c));
     }
     return c;
   }

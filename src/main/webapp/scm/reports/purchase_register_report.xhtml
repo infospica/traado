@@ -5,7 +5,7 @@
   <!--#{purchaseRegisterReportView.switchPurchaseRegistere(main)}-->
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
@@ -111,7 +111,7 @@
           </f:facet> 
           <p:column sortBy="#{productEntryVar.invoiceNo}" field="invoice_no" style="width:150px;">
             <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
-              <h:outputText value="#{appView.display(productEntryVar.invoiceNo)}" escape="false" />
+            <h:outputText value="#{appView.display(productEntryVar.invoiceNo)}" escape="false" />
 
           </p:column>
 

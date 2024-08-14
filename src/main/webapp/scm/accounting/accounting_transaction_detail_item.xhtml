@@ -18,7 +18,7 @@
     <ui:define name="deleteForm" >
       <!--<p:commandButton action="#{actDetailItemView.deleteAccountingTransactionDetailItem(main)}" value="#{lang.delete}" onclick="wdgOff('accountingTransactionDetailItemWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />-->
     </ui:define>
-   
+
     <ui:define name="save" >      
       <p:commandButton  value="#{lang.confirm}" styleClass="btn btn-primary" update="detailItemTableDiv errorMess" onclick="checkConfirm(#{actDetailItemView.accountingTransactionDetail.getDetailItemPayable().size()},#{(actDetailItemView.accountingTransactionDetail.accountingTransactionId.isReceipt() or actDetailItemView.accountingTransactionDetail.accountingTransactionId.isPayment())})" oncomplete="atdiValid(xhr, status, args)" rendered="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null}"  ></p:commandButton>        
       <p:remoteCommand name="atdiSub" actionListener="#{actDetailItemView.saveAccountingTransactionDetailItem(main)}" oncomplete="parent.transactionDetailItemReturned();closeIt()" rendered="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null}"/>
@@ -45,9 +45,8 @@
           if (!args.validationFailed) {
             if (atdi) {
               atdiSub();
-            }
-            else{
-               wdgOn('saveDetailConf');
+            } else {
+              wdgOn('saveDetailConf');
             }
           }
         }
@@ -69,7 +68,7 @@
     <ui:define name="form">  </ui:define>
     <ui:define name="list">  </ui:define>   
     <ui:define name="afterForm">
-       <p:messages id="errorMess" />
+      <p:messages id="errorMess" />
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <h:panelGroup layout="block" id="detailItemTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
         #{actDetailItemView.loadAccountingDocType()}        
@@ -91,7 +90,7 @@
                 <p:ajax event="itemSelect" process="selectedAccountGroupDiv" listener="#{actDetailItemView.accountGroupChanged}" onstart="block()" oncomplete="unblock()" 
                         update="payableReceivableDiv detailItemTable adjTotalDiv leftTable totalAmount rightTable" /> 
               </p:selectOneMenu>   
-               <p:message for="selectedAccountGroupId" />
+              <p:message for="selectedAccountGroupId" />
             </h:panelGroup>
           </p:column>
           <p:column  headerText="#{lang.docType}" >            

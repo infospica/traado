@@ -27,7 +27,7 @@
         <f:ajax execute="f1" render="f1"  />
       </h:commandButton>
     </ui:define>
-    
+
     <ui:define name="form">
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <p:tabView  prependId="false" dynamic="true" cache="false" styleClass="materialTabs">
@@ -119,7 +119,7 @@
             <h:panelGroup>
               <p:inputNumber styleClass="fw" value="#{salesReturnConsignmentReceiptView.consignmentDetail.totalExpenseAmount}" 
                              autocomplete="off" converterMessage="#{lang.lrAmount} #{lang.invalidNumber}" decimalPlaces="2" id="lrAmount" readonly="true"
-                            onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" />
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" />
               <p:message for="lrAmount" display="text"/>
             </h:panelGroup>            
 

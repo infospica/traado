@@ -165,7 +165,7 @@ public class SalesAgentClaimView implements Serializable {
           }
           addIgst(getSalesAgentClaim());
           lessTds(getSalesAgentClaim());
-        } else if (ViewTypes.isList(viewType)) { 
+        } else if (ViewTypes.isList(viewType)) {
           getSalesAgentClaim().setCompanyId(null);
           setSalesAgent(null);
           loadSalesAgentClaimList(main);

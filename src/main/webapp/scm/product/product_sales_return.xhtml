@@ -81,7 +81,7 @@
           <p:outputLabel value="#{lang.value} #{lang.mrp}" for="valueMrp" />
           <h:panelGroup>
             <p:inputNumber styleClass="w-260" value="#{productSalesReturnView.productBatch.valueMrp}" converterMessage="#{lang.value} #{lang.mrp} #{lang.invalidNumber}" decimalPlaces="2"
-                          onfocus="this.select()" inputStyleClass="text-right w-260" maxValue="99999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" autocomplete="off"
+                           onfocus="this.select()" inputStyleClass="text-right w-260" maxValue="99999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" autocomplete="off"
                            readonly="#{productSalesReturnView.productBatchTraded}"
                            requiredMessage="#{lang.value} #{lang.mrp} #{lang.isRequired}" id="valueMrp" />
             <p:message for="valueMrp" display="text"/>

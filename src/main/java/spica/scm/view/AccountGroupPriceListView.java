@@ -22,7 +22,6 @@ import wawo.entity.util.StringUtil;
 import spica.scm.domain.AccountGroupPriceList;
 import spica.scm.service.AccountGroupPriceListService;
 import spica.scm.domain.AccountGroup;
-import wawo.app.config.AppConfig;
 import wawo.app.faces.Jsf;
 
 /**

@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
@@ -17,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * SalesOrderStatusService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon May 09 18:27:36 IST 2016 
+ * @version	1.0, Mon May 09 18:27:36 IST 2016
  */
+public abstract class SalesOrderStatusService {
 
-public abstract class SalesOrderStatusService {  
- 
- /**
+  /**
    * SalesOrderStatus paginated query.
    *
    * @param main
@@ -35,19 +34,20 @@ public abstract class SalesOrderStatusService {
     sql.count("select count(scm_sales_order_status.id) from scm_sales_order_status scm_sales_order_status"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_sales_order_status.title","scm_sales_order_status.created_by","scm_sales_order_status.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_sales_order_status.id","scm_sales_order_status.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_sales_order_status.created_at","scm_sales_order_status.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_sales_order_status.title", "scm_sales_order_status.created_by", "scm_sales_order_status.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_sales_order_status.id", "scm_sales_order_status.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_sales_order_status.created_at", "scm_sales_order_status.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of SalesOrderStatus.
-  * @param main
-  * @return List of SalesOrderStatus
-  */
+
+  /**
+   * Return List of SalesOrderStatus.
+   *
+   * @param main
+   * @return List of SalesOrderStatus
+   */
   public static final List<SalesOrderStatus> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getSalesOrderStatusSqlPaged(main));
+    return AppService.listPagedJpa(main, getSalesOrderStatusSqlPaged(main));
   }
 
 //  /**
@@ -63,34 +63,36 @@ public abstract class SalesOrderStatusService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select SalesOrderStatus by key.
-  * @param main
-  * @param salesOrderStatus
-  * @return SalesOrderStatus
-  */
+  /**
+   * Select SalesOrderStatus by key.
+   *
+   * @param main
+   * @param salesOrderStatus
+   * @return SalesOrderStatus
+   */
   public static final SalesOrderStatus selectByPk(Main main, SalesOrderStatus salesOrderStatus) {
     return (SalesOrderStatus) AppService.find(main, SalesOrderStatus.class, salesOrderStatus.getId());
   }
 
- /**
-  * Insert SalesOrderStatus.
-  * @param main
-  * @param salesOrderStatus
-  */
+  /**
+   * Insert SalesOrderStatus.
+   *
+   * @param main
+   * @param salesOrderStatus
+   */
   public static final void insert(Main main, SalesOrderStatus salesOrderStatus) {
     insertAble(main, salesOrderStatus);  //Validating
     AppService.insert(main, salesOrderStatus);
 
   }
 
- /**
-  * Update SalesOrderStatus by key.
-  * @param main
-  * @param salesOrderStatus
-  * @return SalesOrderStatus
-  */
+  /**
+   * Update SalesOrderStatus by key.
+   *
+   * @param main
+   * @param salesOrderStatus
+   * @return SalesOrderStatus
+   */
   public static final SalesOrderStatus updateByPk(Main main, SalesOrderStatus salesOrderStatus) {
     updateAble(main, salesOrderStatus); //Validating
     return (SalesOrderStatus) AppService.update(main, salesOrderStatus);
@@ -105,9 +107,8 @@ public abstract class SalesOrderStatusService {
   public static void insertOrUpdate(Main main, SalesOrderStatus salesOrderStatus) {
     if (salesOrderStatus.getId() == null) {
       insert(main, salesOrderStatus);
-    }
-    else{
-        updateByPk(main, salesOrderStatus);
+    } else {
+      updateByPk(main, salesOrderStatus);
     }
   }
 
@@ -122,26 +123,29 @@ public abstract class SalesOrderStatusService {
     insert(main, salesOrderStatus);
   }
 
- /**
-  * Delete SalesOrderStatus.
-  * @param main
-  * @param salesOrderStatus
-  */
+  /**
+   * Delete SalesOrderStatus.
+   *
+   * @param main
+   * @param salesOrderStatus
+   */
   public static final void deleteByPk(Main main, SalesOrderStatus salesOrderStatus) {
     deleteAble(main, salesOrderStatus); //Validation
     AppService.delete(main, SalesOrderStatus.class, salesOrderStatus.getId());
   }
-	
- /**
-  * Delete Array of SalesOrderStatus.
-  * @param main
-  * @param salesOrderStatus
-  */
+
+  /**
+   * Delete Array of SalesOrderStatus.
+   *
+   * @param main
+   * @param salesOrderStatus
+   */
   public static final void deleteByPkArray(Main main, SalesOrderStatus[] salesOrderStatus) {
     for (SalesOrderStatus e : salesOrderStatus) {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

@@ -7,13 +7,13 @@
             <table style="font-size:7.5px;">
               <tr style="font-size: 7.5px;">
                 <td align="left" style="width:150px;">
-                    Total items: <span class="data"><b>#{salesReturnPrintView.salesReturnItemList.size()}</b></span> 
+                  Total items: <span class="data"><b>#{salesReturnPrintView.salesReturnItemList.size()}</b></span> 
                   Total Qty: <span class="data"><b> #{salesReturnPrintView.salesReturn.productNetQuantity}</b></span> </td>
                 <td> 
                   &#160;&#160;&#160;&#160;&#160;No.of Cases&#160; 
                   <span class="dataTitle"><b>&#160;&#160;&#160;&#160;&#160;</b></span> 
                   &#160;&#160;&#160;&#160;&#160;&#160;Net Weight <span class="dataTitle"><b></b></span>
-                 </td>
+                </td>
                 <td> </td>
               </tr>
             </table>
@@ -77,23 +77,23 @@
                 <td style="height:12px;"> Taxable Value</td>
                 <td align="right" >#{appView.decimal(salesReturnPrintView.salesReturn.invoiceAmountNet)}</td>
               </tr>
-<!--              <tr>
-                <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Inv. Disc.</td>
-                <td align="right">
-                   -#{appView.decimal(salesReturnPrintView.salesReturn)}
-                </td>
-              </tr>-->
+              <!--              <tr>
+                              <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Inv. Disc.</td>
+                              <td align="right">
+                                 -#{appView.decimal(salesReturnPrintView.salesReturn)}
+                              </td>
+                            </tr>-->
               <tr>
                 <td style="height:12px;" >GST Value</td>
                 <td align="right">#{appView.decimal(salesReturnPrintView.salesReturn.invoiceAmountIgst)}</td>
               </tr>
-<!--              <tr>
-                <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Cash Disc.</td>
-                <td align="right">
-                  #{appView.decimal(salesReturnPrintView.getCahDisc(salesReturnPrintView.salesReturn.))}           
-                  #{(appView.decimal(salesReturnPrintView.salesReturn.cashDiscountValue))>0?ppView.decimal(salesReturnPrintView.salesReturn.cashDiscountValue):'0.00'}
-                </td>
-              </tr>-->
+              <!--              <tr>
+                              <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Cash Disc.</td>
+                              <td align="right">
+              #{appView.decimal(salesReturnPrintView.getCahDisc(salesReturnPrintView.salesReturn.))}           
+              #{(appView.decimal(salesReturnPrintView.salesReturn.cashDiscountValue))>0?ppView.decimal(salesReturnPrintView.salesReturn.cashDiscountValue):'0.00'}
+            </td>
+          </tr>-->
               <tr>
                 <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Round Off</td>
                 <td align="right">#{appView.decimal(salesReturnPrintView.salesReturn.invoiceRoundOff)}</td>

@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.fin.view;
 
@@ -21,7 +21,6 @@ import spica.fin.service.TrialBalanceReportService;
 import spica.scm.domain.Company;
 import spica.sys.FileConstant;
 import spica.sys.SystemConstants;
-import spica.sys.UserRuntimeService;
 import spica.sys.UserRuntimeView;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;

@@ -8,13 +8,11 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.ConsignmentDocType;
 import spica.scm.validate.ConsignmentDocTypeIs;
-import wawo.app.faces.MainView;
 
 /**
  * ConsignmentDocTypeService

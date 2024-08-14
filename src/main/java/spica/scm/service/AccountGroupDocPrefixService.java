@@ -15,7 +15,6 @@ import spica.scm.domain.Account;
 import spica.scm.domain.AccountGroup;
 import spica.scm.domain.AccountGroupDocPrefix;
 import spica.fin.domain.AccountingLedger;
-import spica.fin.domain.AccountingPrefix;
 import spica.fin.domain.DebitCreditNote;
 import spica.scm.domain.AccountingFinancialYear;
 import spica.scm.domain.Company;

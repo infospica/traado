@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Transporter;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -170,7 +169,7 @@ public abstract class TransporterRateCardService {
   }
 
   public static final void deleteTransporterRateCard(Main main, TransporterRateCard transporterRateCard) {
-    
+
     AppService.deleteSql(main, TransporterRateCard.class, "delete from scm_transporter_freight_rate where transporter_rate_card_id = ?", new Object[]{transporterRateCard.getId()});
     AppService.deleteSql(main, TransporterRateCard.class, "delete from scm_transporter_rate_card where id = ?", new Object[]{transporterRateCard.getId()});
 //    AppService.deleteSql(main, TransporterRateCard.class, "delete from scm_trans_freightrate_uomrange where transporter_freight_rate_id = ?", new Object[]{transporterRateCard.});

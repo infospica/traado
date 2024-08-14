@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.ProductPresetStatusService;
 
 /**
  * ProductPresetStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Tue Sep 20 15:27:07 IST 2016 
+ * @version	1.0, Tue Sep 20 15:27:07 IST 2016
  */
-
-@Named(value="productPresetStatusView")
+@Named(value = "productPresetStatusView")
 @ViewScoped
-public class ProductPresetStatusView implements Serializable{
+public class ProductPresetStatusView implements Serializable {
 
   private transient ProductPresetStatus productPresetStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<ProductPresetStatus> productPresetStatusLazyModel; 	//For lazy loading datatable.
   private transient ProductPresetStatus[] productPresetStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ProductPresetStatusView() {
     super();
   }
- 
+
   /**
    * Return ProductPresetStatus.
+   *
    * @return ProductPresetStatus.
-   */  
+   */
   public ProductPresetStatus getProductPresetStatus() {
-    if(productPresetStatus == null) {
+    if (productPresetStatus == null) {
       productPresetStatus = new ProductPresetStatus();
     }
     return productPresetStatus;
-  }   
-  
+  }
+
   /**
    * Set ProductPresetStatus.
+   *
    * @param productPresetStatus.
-   */   
+   */
   public void setProductPresetStatus(ProductPresetStatus productPresetStatus) {
     this.productPresetStatus = productPresetStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchProductPresetStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchProductPresetStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class ProductPresetStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create productPresetStatusLazyModel.
+   *
    * @param main
    */
   private void loadProductPresetStatusList(final MainView main) {
     if (productPresetStatusLazyModel == null) {
       productPresetStatusLazyModel = new LazyDataModel<ProductPresetStatus>() {
-      private List<ProductPresetStatus> list;      
-      @Override
-      public List<ProductPresetStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ProductPresetStatusService.listPaged(main);
-          main.commit(productPresetStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ProductPresetStatus> list;
+
+        @Override
+        public List<ProductPresetStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ProductPresetStatusService.listPaged(main);
+            main.commit(productPresetStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ProductPresetStatus productPresetStatus) {
-        return productPresetStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ProductPresetStatus productPresetStatus) {
+          return productPresetStatus.getId();
+        }
+
+        @Override
         public ProductPresetStatus getRowData(String rowKey) {
           if (list != null) {
             for (ProductPresetStatus obj : list) {
@@ -136,11 +139,12 @@ public class ProductPresetStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_product_preset_status/";	
+    String SUB_FOLDER = "scm_product_preset_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class ProductPresetStatusView implements Serializable{
    */
   public String cloneProductPresetStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneProductPresetStatus(main, "clone"); 
+    return saveOrCloneProductPresetStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class ProductPresetStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ProductPresetStatus.
    *
@@ -205,7 +208,7 @@ public class ProductPresetStatusView implements Serializable{
       } else {
         ProductPresetStatusService.deleteByPk(main, getProductPresetStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class ProductPresetStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of ProductPresetStatus.
+   *
    * @return
    */
   public LazyDataModel<ProductPresetStatus> getProductPresetStatusLazyModel() {
     return productPresetStatusLazyModel;
   }
 
- /**
-  * Return ProductPresetStatus[].
-  * @return 
-  */
+  /**
+   * Return ProductPresetStatus[].
+   *
+   * @return
+   */
   public ProductPresetStatus[] getProductPresetStatusSelected() {
     return productPresetStatusSelected;
   }
-  
+
   /**
    * Set ProductPresetStatus[].
-   * @param productPresetStatusSelected 
+   *
+   * @param productPresetStatusSelected
    */
   public void setProductPresetStatusSelected(ProductPresetStatus[] productPresetStatusSelected) {
     this.productPresetStatusSelected = productPresetStatusSelected;
   }
- 
-
 
 }

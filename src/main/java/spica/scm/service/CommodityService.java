@@ -14,13 +14,11 @@ import wawo.entity.core.SqlPage;
 import spica.scm.domain.ServiceCommodity;
 import spica.scm.domain.Company;
 import spica.scm.domain.ProductCategory;
-import spica.scm.domain.ProductClassification;
 import spica.scm.domain.ProductType;
 import spica.scm.domain.Vendor;
 import spica.scm.validate.ValidateUtil;
 import spica.sys.UserRuntimeView;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 

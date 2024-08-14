@@ -749,7 +749,7 @@ public class ProductPopupView implements Serializable {
    */
   public List<ProductUnit> productPackingUnit(MainView main) {
     try {
-       return ProductUnitService.productPackingUnit(main);
+      return ProductUnitService.productPackingUnit(main);
     } catch (Throwable t) {
       main.rollback(t, "error.select");
     } finally {

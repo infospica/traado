@@ -22,14 +22,14 @@
     <ui:define name="rightList" >
       <h:inputText id="forFocus" styleClass="sr-only" />
       <h:panelGroup styleClass="L">
-      <p:calendar id="fromDate" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}"
+        <p:calendar id="fromDate" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}"
                     required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
                     converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
                     maxlength="12" size="9"  showButtonPanel="true" navigator="true" mask="true" maxdate="#{accountingMainView.toDate}" >
           <p:ajax event="dateSelect" process="@this" listener="#{tradingaccountView.onFromDateSelect}" update="tradingGrid  fmess toDate"/>
         </p:calendar> <p:message for="fromDate" display="text" id="fmess"/>
       </h:panelGroup>  <h:panelGroup styleClass="L">
-      <p:calendar id="toDate" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+        <p:calendar id="toDate" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
                     required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"
                     converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{accountingMainView.fromDate}"
                     maxlength="12" size="9"  showButtonPanel="true" navigator="true" mask="true"  maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}">
@@ -38,7 +38,9 @@
         <p:message for="toDate" display="text" id="tmess"/>
       </h:panelGroup>
     </ui:define>
-    <ui:define name="list">  <style>.vtop{vertical-align: top;}</style>
+    <ui:define name="list">  <style>.vtop{
+          vertical-align: top;
+        }</style>
       <p:panelGrid columns="2" columnClasses="vtop #{sysRuntimeView.getGrid2()} vtop" id="tradingGrid" styleClass="noBorder">
         <p:dataTable id="balanceSheetAssetTable" var="row" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                      value="#{tradingaccountView.getBalanceSheetAssetList()}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"

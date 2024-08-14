@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.view;
 
@@ -35,7 +35,6 @@ import spica.scm.print.PageFooterEvent;
 import spica.scm.print.PrintDebitCreditNote;
 import spica.scm.service.CompanyAddressService;
 import spica.scm.service.CompanyLicenseService;
-import spica.scm.service.CompanySettingsService;
 import spica.scm.service.CustomerAddressService;
 import spica.scm.service.CustomerService;
 import spica.scm.util.CurencyToText;

@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * AccountingDocTypeService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Feb 24 15:58:34 IST 2017 
+ * @version	1.0, Fri Feb 24 15:58:34 IST 2017
  */
+public abstract class AccountingDocTypeService {
 
-public abstract class AccountingDocTypeService {  
- 
- /**
+  /**
    * AccountingDocType paginated query.
    *
    * @param main
@@ -38,18 +36,19 @@ public abstract class AccountingDocTypeService {
     sql.orderBy("fin_accounting_doc_type.sort_order,upper(fin_accounting_doc_type.title)");
 
     sql.string(new String[]{"fin_accounting_doc_type.title"}); //String search or sort fields
-    sql.number(new String[]{"fin_accounting_doc_type.id","fin_accounting_doc_type.sort_order"}); //Numeric search or sort fields
+    sql.number(new String[]{"fin_accounting_doc_type.id", "fin_accounting_doc_type.sort_order"}); //Numeric search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of AccountingDocType.
-  * @param main
-  * @return List of AccountingDocType
-  */
+
+  /**
+   * Return List of AccountingDocType.
+   *
+   * @param main
+   * @return List of AccountingDocType
+   */
   public static final List<AccountingDocType> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getAccountingDocTypeSqlPaged(main));
+    return AppService.listPagedJpa(main, getAccountingDocTypeSqlPaged(main));
   }
 
 //  /**
@@ -65,34 +64,36 @@ public abstract class AccountingDocTypeService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select AccountingDocType by key.
-  * @param main
-  * @param accountingDocType
-  * @return AccountingDocType
-  */
+  /**
+   * Select AccountingDocType by key.
+   *
+   * @param main
+   * @param accountingDocType
+   * @return AccountingDocType
+   */
   public static final AccountingDocType selectByPk(Main main, AccountingDocType accountingDocType) {
     return (AccountingDocType) AppService.find(main, AccountingDocType.class, accountingDocType.getId());
   }
 
- /**
-  * Insert AccountingDocType.
-  * @param main
-  * @param accountingDocType
-  */
+  /**
+   * Insert AccountingDocType.
+   *
+   * @param main
+   * @param accountingDocType
+   */
   public static final void insert(Main main, AccountingDocType accountingDocType) {
     insertAble(main, accountingDocType);  //Validating
     AppService.insert(main, accountingDocType);
 
   }
 
- /**
-  * Update AccountingDocType by key.
-  * @param main
-  * @param accountingDocType
-  * @return AccountingDocType
-  */
+  /**
+   * Update AccountingDocType by key.
+   *
+   * @param main
+   * @param accountingDocType
+   * @return AccountingDocType
+   */
   public static final AccountingDocType updateByPk(Main main, AccountingDocType accountingDocType) {
     updateAble(main, accountingDocType); //Validating
     return (AccountingDocType) AppService.update(main, accountingDocType);
@@ -107,8 +108,7 @@ public abstract class AccountingDocTypeService {
   public static void insertOrUpdate(Main main, AccountingDocType accountingDocType) {
     if (accountingDocType.getId() == null) {
       insert(main, accountingDocType);
-    }
-    else{
+    } else {
       updateByPk(main, accountingDocType);
     }
   }
@@ -124,28 +124,30 @@ public abstract class AccountingDocTypeService {
     insert(main, accountingDocType);
   }
 
- /**
-  * Delete AccountingDocType.
-  * @param main
-  * @param accountingDocType
-  */
+  /**
+   * Delete AccountingDocType.
+   *
+   * @param main
+   * @param accountingDocType
+   */
   public static final void deleteByPk(Main main, AccountingDocType accountingDocType) {
     deleteAble(main, accountingDocType); //Validation
     AppService.delete(main, AccountingDocType.class, accountingDocType.getId());
   }
-	
- /**
-  * Delete Array of AccountingDocType.
-  * @param main
-  * @param accountingDocType
-  */
+
+  /**
+   * Delete Array of AccountingDocType.
+   *
+   * @param main
+   * @param accountingDocType
+   */
   public static final void deleteByPkArray(Main main, AccountingDocType[] accountingDocType) {
     for (AccountingDocType e : accountingDocType) {
       deleteByPk(main, e);
     }
   }
-  
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main

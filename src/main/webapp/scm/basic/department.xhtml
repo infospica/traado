@@ -4,11 +4,11 @@
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.department}" />
     <ui:param name="ids" value="department" />
-    
+
     <ui:define name="navRight" >
       <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
     </ui:define>
-    
+
     <ui:define name="deleteList" >
       <p:commandButton action="#{departmentView.deleteDepartment(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('departmentWidgetDelConf')" process="f1" update="f1" >
         <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />

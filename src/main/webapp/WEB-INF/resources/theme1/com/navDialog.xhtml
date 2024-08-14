@@ -7,8 +7,8 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
   <ui:include src="/theme1/messages.xhtml" />
   <ui:insert name="nav">
-    
-      <div class="bar-N bg-default header">
+
+    <div class="bar-N bg-default header">
       <div class="L h5"> 
 
         <span>#{userRuntimeView.menuActive.parentId.title}</span> <i class="fa fa-angle-right m-x-5" style="color: #08c;"></i> <span>#{userRuntimeView.menuActive.title}</span> <i class="fa fa-angle-right m-x-5" style="color: #08c;"></i> 
@@ -22,12 +22,12 @@
       <h:panelGroup styleClass="L" style="padding-left: 5%" layout="block">
         <ui:insert name="navLeftRight" />
       </h:panelGroup>
-         <h:panelGroup styleClass="R" style="padding-left: 5%" layout="block">
+      <h:panelGroup styleClass="R" style="padding-left: 5%" layout="block">
         <ui:insert name="navRight" />
       </h:panelGroup>
-</div>
+    </div>
 
-</ui:insert>
+  </ui:insert>
 </ui:composition>
 
 

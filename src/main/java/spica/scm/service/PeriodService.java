@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * PeriodService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:21 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:21 IST 2016
  */
+public abstract class PeriodService {
 
-public abstract class PeriodService {  
- 
- /**
+  /**
    * Period paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class PeriodService {
     sql.count("select count(scm_period.id) as total from scm_period scm_period"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_period.title","scm_period.created_by","scm_period.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_period.id","scm_period.days","scm_period.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_period.created_at","scm_period.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_period.title", "scm_period.created_by", "scm_period.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_period.id", "scm_period.days", "scm_period.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_period.created_at", "scm_period.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of Period.
-  * @param main
-  * @return List of Period
-  */
+
+  /**
+   * Return List of Period.
+   *
+   * @param main
+   * @return List of Period
+   */
   public static final List<Period> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getPeriodSqlPaged(main));
+    return AppService.listPagedJpa(main, getPeriodSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class PeriodService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select Period by key.
-  * @param main
-  * @param period
-  * @return Period
-  */
+  /**
+   * Select Period by key.
+   *
+   * @param main
+   * @param period
+   * @return Period
+   */
   public static final Period selectByPk(Main main, Period period) {
     return (Period) AppService.find(main, Period.class, period.getId());
   }
 
- /**
-  * Insert Period.
-  * @param main
-  * @param period
-  */
+  /**
+   * Insert Period.
+   *
+   * @param main
+   * @param period
+   */
   public static final void insert(Main main, Period period) {
     insertAble(main, period);  //Validating
     AppService.insert(main, period);
 
   }
 
- /**
-  * Update Period by key.
-  * @param main
-  * @param period
-  * @return Period
-  */
+  /**
+   * Update Period by key.
+   *
+   * @param main
+   * @param period
+   * @return Period
+   */
   public static final Period updateByPk(Main main, Period period) {
     updateAble(main, period); //Validating
     return (Period) AppService.update(main, period);
@@ -106,8 +107,7 @@ public abstract class PeriodService {
   public static void insertOrUpdate(Main main, Period period) {
     if (period.getId() == null) {
       insert(main, period);
-    }
-    else{
+    } else {
       updateByPk(main, period);
     }
   }
@@ -123,26 +123,29 @@ public abstract class PeriodService {
     insert(main, period);
   }
 
- /**
-  * Delete Period.
-  * @param main
-  * @param period
-  */
+  /**
+   * Delete Period.
+   *
+   * @param main
+   * @param period
+   */
   public static final void deleteByPk(Main main, Period period) {
     deleteAble(main, period); //Validation
     AppService.delete(main, Period.class, period.getId());
   }
-	
- /**
-  * Delete Array of Period.
-  * @param main
-  * @param period
-  */
+
+  /**
+   * Delete Array of Period.
+   *
+   * @param main
+   * @param period
+   */
   public static final void deleteByPkArray(Main main, Period[] period) {
     for (Period e : period) {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

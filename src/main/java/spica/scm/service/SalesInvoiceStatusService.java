@@ -145,6 +145,7 @@ public abstract class SalesInvoiceStatusService {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

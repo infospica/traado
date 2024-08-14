@@ -51,8 +51,8 @@
                    selection="#{salesAgentContractStatView.salesAgentContractStatSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{salesAgentContractStatVar.title}" field="title" >
-           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{salesAgentContractStatVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{salesAgentContractStatVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{salesAgentContractStatView.salesAgentContractStat}" value="#{salesAgentContractStatVar}" />
           </p:commandLink>
         </p:column>
@@ -61,7 +61,7 @@
           <h:outputText value="#{appView.number(salesAgentContractStatVar.priority)}" escape="false" />
         </p:column>
         <p:column exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(salesAgentContractStatVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(salesAgentContractStatVar.createdAt)}</ui:define>

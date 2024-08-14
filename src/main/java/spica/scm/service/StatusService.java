@@ -13,7 +13,6 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.Status;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -151,6 +150,7 @@ public abstract class StatusService {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

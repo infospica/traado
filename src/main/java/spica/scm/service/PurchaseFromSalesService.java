@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -31,7 +31,7 @@ public class PurchaseFromSalesService {
     SqlPage sql = AppService.sqlPage("scm_sales_invoice", SalesInvoice.class, main);
     sql.main("select scm_sales_invoice.id,scm_sales_invoice.invoice_no,scm_sales_invoice.invoice_date,scm_sales_invoice.customer_id,scm_sales_invoice.account_group_id,\n"
             + "scm_sales_invoice.invoice_amount_net,scm_sales_invoice.invoice_amount_igst,invoice_amt_disc_percent,scm_sales_invoice.invoice_amount,"
-            + "scm_sales_invoice.is_tax_code_modified,scm_sales_invoice.sales_invoice_status_id,scm_sales_invoice.invoice_entry_date," 
+            + "scm_sales_invoice.is_tax_code_modified,scm_sales_invoice.sales_invoice_status_id,scm_sales_invoice.invoice_entry_date,"
             + "scm_sales_invoice.cash_discount_applicable,scm_sales_invoice.cash_discount_taxable,scm_sales_invoice.cash_discount_value,scm_sales_invoice.tcs_net_value,"
             + "scm_sales_invoice.invoice_amount_discount,scm_sales_invoice.account_group_price_list_id "
             + " from scm_sales_invoice"); //Main query  

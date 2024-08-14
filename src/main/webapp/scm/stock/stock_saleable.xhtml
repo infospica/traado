@@ -1,121 +1,121 @@
 <!--<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
-  #{stockSaleableView.switchStockSaleable(main, viewType)}
+#{stockSaleableView.switchStockSaleable(main, viewType)}
 //FIXME remove
- <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
-    <ui:param name="label" value="#{lang.stockSaleable}" />
-    <ui:param name="ids" value="stockSaleable" />
+<ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:param name="label" value="#{lang.stockSaleable}" />
+  <ui:param name="ids" value="stockSaleable" />
 
-    <ui:define name="deleteList" >
-      <p:commandButton action="#{stockSaleableView.deleteStockSaleable(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('stockSaleableWidgetDelConf')" process="f1" update="f1" >
-	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
-      </p:commandButton>
-    </ui:define>
+  <ui:define name="deleteList" >
+    <p:commandButton action="#{stockSaleableView.deleteStockSaleable(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('stockSaleableWidgetDelConf')" process="f1" update="f1" >
+    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+    </p:commandButton>
+  </ui:define>
 
-    <ui:define name="menu1" >
-      <p:menuitem actionListener="#{stockSaleableView.cloneStockSaleable(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
-    </ui:define>
+  <ui:define name="menu1" >
+    <p:menuitem actionListener="#{stockSaleableView.cloneStockSaleable(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+  </ui:define>
 
-    <ui:define name="deleteForm" >
-      <p:commandButton action="#{stockSaleableView.deleteStockSaleable(main)}" value="#{lang.delete}" onclick="wdgOff('stockSaleableWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
-    </ui:define>
+  <ui:define name="deleteForm" >
+    <p:commandButton action="#{stockSaleableView.deleteStockSaleable(main)}" value="#{lang.delete}" onclick="wdgOff('stockSaleableWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+  </ui:define>
 
-    <ui:define name="save" >
-      <h:commandButton action="#{stockSaleableView.saveStockSaleable(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
-    </ui:define>   
+  <ui:define name="save" >
+    <h:commandButton action="#{stockSaleableView.saveStockSaleable(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+  </ui:define>   
 
-    <ui:define name="form">
-	 Small list combo 
-  	<p:outputLabel value="#{lang.stockSaleableProductDetailId}" for="stockSaleableProductDetailId" /><h:panelGroup>
-         <p:selectOneMenu value="#{stockSaleableView.stockSaleable.productDetailId}"  id="stockSaleableProductDetailId" converter="omnifaces.SelectItemsConverter">
-          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
-          <f:selectItems value="#{scmLookupView.productDetail(main)}" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" />
-        </p:selectOneMenu><p:message for="stockSaleableProductDetailId" display="text" /></h:panelGroup>	
-	 Small list autocomplete 
-	  <p:outputLabel value="#{lang.stockSaleableProductDetailId}" for="stockSaleableProductDetailId" /><h:panelGroup>
-          <p:autoComplete value="#{stockSaleableView.stockSaleable.productDetailId}" completeMethod="#{scmLookupView.productDetailAuto}"  id="stockSaleableProductDetailId" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-          <o:converter list="#{scmLookupView.productDetail(main)}" converterId="omnifaces.ListConverter"  />
-        </p:autoComplete><p:message for="stockSaleableProductDetailId" display="text" /></h:panelGroup> 	
-	 Big list autocomplete 
-        <p:outputLabel value="#{lang.stockSaleableProductDetailId}" for="stockSaleableProductDetailId"/><h:panelGroup>
-          <p:autoComplete value="#{stockSaleableView.stockSaleable.productDetailId}" completeMethod="#{stockSaleableView.productDetailAuto}" converter="wawo.LookupIntConverter"   id="stockSaleableProductDetailId" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.productDetailClass()}"/>
-          <f:attribute name="byid" value="#{scmLookupView.productDetailById()}"/>
-        </p:autoComplete><p:message for="stockSaleableProductDetailId" display="text" /></h:panelGroup>
-	 Small list combo 
-  	<p:outputLabel value="#{lang.stockSaleableAccountId}" for="stockSaleableAccountId" /><h:panelGroup>
-         <p:selectOneMenu value="#{stockSaleableView.stockSaleable.accountId}"  id="stockSaleableAccountId" converter="omnifaces.SelectItemsConverter">
-          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
-          <f:selectItems value="#{scmLookupView.account(main)}" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" />
-        </p:selectOneMenu><p:message for="stockSaleableAccountId" display="text" /></h:panelGroup>	
-	 Small list autocomplete 
-	  <p:outputLabel value="#{lang.stockSaleableAccountId}" for="stockSaleableAccountId" /><h:panelGroup>
-          <p:autoComplete value="#{stockSaleableView.stockSaleable.accountId}" completeMethod="#{scmLookupView.accountAuto}"  id="stockSaleableAccountId" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-          <o:converter list="#{scmLookupView.account(main)}" converterId="omnifaces.ListConverter"  />
-        </p:autoComplete><p:message for="stockSaleableAccountId" display="text" /></h:panelGroup> 	
-	 Big list autocomplete 
-        <p:outputLabel value="#{lang.stockSaleableAccountId}" for="stockSaleableAccountId"/><h:panelGroup>
-          <p:autoComplete value="#{stockSaleableView.stockSaleable.accountId}" completeMethod="#{stockSaleableView.accountAuto}" converter="wawo.LookupIntConverter"   id="stockSaleableAccountId" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
-          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>
-        </p:autoComplete><p:message for="stockSaleableAccountId" display="text" /></h:panelGroup>
-        <p:outputLabel value="#{lang.qtyIn}" for="qtyIn" />
-        <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.quantityIn}" converterMessage="#{lang.qtyIn} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="qtyIn" /><p:message for="qtyIn" display="text"/></h:panelGroup>
-        <p:outputLabel value="#{lang.qtyOut}" for="qtyOut" />
-        <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.quantityOut}" converterMessage="#{lang.qtyOut} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="qtyOut" /><p:message for="qtyOut" display="text"/></h:panelGroup>
-	 Small list combo 
-  	<p:outputLabel value="#{lang.stockSaleableStockStatusId}" for="stockSaleableStockStatusId" /><h:panelGroup>
-         <p:selectOneMenu value="#{stockSaleableView.stockSaleable.stockStatusId}"  id="stockSaleableStockStatusId" converter="omnifaces.SelectItemsConverter">
-          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
-          <f:selectItems value="#{scmLookupView.stockStatus(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
-        </p:selectOneMenu><p:message for="stockSaleableStockStatusId" display="text" /></h:panelGroup>	
-	 Small list autocomplete 
-	  <p:outputLabel value="#{lang.stockSaleableStockStatusId}" for="stockSaleableStockStatusId" /><h:panelGroup>
-          <p:autoComplete value="#{stockSaleableView.stockSaleable.stockStatusId}" completeMethod="#{scmLookupView.stockStatusAuto}"  id="stockSaleableStockStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-          <o:converter list="#{scmLookupView.stockStatus(main)}" converterId="omnifaces.ListConverter"  />
-        </p:autoComplete><p:message for="stockSaleableStockStatusId" display="text" /></h:panelGroup> 	
-	 Big list autocomplete 
-        <p:outputLabel value="#{lang.stockSaleableStockStatusId}" for="stockSaleableStockStatusId"/><h:panelGroup>
-          <p:autoComplete value="#{stockSaleableView.stockSaleable.stockStatusId}" completeMethod="#{stockSaleableView.stockStatusAuto}" converter="wawo.LookupIntConverter"   id="stockSaleableStockStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.stockStatusClass()}"/>
-          <f:attribute name="byid" value="#{scmLookupView.stockStatusById()}"/>
-        </p:autoComplete><p:message for="stockSaleableStockStatusId" display="text" /></h:panelGroup>
-        <p:outputLabel value="#{lang.stockReferenceId}" for="stockReferenceId" />
-        <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.stockReferenceId}" converterMessage="#{lang.stockReferenceId} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="stockReferenceId" /><p:message for="stockReferenceId" display="text"/></h:panelGroup>            
-        <p:outputLabel value="#{lang.stockReferenceCode}" for="stockReferenceCode" />
-        <h:panelGroup><p:inputText value="#{stockSaleableView.stockSaleable.stockReferenceCode}" maxlength="50" id="stockReferenceCode" /><p:message for="stockReferenceCode" display="text" styleClass="fw" /></h:panelGroup>
-        <p:outputLabel value="#{lang.stockSaleableId}" for="stockSaleableId" />
-        <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.stockSaleableId}" converterMessage="#{lang.stockSaleableId} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="stockSaleableId" /><p:message for="stockSaleableId" display="text"/></h:panelGroup>            
-        <p:outputLabel value="#{lang.transferCode}" for="transferCode" />
-        <h:panelGroup><p:inputText value="#{stockSaleableView.stockSaleable.transferCode}" maxlength="50" id="transferCode" /><p:message for="transferCode" display="text" styleClass="fw" /></h:panelGroup>
-        <p:outputLabel value="#{lang.blockedAt}" for="blockedAt" />
-        <h:panelGroup><p:calendar value="#{stockSaleableView.stockSaleable.blockedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.blockedAt} #{lang.invalidDate}" maxlength="29" id="blockedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="blockedAt" display="text"/></h:panelGroup>
-        <p:outputLabel value="#{lang.releasedAt}" for="releasedAt" />
-        <h:panelGroup><p:calendar value="#{stockSaleableView.stockSaleable.releasedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.releasedAt} #{lang.invalidDate}" maxlength="29" id="releasedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="releasedAt" display="text"/></h:panelGroup>
-    </ui:define>
-	
-    <ui:define name="list">
-      <p:dataTable id="stockSaleableTable" var="stockSaleableVar" widgetVar="stockSaleableWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-        lazy="true" value="#{stockSaleableView.stockSaleableLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{stockSaleableVar.id}"
-        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
-        selection="#{stockSaleableView.stockSaleableSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
-        <p:column selectionMode="multiple" exportable="false" />
-        <p:column headerText="#{lang.id}" sortBy="#{stockSaleableVar.id}" field="id" >
-          <p:commandLink action="#{main.setViewType(editform)}" value="#{stockSaleableVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
-        <f:setPropertyActionListener target="#{stockSaleableView.stockSaleable}" value="#{stockSaleableVar}" />
-          </p:commandLink>
-        </p:column>
-        <p:column headerText="#{lang.batchNo}" sortBy="#{stockSaleableVar.productDetailId.batchNo}" field="product_detail_id.batch_no"><h:outputText value="#{appView.display(stockSaleableVar.productDetailId.batchNo)}" title="#{appView.title(stockSaleableVar.productDetailId.batchNo)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.accountCode}" sortBy="#{stockSaleableVar.accountId.accountCode}" field="account_id.account_code"><h:outputText value="#{appView.display(stockSaleableVar.accountId.accountCode)}" title="#{appView.title(stockSaleableVar.accountId.accountCode)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.qtyIn}" sortBy="#{stockSaleableVar.quantityIn}" field="qty_in" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.quantityIn)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.qtyOut}" sortBy="#{stockSaleableVar.quantityOut}" field="qty_out" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.quantityOut)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.title}" sortBy="#{stockSaleableVar.stockStatusId.title}" field="stock_status_id.title"><h:outputText value="#{appView.display(stockSaleableVar.stockStatusId.title)}" title="#{appView.title(stockSaleableVar.stockStatusId.title)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.stockReferenceId}" sortBy="#{stockSaleableVar.stockReferenceId}" field="stock_reference_id" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.stockReferenceId)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.stockReferenceCode}" sortBy="#{stockSaleableVar.stockReferenceCode}" field="stock_reference_code"><h:outputText value="#{appView.display(stockSaleableVar.stockReferenceCode)}" title="#{appView.title(stockSaleableVar.stockReferenceCode)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.stockSaleableId}" sortBy="#{stockSaleableVar.stockSaleableId}" field="stock_saleable_id" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.stockSaleableId)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.transferCode}" sortBy="#{stockSaleableVar.transferCode}" field="transfer_code"><h:outputText value="#{appView.display(stockSaleableVar.transferCode)}" title="#{appView.title(stockSaleableVar.transferCode)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.blockedAt}" sortBy="#{stockSaleableVar.blockedAt}" field="blocked_at" ><h:outputText value="#{appView.dateTime(stockSaleableVar.blockedAt)}" escape="false" /></p:column>
-        <p:column headerText="#{lang.releasedAt}" sortBy="#{stockSaleableVar.releasedAt}" field="released_at" ><h:outputText value="#{appView.dateTime(stockSaleableVar.releasedAt)}" escape="false" /></p:column>
-      </p:dataTable> 	
-    </ui:define>   
-  </ui:decorate>
+  <ui:define name="form">
+ Small list combo 
+  <p:outputLabel value="#{lang.stockSaleableProductDetailId}" for="stockSaleableProductDetailId" /><h:panelGroup>
+       <p:selectOneMenu value="#{stockSaleableView.stockSaleable.productDetailId}"  id="stockSaleableProductDetailId" converter="omnifaces.SelectItemsConverter">
+        <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+        <f:selectItems value="#{scmLookupView.productDetail(main)}" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" />
+      </p:selectOneMenu><p:message for="stockSaleableProductDetailId" display="text" /></h:panelGroup>	
+ Small list autocomplete 
+  <p:outputLabel value="#{lang.stockSaleableProductDetailId}" for="stockSaleableProductDetailId" /><h:panelGroup>
+        <p:autoComplete value="#{stockSaleableView.stockSaleable.productDetailId}" completeMethod="#{scmLookupView.productDetailAuto}"  id="stockSaleableProductDetailId" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+        <o:converter list="#{scmLookupView.productDetail(main)}" converterId="omnifaces.ListConverter"  />
+      </p:autoComplete><p:message for="stockSaleableProductDetailId" display="text" /></h:panelGroup> 	
+ Big list autocomplete 
+      <p:outputLabel value="#{lang.stockSaleableProductDetailId}" for="stockSaleableProductDetailId"/><h:panelGroup>
+        <p:autoComplete value="#{stockSaleableView.stockSaleable.productDetailId}" completeMethod="#{stockSaleableView.productDetailAuto}" converter="wawo.LookupIntConverter"   id="stockSaleableProductDetailId" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productDetailClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.productDetailById()}"/>
+      </p:autoComplete><p:message for="stockSaleableProductDetailId" display="text" /></h:panelGroup>
+ Small list combo 
+  <p:outputLabel value="#{lang.stockSaleableAccountId}" for="stockSaleableAccountId" /><h:panelGroup>
+       <p:selectOneMenu value="#{stockSaleableView.stockSaleable.accountId}"  id="stockSaleableAccountId" converter="omnifaces.SelectItemsConverter">
+        <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+        <f:selectItems value="#{scmLookupView.account(main)}" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" />
+      </p:selectOneMenu><p:message for="stockSaleableAccountId" display="text" /></h:panelGroup>	
+ Small list autocomplete 
+  <p:outputLabel value="#{lang.stockSaleableAccountId}" for="stockSaleableAccountId" /><h:panelGroup>
+        <p:autoComplete value="#{stockSaleableView.stockSaleable.accountId}" completeMethod="#{scmLookupView.accountAuto}"  id="stockSaleableAccountId" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+        <o:converter list="#{scmLookupView.account(main)}" converterId="omnifaces.ListConverter"  />
+      </p:autoComplete><p:message for="stockSaleableAccountId" display="text" /></h:panelGroup> 	
+ Big list autocomplete 
+      <p:outputLabel value="#{lang.stockSaleableAccountId}" for="stockSaleableAccountId"/><h:panelGroup>
+        <p:autoComplete value="#{stockSaleableView.stockSaleable.accountId}" completeMethod="#{stockSaleableView.accountAuto}" converter="wawo.LookupIntConverter"   id="stockSaleableAccountId" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>
+      </p:autoComplete><p:message for="stockSaleableAccountId" display="text" /></h:panelGroup>
+      <p:outputLabel value="#{lang.qtyIn}" for="qtyIn" />
+      <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.quantityIn}" converterMessage="#{lang.qtyIn} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="qtyIn" /><p:message for="qtyIn" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.qtyOut}" for="qtyOut" />
+      <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.quantityOut}" converterMessage="#{lang.qtyOut} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="qtyOut" /><p:message for="qtyOut" display="text"/></h:panelGroup>
+ Small list combo 
+  <p:outputLabel value="#{lang.stockSaleableStockStatusId}" for="stockSaleableStockStatusId" /><h:panelGroup>
+       <p:selectOneMenu value="#{stockSaleableView.stockSaleable.stockStatusId}"  id="stockSaleableStockStatusId" converter="omnifaces.SelectItemsConverter">
+        <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+        <f:selectItems value="#{scmLookupView.stockStatus(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+      </p:selectOneMenu><p:message for="stockSaleableStockStatusId" display="text" /></h:panelGroup>	
+ Small list autocomplete 
+  <p:outputLabel value="#{lang.stockSaleableStockStatusId}" for="stockSaleableStockStatusId" /><h:panelGroup>
+        <p:autoComplete value="#{stockSaleableView.stockSaleable.stockStatusId}" completeMethod="#{scmLookupView.stockStatusAuto}"  id="stockSaleableStockStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+        <o:converter list="#{scmLookupView.stockStatus(main)}" converterId="omnifaces.ListConverter"  />
+      </p:autoComplete><p:message for="stockSaleableStockStatusId" display="text" /></h:panelGroup> 	
+ Big list autocomplete 
+      <p:outputLabel value="#{lang.stockSaleableStockStatusId}" for="stockSaleableStockStatusId"/><h:panelGroup>
+        <p:autoComplete value="#{stockSaleableView.stockSaleable.stockStatusId}" completeMethod="#{stockSaleableView.stockStatusAuto}" converter="wawo.LookupIntConverter"   id="stockSaleableStockStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.stockStatusClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.stockStatusById()}"/>
+      </p:autoComplete><p:message for="stockSaleableStockStatusId" display="text" /></h:panelGroup>
+      <p:outputLabel value="#{lang.stockReferenceId}" for="stockReferenceId" />
+      <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.stockReferenceId}" converterMessage="#{lang.stockReferenceId} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="stockReferenceId" /><p:message for="stockReferenceId" display="text"/></h:panelGroup>            
+      <p:outputLabel value="#{lang.stockReferenceCode}" for="stockReferenceCode" />
+      <h:panelGroup><p:inputText value="#{stockSaleableView.stockSaleable.stockReferenceCode}" maxlength="50" id="stockReferenceCode" /><p:message for="stockReferenceCode" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.stockSaleableId}" for="stockSaleableId" />
+      <h:panelGroup><p:inputNumber value="#{stockSaleableView.stockSaleable.stockSaleableId}" converterMessage="#{lang.stockSaleableId} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="stockSaleableId" /><p:message for="stockSaleableId" display="text"/></h:panelGroup>            
+      <p:outputLabel value="#{lang.transferCode}" for="transferCode" />
+      <h:panelGroup><p:inputText value="#{stockSaleableView.stockSaleable.transferCode}" maxlength="50" id="transferCode" /><p:message for="transferCode" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.blockedAt}" for="blockedAt" />
+      <h:panelGroup><p:calendar value="#{stockSaleableView.stockSaleable.blockedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.blockedAt} #{lang.invalidDate}" maxlength="29" id="blockedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="blockedAt" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.releasedAt}" for="releasedAt" />
+      <h:panelGroup><p:calendar value="#{stockSaleableView.stockSaleable.releasedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.releasedAt} #{lang.invalidDate}" maxlength="29" id="releasedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="releasedAt" display="text"/></h:panelGroup>
+  </ui:define>
+
+  <ui:define name="list">
+    <p:dataTable id="stockSaleableTable" var="stockSaleableVar" widgetVar="stockSaleableWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+      lazy="true" value="#{stockSaleableView.stockSaleableLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{stockSaleableVar.id}"
+      rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+      selection="#{stockSaleableView.stockSaleableSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+      <p:column selectionMode="multiple" exportable="false" />
+      <p:column headerText="#{lang.id}" sortBy="#{stockSaleableVar.id}" field="id" >
+        <p:commandLink action="#{main.setViewType(editform)}" value="#{stockSaleableVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+      <f:setPropertyActionListener target="#{stockSaleableView.stockSaleable}" value="#{stockSaleableVar}" />
+        </p:commandLink>
+      </p:column>
+      <p:column headerText="#{lang.batchNo}" sortBy="#{stockSaleableVar.productDetailId.batchNo}" field="product_detail_id.batch_no"><h:outputText value="#{appView.display(stockSaleableVar.productDetailId.batchNo)}" title="#{appView.title(stockSaleableVar.productDetailId.batchNo)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.accountCode}" sortBy="#{stockSaleableVar.accountId.accountCode}" field="account_id.account_code"><h:outputText value="#{appView.display(stockSaleableVar.accountId.accountCode)}" title="#{appView.title(stockSaleableVar.accountId.accountCode)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.qtyIn}" sortBy="#{stockSaleableVar.quantityIn}" field="qty_in" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.quantityIn)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.qtyOut}" sortBy="#{stockSaleableVar.quantityOut}" field="qty_out" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.quantityOut)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.title}" sortBy="#{stockSaleableVar.stockStatusId.title}" field="stock_status_id.title"><h:outputText value="#{appView.display(stockSaleableVar.stockStatusId.title)}" title="#{appView.title(stockSaleableVar.stockStatusId.title)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.stockReferenceId}" sortBy="#{stockSaleableVar.stockReferenceId}" field="stock_reference_id" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.stockReferenceId)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.stockReferenceCode}" sortBy="#{stockSaleableVar.stockReferenceCode}" field="stock_reference_code"><h:outputText value="#{appView.display(stockSaleableVar.stockReferenceCode)}" title="#{appView.title(stockSaleableVar.stockReferenceCode)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.stockSaleableId}" sortBy="#{stockSaleableVar.stockSaleableId}" field="stock_saleable_id" style="text-align: right"><h:outputText value="#{appView.number(stockSaleableVar.stockSaleableId)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.transferCode}" sortBy="#{stockSaleableVar.transferCode}" field="transfer_code"><h:outputText value="#{appView.display(stockSaleableVar.transferCode)}" title="#{appView.title(stockSaleableVar.transferCode)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.blockedAt}" sortBy="#{stockSaleableVar.blockedAt}" field="blocked_at" ><h:outputText value="#{appView.dateTime(stockSaleableVar.blockedAt)}" escape="false" /></p:column>
+      <p:column headerText="#{lang.releasedAt}" sortBy="#{stockSaleableVar.releasedAt}" field="released_at" ><h:outputText value="#{appView.dateTime(stockSaleableVar.releasedAt)}" escape="false" /></p:column>
+    </p:dataTable> 	
+  </ui:define>   
+</ui:decorate>
 </ui:composition>-->

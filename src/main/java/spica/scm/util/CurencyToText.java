@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  * 
  */
-
 package spica.scm.util;
 
 /**

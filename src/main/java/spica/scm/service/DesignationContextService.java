@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
@@ -16,13 +15,13 @@ import spica.scm.domain.DesignationContext;
 
 /**
  * DesignationContextService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Jun 17 17:57:48 IST 2016 
+ * @version	1.0, Fri Jun 17 17:57:48 IST 2016
  */
+public abstract class DesignationContextService {
 
-public abstract class DesignationContextService {  
- 
- /**
+  /**
    * DesignationContext paginated query.
    *
    * @param main
@@ -34,19 +33,20 @@ public abstract class DesignationContextService {
     sql.count("select count(scm_designation_context.id) as total from scm_designation_context scm_designation_context "); //Count query
     sql.join("left outer join scm_designation scm_designation_contextdesignation_id on (scm_designation_contextdesignation_id.id = scm_designation_context.designation_id) left outer join scm_system_context scm_designation_contextsystem_context_id on (scm_designation_contextsystem_context_id.id = scm_designation_context.system_context_id)"); //Join Query
 
-    sql.string(new String[]{"scm_designation_contextdesignation_id.title","scm_designation_contextsystem_context_id.title"}); //String search or sort fields
+    sql.string(new String[]{"scm_designation_contextdesignation_id.title", "scm_designation_contextsystem_context_id.title"}); //String search or sort fields
     sql.number(new String[]{"scm_designation_context.id"}); //Numeric search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of DesignationContext.
-  * @param main
-  * @return List of DesignationContext
-  */
+
+  /**
+   * Return List of DesignationContext.
+   *
+   * @param main
+   * @return List of DesignationContext
+   */
   public static final List<DesignationContext> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getDesignationContextSqlPaged(main));
+    return AppService.listPagedJpa(main, getDesignationContextSqlPaged(main));
   }
 
 //  /**
@@ -62,32 +62,34 @@ public abstract class DesignationContextService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select DesignationContext by key.
-  * @param main
-  * @param designationContext
-  * @return DesignationContext
-  */
+  /**
+   * Select DesignationContext by key.
+   *
+   * @param main
+   * @param designationContext
+   * @return DesignationContext
+   */
   public static final DesignationContext selectByPk(Main main, DesignationContext designationContext) {
     return (DesignationContext) AppService.find(main, DesignationContext.class, designationContext.getId());
   }
 
- /**
-  * Insert DesignationContext.
-  * @param main
-  * @param designationContext
-  */
+  /**
+   * Insert DesignationContext.
+   *
+   * @param main
+   * @param designationContext
+   */
   public static final void insert(Main main, DesignationContext designationContext) {
     AppService.insert(main, designationContext);
   }
 
- /**
-  * Update DesignationContext by key.
-  * @param main
-  * @param designationContext
-  * @return DesignationContext
-  */
+  /**
+   * Update DesignationContext by key.
+   *
+   * @param main
+   * @param designationContext
+   * @return DesignationContext
+   */
   public static final DesignationContext updateByPk(Main main, DesignationContext designationContext) {
     return (DesignationContext) AppService.update(main, designationContext);
   }
@@ -101,9 +103,8 @@ public abstract class DesignationContextService {
   public static void insertOrUpdate(Main main, DesignationContext designationContext) {
     if (designationContext.getId() == null) {
       insert(main, designationContext);
-    }
-    else{
-        updateByPk(main, designationContext);
+    } else {
+      updateByPk(main, designationContext);
     }
   }
 
@@ -118,20 +119,22 @@ public abstract class DesignationContextService {
     insert(main, designationContext);
   }
 
- /**
-  * Delete DesignationContext.
-  * @param main
-  * @param designationContext
-  */
+  /**
+   * Delete DesignationContext.
+   *
+   * @param main
+   * @param designationContext
+   */
   public static final void deleteByPk(Main main, DesignationContext designationContext) {
     AppService.delete(main, DesignationContext.class, designationContext.getId());
   }
-	
- /**
-  * Delete Array of DesignationContext.
-  * @param main
-  * @param designationContext
-  */
+
+  /**
+   * Delete Array of DesignationContext.
+   *
+   * @param main
+   * @param designationContext
+   */
   public static final void deleteByPkArray(Main main, DesignationContext[] designationContext) {
     for (DesignationContext e : designationContext) {
       deleteByPk(main, e);

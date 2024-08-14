@@ -1544,7 +1544,7 @@ public class ProductView implements Serializable {
   public String actionSaveProductName(MainView main) {
     try {
       if (main.isEdit() && isProductCategoryTaxCodeModified()) {
-        Jsf.addCallbackParam("saved", 0);       
+        Jsf.addCallbackParam("saved", 0);
       } else {
         ProductService.updateProductName(main, product);
       }

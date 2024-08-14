@@ -5,38 +5,21 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypes;
-import wawo.app.faces.MainView;
-import wawo.entity.core.AppPage;
-import wawo.entity.util.StringUtil;
-
-import spica.scm.domain.ProductEntryDetail;
-import spica.scm.service.ProductEntryDetailService;
-import spica.scm.domain.ProductEntry;
-import spica.scm.domain.ProductDetail;
-import spica.scm.domain.ProdEntDetBuybackStat;
-import spica.scm.domain.ProdEntDetRtnStatus;
 
 /**
  * ProductEntryDetailView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Sep 08 18:33:15 IST 2016 
+ * @version	1.0, Thu Sep 08 18:33:15 IST 2016
  */
-
-@Named(value="productEntryDetailView")
+@Named(value = "productEntryDetailView")
 @ViewScoped
-public class ProductEntryDetailView implements Serializable{
+public class ProductEntryDetailView implements Serializable {
 
 //  private transient ProductEntryDetail productEntryDetail;	//Domain object/selected Domain.
 //  private transient LazyDataModel<ProductEntryDetail> productEntryDetailLazyModel; 	//For lazy loading datatable.

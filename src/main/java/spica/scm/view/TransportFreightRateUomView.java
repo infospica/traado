@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -31,52 +26,56 @@ import spica.scm.domain.TransportFreightRatebase;
 
 /**
  * TransportFreightRateUomView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:15 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:15 IST 2016
  */
-
-@Named(value="transportFreightRateUomView")
+@Named(value = "transportFreightRateUomView")
 @ViewScoped
-public class TransportFreightRateUomView implements Serializable{
+public class TransportFreightRateUomView implements Serializable {
 
   private transient TransportFreightRateUom transportFreightRateUom;	//Domain object/selected Domain.
   private transient LazyDataModel<TransportFreightRateUom> transportFreightRateUomLazyModel; 	//For lazy loading datatable.
   private transient TransportFreightRateUom[] transportFreightRateUomSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public TransportFreightRateUomView() {
     super();
   }
- 
+
   /**
    * Return TransportFreightRateUom.
+   *
    * @return TransportFreightRateUom.
-   */  
+   */
   public TransportFreightRateUom getTransportFreightRateUom() {
-    if(transportFreightRateUom == null) {
+    if (transportFreightRateUom == null) {
       transportFreightRateUom = new TransportFreightRateUom();
     }
     return transportFreightRateUom;
-  }   
-  
+  }
+
   /**
    * Set TransportFreightRateUom.
+   *
    * @param transportFreightRateUom.
-   */   
+   */
   public void setTransportFreightRateUom(TransportFreightRateUom transportFreightRateUom) {
     this.transportFreightRateUom = transportFreightRateUom;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchTransportFreightRateUom(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchTransportFreightRateUom(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -88,40 +87,44 @@ public class TransportFreightRateUomView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create transportFreightRateUomLazyModel.
+   *
    * @param main
    */
   private void loadTransportFreightRateUomList(final MainView main) {
     if (transportFreightRateUomLazyModel == null) {
       transportFreightRateUomLazyModel = new LazyDataModel<TransportFreightRateUom>() {
-      private List<TransportFreightRateUom> list;      
-      @Override
-      public List<TransportFreightRateUom> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = TransportFreightRateUomService.listPaged(main);
-          main.commit(transportFreightRateUomLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<TransportFreightRateUom> list;
+
+        @Override
+        public List<TransportFreightRateUom> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = TransportFreightRateUomService.listPaged(main);
+            main.commit(transportFreightRateUomLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(TransportFreightRateUom transportFreightRateUom) {
-        return transportFreightRateUom.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(TransportFreightRateUom transportFreightRateUom) {
+          return transportFreightRateUom.getId();
+        }
+
+        @Override
         public TransportFreightRateUom getRowData(String rowKey) {
           if (list != null) {
             for (TransportFreightRateUom obj : list) {
@@ -137,11 +140,12 @@ public class TransportFreightRateUomView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_transport_freight_rate_uom/";	
+    String SUB_FOLDER = "scm_transport_freight_rate_uom/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -157,7 +161,7 @@ public class TransportFreightRateUomView implements Serializable{
    */
   public String cloneTransportFreightRateUom(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneTransportFreightRateUom(main, "clone"); 
+    return saveOrCloneTransportFreightRateUom(main, "clone");
   }
 
   /**
@@ -183,14 +187,13 @@ public class TransportFreightRateUomView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many TransportFreightRateUom.
    *
@@ -206,7 +209,7 @@ public class TransportFreightRateUomView implements Serializable{
       } else {
         TransportFreightRateUomService.deleteByPk(main, getTransportFreightRateUom());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -220,41 +223,43 @@ public class TransportFreightRateUomView implements Serializable{
 
   /**
    * Return LazyDataModel of TransportFreightRateUom.
+   *
    * @return
    */
   public LazyDataModel<TransportFreightRateUom> getTransportFreightRateUomLazyModel() {
     return transportFreightRateUomLazyModel;
   }
 
- /**
-  * Return TransportFreightRateUom[].
-  * @return 
-  */
+  /**
+   * Return TransportFreightRateUom[].
+   *
+   * @return
+   */
   public TransportFreightRateUom[] getTransportFreightRateUomSelected() {
     return transportFreightRateUomSelected;
   }
-  
+
   /**
    * Set TransportFreightRateUom[].
-   * @param transportFreightRateUomSelected 
+   *
+   * @param transportFreightRateUomSelected
    */
   public void setTransportFreightRateUomSelected(TransportFreightRateUom[] transportFreightRateUomSelected) {
     this.transportFreightRateUomSelected = transportFreightRateUomSelected;
   }
- 
 
-
- /**
-  * TransportFreightRatebase autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.transportFreightRatebaseAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.transportFreightRatebaseAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * TransportFreightRatebase autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.transportFreightRatebaseAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.transportFreightRatebaseAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<TransportFreightRatebase> transportFreightRatebaseAuto(String filter) {
     return ScmLookupView.transportFreightRatebaseAuto(filter);
   }

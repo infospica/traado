@@ -186,8 +186,8 @@
 
         </h:panelGroup>
         <h:panelGroup id="phoneVerifyDiv">  
-             
-          
+
+
           <p:commandButton value="#{lang.verifyOtp}" styleClass="btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
                            actionListener="#{salesAgentView.verifyOtp(main)}"
                            rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
@@ -196,9 +196,9 @@
           <p:commandButton value="#{lang.resendOtp}" styleClass="btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
                            actionListener="#{salesAgentView.resendOtp(main)}"
                            rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
-          
+
         </h:panelGroup>
-        
+
         <!-- Mobile Number -->
         <h:panelGroup>                 
           <p:outputLabel value="#{lang.mobile} #{lang.no} 2" for="phone2" />

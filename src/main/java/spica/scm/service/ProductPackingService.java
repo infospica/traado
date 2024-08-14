@@ -8,7 +8,6 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -123,6 +122,7 @@ public abstract class ProductPackingService {
       insertArray(main, unitSelected.toArray(new ProductUnit[unitSelected.size()]), productPacking);   //Inserting all the relation records.
     }
   }
+
   public static void insertArray(Main main, ProductUnit[] unitSelected, ProductPacking productPacking) {
     if (unitSelected != null) {
       ProductPackingUnit bg;
@@ -134,7 +134,7 @@ public abstract class ProductPackingService {
       }
     }
   }
-  
+
   /**
    * Clone and existing object
    *

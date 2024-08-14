@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * AccountingHeadService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Apr 28 12:24:49 IST 2017 
+ * @version	1.0, Fri Apr 28 12:24:49 IST 2017
  */
+public abstract class AccountingHeadService {
 
-public abstract class AccountingHeadService {  
- 
- /**
+  /**
    * AccountingHead paginated query.
    *
    * @param main
@@ -38,18 +36,19 @@ public abstract class AccountingHeadService {
     sql.orderBy("t1.sort_order,upper(t1.title)");
 
     sql.string(new String[]{"t1.title"}); //String search or sort fields
-    sql.number(new String[]{"t1.id","t1.sort_order"}); //Numeric search or sort fields
+    sql.number(new String[]{"t1.id", "t1.sort_order"}); //Numeric search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of AccountingHead.
-  * @param main
-  * @return List of AccountingHead
-  */
+
+  /**
+   * Return List of AccountingHead.
+   *
+   * @param main
+   * @return List of AccountingHead
+   */
   public static final List<AccountingHead> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getAccountingHeadSqlPaged(main));
+    return AppService.listPagedJpa(main, getAccountingHeadSqlPaged(main));
   }
 
 //  /**
@@ -65,34 +64,36 @@ public abstract class AccountingHeadService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select AccountingHead by key.
-  * @param main
-  * @param accountingHead
-  * @return AccountingHead
-  */
+  /**
+   * Select AccountingHead by key.
+   *
+   * @param main
+   * @param accountingHead
+   * @return AccountingHead
+   */
   public static final AccountingHead selectByPk(Main main, AccountingHead accountingHead) {
     return (AccountingHead) AppService.find(main, AccountingHead.class, accountingHead.getId());
   }
 
- /**
-  * Insert AccountingHead.
-  * @param main
-  * @param accountingHead
-  */
+  /**
+   * Insert AccountingHead.
+   *
+   * @param main
+   * @param accountingHead
+   */
   public static final void insert(Main main, AccountingHead accountingHead) {
     insertAble(main, accountingHead);  //Validating
     AppService.insert(main, accountingHead);
 
   }
 
- /**
-  * Update AccountingHead by key.
-  * @param main
-  * @param accountingHead
-  * @return AccountingHead
-  */
+  /**
+   * Update AccountingHead by key.
+   *
+   * @param main
+   * @param accountingHead
+   * @return AccountingHead
+   */
   public static final AccountingHead updateByPk(Main main, AccountingHead accountingHead) {
     updateAble(main, accountingHead); //Validating
     return (AccountingHead) AppService.update(main, accountingHead);
@@ -107,8 +108,7 @@ public abstract class AccountingHeadService {
   public static void insertOrUpdate(Main main, AccountingHead accountingHead) {
     if (accountingHead.getId() == null) {
       insert(main, accountingHead);
-    }
-    else{
+    } else {
       updateByPk(main, accountingHead);
     }
   }
@@ -124,28 +124,30 @@ public abstract class AccountingHeadService {
     insert(main, accountingHead);
   }
 
- /**
-  * Delete AccountingHead.
-  * @param main
-  * @param accountingHead
-  */
+  /**
+   * Delete AccountingHead.
+   *
+   * @param main
+   * @param accountingHead
+   */
   public static final void deleteByPk(Main main, AccountingHead accountingHead) {
     deleteAble(main, accountingHead); //Validation
     AppService.delete(main, AccountingHead.class, accountingHead.getId());
   }
-	
- /**
-  * Delete Array of AccountingHead.
-  * @param main
-  * @param accountingHead
-  */
+
+  /**
+   * Delete Array of AccountingHead.
+   *
+   * @param main
+   * @param accountingHead
+   */
   public static final void deleteByPkArray(Main main, AccountingHead[] accountingHead) {
     for (AccountingHead e : accountingHead) {
       deleteByPk(main, e);
     }
   }
-  
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main

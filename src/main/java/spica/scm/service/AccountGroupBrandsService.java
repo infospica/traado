@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -12,7 +12,6 @@ import spica.scm.domain.AccountGroupBrands;
 import spica.scm.domain.Vendor;
 import wawo.app.Main;
 import wawo.app.common.AppService;
-import wawo.app.faces.MainView;
 import wawo.entity.core.SqlPage;
 import wawo.entity.util.StringUtil;
 
@@ -69,7 +68,7 @@ public abstract class AccountGroupBrandsService {
    */
   public static final void insert(Main main, AccountGroupBrands accountGroupBrands) {
     AppService.insert(main, accountGroupBrands);
-    
+
   }
 
   /**
@@ -156,10 +155,10 @@ public abstract class AccountGroupBrandsService {
   public static List<Brand> selectBrandByAccountGroup(Main main, AccountGroup accountGroup) {
     return AppService.list(main, Brand.class, "select id, code from scm_brand where id in (select brand_id from scm_account_group_brands where account_group_id = ?)", new Object[]{accountGroup.getId()});
   }
-  
+
   public static void insertSecondaryAccountBrands(Main main, Vendor vendorId, AccountGroup defaultAccountGroup) {
     List<Brand> brandList = AppService.list(main, Brand.class, "select * from scm_brand where id in(select brand_id from scm_supplier_brand where vendor_id = ?)", new Object[]{vendorId.getId()});
-    
+
     if (!StringUtil.isEmpty(brandList)) {
       for (Brand brand : brandList) {
         if (!AppService.exist(main, "select 1 from scm_account_group_brands where account_group_id = ? and brand_id = ?", new Object[]{defaultAccountGroup.getId(), brand.getId()})) {

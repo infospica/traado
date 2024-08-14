@@ -333,10 +333,10 @@ public class CompanyBankContactView implements Serializable {
   public List<Status> statusAuto(String filter) {
     return ScmLookupView.statusAuto(filter);
   }
-  
+
   public List<Designation> selectDesignationByCompanyContext(MainView main) {
     try {
-       return DesignationService.selectDesignationByCompanyContext(main);
+      return DesignationService.selectDesignationByCompanyContext(main);
     } catch (Throwable t) {
       main.rollback(t, "error.select");
     } finally {

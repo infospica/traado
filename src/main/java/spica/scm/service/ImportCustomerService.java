@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -10,14 +10,12 @@ import spica.scm.domain.Company;
 import spica.scm.domain.Country;
 import spica.scm.domain.CustomerImporter;
 import spica.scm.domain.District;
-import spica.scm.domain.ImportProduct;
 import spica.scm.domain.State;
 import spica.scm.domain.Territory;
 import spica.scm.util.AppUtil;
 import spica.sys.SystemConstants;
 import wawo.app.Main;
 import wawo.app.common.AppService;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -52,7 +50,7 @@ public class ImportCustomerService {
           error += (error.isEmpty() ? "" : ", ") + "Empty District field";
           validate = false;
         }
-        if (customerImporter.getGstNo() == null || (customerImporter.getGstNo()!=null && customerImporter.getGstNo().isEmpty())) {
+        if (customerImporter.getGstNo() == null || (customerImporter.getGstNo() != null && customerImporter.getGstNo().isEmpty())) {
 //          error += (error.isEmpty() ? "" : ", ") + "Empty Gst No";
 //          validate = false;
         } else {

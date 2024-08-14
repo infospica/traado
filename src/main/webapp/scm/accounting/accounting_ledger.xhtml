@@ -308,13 +308,13 @@
           <ui:param name="ids" value="opbEntry"/>
           <ui:define name="menuleft"> 
             <p:spacer width="4" /> <p:commandButton style="float: right;" value="#{lang.confirm}" process="openBalanceDlg" 
-                             rendered="#{accountingLedgerView.hasOpeningBalance()}"
-                             actionListener="#{accountingLedgerView.saveOpeningBalance}" update="openingBalanceTxtDiv"
-                             styleClass="btn btn-info"  /></ui:define>
+                                                    rendered="#{accountingLedgerView.hasOpeningBalance()}"
+                                                    actionListener="#{accountingLedgerView.saveOpeningBalance}" update="openingBalanceTxtDiv"
+                                                    styleClass="btn btn-info"  /></ui:define>
 
           <p:dataTable id="accountList" var="tradeOutstandingVar" value="#{accountingLedgerView.tradeOutstandingList}" rowKey="#{tradeOutstandingVar.id}" 
                        tableStyleClass="mDataTable editLinks">              
-              <p:column headerText="#{lang.supplier}" style="text-align: right">
+            <p:column headerText="#{lang.supplier}" style="text-align: right">
               <h:outputText value="#{tradeOutstandingVar.accountId.vendorId.vendorName}" />
             </p:column>
             <p:column headerText="#{lang.opening}" styleClass="w-140" style="text-align: right">

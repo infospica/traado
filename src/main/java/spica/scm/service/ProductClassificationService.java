@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
@@ -15,17 +14,16 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.ProductClassification;
 import spica.scm.validate.ProductClassificationIs;
-import spica.sys.UserRuntimeView;
 
 /**
  * ProductClassificationService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:21 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:21 IST 2016
  */
+public abstract class ProductClassificationService {
 
-public abstract class ProductClassificationService {  
- 
- /**
+  /**
    * ProductClassification paginated query.
    *
    * @param main
@@ -36,22 +34,23 @@ public abstract class ProductClassificationService {
     sql.main("select scm_product_classification.id,scm_product_classification.title,scm_product_classification.sort_order,scm_product_classification.created_by,scm_product_classification.modified_by,scm_product_classification.created_at,scm_product_classification.modified_at,scm_product_classification.status_id from scm_product_classification scm_product_classification "); //Main query
     sql.count("select count(scm_product_classification.id) as total from scm_product_classification scm_product_classification "); //Count query
 
-    sql.string(new String[]{"scm_product_classification.title","scm_product_classification.created_by","scm_product_classification.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_product_classification.id","scm_product_classification.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_product_classification.created_at","scm_product_classification.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_product_classification.title", "scm_product_classification.created_by", "scm_product_classification.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_product_classification.id", "scm_product_classification.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_product_classification.created_at", "scm_product_classification.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of ProductClassification.
-  * @param main
-  * @return List of ProductClassification
-  */
-  public static final List<ProductClassification> listPaged(Main main,Company company) {
+
+  /**
+   * Return List of ProductClassification.
+   *
+   * @param main
+   * @return List of ProductClassification
+   */
+  public static final List<ProductClassification> listPaged(Main main, Company company) {
     SqlPage sql = getProductClassificationSqlPaged(main);
     sql.cond(" where company_id=? ");
     sql.param(company.getId());
-     return AppService.listPagedJpa(main, sql);
+    return AppService.listPagedJpa(main, sql);
   }
 
 //  /**
@@ -67,34 +66,36 @@ public abstract class ProductClassificationService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select ProductClassification by key.
-  * @param main
-  * @param productClassification
-  * @return ProductClassification
-  */
+  /**
+   * Select ProductClassification by key.
+   *
+   * @param main
+   * @param productClassification
+   * @return ProductClassification
+   */
   public static final ProductClassification selectByPk(Main main, ProductClassification productClassification) {
     return (ProductClassification) AppService.find(main, ProductClassification.class, productClassification.getId());
   }
 
- /**
-  * Insert ProductClassification.
-  * @param main
-  * @param productClassification
-  */
+  /**
+   * Insert ProductClassification.
+   *
+   * @param main
+   * @param productClassification
+   */
   public static final void insert(Main main, ProductClassification productClassification) {
     ProductClassificationIs.insertAble(main, productClassification);  //Validating
     AppService.insert(main, productClassification);
 
   }
 
- /**
-  * Update ProductClassification by key.
-  * @param main
-  * @param productClassification
-  * @return ProductClassification
-  */
+  /**
+   * Update ProductClassification by key.
+   *
+   * @param main
+   * @param productClassification
+   * @return ProductClassification
+   */
   public static final ProductClassification updateByPk(Main main, ProductClassification productClassification) {
     ProductClassificationIs.updateAble(main, productClassification); //Validating
     return (ProductClassification) AppService.update(main, productClassification);
@@ -109,8 +110,7 @@ public abstract class ProductClassificationService {
   public static void insertOrUpdate(Main main, ProductClassification productClassification) {
     if (productClassification.getId() == null) {
       insert(main, productClassification);
-    }
-    else{
+    } else {
       updateByPk(main, productClassification);
     }
   }
@@ -126,21 +126,23 @@ public abstract class ProductClassificationService {
     insert(main, productClassification);
   }
 
- /**
-  * Delete ProductClassification.
-  * @param main
-  * @param productClassification
-  */
+  /**
+   * Delete ProductClassification.
+   *
+   * @param main
+   * @param productClassification
+   */
   public static final void deleteByPk(Main main, ProductClassification productClassification) {
     ProductClassificationIs.deleteAble(main, productClassification); //Validation
     AppService.delete(main, ProductClassification.class, productClassification.getId());
   }
-	
- /**
-  * Delete Array of ProductClassification.
-  * @param main
-  * @param productClassification
-  */
+
+  /**
+   * Delete Array of ProductClassification.
+   *
+   * @param main
+   * @param productClassification
+   */
   public static final void deleteByPkArray(Main main, ProductClassification[] productClassification) {
     for (ProductClassification e : productClassification) {
       deleteByPk(main, e);

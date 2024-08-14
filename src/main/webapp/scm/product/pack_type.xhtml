@@ -61,7 +61,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{packTypeVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{packTypeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{packTypeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{packTypeView.packType}" value="#{packTypeVar}" />
           </p:commandLink>
         </p:column>
@@ -75,7 +75,7 @@
         </p:column>-->
 
         <p:column exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(packTypeVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(packTypeVar.createdAt)}</ui:define>

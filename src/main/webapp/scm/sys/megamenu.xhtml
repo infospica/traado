@@ -14,7 +14,7 @@ and open the template in the editor.
   <h:form id="frmMega" prependId="false">
 
     <p:overlayPanel  widgetVar="overLayMenu" id="imagePanel" hideEffect="fade"  style="width:#{!userRuntimeView.appUser.userProfileId.preferedMenu?'1200px':'450px'};
-                       " styleClass="megaMenu" onHide="rc()" >
+                     " styleClass="megaMenu" onHide="rc()" >
       <p:remoteCommand name="rc" update="searchMenu fluidDivMenuId" action="#{userRuntimeView.clearSerach}" />
       <h:panelGroup  rendered="#{!userRuntimeView.appUser.userProfileId.preferedMenu}">
 <!--        <h:panelGroup rendered="#{!main.appUser.root}">-->

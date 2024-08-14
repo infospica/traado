@@ -9,9 +9,7 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.AccountGroup;
-import spica.scm.domain.AccountGroupPriceList;
 import spica.scm.domain.Customer;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;

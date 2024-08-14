@@ -53,7 +53,7 @@
       <!--Description-->
       <p:outputLabel value="#{lang.description}" for="description" />
       <h:panelGroup><p:inputText value="#{customerLicenseView.customerLicense.description}" maxlength="200" 
-                                  id="description" style="position: relative" styleClass="fw"/>
+                                 id="description" style="position: relative" styleClass="fw"/>
         <p:message for="description" display="text"/>
       </h:panelGroup>  
 
@@ -105,7 +105,7 @@
       <!--status-->
       <p:outputLabel value="#{lang.status}" for="companyBankStatusId"/>
       <h:panelGroup>
-          <p:selectOneMenu value="#{customerLicenseView.customerLicense.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+        <p:selectOneMenu value="#{customerLicenseView.customerLicense.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
                          id="companyBankStatusId">
           <f:selectItems value="#{customerLicenseView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
         </p:selectOneMenu>

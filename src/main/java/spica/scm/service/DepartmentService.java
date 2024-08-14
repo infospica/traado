@@ -8,7 +8,6 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -16,7 +15,6 @@ import spica.scm.domain.Department;
 import spica.scm.domain.Designation;
 import spica.scm.validate.ValidateUtil;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -153,9 +151,9 @@ public abstract class DepartmentService {
     }
   }
 
-  public static final List<Department> selectCompanyDepartment(MainView main,int k) {
-    if(k==2){
-      return AppService.list(main, Department.class, "select id,title from scm_department where system_context_id=? and  id = ?", new Object[]{1,13});
+  public static final List<Department> selectCompanyDepartment(MainView main, int k) {
+    if (k == 2) {
+      return AppService.list(main, Department.class, "select id,title from scm_department where system_context_id=? and  id = ?", new Object[]{1, 13});
     }
     return AppService.list(main, Department.class, "select id,title from scm_department where system_context_id=?", new Object[]{1});
   }
@@ -167,9 +165,11 @@ public abstract class DepartmentService {
   public static final List<Department> selectCustomerDepartment(MainView main) {
     return AppService.list(main, Department.class, "select id,title from scm_department where system_context_id=?", new Object[]{3});
   }
+
   public static final List<Department> selectTransporterDepartment(MainView main) {
     return AppService.list(main, Department.class, "select id,title from scm_department where system_context_id=?", new Object[]{4});
   }
+
   /**
    * Validate delete.
    *

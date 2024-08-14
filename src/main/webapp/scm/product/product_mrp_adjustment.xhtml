@@ -133,13 +133,16 @@
     <ui:define name="afterForm" >
       <h:panelGroup layout="block" rendered="#{main.isForm()}"  id="p21">
         <style>
-          .vtop{vertical-align: top;}
+          .vtop{
+            vertical-align: top;
+          }
           .old{
             background-color: #fca752 !important;
             background-image: none !important;
-            color: #000000 !important;}
-          </style>
-          <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" >
+            color: #000000 !important;
+          }
+        </style>
+        <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" >
           <p:dataTable id="dt1" var="productMrpAdjustmentItemVar" widgetVar="productMrpAdjustmentItemWidget" rowIndexVar="rowIndex" reflow="true"
                        tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable"
                        value="#{productMrpAdjustmentView.productMrpAdjustmentItemList}" >
@@ -153,7 +156,7 @@
               <f:facet name="header"><h:outputText id="lbl34" value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
               <h:outputText id="txt15" value="#{productMrpAdjustmentItemVar.invoiceNo}" />
             </p:column>            
-            
+
             <!-- Saleable Qty -->
             <p:column>
               <f:facet name="header"><h:outputText value="#{lang.saleableQty}" title="#{lang.saleableQuantity}"/></f:facet>

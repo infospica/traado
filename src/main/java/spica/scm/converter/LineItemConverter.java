@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.converter;
 
@@ -56,80 +56,80 @@ public class LineItemConverter implements Converter {
   private Object convertionHelper(String value, Class entityType, Object object) {
     MainView main = Jsf.getMain();
     try {
-         if (entityType.equals(Vendor.class)) {
-      Vendor vendor = ImportUtil.getVendorbyId(main, value);
-      if (vendor.getVendorName() == null && object != null) {
-        vendor = (Vendor) object;
+      if (entityType.equals(Vendor.class)) {
+        Vendor vendor = ImportUtil.getVendorbyId(main, value);
+        if (vendor.getVendorName() == null && object != null) {
+          vendor = (Vendor) object;
+        }
+        return vendor;
       }
-      return vendor;
-    }
-    if (entityType.equals(ServiceCommodity.class)) {
-      ServiceCommodity commodity = ImportUtil.getCommoditybyId(main, value);
-      if (commodity.getTitle() == null && object != null) {
-        commodity = (ServiceCommodity) object;
+      if (entityType.equals(ServiceCommodity.class)) {
+        ServiceCommodity commodity = ImportUtil.getCommoditybyId(main, value);
+        if (commodity.getTitle() == null && object != null) {
+          commodity = (ServiceCommodity) object;
+        }
+        return commodity;
+      } else if (entityType.equals(Brand.class)) {
+        Brand brand = ImportUtil.getBrandbyId(main, value);
+        if (brand.getCode() == null && object != null) {
+          brand = (Brand) object;
+        }
+        return brand;
+      } else if (entityType.equals(ProductCategory.class)) {
+        ProductCategory productCategory = ImportUtil.getProductCategorybyId(main, value);
+        if (productCategory.getTitle() == null && object != null) {
+          productCategory = (ProductCategory) object;
+        }
+        return productCategory;
+      } else if (entityType.equals(ProductClassification.class)) {
+        ProductClassification classification = ImportUtil.getProductClassificationbyId(main, value);
+        if (classification.getTitle() == null && object != null) {
+          classification = (ProductClassification) object;
+        }
+        return classification;
+      } else if (entityType.equals(ProductUnit.class)) {
+        ProductUnit productUnit = ImportUtil.getProductUnitbyId(main, value);
+        if (productUnit.getTitle() == null && object != null) {
+          productUnit = (ProductUnit) object;
+        }
+        return productUnit;
+      } else if (entityType.equals(ProductPackingDetail.class)) {
+        ProductPackingDetail packingDetail = ImportUtil.getProductPackingDetailbyId(main, value);
+        if (packingDetail.getTitle() == null && object != null) {
+          packingDetail = (ProductPackingDetail) object;
+        }
+        return packingDetail;
+      } else if (entityType.equals(ProductType.class)) {
+        ProductType productType = ImportUtil.getProductTypebyId(main, value);
+        if (productType.getTitle() == null && object != null) {
+          productType = (ProductType) object;
+        }
+        return productType;
+      } else if (entityType.equals(Manufacture.class)) {
+        Manufacture manufacture = ImportUtil.getmanufacturebyId(main, value);
+        if (manufacture.getCode() == null && object != null) {
+          manufacture = (Manufacture) object;
+        }
+        return manufacture;
+      } else if (entityType.equals(Product.class)) {
+        Product product = ImportUtil.getProductbyId(main, value);
+        if (product.getProductName() == null && object != null) {
+          product = (Product) object;
+        }
+        return product;
+      } else if (entityType.equals(ProductBatch.class)) {
+        ProductBatch batch = ImportUtil.getProductBatchbyId(main, value);
+        if (batch.getBatchNo() == null && object != null) {
+          batch.setBatchNo(object.toString());
+        }
+        return batch;
       }
-      return commodity;
-    } else if (entityType.equals(Brand.class)) {
-      Brand brand = ImportUtil.getBrandbyId(main, value);
-      if (brand.getCode() == null && object != null) {
-        brand = (Brand) object;
-      }
-      return brand;
-    } else if (entityType.equals(ProductCategory.class)) {
-      ProductCategory productCategory = ImportUtil.getProductCategorybyId(main, value);
-      if (productCategory.getTitle() == null && object != null) {
-        productCategory = (ProductCategory) object;
-      }
-      return productCategory;
-    } else if (entityType.equals(ProductClassification.class)) {
-      ProductClassification classification = ImportUtil.getProductClassificationbyId(main, value);
-      if (classification.getTitle() == null && object != null) {
-        classification = (ProductClassification) object;
-      }
-      return classification;
-    } else if (entityType.equals(ProductUnit.class)) {
-      ProductUnit productUnit = ImportUtil.getProductUnitbyId(main, value);
-      if (productUnit.getTitle() == null && object != null) {
-        productUnit = (ProductUnit) object;
-      }
-      return productUnit;
-    } else if (entityType.equals(ProductPackingDetail.class)) {
-      ProductPackingDetail packingDetail = ImportUtil.getProductPackingDetailbyId(main, value);
-      if (packingDetail.getTitle() == null && object != null) {
-        packingDetail = (ProductPackingDetail) object;
-      }
-      return packingDetail;
-    } else if (entityType.equals(ProductType.class)) {
-      ProductType productType = ImportUtil.getProductTypebyId(main, value);
-      if (productType.getTitle() == null && object != null) {
-        productType = (ProductType) object;
-      }
-      return productType;
-    } else if (entityType.equals(Manufacture.class)) {
-      Manufacture manufacture = ImportUtil.getmanufacturebyId(main, value);
-      if (manufacture.getCode() == null && object != null) {
-        manufacture = (Manufacture) object;
-      }
-      return manufacture;
-    } else if (entityType.equals(Product.class)) {
-      Product product = ImportUtil.getProductbyId(main, value);
-      if (product.getProductName() == null && object != null) {
-        product = (Product) object;
-      }
-      return product;
-    } else if (entityType.equals(ProductBatch.class)) {
-      ProductBatch batch = ImportUtil.getProductBatchbyId(main, value);
-      if (batch.getBatchNo() == null && object != null) {
-        batch.setBatchNo(object.toString());
-      }
-      return batch;
-    }
     } catch (Throwable t) {
       main.rollback(t, "error.select");
     } finally {
       main.close();
     }
- 
+
     return null;
   }
 }

@@ -121,7 +121,7 @@
     </ui:define>
 
     <ui:define name="list">
-     
+
       <p:dataTable id="salesAgentCommisionTable" var="salesAgentCommisionVar" widgetVar="salesAgentCommisionWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                    lazy="true" value="#{salesAgentCommisionView.salesAgentCommisionLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesAgentCommisionVar.id}"
                    rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
@@ -176,16 +176,16 @@
             <p:ajax event="blur" listener="#{salesAgentCommisionView.calculatePayablePercent(salesAgentCommisionVar)}" update="payablePercent" />
           </h:inputText>
         </p:column>          
-<!--        <p:columnGroup type="footer" id="total">
-          <p:row >
-            <p:column  style="text-align:right;font-weight: bold;" styleClass="text-right" footerText="#{lang.total}: #{appView.decimal(salesAgentCommisionView.total)}" >
-            
-            </p:column>
-          </p:row>
-        </p:columnGroup>  -->
+        <!--        <p:columnGroup type="footer" id="total">
+                  <p:row >
+                    <p:column  style="text-align:right;font-weight: bold;" styleClass="text-right" footerText="#{lang.total}: #{appView.decimal(salesAgentCommisionView.total)}" >
+                    
+                    </p:column>
+                  </p:row>
+                </p:columnGroup>  -->
 
       </p:dataTable> 	
-      
+
     </ui:define>   
   </ui:decorate>
 </ui:composition>

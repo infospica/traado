@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.print;
 
@@ -24,7 +24,6 @@ import spica.scm.common.InvoiceGroup;
 import spica.scm.common.InvoiceItem;
 import spica.scm.domain.Company;
 import spica.scm.domain.CompanyAddress;
-import spica.scm.domain.CompanyBank;
 import spica.scm.domain.CompanyLicense;
 import spica.scm.domain.CompanySettings;
 import spica.scm.domain.ConsignmentDetail;
@@ -149,7 +148,7 @@ public class PrintSample extends PdfUtil {
       tableMap.put(30f, pageHeader.setCustomerAddress(customer, customerAddress, true));
       tableMap.put(24f, pageHeader.setCustomerGST(customer, customerLicenseList, SystemConstants.PRINT_MULTIPLE_LINE));
       tableMap.put(26f, pageHeader.setShipingAddress(getSalesInvoice().getShippingAddressId()));
-      tableMap.put(20f, pageHeader.setCarrierDetails(consignmentDetail, SystemConstants.PRINT_MULTIPLE_LINE,false,null,null,null));
+      tableMap.put(20f, pageHeader.setCarrierDetails(consignmentDetail, SystemConstants.PRINT_MULTIPLE_LINE, false, null, null, null));
       setIterator(false);
     }
     return tableMap;

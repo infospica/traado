@@ -1,5 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
-  <style>.vtop{vertical-align: top;}</style>
+  <style>.vtop{
+      vertical-align: top;
+    }</style>
 
   <p:panelGrid columns="2" columnClasses="vtop #{sysRuntimeView.getGrid2()} vtop" id="pandlGrid" styleClass="noBorder">
 
@@ -21,7 +23,7 @@
       <p:column headerText="#{lang.particulars}">
         <h:outputText value="#{row.title}" title="#{row.title}" escape="false" rendered="#{row.ledgerId eq null}" />
         <p:commandLink value="#{row.title}" title="#{row.title}" actionListener="#{popUpView.showLedgerBalance(row.ledgerId)}" rendered="#{row.ledgerId ne null}" onclick="block();" oncomplete="unblock()" process="@this" immediate="true"/>
-          
+
       </p:column>
       <p:column headerText="#{lang.amount}" style="text-align: right"><h:outputText value="#{row.trtype eq 'dr'?appView.decimal(tradingaccountView.salesTotal):appView.decimal(row.totalAmount)}" escape="false" rendered="#{row.trtype eq 'dr' or row.trtype eq 'exp'}" /></p:column>
     </p:dataTable>  

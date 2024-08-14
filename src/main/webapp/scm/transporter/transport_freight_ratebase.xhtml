@@ -48,13 +48,13 @@
                    selection="#{transportFreightRatebaseView.transportFreightRatebaseSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false">
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{transportFreightRatebaseVar.title}" field="title" >
-           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{transportFreightRatebaseVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{transportFreightRatebaseVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{transportFreightRatebaseView.transportFreightRatebase}" value="#{transportFreightRatebaseVar}" />
           </p:commandLink>
         </p:column>
         <p:column exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(transportFreightRatebaseVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(transportFreightRatebaseVar.createdAt)}</ui:define>

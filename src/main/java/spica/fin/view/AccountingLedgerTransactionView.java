@@ -85,7 +85,7 @@ public class AccountingLedgerTransactionView implements Serializable {
   @PostConstruct
   public void init() {
     accountingLedger = (AccountingLedger) Jsf.popupParentValue(AccountingLedger.class);
-       if (accountingLedger != null) {
+    if (accountingLedger != null) {
       try (MainView main = Jsf.getMain()) {
         accountingLedger = AccountingLedgerService.selectByPk(main, accountingLedger);
       }
@@ -119,11 +119,10 @@ public class AccountingLedgerTransactionView implements Serializable {
         }
         closingBalanceCredit = (creditTotal == null ? 0 : creditTotal);// + (accountingLedger.getBalanceCredit() == null ? 0 : accountingLedger.getBalanceCredit());
         closingBalanceDebit = (debitTotal == null ? 0 : debitTotal);// + (accountingLedger.getBalanceDebit() == null ? 0 : accountingLedger.getBalanceDebit());
-        
 
         if (accountingLedger.isBankAc()) {
-         debit = selectSumOfDebitCreditReconcilation(main, accountingLedger.getCompanyId().getId(), accountingMainView, accountingLedger.getId(), AccountingConstant.IS_DEBIT);
-        credit = selectSumOfDebitCreditReconcilation(main, accountingLedger.getCompanyId().getId(), accountingMainView, accountingLedger.getId(), AccountingConstant.IS_CREDIT);
+          debit = selectSumOfDebitCreditReconcilation(main, accountingLedger.getCompanyId().getId(), accountingMainView, accountingLedger.getId(), AccountingConstant.IS_DEBIT);
+          credit = selectSumOfDebitCreditReconcilation(main, accountingLedger.getCompanyId().getId(), accountingMainView, accountingLedger.getId(), AccountingConstant.IS_CREDIT);
           if (closingBalanceCredit > 0) {
             processedAmountCredit = (closingBalanceCredit - debit);
           }

@@ -11,7 +11,7 @@
     <ui:define name="more" ></ui:define>
     <ui:define name="reset"></ui:define>
 
-     <ui:define name="navRight" >      
+    <ui:define name="navRight" >      
       <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{consignmentReceiptView.consignmentReceiptPopupClose}"  
                        oncomplete="parent.receiptPopupReturned(); closePopup()"
                        icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      

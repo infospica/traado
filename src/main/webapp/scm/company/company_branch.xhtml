@@ -98,7 +98,7 @@
       <p:outputLabel value="#{lang.pincode}" for="pin" />
       <h:panelGroup>
         <p:inputNumber styleClass="fw" value="#{companyBranchView.companyBranch.pin}" maxlength="6" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="0"  thousandSeparator="" validatorMessage="#{lang.pincode} #{lang.requiredLength} is 6 " id="pin">
-         <f:validateLength minimum="6"/>
+          <f:validateLength minimum="6"/>
         </p:inputNumber>
         <p:message for="pin" display="text"/>
       </h:panelGroup>
@@ -107,7 +107,7 @@
       <p:outputLabel value="#{lang.phone1}" for="phone1" />
       <h:panelGroup>
         <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.phone1}" maxlength="13" id="phone1" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}"
-                       validator="wawo.WhiteSpaceValidator">
+                     validator="wawo.WhiteSpaceValidator">
           <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
         </p:inputText>
         <p:message for="phone1" display="text"/>
@@ -160,7 +160,7 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{companyBranchView.companyBranch.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator=""/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator=""/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 

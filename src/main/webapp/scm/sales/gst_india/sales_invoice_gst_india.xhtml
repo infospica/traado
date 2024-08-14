@@ -10,9 +10,9 @@
   #{salesInvoiceGstIndiaView.switchSalesInvoice(main, viewType)}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
-    .card, .dispBoard, .cards > li, .cards > article {      
+    .card, .dispBoard, .cards > li, .cards > article {
       padding: 0px;
     }
     .card .header, .dispBoard .header, .cards > li .header, .cards > article .header {
@@ -21,8 +21,13 @@
     .ui-treetable .mDataTable thead td:first-of-type, .ui-treetable .mDataTable thead th:first-of-type, .ui-treetable .mDataTable tbody td:first-of-type, .ui-treetable .mDataTable tbody th:first-of-type, .ui-treetable .mDataTable tfoot td:first-of-type, .ui-treetable .mDataTable tfoot th:first-of-type, .ui-datatable .mDataTable thead td:first-of-type, .ui-datatable .mDataTable thead th:first-of-type, .ui-datatable .mDataTable tbody td:first-of-type, .ui-datatable .mDataTable tbody th:first-of-type, .ui-datatable .mDataTable tfoot td:first-of-type, .ui-datatable .mDataTable tfoot th:first-of-type {
       padding-left: 0px;
     }
-    .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
-    .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+    .mDataTable td, .themeTable td, .dataTable td{
+      border-top:none;
+      border-bottom: none;
+    }
+    .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{
+      border: none;
+    }
     .ui-treetable .mDataTable thead td:last-of-type, .ui-treetable .mDataTable thead th:last-of-type, .ui-treetable .mDataTable tbody td:last-of-type, .ui-treetable .mDataTable tbody th:last-of-type, .ui-treetable .mDataTable tfoot td:last-of-type, .ui-treetable .mDataTable tfoot th:last-of-type, .ui-datatable .mDataTable thead td:last-of-type, .ui-datatable .mDataTable thead th:last-of-type, .ui-datatable .mDataTable tbody td:last-of-type, .ui-datatable .mDataTable tbody th:last-of-type, .ui-datatable .mDataTable tfoot td:last-of-type, .ui-datatable .mDataTable tfoot th:last-of-type {
       padding-right: 0px;
     }
@@ -65,12 +70,12 @@
     </ui:define>
     <ui:define name="menu1" >
 
-      <p:menuitem value="Notify #{lang.customer}" onclick="rcMenuItem([{name:'customer',value:true}])"  icon="fa fa-bell" iconPos="left"                   
+      <p:menuitem value="Notify #{lang.customer}" onclick="rcMenuItem([{name: 'customer', value: true}])"  icon="fa fa-bell" iconPos="left"                   
                   rendered="#{salesInvoiceGstIndiaView.isMenuItemRendered(true)}" process="@this" >
         <f:param name="customer" value="true" />
       </p:menuitem>
 
-      <p:menuitem value="Notify #{lang.salesAgent}" onclick="rcMenuItem([{name:'customer',value:false}])"  icon="fa fa-bell" iconPos="left"                  
+      <p:menuitem value="Notify #{lang.salesAgent}" onclick="rcMenuItem([{name: 'customer', value: false}])"  icon="fa fa-bell" iconPos="left"                  
                   rendered="#{salesInvoiceGstIndiaView.isMenuItemRendered(false)}" process="@this" />
     </ui:define>
     <ui:define name="formRight" >      
@@ -129,11 +134,11 @@
                        rendered="#{(main.isNew() or salesInvoiceGstIndiaView.draft) and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}">        
       </p:commandButton>
 
-<!--       Pro-forma 
-      <p:commandButton value="#{lang.proFormaInvoice}" process="@this" type="button"  
-                       rendered="#{main.edit and salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}"
-                       styleClass="btn btn-primary" onclick="PF('confirmPerformaDlgVar').show();">
-      </p:commandButton>-->
+      <!--       Pro-forma 
+            <p:commandButton value="#{lang.proFormaInvoice}" process="@this" type="button"  
+                             rendered="#{main.edit and salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}"
+                             styleClass="btn btn-primary" onclick="PF('confirmPerformaDlgVar').show();">
+            </p:commandButton>-->
 
       <!-- Cancel Pro-forma -->
       <p:commandButton value="#{lang.cancelProforma}" process="f1" update="f1" 
@@ -256,7 +261,8 @@
     <ui:define name="afterForm">
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <style>
-        .notProcess{}
+        .notProcess{
+        }
       </style>
       <h:panelGroup id="salesAccountDetailDiv" layout="block" rendered="#{main.isForm()}" pt:data-watermark="#{salesInvoiceGstIndiaView.confirmed ? 'block' : 'true'}">
 
@@ -853,7 +859,7 @@
         .bg-danger {
           color: #fff;
           background: #ef565a !important;
-        }        
+        }
       </style>
 
       <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and main.edit}">
@@ -1609,35 +1615,35 @@
 
           <br />
           <p:fragment id="notificationRcvrDtls">
-          <h:panelGroup id="salesAgentPanelGroup" rendered="#{!salesInvoiceGstIndiaView.customer}" >
-            <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" > 
-              <i class="fa fa-envelope-o"></i>
-            </p:outputLabel>
-            <h:outputText value="&#160; #{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId.email}" 
-                          rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
-            <h:outputText value=" , " rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
-            <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" >
-              <i class="fa fa-phone"></i>
-            </p:outputLabel>
-            <h:outputText value="&#160; #{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId.phone1}" 
-                          rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
-          </h:panelGroup>
-          <h:panelGroup id="customerPanelGroup" rendered="#{salesInvoiceGstIndiaView.customer}" >  
-            <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" > 
-              <i class="fa fa-envelope-o"></i>
-            </p:outputLabel>
-            <h:outputText value="&#160;#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId.email}" 
-                           rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
-            <h:outputText value=" , " rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
-             <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL }" >
-              <i class="fa fa-phone"></i>
-            </p:outputLabel>
-            <h:outputText value="&#160;#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId.phone1}" 
-                          rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL }" />
-          </h:panelGroup>
-            </p:fragment>
+            <h:panelGroup id="salesAgentPanelGroup" rendered="#{!salesInvoiceGstIndiaView.customer}" >
+              <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" > 
+                <i class="fa fa-envelope-o"></i>
+              </p:outputLabel>
+              <h:outputText value="&#160; #{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId.email}" 
+                            rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+              <h:outputText value=" , " rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+              <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" >
+                <i class="fa fa-phone"></i>
+              </p:outputLabel>
+              <h:outputText value="&#160; #{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId.phone1}" 
+                            rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+            </h:panelGroup>
+            <h:panelGroup id="customerPanelGroup" rendered="#{salesInvoiceGstIndiaView.customer}" >  
+              <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" > 
+                <i class="fa fa-envelope-o"></i>
+              </p:outputLabel>
+              <h:outputText value="&#160;#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId.email}" 
+                            rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+              <h:outputText value=" , " rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+              <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL }" >
+                <i class="fa fa-phone"></i>
+              </p:outputLabel>
+              <h:outputText value="&#160;#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId.phone1}" 
+                            rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL }" />
+            </h:panelGroup>
+          </p:fragment>
         </h:panelGroup>
-        
+
         <h:panelGroup layout="block" id="buttonGroupDiv" style="text-align: right;" >
           <p:commandButton value="#{lang.cancel}" onclick="PF('messageServiceWidget').hide();" styleClass="btn-warning" />
           <p:commandButton value="#{lang.send}" disabled="#{salesInvoiceGstIndiaView.chooseAnOption eq null}" immediate="true"
@@ -1645,11 +1651,15 @@
                            oncomplete="PF('messageServiceWidget').hide();" />
         </h:panelGroup>
       </p:dialog>
-        <p:remoteCommand name="rcMenuItem" actionListener="#{salesInvoiceGstIndiaView.setRcCustomer}" immediate="true"
-                      oncomplete="PF('messageServiceWidget').show();" update="messageServiceWidgetId notificationRcvrDtls" async="true"  />
+      <p:remoteCommand name="rcMenuItem" actionListener="#{salesInvoiceGstIndiaView.setRcCustomer}" immediate="true"
+                       oncomplete="PF('messageServiceWidget').show();" update="messageServiceWidgetId notificationRcvrDtls" async="true"  />
       <style>
-        .vtop{vertical-align: top;}
-        .col_bottom_color{border-bottom-color: red !important;}
+        .vtop{
+          vertical-align: top;
+        }
+        .col_bottom_color{
+          border-bottom-color: red !important;
+        }
       </style>
 
       <script>

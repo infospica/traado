@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -48,27 +48,27 @@ public abstract class PurchaseRegisterReportService {
    * @param main
    * @return List of ProductEntry
    */
-  public static final List<ProductEntry> selectAllEntry(Main main,FilterParameters filterParameters) {
+  public static final List<ProductEntry> selectAllEntry(Main main, FilterParameters filterParameters) {
     String cond = "where scm_product_entry.company_id = ? and scm_product_entry.opening_stock_entry=0 and scm_product_entry.product_entry_status_id= ? ";
-    cond += " AND scm_product_entry.product_entry_date ::date >= ? ::date AND scm_product_entry.product_entry_date ::date <= ? ::date " ;
+    cond += " AND scm_product_entry.product_entry_date ::date >= ? ::date AND scm_product_entry.product_entry_date ::date <= ? ::date ";
     String sql = getProductEntrySqlPaged() + cond;
-    return AppService.list(main, ProductEntry.class, sql, new Object[]{UserRuntimeView.instance().getCompany().getId(),SystemConstants.CONFIRMED,SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getFromDate()),SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getToDate())});
+    return AppService.list(main, ProductEntry.class, sql, new Object[]{UserRuntimeView.instance().getCompany().getId(), SystemConstants.CONFIRMED, SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getFromDate()), SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getToDate())});
   }
 
   public static final List<ProductEntry> selectAllPurchaseEntryByAccount(Main main, FilterParameters filterParameters) {
     String cond = "where scm_product_entry.account_id = ? and scm_product_entry.company_id = ?  and scm_product_entry.opening_stock_entry=0 and scm_product_entry.product_entry_status_id= ? ";
-    cond += " AND scm_product_entry.product_entry_date ::date >= ? ::date AND scm_product_entry.product_entry_date ::date <= ? ::date " ;
+    cond += " AND scm_product_entry.product_entry_date ::date >= ? ::date AND scm_product_entry.product_entry_date ::date <= ? ::date ";
     String orderBy = "order by scm_product_entry.invoice_date desc";
     String sql = getProductEntrySqlPaged() + cond + orderBy;
-    return AppService.list(main, ProductEntry.class, sql, new Object[]{filterParameters.getAccount().getId(),UserRuntimeView.instance().getCompany().getId(),SystemConstants.CONFIRMED,SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getFromDate()),SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getToDate())});
+    return AppService.list(main, ProductEntry.class, sql, new Object[]{filterParameters.getAccount().getId(), UserRuntimeView.instance().getCompany().getId(), SystemConstants.CONFIRMED, SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getFromDate()), SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getToDate())});
   }
 
   public static final List<ProductEntry> selectAllPurchaseEntryByAccountGroup(Main main, FilterParameters filterParameters) {
     String cond = "where scm_product_entry.account_id IN ( select account_id from scm_account_group_detail where account_group_id = ? ) and scm_product_entry.company_id = ?  and scm_product_entry.opening_stock_entry=0 and scm_product_entry.product_entry_status_id= ? ";
-    cond += " AND scm_product_entry.product_entry_date ::date >= ? ::date AND scm_product_entry.product_entry_date ::date <= ? ::date " ;
+    cond += " AND scm_product_entry.product_entry_date ::date >= ? ::date AND scm_product_entry.product_entry_date ::date <= ? ::date ";
     String orderBy = "order by scm_product_entry.invoice_date desc";
     String sql = getProductEntrySqlPaged() + cond + orderBy;
-    return AppService.list(main, ProductEntry.class, sql, new Object[]{filterParameters.getAccountGroup().getId(),UserRuntimeView.instance().getCompany().getId(),SystemConstants.CONFIRMED,SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getFromDate()),SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getToDate())});
+    return AppService.list(main, ProductEntry.class, sql, new Object[]{filterParameters.getAccountGroup().getId(), UserRuntimeView.instance().getCompany().getId(), SystemConstants.CONFIRMED, SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getFromDate()), SystemRuntimeConfig.SDF_YYYY_MM_DD.format(filterParameters.getToDate())});
 
   }
 

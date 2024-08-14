@@ -30,7 +30,7 @@
       <h:panelGroup>
         <p:inputText id="shortCode" value="#{platformDescriptionView.platformDescription.shortCode}" maxlength="4" required="true" requiredMessage="#{lang.shortcode} #{lang.isRequired}" />
         <p:message for="shortCode" display="text" styleClass="fw" />
-        
+
       </h:panelGroup>
       <p:outputLabel value="#{lang.description}" for="description" />
       <h:panelGroup><p:inputTextarea value="#{platformDescriptionView.platformDescription.description}" cols="100" rows="3" maxlength="1000" id="description" autoResize="false" styleClass="fw" /><p:message for="description" display="text"/></h:panelGroup>
@@ -69,14 +69,14 @@
           </p:commandLink>
         </p:column>
 <!--        <p:column headerText="#{lang.title}" sortBy="#{platformDescriptionVar.title}" field="title"><h:outputText value="#{appView.display(platformDescriptionVar.title)}" title="#{appView.title(platformDescriptionVar.title)}" escape="false" /></p:column>-->
-        
-            <!-- Column for the short code -->
-            <p:column headerText="#{lang.shortcode}" sortBy="#{platformDescriptionVar.shortCode}" field="short_code">
-              <f:facet name="header" ><h:outputText value="#{lang.shortcode}" title="#{lang.shortcode}" /></f:facet>              
-              <h:outputText styleClass="label" style="background-color: ##{platformDescriptionVar.displayColor}" value="#{platformDescriptionVar.shortCode}" escape="false" />
-            </p:column>
-        
-          <p:column headerText="#{lang.description}" sortBy="#{platformDescriptionVar.description}" field="description">
+
+        <!-- Column for the short code -->
+        <p:column headerText="#{lang.shortcode}" sortBy="#{platformDescriptionVar.shortCode}" field="short_code">
+          <f:facet name="header" ><h:outputText value="#{lang.shortcode}" title="#{lang.shortcode}" /></f:facet>              
+          <h:outputText styleClass="label" style="background-color: ##{platformDescriptionVar.displayColor}" value="#{platformDescriptionVar.shortCode}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.description}" sortBy="#{platformDescriptionVar.description}" field="description">
           <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
 
           <h:outputText value="#{appView.display(platformDescriptionVar.description)}" title="#{appView.title(platformDescriptionVar.description)}" escape="false" />

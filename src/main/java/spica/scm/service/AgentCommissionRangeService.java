@@ -11,7 +11,6 @@ import java.util.List;
 import spica.scm.domain.AgentCommissionRange;
 import spica.scm.domain.SalesAgentContract;
 import spica.scm.validate.AgentCommissionRangeIs;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;

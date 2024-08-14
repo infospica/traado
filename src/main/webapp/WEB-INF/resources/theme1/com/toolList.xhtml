@@ -42,7 +42,7 @@
           <p:menu overlay="true" trigger="#{ids}dynaButton" my="left top" at="left bottom">
             <ui:insert name="moreMenuTopList" />
             <p:submenu label="Current Page">
-                <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad" ><p:dataExporter type="xls" target="#{ids}Table" fileName="#{userRuntimeView.exportFileName(masterReportView.fileName)}" pageOnly="true" postProcessor="#{excelExportView.postProcessXLS}"  /></p:menuitem>              
+              <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad" ><p:dataExporter type="xls" target="#{ids}Table" fileName="#{userRuntimeView.exportFileName(masterReportView.fileName)}" pageOnly="true" postProcessor="#{excelExportView.postProcessXLS}"  /></p:menuitem>              
               <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{ids}" pageOnly="true"  /></p:menuitem>
             </p:submenu>
             <p:submenu label="All Pages">

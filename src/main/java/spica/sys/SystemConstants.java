@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.sys;
 
@@ -374,7 +374,7 @@ public final class SystemConstants {
   public static final String CUSTOMER_OUTSTANDING = "CUSTOMER OUTSTANDING";
   public static final String MRP_ADJUSTMENT = "MRP ADJUSTMENT";
   public static final String REPLACEMENT = "REPLACEMENT";
-  
+
   //public static final String SMS_API_KEY="UKeFXe8SXqI-nnX0m2SqOsbacW5S54Dpu2WmLI2kPH";
   //public static final String SMS_SENDER_URL="https://api.textlocal.in/send/?";
   //public static final String SMS_HOST_URL="https://geco.infospica.com/";

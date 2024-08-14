@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -29,20 +28,20 @@ import wawo.app.faces.Jsf;
 
 /**
  * ContractCommiByRangeView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:15 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:15 IST 2016
  */
-
-@Named(value="contractCommiByRangeView")
+@Named(value = "contractCommiByRangeView")
 @ViewScoped
-public class ContractCommiByRangeView implements Serializable{
+public class ContractCommiByRangeView implements Serializable {
 
   private transient ContractCommiByRange contractCommiByRange;	//Domain object/selected Domain.
   private transient LazyDataModel<ContractCommiByRange> contractCommiByRangeLazyModel; 	//For lazy loading datatable.
   private transient ContractCommiByRange[] contractCommiByRangeSelected;	 //Selected Domain Array
-  
+
   private Contract parent;
-  
+
   /**
    * Getting the parent object and id for edit.
    */
@@ -51,14 +50,14 @@ public class ContractCommiByRangeView implements Serializable{
     parent = (Contract) Jsf.dialogParent(Contract.class);
     getContractCommiByRange().setId(Jsf.getParameterInt("id"));
   }
-  
+
   /**
    * Default Constructor.
-   */   
+   */
   public ContractCommiByRangeView() {
     super();
   }
-  
+
   public Contract getParent() {
     return parent;
   }
@@ -66,40 +65,43 @@ public class ContractCommiByRangeView implements Serializable{
   public void setParent(Contract parent) {
     this.parent = parent;
   }
- 
+
   /**
    * Return ContractCommiByRange.
+   *
    * @return ContractCommiByRange.
-   */  
+   */
   public ContractCommiByRange getContractCommiByRange() {
-    if(contractCommiByRange == null) {
+    if (contractCommiByRange == null) {
       contractCommiByRange = new ContractCommiByRange();
     }
     return contractCommiByRange;
-  }   
-  
+  }
+
   /**
    * Set ContractCommiByRange.
+   *
    * @param contractCommiByRange.
-   */   
+   */
   public void setContractCommiByRange(ContractCommiByRange contractCommiByRange) {
     this.contractCommiByRange = contractCommiByRange;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchContractCommiByRange(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchContractCommiByRange(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
           getContractCommiByRange().reset();
-          getContractCommiByRange().setContractId(parent);          
+          getContractCommiByRange().setContractId(parent);
         } else if (ViewType.editform.toString().equals(viewType)) {
           setContractCommiByRange((ContractCommiByRange) ContractCommiByRangeService.selectByPk(main, getContractCommiByRange()));
         } else if (ViewType.list.toString().equals(viewType)) {
@@ -107,40 +109,44 @@ public class ContractCommiByRangeView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create contractCommiByRangeLazyModel.
+   *
    * @param main
    */
   private void loadContractCommiByRangeList(final MainView main) {
     if (contractCommiByRangeLazyModel == null) {
       contractCommiByRangeLazyModel = new LazyDataModel<ContractCommiByRange>() {
-      private List<ContractCommiByRange> list;      
-      @Override
-      public List<ContractCommiByRange> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ContractCommiByRangeService.listPaged(main);
-          main.commit(contractCommiByRangeLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ContractCommiByRange> list;
+
+        @Override
+        public List<ContractCommiByRange> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ContractCommiByRangeService.listPaged(main);
+            main.commit(contractCommiByRangeLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ContractCommiByRange contractCommiByRange) {
-        return contractCommiByRange.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ContractCommiByRange contractCommiByRange) {
+          return contractCommiByRange.getId();
+        }
+
+        @Override
         public ContractCommiByRange getRowData(String rowKey) {
           if (list != null) {
             for (ContractCommiByRange obj : list) {
@@ -156,11 +162,12 @@ public class ContractCommiByRangeView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_contract_commi_by_range/";	
+    String SUB_FOLDER = "scm_contract_commi_by_range/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -176,7 +183,7 @@ public class ContractCommiByRangeView implements Serializable{
    */
   public String cloneContractCommiByRange(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneContractCommiByRange(main, "clone"); 
+    return saveOrCloneContractCommiByRange(main, "clone");
   }
 
   /**
@@ -202,14 +209,13 @@ public class ContractCommiByRangeView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ContractCommiByRange.
    *
@@ -225,7 +231,7 @@ public class ContractCommiByRangeView implements Serializable{
       } else {
         ContractCommiByRangeService.deleteByPk(main, getContractCommiByRange());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -239,45 +245,47 @@ public class ContractCommiByRangeView implements Serializable{
 
   /**
    * Return LazyDataModel of ContractCommiByRange.
+   *
    * @return
    */
   public LazyDataModel<ContractCommiByRange> getContractCommiByRangeLazyModel() {
     return contractCommiByRangeLazyModel;
   }
 
- /**
-  * Return ContractCommiByRange[].
-  * @return 
-  */
+  /**
+   * Return ContractCommiByRange[].
+   *
+   * @return
+   */
   public ContractCommiByRange[] getContractCommiByRangeSelected() {
     return contractCommiByRangeSelected;
   }
-  
+
   /**
    * Set ContractCommiByRange[].
-   * @param contractCommiByRangeSelected 
+   *
+   * @param contractCommiByRangeSelected
    */
   public void setContractCommiByRangeSelected(ContractCommiByRange[] contractCommiByRangeSelected) {
     this.contractCommiByRangeSelected = contractCommiByRangeSelected;
   }
- 
 
-
- /**
-  * Contract autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.contractAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.contractAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * Contract autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.contractAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.contractAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<Contract> contractAuto(String filter) {
     return ScmLookupView.contractAuto(filter);
   }
-  
+
   /**
    * Calling back the dialogReturn method. Can pass an object back to the returning method.
    */

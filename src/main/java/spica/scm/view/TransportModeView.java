@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.TransportModeService;
 
 /**
  * TransportModeView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Jul 22 10:57:43 IST 2016 
+ * @version	1.0, Fri Jul 22 10:57:43 IST 2016
  */
-
-@Named(value="transportModeView")
+@Named(value = "transportModeView")
 @ViewScoped
-public class TransportModeView implements Serializable{
+public class TransportModeView implements Serializable {
 
   private transient TransportMode transportMode;	//Domain object/selected Domain.
   private transient LazyDataModel<TransportMode> transportModeLazyModel; 	//For lazy loading datatable.
   private transient TransportMode[] transportModeSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public TransportModeView() {
     super();
   }
- 
+
   /**
    * Return TransportMode.
+   *
    * @return TransportMode.
-   */  
+   */
   public TransportMode getTransportMode() {
-    if(transportMode == null) {
+    if (transportMode == null) {
       transportMode = new TransportMode();
     }
     return transportMode;
-  }   
-  
+  }
+
   /**
    * Set TransportMode.
+   *
    * @param transportMode.
-   */   
+   */
   public void setTransportMode(TransportMode transportMode) {
     this.transportMode = transportMode;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchTransportMode(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchTransportMode(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class TransportModeView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create transportModeLazyModel.
+   *
    * @param main
    */
   private void loadTransportModeList(final MainView main) {
     if (transportModeLazyModel == null) {
       transportModeLazyModel = new LazyDataModel<TransportMode>() {
-      private List<TransportMode> list;      
-      @Override
-      public List<TransportMode> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = TransportModeService.listPaged(main);
-          main.commit(transportModeLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<TransportMode> list;
+
+        @Override
+        public List<TransportMode> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = TransportModeService.listPaged(main);
+            main.commit(transportModeLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(TransportMode transportMode) {
-        return transportMode.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(TransportMode transportMode) {
+          return transportMode.getId();
+        }
+
+        @Override
         public TransportMode getRowData(String rowKey) {
           if (list != null) {
             for (TransportMode obj : list) {
@@ -136,11 +139,12 @@ public class TransportModeView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_transport_mode/";	
+    String SUB_FOLDER = "scm_transport_mode/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class TransportModeView implements Serializable{
    */
   public String cloneTransportMode(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneTransportMode(main, "clone"); 
+    return saveOrCloneTransportMode(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class TransportModeView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many TransportMode.
    *
@@ -205,7 +208,7 @@ public class TransportModeView implements Serializable{
       } else {
         TransportModeService.deleteByPk(main, getTransportMode());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class TransportModeView implements Serializable{
 
   /**
    * Return LazyDataModel of TransportMode.
+   *
    * @return
    */
   public LazyDataModel<TransportMode> getTransportModeLazyModel() {
     return transportModeLazyModel;
   }
 
- /**
-  * Return TransportMode[].
-  * @return 
-  */
+  /**
+   * Return TransportMode[].
+   *
+   * @return
+   */
   public TransportMode[] getTransportModeSelected() {
     return transportModeSelected;
   }
-  
+
   /**
    * Set TransportMode[].
-   * @param transportModeSelected 
+   *
+   * @param transportModeSelected
    */
   public void setTransportModeSelected(TransportMode[] transportModeSelected) {
     this.transportModeSelected = transportModeSelected;
   }
- 
-
 
 }

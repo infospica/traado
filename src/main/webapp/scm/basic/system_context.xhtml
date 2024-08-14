@@ -32,11 +32,11 @@
         <p:message for="title" display="text"/>
       </h:panelGroup>     
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
-        <h:panelGroup>
-          <p:inputNumber value="#{systemContextView.systemContext.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" 
-                         thousandSeparator="" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="3" id="sortOrder" />
-          <p:message for="sortOrder" display="text"/>
-        </h:panelGroup> 
+      <h:panelGroup>
+        <p:inputNumber value="#{systemContextView.systemContext.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" 
+                       thousandSeparator="" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup> 
     </ui:define>
     <ui:define name="after">
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
@@ -55,7 +55,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{systemContextVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{systemContextVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{systemContextVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{systemContextView.systemContext}" value="#{systemContextVar}" />
           </p:commandLink>
         </p:column>

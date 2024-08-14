@@ -29,8 +29,6 @@ import spica.scm.domain.State;
 import spica.scm.domain.District;
 import spica.scm.domain.Status;
 import spica.scm.domain.Territory;
-import spica.scm.service.CountryService;
-import spica.scm.service.StateService;
 import wawo.app.faces.Jsf;
 
 /**
@@ -360,7 +358,7 @@ public class CompanyBranchView implements Serializable {
   }
 
   public void companyBranchPopupClose() {
-    Jsf.popupReturn(parent,null);
+    Jsf.popupReturn(parent, null);
   }
 
   public void clearStateDistrict() {

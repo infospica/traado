@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import spica.scm.validate.SalesAgentAccountGroupIs;
 
 /**
  * SalesAgentAccountGroupService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Tue Dec 19 11:35:13 IST 2017 
+ * @version	1.0, Tue Dec 19 11:35:13 IST 2017
  */
+public abstract class SalesAgentAccountGroupService {
 
-public abstract class SalesAgentAccountGroupService {  
- 
- /**
+  /**
    * SalesAgentAccountGroup paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class SalesAgentAccountGroupService {
     sql.count("select count(t1.id) as total from scm_sales_agent_account_group scm_sales_agent_account_group "); //Count query
     sql.join("left outer join scm_user_profile t2 on (t2.id = t1.sales_agent_id) left outer join scm_account_group t3 on (t3.id = t1.account_group_id)"); //Join Query
 
-    sql.string(new String[]{"t2.user_code","t3.group_name"}); //String search or sort fields
+    sql.string(new String[]{"t2.user_code", "t3.group_name"}); //String search or sort fields
     sql.number(new String[]{"t1.id"}); //Numeric search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of SalesAgentAccountGroup.
-  * @param main
-  * @return List of SalesAgentAccountGroup
-  */
+
+  /**
+   * Return List of SalesAgentAccountGroup.
+   *
+   * @param main
+   * @return List of SalesAgentAccountGroup
+   */
   public static final List<SalesAgentAccountGroup> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getSalesAgentAccountGroupSqlPaged(main));
+    return AppService.listPagedJpa(main, getSalesAgentAccountGroupSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class SalesAgentAccountGroupService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select SalesAgentAccountGroup by key.
-  * @param main
-  * @param salesAgentAccountGroup
-  * @return SalesAgentAccountGroup
-  */
+  /**
+   * Select SalesAgentAccountGroup by key.
+   *
+   * @param main
+   * @param salesAgentAccountGroup
+   * @return SalesAgentAccountGroup
+   */
   public static final SalesAgentAccountGroup selectByPk(Main main, SalesAgentAccountGroup salesAgentAccountGroup) {
     return (SalesAgentAccountGroup) AppService.find(main, SalesAgentAccountGroup.class, salesAgentAccountGroup.getId());
   }
 
- /**
-  * Insert SalesAgentAccountGroup.
-  * @param main
-  * @param salesAgentAccountGroup
-  */
+  /**
+   * Insert SalesAgentAccountGroup.
+   *
+   * @param main
+   * @param salesAgentAccountGroup
+   */
   public static final void insert(Main main, SalesAgentAccountGroup salesAgentAccountGroup) {
     SalesAgentAccountGroupIs.insertAble(main, salesAgentAccountGroup);  //Validating
     AppService.insert(main, salesAgentAccountGroup);
 
   }
 
- /**
-  * Update SalesAgentAccountGroup by key.
-  * @param main
-  * @param salesAgentAccountGroup
-  * @return SalesAgentAccountGroup
-  */
+  /**
+   * Update SalesAgentAccountGroup by key.
+   *
+   * @param main
+   * @param salesAgentAccountGroup
+   * @return SalesAgentAccountGroup
+   */
   public static final SalesAgentAccountGroup updateByPk(Main main, SalesAgentAccountGroup salesAgentAccountGroup) {
     SalesAgentAccountGroupIs.updateAble(main, salesAgentAccountGroup); //Validating
     return (SalesAgentAccountGroup) AppService.update(main, salesAgentAccountGroup);
@@ -106,8 +107,7 @@ public abstract class SalesAgentAccountGroupService {
   public static void insertOrUpdate(Main main, SalesAgentAccountGroup salesAgentAccountGroup) {
     if (salesAgentAccountGroup.getId() == null) {
       insert(main, salesAgentAccountGroup);
-    }
-    else{
+    } else {
       updateByPk(main, salesAgentAccountGroup);
     }
   }
@@ -123,21 +123,23 @@ public abstract class SalesAgentAccountGroupService {
     insert(main, salesAgentAccountGroup);
   }
 
- /**
-  * Delete SalesAgentAccountGroup.
-  * @param main
-  * @param salesAgentAccountGroup
-  */
+  /**
+   * Delete SalesAgentAccountGroup.
+   *
+   * @param main
+   * @param salesAgentAccountGroup
+   */
   public static final void deleteByPk(Main main, SalesAgentAccountGroup salesAgentAccountGroup) {
     SalesAgentAccountGroupIs.deleteAble(main, salesAgentAccountGroup); //Validation
     AppService.delete(main, SalesAgentAccountGroup.class, salesAgentAccountGroup.getId());
   }
-	
- /**
-  * Delete Array of SalesAgentAccountGroup.
-  * @param main
-  * @param salesAgentAccountGroup
-  */
+
+  /**
+   * Delete Array of SalesAgentAccountGroup.
+   *
+   * @param main
+   * @param salesAgentAccountGroup
+   */
   public static final void deleteByPkArray(Main main, SalesAgentAccountGroup[] salesAgentAccountGroup) {
     for (SalesAgentAccountGroup e : salesAgentAccountGroup) {
       deleteByPk(main, e);

@@ -72,7 +72,7 @@
       <p:outputLabel value="#{lang.sequence}" for="invoiceNoCounter" />
       <h:panelGroup>
         <p:inputNumber value="#{accountGroupView.accountGroup.invoiceNoCounter}" converterMessage="#{lang.invoiceNoCounter} #{lang.invalidNumber}" decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="invoiceNoCounter" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="invoiceNoCounter" />
         <p:message for="invoiceNoCounter" display="text"/>
       </h:panelGroup>
 
@@ -122,7 +122,7 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" rendered="false" />
       <h:panelGroup rendered="false">
         <p:inputNumber value="#{accountGroupView.accountGroup.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder"  thousandSeparator=""/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder"  thousandSeparator=""/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 
@@ -169,7 +169,7 @@
                      rowHover="false" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
           <p:ajax event="rowEdit" listener="#{accountGroupView.onAccountGroupPriceListRowEdit}" update="@this" />
 
-          
+
           <p:column headerText="#{lang.name}" sortBy="#{accountGrpPriceVar.title}" field="title">
             <p:cellEditor>
               <f:facet name="output"><h:outputText value="#{appView.display(accountGrpPriceVar.title)}" title="#{appView.title(accountGrpPriceVar.title)}" escape="false" /></f:facet>
@@ -186,7 +186,7 @@
           <p:column style="width:50px;">
             <p:rowEditor />
           </p:column>
-          
+
         </p:dataTable>
       </ui:decorate>
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">

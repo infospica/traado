@@ -33,7 +33,7 @@ import spica.sys.UserRuntimeView;
 @Named(value = "supplierGroupView")
 @ViewScoped
 public class SupplierGroupView implements Serializable {
-  
+
   private transient SupplierGroup supplierGroup;	//Domain object/selected Domain.
   private transient LazyDataModel<SupplierGroup> supplierGroupLazyModel; 	//For lazy loading datatable.
   private transient SupplierGroup[] supplierGroupSelected;	 //Selected Domain Array
@@ -102,7 +102,7 @@ public class SupplierGroupView implements Serializable {
     if (supplierGroupLazyModel == null) {
       supplierGroupLazyModel = new LazyDataModel<SupplierGroup>() {
         private List<SupplierGroup> list;
-        
+
         @Override
         public List<SupplierGroup> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -119,12 +119,12 @@ public class SupplierGroupView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(SupplierGroup supplierGroup) {
           return supplierGroup.getId();
         }
-        
+
         @Override
         public SupplierGroup getRowData(String rowKey) {
           if (list != null) {
@@ -139,7 +139,7 @@ public class SupplierGroupView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_supplier_group/";
   }

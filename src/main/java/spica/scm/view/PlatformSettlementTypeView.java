@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,10 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +24,56 @@ import spica.scm.service.PlatformSettlementTypeService;
 
 /**
  * PlatformSettlementTypeView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Apr 20 15:04:02 IST 2017 
+ * @version	1.0, Thu Apr 20 15:04:02 IST 2017
  */
-
-@Named(value="platformSettlementTypeView")
+@Named(value = "platformSettlementTypeView")
 @ViewScoped
-public class PlatformSettlementTypeView implements Serializable{
+public class PlatformSettlementTypeView implements Serializable {
 
   private transient PlatformSettlementType platformSettlementType;	//Domain object/selected Domain.
   private transient LazyDataModel<PlatformSettlementType> platformSettlementTypeLazyModel; 	//For lazy loading datatable.
   private transient PlatformSettlementType[] platformSettlementTypeSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public PlatformSettlementTypeView() {
     super();
   }
- 
+
   /**
    * Return PlatformSettlementType.
+   *
    * @return PlatformSettlementType.
-   */  
+   */
   public PlatformSettlementType getPlatformSettlementType() {
-    if(platformSettlementType == null) {
+    if (platformSettlementType == null) {
       platformSettlementType = new PlatformSettlementType();
     }
     return platformSettlementType;
-  }   
-  
+  }
+
   /**
    * Set PlatformSettlementType.
+   *
    * @param platformSettlementType.
-   */   
+   */
   public void setPlatformSettlementType(PlatformSettlementType platformSettlementType) {
     this.platformSettlementType = platformSettlementType;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchPlatformSettlementType(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchPlatformSettlementType(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewTypes.isNew(viewType) && !main.hasError()) {
@@ -87,40 +85,44 @@ public class PlatformSettlementTypeView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create platformSettlementTypeLazyModel.
+   *
    * @param main
    */
   private void loadPlatformSettlementTypeList(final MainView main) {
     if (platformSettlementTypeLazyModel == null) {
       platformSettlementTypeLazyModel = new LazyDataModel<PlatformSettlementType>() {
-      private List<PlatformSettlementType> list;      
-      @Override
-      public List<PlatformSettlementType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = PlatformSettlementTypeService.listPaged(main);
-          main.commit(platformSettlementTypeLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<PlatformSettlementType> list;
+
+        @Override
+        public List<PlatformSettlementType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = PlatformSettlementTypeService.listPaged(main);
+            main.commit(platformSettlementTypeLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(PlatformSettlementType platformSettlementType) {
-        return platformSettlementType.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(PlatformSettlementType platformSettlementType) {
+          return platformSettlementType.getId();
+        }
+
+        @Override
         public PlatformSettlementType getRowData(String rowKey) {
           if (list != null) {
             for (PlatformSettlementType obj : list) {
@@ -136,11 +138,12 @@ public class PlatformSettlementTypeView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_platform_settlement_type/";	
+    String SUB_FOLDER = "scm_platform_settlement_type/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +159,7 @@ public class PlatformSettlementTypeView implements Serializable{
    */
   public String clonePlatformSettlementType(MainView main) {
     main.setViewType("newform");
-    return saveOrClonePlatformSettlementType(main, "clone"); 
+    return saveOrClonePlatformSettlementType(main, "clone");
   }
 
   /**
@@ -182,14 +185,13 @@ public class PlatformSettlementTypeView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many PlatformSettlementType.
    *
@@ -205,7 +207,7 @@ public class PlatformSettlementTypeView implements Serializable{
       } else {
         PlatformSettlementTypeService.deleteByPk(main, getPlatformSettlementType());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (ViewTypes.isEdit(main.getViewType())){
+        if (ViewTypes.isEdit(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +221,29 @@ public class PlatformSettlementTypeView implements Serializable{
 
   /**
    * Return LazyDataModel of PlatformSettlementType.
+   *
    * @return
    */
   public LazyDataModel<PlatformSettlementType> getPlatformSettlementTypeLazyModel() {
     return platformSettlementTypeLazyModel;
   }
 
- /**
-  * Return PlatformSettlementType[].
-  * @return 
-  */
+  /**
+   * Return PlatformSettlementType[].
+   *
+   * @return
+   */
   public PlatformSettlementType[] getPlatformSettlementTypeSelected() {
     return platformSettlementTypeSelected;
   }
-  
+
   /**
    * Set PlatformSettlementType[].
-   * @param platformSettlementTypeSelected 
+   *
+   * @param platformSettlementTypeSelected
    */
   public void setPlatformSettlementTypeSelected(PlatformSettlementType[] platformSettlementTypeSelected) {
     this.platformSettlementTypeSelected = platformSettlementTypeSelected;
   }
- 
-
 
 }

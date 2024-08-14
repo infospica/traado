@@ -31,8 +31,8 @@
           <f:selectItem itemLabel="#{lang.purchaseOrder}" itemValue="#{REPORT_CONSTANT.PURCHASE_ORDER}" />
           <f:selectItem itemLabel="#{lang.purchaseReturn}" itemValue="#{REPORT_CONSTANT.PURCHASE_RETURN}" />
           <f:selectItem itemLabel="#{lang.salesServicesInvoice}" itemValue="#{REPORT_CONSTANT.SALES_SERVICE}" />
-          
-          
+
+
         </p:selectOneMenu>
       </h:panelGroup>
 
@@ -70,8 +70,8 @@
       <h:panelGroup id="reportView" >
         <div style="padding:10px;">
           <p:schedule id="schedule" value="#{calendarReportView.lazyEventModel}" widgetVar="calendarWidget" clientTimeZone="local"
-                         draggable="false" tooltip="true" >
-             
+                      draggable="false" tooltip="true" >
+
             <p:ajax event="eventSelect" listener="#{calendarReportView.onEventSelect}" onstart="block();" oncomplete="unblock();"  />              
           </p:schedule>
         </div>

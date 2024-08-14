@@ -10,14 +10,12 @@ package spica.scm.service;
 import java.util.List;
 import spica.scm.domain.Company;
 import spica.scm.domain.Vendor;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.VendorBank;
 import spica.scm.domain.VendorBankContact;
 import spica.scm.validate.VendorBankIs;
-import wawo.app.faces.MainView;
 
 /**
  * VendorBankService
@@ -153,7 +151,6 @@ public abstract class VendorBankService {
 //      AppService.updateSql(main, VendorBank.class, "update scm_vendor_bank set modified_by = ?, lasdt_modified_at = ?, sort_order = ? where vendor_id = ? and id <> ? and sort_order = ?", true);
 //    }
 //  }
-
   /**
    * Clone and existing object
    *

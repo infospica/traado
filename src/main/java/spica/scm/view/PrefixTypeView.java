@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.PrefixTypeService;
 
 /**
  * PrefixTypeView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Oct 28 09:25:45 IST 2016 
+ * @version	1.0, Fri Oct 28 09:25:45 IST 2016
  */
-
-@Named(value="prefixTypeView")
+@Named(value = "prefixTypeView")
 @ViewScoped
-public class PrefixTypeView implements Serializable{
+public class PrefixTypeView implements Serializable {
 
   private transient PrefixType prefixType;	//Domain object/selected Domain.
   private transient LazyDataModel<PrefixType> prefixTypeLazyModel; 	//For lazy loading datatable.
   private transient PrefixType[] prefixTypeSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public PrefixTypeView() {
     super();
   }
- 
+
   /**
    * Return PrefixType.
+   *
    * @return PrefixType.
-   */  
+   */
   public PrefixType getPrefixType() {
-    if(prefixType == null) {
+    if (prefixType == null) {
       prefixType = new PrefixType();
     }
     return prefixType;
-  }   
-  
+  }
+
   /**
    * Set PrefixType.
+   *
    * @param prefixType.
-   */   
+   */
   public void setPrefixType(PrefixType prefixType) {
     this.prefixType = prefixType;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchPrefixType(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchPrefixType(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class PrefixTypeView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create prefixTypeLazyModel.
+   *
    * @param main
    */
   private void loadPrefixTypeList(final MainView main) {
     if (prefixTypeLazyModel == null) {
       prefixTypeLazyModel = new LazyDataModel<PrefixType>() {
-      private List<PrefixType> list;      
-      @Override
-      public List<PrefixType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = PrefixTypeService.listPaged(main);
-          main.commit(prefixTypeLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<PrefixType> list;
+
+        @Override
+        public List<PrefixType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = PrefixTypeService.listPaged(main);
+            main.commit(prefixTypeLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(PrefixType prefixType) {
-        return prefixType.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(PrefixType prefixType) {
+          return prefixType.getId();
+        }
+
+        @Override
         public PrefixType getRowData(String rowKey) {
           if (list != null) {
             for (PrefixType obj : list) {
@@ -136,11 +139,12 @@ public class PrefixTypeView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_prefix_type/";	
+    String SUB_FOLDER = "scm_prefix_type/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class PrefixTypeView implements Serializable{
    */
   public String clonePrefixType(MainView main) {
     main.setViewType("newform");
-    return saveOrClonePrefixType(main, "clone"); 
+    return saveOrClonePrefixType(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class PrefixTypeView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many PrefixType.
    *
@@ -205,7 +208,7 @@ public class PrefixTypeView implements Serializable{
       } else {
         PrefixTypeService.deleteByPk(main, getPrefixType());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class PrefixTypeView implements Serializable{
 
   /**
    * Return LazyDataModel of PrefixType.
+   *
    * @return
    */
   public LazyDataModel<PrefixType> getPrefixTypeLazyModel() {
     return prefixTypeLazyModel;
   }
 
- /**
-  * Return PrefixType[].
-  * @return 
-  */
+  /**
+   * Return PrefixType[].
+   *
+   * @return
+   */
   public PrefixType[] getPrefixTypeSelected() {
     return prefixTypeSelected;
   }
-  
+
   /**
    * Set PrefixType[].
-   * @param prefixTypeSelected 
+   *
+   * @param prefixTypeSelected
    */
   public void setPrefixTypeSelected(PrefixType[] prefixTypeSelected) {
     this.prefixTypeSelected = prefixTypeSelected;
   }
- 
-
 
 }

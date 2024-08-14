@@ -227,7 +227,7 @@
         </p:column>
         <p:column headerText="#{lang.code}"><h:outputText value="#{appView.display(vendorClaimVar.salesAgentId.userCode)}" escape="false" /></p:column>
         <p:column headerText="#{lang.date}">
-            <p:calendar value="#{vendorClaimVar.createdAt}" pattern="MM/yyyy" showOn="off" mask="true"
+          <p:calendar value="#{vendorClaimVar.createdAt}" pattern="MM/yyyy" showOn="off" mask="true"
                       converterMessage="#{lang.expiryDateActual} #{lang.invalidDate}" maskSlotChar="mm/yyyy"
                       maxlength="29" id="expiryDateActual" disabled="true">
           </p:calendar>

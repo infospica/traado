@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.model;
 
@@ -10,7 +10,7 @@ package spica.addon.model;
  * @author sujesh
  */
 public class SmsUsages {
-  
+
   private Integer companyId;
   private String companyName;
   private Integer allowedSms;
@@ -65,7 +65,5 @@ public class SmsUsages {
   public void setSmsEnabled(Integer smsEnabled) {
     this.smsEnabled = smsEnabled;
   }
-  
-  
-  
+
 }

@@ -61,7 +61,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column  sortBy="#{transportFreightRateUomVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.uom}" title="#{lang.uom}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{transportFreightRateUomVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{transportFreightRateUomVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{transportFreightRateUomView.transportFreightRateUom}" value="#{transportFreightRateUomVar}" />
           </p:commandLink>
         </p:column>
@@ -69,7 +69,7 @@
           <f:facet name="header"><h:outputText value="#{lang.freightRateBase}" title="#{lang.freightRateBase}"/></f:facet>
           <h:outputText value="#{appView.display(transportFreightRateUomVar.transportFreightRatebaseId.title)}" title="#{appView.title(transportFreightRateUomVar.transportFreightRatebaseId.title)}" escape="false" /></p:column>
         <p:column  exportable="false">
-           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
           <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
             <ui:define name="cby">#{appView.display(transportFreightRateUomVar.createdBy)}</ui:define>
             <ui:define name="cat">#{appView.dateTime(transportFreightRateUomVar.createdAt)}</ui:define>

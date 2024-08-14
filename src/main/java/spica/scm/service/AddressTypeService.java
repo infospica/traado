@@ -13,7 +13,6 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.AddressType;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -150,7 +149,7 @@ public abstract class AddressTypeService {
       deleteByPk(main, e);
     }
   }
-  
+
   /**
    * Validate delete.
    *

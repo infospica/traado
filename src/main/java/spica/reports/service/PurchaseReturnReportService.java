@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
@@ -62,7 +62,7 @@ public class PurchaseReturnReportService {
               + "scm_purchase_return_item.value_goods as goods_value,\n"
               + "(CASE WHEN scm_purchase_return.is_return_interstate = 1 OR scm_purchase_return.sez_zone = 1 THEN scm_purchase_return_item.value_igst ELSE 0 END)as igst,"
               + "(CASE WHEN scm_purchase_return.is_return_interstate = 1 OR scm_purchase_return.sez_zone = 1 THEN 0 ELSE scm_purchase_return_item.value_cgst END) as cgst,"
-              + "(CASE WHEN scm_purchase_return.is_return_interstate = 1 OR scm_purchase_return.sez_zone = 1 THEN 0 ELSE scm_purchase_return_item.value_sgst END) as sgst,\n" 
+              + "(CASE WHEN scm_purchase_return.is_return_interstate = 1 OR scm_purchase_return.sez_zone = 1 THEN 0 ELSE scm_purchase_return_item.value_sgst END) as sgst,\n"
               + "(scm_purchase_return_item.value_goods + scm_purchase_return_item.value_igst) as net_amount,\n"
               + "scm_purchase_return_item.scheme_discount_value as scheme_discount,scm_purchase_return_item.scheme_discount_percentage,\n"
               + "scm_purchase_return_item.product_discount_value as product_discount,scm_purchase_return_item.product_discount_perc as product_discount_percentage,\n"
@@ -82,7 +82,7 @@ public class PurchaseReturnReportService {
 
       sqlOrderBy = " ORDER BY UPPER(scm_vendor.vendor_name),scm_purchase_return.invoice_date,scm_purchase_return.invoice_no ";
 
-    } 
+    }
 
     ArrayList<Object> params = new ArrayList<>();
     params.add(SystemConstants.DRAFT);

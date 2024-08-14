@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.PurchaseReturnStockTypeService;
 
 /**
  * PurchaseReturnStockTypeView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed May 25 13:23:25 IST 2016 
+ * @version	1.0, Wed May 25 13:23:25 IST 2016
  */
-
-@Named(value="purchaseReturnStockTypeView")
+@Named(value = "purchaseReturnStockTypeView")
 @ViewScoped
-public class PurchaseReturnStockTypeView implements Serializable{
+public class PurchaseReturnStockTypeView implements Serializable {
 
   private transient PurchaseReturnStockType purchaseReturnStockType;	//Domain object/selected Domain.
   private transient LazyDataModel<PurchaseReturnStockType> purchaseReturnStockTypeLazyModel; 	//For lazy loading datatable.
   private transient PurchaseReturnStockType[] purchaseReturnStockTypeSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public PurchaseReturnStockTypeView() {
     super();
   }
- 
+
   /**
    * Return PurchaseReturnStockType.
+   *
    * @return PurchaseReturnStockType.
-   */  
+   */
   public PurchaseReturnStockType getPurchaseReturnStockType() {
-    if(purchaseReturnStockType == null) {
+    if (purchaseReturnStockType == null) {
       purchaseReturnStockType = new PurchaseReturnStockType();
     }
     return purchaseReturnStockType;
-  }   
-  
+  }
+
   /**
    * Set PurchaseReturnStockType.
+   *
    * @param purchaseReturnStockType.
-   */   
+   */
   public void setPurchaseReturnStockType(PurchaseReturnStockType purchaseReturnStockType) {
     this.purchaseReturnStockType = purchaseReturnStockType;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchPurchaseReturnStockType(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchPurchaseReturnStockType(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class PurchaseReturnStockTypeView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create purchaseReturnStockTypeLazyModel.
+   *
    * @param main
    */
   private void loadPurchaseReturnStockTypeList(final MainView main) {
     if (purchaseReturnStockTypeLazyModel == null) {
       purchaseReturnStockTypeLazyModel = new LazyDataModel<PurchaseReturnStockType>() {
-      private List<PurchaseReturnStockType> list;      
-      @Override
-      public List<PurchaseReturnStockType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = PurchaseReturnStockTypeService.listPaged(main);
-          main.commit(purchaseReturnStockTypeLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<PurchaseReturnStockType> list;
+
+        @Override
+        public List<PurchaseReturnStockType> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = PurchaseReturnStockTypeService.listPaged(main);
+            main.commit(purchaseReturnStockTypeLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(PurchaseReturnStockType purchaseReturnStockType) {
-        return purchaseReturnStockType.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(PurchaseReturnStockType purchaseReturnStockType) {
+          return purchaseReturnStockType.getId();
+        }
+
+        @Override
         public PurchaseReturnStockType getRowData(String rowKey) {
           if (list != null) {
             for (PurchaseReturnStockType obj : list) {
@@ -136,11 +139,12 @@ public class PurchaseReturnStockTypeView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_purchase_return_stock_type/";	
+    String SUB_FOLDER = "scm_purchase_return_stock_type/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class PurchaseReturnStockTypeView implements Serializable{
    */
   public String clonePurchaseReturnStockType(MainView main) {
     main.setViewType("newform");
-    return saveOrClonePurchaseReturnStockType(main, "clone"); 
+    return saveOrClonePurchaseReturnStockType(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class PurchaseReturnStockTypeView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many PurchaseReturnStockType.
    *
@@ -205,7 +208,7 @@ public class PurchaseReturnStockTypeView implements Serializable{
       } else {
         PurchaseReturnStockTypeService.deleteByPk(main, getPurchaseReturnStockType());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class PurchaseReturnStockTypeView implements Serializable{
 
   /**
    * Return LazyDataModel of PurchaseReturnStockType.
+   *
    * @return
    */
   public LazyDataModel<PurchaseReturnStockType> getPurchaseReturnStockTypeLazyModel() {
     return purchaseReturnStockTypeLazyModel;
   }
 
- /**
-  * Return PurchaseReturnStockType[].
-  * @return 
-  */
+  /**
+   * Return PurchaseReturnStockType[].
+   *
+   * @return
+   */
   public PurchaseReturnStockType[] getPurchaseReturnStockTypeSelected() {
     return purchaseReturnStockTypeSelected;
   }
-  
+
   /**
    * Set PurchaseReturnStockType[].
-   * @param purchaseReturnStockTypeSelected 
+   *
+   * @param purchaseReturnStockTypeSelected
    */
   public void setPurchaseReturnStockTypeSelected(PurchaseReturnStockType[] purchaseReturnStockTypeSelected) {
     this.purchaseReturnStockTypeSelected = purchaseReturnStockTypeSelected;
   }
- 
-
 
 }

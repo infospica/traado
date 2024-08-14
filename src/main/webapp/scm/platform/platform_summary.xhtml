@@ -55,7 +55,9 @@
 
     <ui:define name="list">      
       <style>
-        .vtop{vertical-align: top;}
+        .vtop{
+          vertical-align: top;
+        }
         .ui-treetable-toggler.ui-icon.ui-icon-triangle-1-e.ui-c {
           visibility: visible !important;
         }
@@ -107,8 +109,8 @@
                        id="debitTreeTableId" widgetVar="debitTreeTableWidgetVar"
                        expandMode="self" value="#{platformSummaryView.getRootDebit(main)}" var="debitVar" tableStyleClass="mDataTable mDataTable-center fw editLinks">            
             <p:ajax event="expand" listener="#{platformSummaryView.onNodeExpandDebit}" update="debitTreeTableId" />
-<!--            <p:ajax event="select" update="debitTreeTableId"  process="debitTreeTableId"  oncomplete="onSelect();"/>
-            <p:ajax event="unselect" update="debitTreeTableId" process="debitTreeTableId" oncomplete="onUnSelect();"  />-->
+            <!--            <p:ajax event="select" update="debitTreeTableId"  process="debitTreeTableId"  oncomplete="onSelect();"/>
+                        <p:ajax event="unselect" update="debitTreeTableId" process="debitTreeTableId" oncomplete="onUnSelect();"  />-->
 
             <p:column headerText="#{lang.description}" >
               <h:outputText value="#{appView.title(debitVar.title)}" rendered="#{debitVar.level ne 2}" style="font-weight: bold;"/>              

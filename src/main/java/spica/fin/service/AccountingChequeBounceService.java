@@ -7,7 +7,6 @@
  */
 package spica.fin.service;
 
-import java.util.Date;
 import java.util.List;
 import spica.constant.AccountingConstant;
 import wawo.app.common.AppService;
@@ -20,13 +19,7 @@ import spica.fin.domain.AccountingTransactionDetail;
 import spica.fin.domain.AccountingTransactionDetailItem;
 import spica.fin.domain.AccountingTransactionSettlement;
 import spica.fin.common.BankReconciliation;
-import spica.scm.domain.Account;
 import spica.scm.domain.AccountGroup;
-import spica.scm.domain.Company;
-import spica.scm.domain.Vendor;
-import spica.scm.service.AccountGroupService;
-import spica.scm.service.AccountService;
-import spica.sys.UserRuntimeView;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -172,7 +165,7 @@ public abstract class AccountingChequeBounceService {
       group = getAccountGroup(main, bankReconciliation);
     }
     if (bankReconciliation.isReciept(chequeBounce.getAccountingLedgerId().getId())) {
-       AccountingLedger penaltyLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_BANK_CHARGE_RECEIVABLE, bankchargeLedger.getCompanyId().getId());    
+      AccountingLedger penaltyLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_BANK_CHARGE_RECEIVABLE, bankchargeLedger.getCompanyId().getId());
       //AccountingLedger bankchargeReceivableLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_CHEQUE_BOUNCE_RECEIVABLE, company.getId());
       AccountingLedger partyLedger = AccountingLedgerService.selectByPk(main, new AccountingLedger(bankReconciliation.getLedgerId()));
 
@@ -224,7 +217,7 @@ public abstract class AccountingChequeBounceService {
 //      LedgerExternalDataService.setFirstAsDebit(tran);
 //      AccountingTransactionService.insertOrUpdateAll(main, tran);
     } else {
- AccountingLedger penaltyLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_BANK_CHARGE_PAYABLE, bankchargeLedger.getCompanyId().getId());    
+      AccountingLedger penaltyLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_BANK_CHARGE_PAYABLE, bankchargeLedger.getCompanyId().getId());
       //   AccountingLedger bankchargePayableLedger = AccountingLedgerService.selectLedgerByLedgerCode(main, AccountingConstant.LEDGER_CODE_CHEQUE_BOUNCE_PAYABLE, company.getId());
       AccountingLedger partyLedger = AccountingLedgerService.selectByPk(main, new AccountingLedger(bankReconciliation.getLedgerId()));
 

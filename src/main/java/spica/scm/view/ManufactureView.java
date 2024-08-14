@@ -38,7 +38,7 @@ import wawo.app.faces.Jsf;
 @Named(value = "manufactureView")
 @ViewScoped
 public class ManufactureView implements Serializable {
-  
+
   private transient Manufacture manufacture;	//Domain object/selected Domain.
   private transient LazyDataModel<Manufacture> manufactureLazyModel; 	//For lazy loading datatable.
   private transient Manufacture[] manufactureSelected;	 //Selected Domain Array
@@ -119,7 +119,7 @@ public class ManufactureView implements Serializable {
     if (manufactureLazyModel == null) {
       manufactureLazyModel = new LazyDataModel<Manufacture>() {
         private List<Manufacture> list;
-        
+
         @Override
         public List<Manufacture> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -136,12 +136,12 @@ public class ManufactureView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(Manufacture manufacture) {
           return manufacture.getId();
         }
-        
+
         @Override
         public Manufacture getRowData(String rowKey) {
           if (list != null) {
@@ -156,7 +156,7 @@ public class ManufactureView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_manufacture/";
   }

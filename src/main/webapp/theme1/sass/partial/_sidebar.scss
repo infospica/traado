@@ -28,343 +28,366 @@ $popUpWidth: 200px;
 $mWidth: 45px;
 
 .sidebar {
-	z-index: 999;
-	font-size:14px;
-	width: $sideWdt;
-	padding:10px 0px;
-	color: $sideBarTxt;
-	background:$sideBarBG;
-	@include box-shadow(1px -4px 8px rgba(0,0,0,0.5));
-	@extend .animate-Xfast !optional;
-	&:hover{
-		overflow: auto;
-	}
-	a{
-		color:$sideBarTxt;
-		text-decoration:none;
-	}
-	
-	& > .fwhFixer{
-		min-height:$sideMinHgt;
-	}
-		ul.menu{
-			@extend .notaList !optional;
-			li{
-				display:block;
-				cursor: pointer;
-				position:relative;
-				a{
-					.fa,.icon,.glyphicon {
-						font-size: 14px;
-						margin:0px 6px 0px -20px;
-					}
-				}
-				///*&[class|=ico]{
-//					& > a{padding-left:35px;}
-//					&:before{
-//						top:20px;
-//						z-index:1;
-//						left: 10px;
-//						width: 20px;
-//						height: 20px;
-//						margin-top:-10px;
-//						@extend .pseudo !optional;
-//						background:url(../img/sprite-ico20-Buildea.png) 20px 20px no-repeat;
-//					}
-//				}*/
+  z-index: 999;
+  font-size:14px;
+  width: $sideWdt;
+  padding:10px 0px;
+  color: $sideBarTxt;
+  background:$sideBarBG;
+  @include box-shadow(1px -4px 8px rgba(0,0,0,0.5));
+  @extend .animate-Xfast !optional;
+  &:hover{
+    overflow: auto;
+  }
+  a{
+    color:$sideBarTxt;
+    text-decoration:none;
+  }
 
-///*			&.ico-dashboard:before{ background-position:0px 0px;}*/
-				
-				& > a{
-					display: block;
-					position: relative;
-					padding:10px 15px 10px 30px;
-					@extend .animate-fast,.ellipsis !optional;
-					& + ul{
-						top: 0px;
-						left:100%;
-						z-index: -1;
-						display:block;
-						overflow:hidden;
-						color:$subMenuTxt;
-						background:$subMenuBG;
-						@include prefix((
-							transition-property:width
-						), ms moz webkit );
-						border:$subMenuBrdr 0px solid;
-						border-left: none !important;
-						@extend .notaList, .animate-Xfast !optional;
-						//@include box-shadow(7px 7px 10px 0px rgba(0, 0, 0, 0.1));
-						width:0px;position:absolute;///*Animating Menu*/
-						& > li{
-							font-size:13px;
-							min-width:$sideWdt;
-							& > a{
-								padding:8px 15px;
-								color: $subMenuTxt;
-								background:$subMenuBG;
-								&:after{ display:none; }
-								&:hover,&:focus,&:active{
-									background: $subMenuHoverBG;
-									color: $subMenuHoverTxt;
-								}
-							}
-						}
-					}
-					&:hover,&:focus,&:active{
-						color:$sideBarHoverTxt;
-						background:$sideBarHoverBG;
-						///*& + ul{z-index:200;width:$popUpWidth;background:$dark-3;@extend .animate-Xfast !optional;}*/
-					}
-					&:after{
-						top: 50%;
-						right:0px;
-						width: 0px;
-						margin-top:-7px;
-						border-style: solid;
-						border-color:transparent;
-						border-width:7px 7px 7px 0px;
-						border-right-color: $sideBarBG;
-						@extend .pseudo !optional;
-					}
-				}
-				
-				&.active{
-					& > a{
-						& + ul{
-							width:100%;
-							display:block;
-							position:static;
-							& > li{
-								& > a{}
-								&.active > a{
-									color: $subMenuActiveTxt;
-									background:none;
-									font-family: $prFontB;
-								}
-							}
-						}
-					}
-				}
-				
-				&.active,
-				&.active.open{
-					& > a{
-						color:$sideBarHoverTxt;
-						background:$sideBarActiveBG;
-						&:after{border-right-color:$activeArrow;}
-						& + ul{
-							width:100%;
-							@include box-shadow(0px 4px 4px 0px rgba(0,0,0,0.1));
-							&[aria-label]{
-								padding-top:0px;
-								&:before{display:none;}
-							}
-						}
-					}
-					///*&.ico-dashboard:before{ background-position:0px -50px;}*/
-				}
-				
-				&.open:not(.active){
-					& > a{
-						color:$sideBarHoverTxt;
-						background:$sideBarHoverBG;
-						&:after{border-right-color:$subMenuBG;}
-						& + ul{
-							z-index:200;
-							width:$popUpWidth;///*$sideWdt;*/
-							background:$subMenuBG;
-							@include box-shadow(0px 4px 8px 0px rgba(0, 0, 0, 0.2));
-							//border:$subMenuBrdr 1px solid;
-							& > li{
-								& > a{}
-								&.active > a{
-									background:none;
-									color:$subMenuTxt;
-									&:hover,&:focus,&:active{
-										background:none;
-										color:$subMenuHoverTxt;
-									}
-								}
-							}
-						}
-					}
-					///*&.ico-dashboard:before{ background-position:0px -25px;}*/
-				}
-				&[aria-label]{
-					& > a:after{
-						border-color: $sideBarBG;
-						display: none;
-					}
-					&.open{
-						& > a:after{
-							@include opacity(0);
-							border-color: rgba($sideBarHoverBG,0);
-						}
-					}
-					&.active.open,
-					&.active{
-						& > a:after{
-							border-color: $sideBarHoverBG;
-						}
-					}
-				}
-			}
-			
-			&.tiles{
-				
-			}
-		}
-	//}
-	
-	///*MINIMISED or CLOSED*/
-	&[data-minimise="true"],
-	&[data-minimize="true"],
-	&.minimize{
-		width:$mWidth;
-		//& > .fwhFixer{
-			ul.menu{
-				li{
-					///*text-indent:-99999px;*/
-					&>a{
-						&:after,&>span:not(.icon){
-							width: 0px;
-							display:none;
-							overflow: hidden;
-						}
-						& > .fa,.icon,.glyphicon{
-							font-size: 18px;
-							margin: 0px 6px 0px -16px !important;
-						}
-						&+ul{
-							position:absolute;
-							&[aria-label]{
-								padding-top:40px;
-								&:before{
-									top:-1px;
-									left: 0px;
-									z-index: 1;
-									width: 100%;
-									cursor: auto;
-									padding: 10px 15px;
-									color:$sideBarHoverTxt;
-									content:attr(aria-label);
-									background:$sideBarHoverBG;
-									@extend .pseudo !optional;
-								}
-							}
-							li{
-								text-indent:0px;
-								min-width:$sideWdt;
-							}
-						}
-					}
-					&.active > a + ul{
-						width:0px;
-					}
-					&.open{
-						&[aria-label]{
-							&:after,
-							&:before{
-								pointer-events:none;
-								@include opacity(0.9);
-								@extend .pseudo !optional;
-							}
-							&:before{
-								left: $mWidth + 5;///*right: -($popUpWidth+5); */
-								top: -1px;
-								z-index: 1;
-								width: auto;///*$popUpWidth*/
-								cursor: auto;
-								padding:6px 10px;
-								color:$sideBarHoverTxt;
-								content:attr(aria-label);
-								background:$sideBarActiveBG;
-								@include border-radius(6px);
-								
-							}
-							&:after{
-								top: 10px;
-								left: $mWidth;
-								position: absolute;
-								border:transparent 5px solid;
-								border-right-color: $sideBarHoverBG;
-								border-left:none;
-							}
-						}
-						
-						&.active > a + ul {
-							z-index: 200;
-							width: $popUpWidth;
-							background:$sideBarHoverBG;
-							&[aria-label]{padding-top:40px;}
-							&:before{display:block;}
-						}
-					}
-				}
-			}
-		//}
-	}
-	
-	&.close{
-		width:0px;
-		overflow:hidden;
-	}
-	
-	&.right{
-		direction:rtl;
-		& /*> .fwhFixer*/ ul.menu li{
-			& > a{
-				padding: 10px 8px 10px 15px;
-				&::after{
-					right:auto;
-					left: 0;
-					border-width: 7px 0px 7px 7px;
-					border-color: transparent transparent transparent $sideBarBG;
-				}
-				.icon,.fa
-				.glyphicon {
-					margin:0px 7px 0px 6px;
-				}
-				& + ul{
-					left:auto;
-					right:100%;
-				}
-			}
-			&.active,&.active.open{
-				&>a{
-					&:after{border-left-color:$activeArrow;}
-				}
-			}
-			&.open{
-				&>a{
-					&:after{border-left-color:$subMenuBG;}
-				}
-			}
-			
-		}
-		///*MINIMISED or CLOSED*/
-		&[data-minimise="true"],
-		&[data-minimize="true"],
-		&.minimize{
-			& > .fwhFixer{
-				ul.menu{
-					li{
-						&.open{
-							&:before{
-								right:auto;
-								left:-$popUpWidth;
-							}
-						}
-					}
-				}
-			}
-		}
-	}	
+  & > .fwhFixer{
+    min-height:$sideMinHgt;
+  }
+  ul.menu{
+    @extend .notaList !optional;
+    li{
+      display:block;
+      cursor: pointer;
+      position:relative;
+      a{
+        .fa,.icon,.glyphicon {
+          font-size: 14px;
+          margin:0px 6px 0px -20px;
+        }
+      }
+      ///*&[class|=ico]{
+      //					& > a{padding-left:35px;}
+      //					&:before{
+      //						top:20px;
+      //						z-index:1;
+      //						left: 10px;
+      //						width: 20px;
+      //						height: 20px;
+      //						margin-top:-10px;
+      //						@extend .pseudo !optional;
+      //						background:url(../img/sprite-ico20-Buildea.png) 20px 20px no-repeat;
+      //					}
+      //				}*/
+
+      ///*			&.ico-dashboard:before{ background-position:0px 0px;}*/
+
+      & > a{
+        display: block;
+        position: relative;
+        padding:10px 15px 10px 30px;
+        @extend .animate-fast,.ellipsis !optional;
+        & + ul{
+          top: 0px;
+          left:100%;
+          z-index: -1;
+          display:block;
+          overflow:hidden;
+          color:$subMenuTxt;
+          background:$subMenuBG;
+          @include prefix((
+          transition-property:width
+            ), ms moz webkit );
+          border:$subMenuBrdr 0px solid;
+          border-left: none !important;
+          @extend .notaList, .animate-Xfast !optional;
+          //@include box-shadow(7px 7px 10px 0px rgba(0, 0, 0, 0.1));
+          width:0px;
+          position:absolute;
+          ///*Animating Menu*/
+          & > li{
+            font-size:13px;
+            min-width:$sideWdt;
+            & > a{
+              padding:8px 15px;
+              color: $subMenuTxt;
+              background:$subMenuBG;
+              &:after{
+                display:none;
+              }
+              &:hover,&:focus,&:active{
+                background: $subMenuHoverBG;
+                color: $subMenuHoverTxt;
+              }
+            }
+          }
+        }
+        &:hover,&:focus,&:active{
+          color:$sideBarHoverTxt;
+          background:$sideBarHoverBG;
+          ///*& + ul{z-index:200;width:$popUpWidth;background:$dark-3;@extend .animate-Xfast !optional;}*/
+        }
+        &:after{
+          top: 50%;
+          right:0px;
+          width: 0px;
+          margin-top:-7px;
+          border-style: solid;
+          border-color:transparent;
+          border-width:7px 7px 7px 0px;
+          border-right-color: $sideBarBG;
+          @extend .pseudo !optional;
+        }
+      }
+
+      &.active{
+        & > a{
+          & + ul{
+            width:100%;
+            display:block;
+            position:static;
+            & > li{
+              & > a{
+              }
+              &.active > a{
+                color: $subMenuActiveTxt;
+                background:none;
+                font-family: $prFontB;
+              }
+            }
+          }
+        }
+      }
+
+      &.active,
+      &.active.open{
+        & > a{
+          color:$sideBarHoverTxt;
+          background:$sideBarActiveBG;
+          &:after{
+            border-right-color:$activeArrow;
+          }
+          & + ul{
+            width:100%;
+            @include box-shadow(0px 4px 4px 0px rgba(0,0,0,0.1));
+            &[aria-label]{
+              padding-top:0px;
+              &:before{
+                display:none;
+              }
+            }
+          }
+        }
+        ///*&.ico-dashboard:before{ background-position:0px -50px;}*/
+      }
+
+      &.open:not(.active){
+        & > a{
+          color:$sideBarHoverTxt;
+          background:$sideBarHoverBG;
+          &:after{
+            border-right-color:$subMenuBG;
+          }
+          & + ul{
+            z-index:200;
+            width:$popUpWidth;
+            ///*$sideWdt;*/
+            background:$subMenuBG;
+            @include box-shadow(0px 4px 8px 0px rgba(0, 0, 0, 0.2));
+            //border:$subMenuBrdr 1px solid;
+            & > li{
+              & > a{
+              }
+              &.active > a{
+                background:none;
+                color:$subMenuTxt;
+                &:hover,&:focus,&:active{
+                  background:none;
+                  color:$subMenuHoverTxt;
+                }
+              }
+            }
+          }
+        }
+        ///*&.ico-dashboard:before{ background-position:0px -25px;}*/
+      }
+      &[aria-label]{
+        & > a:after{
+          border-color: $sideBarBG;
+          display: none;
+        }
+        &.open{
+          & > a:after{
+            @include opacity(0);
+            border-color: rgba($sideBarHoverBG,0);
+          }
+        }
+        &.active.open,
+        &.active{
+          & > a:after{
+            border-color: $sideBarHoverBG;
+          }
+        }
+      }
+    }
+
+    &.tiles{
+
+    }
+  }
+  //}
+
+  ///*MINIMISED or CLOSED*/
+  &[data-minimise="true"],
+  &[data-minimize="true"],
+  &.minimize{
+    width:$mWidth;
+    //& > .fwhFixer{
+    ul.menu{
+      li{
+        ///*text-indent:-99999px;*/
+        &>a{
+          &:after,&>span:not(.icon){
+            width: 0px;
+            display:none;
+            overflow: hidden;
+          }
+          & > .fa,.icon,.glyphicon{
+            font-size: 18px;
+            margin: 0px 6px 0px -16px !important;
+          }
+          &+ul{
+            position:absolute;
+            &[aria-label]{
+              padding-top:40px;
+              &:before{
+                top:-1px;
+                left: 0px;
+                z-index: 1;
+                width: 100%;
+                cursor: auto;
+                padding: 10px 15px;
+                color:$sideBarHoverTxt;
+                content:attr(aria-label);
+                background:$sideBarHoverBG;
+                @extend .pseudo !optional;
+              }
+            }
+            li{
+              text-indent:0px;
+              min-width:$sideWdt;
+            }
+          }
+        }
+        &.active > a + ul{
+          width:0px;
+        }
+        &.open{
+          &[aria-label]{
+            &:after,
+              &:before{
+              pointer-events:none;
+              @include opacity(0.9);
+              @extend .pseudo !optional;
+            }
+            &:before{
+              left: $mWidth + 5;
+              ///*right: -($popUpWidth+5); */
+              top: -1px;
+              z-index: 1;
+              width: auto;
+              ///*$popUpWidth*/
+              cursor: auto;
+              padding:6px 10px;
+              color:$sideBarHoverTxt;
+              content:attr(aria-label);
+              background:$sideBarActiveBG;
+              @include border-radius(6px);
+
+            }
+            &:after{
+              top: 10px;
+              left: $mWidth;
+              position: absolute;
+              border:transparent 5px solid;
+              border-right-color: $sideBarHoverBG;
+              border-left:none;
+            }
+          }
+
+          &.active > a + ul {
+            z-index: 200;
+            width: $popUpWidth;
+            background:$sideBarHoverBG;
+            &[aria-label]{
+              padding-top:40px;
+            }
+            &:before{
+              display:block;
+            }
+          }
+        }
+      }
+    }
+    //}
+  }
+
+  &.close{
+    width:0px;
+    overflow:hidden;
+  }
+
+  &.right{
+    direction:rtl;
+    & /*> .fwhFixer*/ ul.menu li{
+      & > a{
+        padding: 10px 8px 10px 15px;
+        &::after{
+          right:auto;
+          left: 0;
+          border-width: 7px 0px 7px 7px;
+          border-color: transparent transparent transparent $sideBarBG;
+        }
+        .icon,.fa
+        .glyphicon {
+          margin:0px 7px 0px 6px;
+        }
+        & + ul{
+          left:auto;
+          right:100%;
+        }
+      }
+      &.active,&.active.open{
+        &>a{
+          &:after{
+            border-left-color:$activeArrow;
+          }
+        }
+      }
+      &.open{
+        &>a{
+          &:after{
+            border-left-color:$subMenuBG;
+          }
+        }
+      }
+
+    }
+    ///*MINIMISED or CLOSED*/
+    &[data-minimise="true"],
+    &[data-minimize="true"],
+    &.minimize{
+      & > .fwhFixer{
+        ul.menu{
+          li{
+            &.open{
+              &:before{
+                right:auto;
+                left:-$popUpWidth;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 @media only screen and (max-width: 767px){
-	///*.menuToggler{display:none !important;}*/
+  ///*.menuToggler{display:none !important;}*/
 }
 
 /* sidebar STYLE ends --> */

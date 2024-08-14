@@ -11,7 +11,7 @@
         <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
       </p:commandButton>
     </ui:define>
-    
+
     <p:outputLabel value="#{lang.rate}" for="#{ids}lrRateFixed" />
     <h:panelGroup>
       <p:inputNumber value="#{transporterView.transporterRateCard.lrRateFixed}" converterMessage="#{lang.rate} #{lang.invalidNumber}" 
@@ -67,8 +67,8 @@
 
       <p:column sortBy="#{transporterFreightRateVar.sourceStateId.stateName}" field="source_state_id.state_name"
                 filterBy="#{transporterFreightRateVar.sourceStateId.stateName}" filterStyleClass="hidden">
-         <f:facet name="header"><h:outputText value="#{lang.source} #{lang.state}" title="#{lang.source} #{lang.state}"/></f:facet>
-          <p:cellEditor>
+        <f:facet name="header"><h:outputText value="#{lang.source} #{lang.state}" title="#{lang.source} #{lang.state}"/></f:facet>
+        <p:cellEditor>
           <f:facet name="output">
             <h:outputText value="#{appView.display(transporterFreightRateVar.sourceStateId.stateName)}" title="#{appView.title(transporterFreightRateVar.sourceStateId.stateName)}" escape="false" />
           </f:facet>
@@ -162,7 +162,7 @@
       </p:column>
 
       <p:column sortBy="#{transporterFreightRateVar.freightRateBaseUomId.title}" field="freight_rate_base_uom_id.title">
-         <f:facet name="header"><h:outputText value="#{lang.uom}" title="#{lang.uom}"/></f:facet>
+        <f:facet name="header"><h:outputText value="#{lang.uom}" title="#{lang.uom}"/></f:facet>
         <p:cellEditor>
           <f:facet name="output">
             <h:outputText value="#{appView.display(transporterFreightRateVar.freightRateBaseUomId.title)}" title="#{appView.title(transporterFreightRateVar.freightRateBaseUomId.title)}" escape="false" />
@@ -186,7 +186,7 @@
         </p:cellEditor>
       </p:column>
 
-₹ 
+      ₹ 
 
       <p:column>
         <f:facet name="header"><h:outputText value="#{lang.slabRate}" title="#{lang.slabRate}"/></f:facet>
@@ -206,7 +206,7 @@
       </p:column>
 
       <p:column headerText="#{lang.rate}" sortBy="#{transporterFreightRateVar.freightRateFixedPerBaseuom}" field="freight_rate_fixed_per_baseuom" >
-         <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+        <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
         <p:cellEditor id="divRate">
           <f:facet name="output">
             <h:outputText value="#{appView.number(transporterFreightRateVar.freightRateFixedPerBaseuom)}" escape="false" rendered="#{transporterFreightRateVar.freightRateByBaseUomrange==0}"/>

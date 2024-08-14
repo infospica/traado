@@ -27,7 +27,6 @@ import wawo.entity.util.StringUtil;
 import spica.scm.domain.CompanySettings;
 import spica.scm.service.CompanySettingsService;
 import spica.scm.domain.Company;
-import spica.scm.domain.AccountingFinancialYear;
 import spica.scm.domain.CompanyFinancialYear;
 import spica.scm.service.PrefixTypeService;
 import spica.sys.UserRuntimeView;

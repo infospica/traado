@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.view.delete;
 
 import java.io.Serializable;
@@ -23,54 +22,57 @@ import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
-import spica.scm.view.ScmLookupView;
 
 /**
  * DebitCreditNoteItemView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Tue Feb 27 12:40:23 IST 2018 
+ * @version	1.0, Tue Feb 27 12:40:23 IST 2018
  */
-
-@Named(value="debitCreditNoteItemView")
+@Named(value = "debitCreditNoteItemView")
 @ViewScoped
-public class DebitCreditNoteItemView implements Serializable{
+public class DebitCreditNoteItemView implements Serializable {
 
   private transient DebitCreditNoteItem debitCreditNoteItem;	//Domain object/selected Domain.
   private transient LazyDataModel<DebitCreditNoteItem> debitCreditNoteItemLazyModel; 	//For lazy loading datatable.
   private transient DebitCreditNoteItem[] debitCreditNoteItemSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public DebitCreditNoteItemView() {
     super();
   }
- 
+
   /**
    * Return DebitCreditNoteItem.
+   *
    * @return DebitCreditNoteItem.
-   */  
+   */
   public DebitCreditNoteItem getDebitCreditNoteItem() {
-    if(debitCreditNoteItem == null) {
+    if (debitCreditNoteItem == null) {
       debitCreditNoteItem = new DebitCreditNoteItem();
     }
     return debitCreditNoteItem;
-  }   
-  
+  }
+
   /**
    * Set DebitCreditNoteItem.
+   *
    * @param debitCreditNoteItem.
-   */   
+   */
   public void setDebitCreditNoteItem(DebitCreditNoteItem debitCreditNoteItem) {
     this.debitCreditNoteItem = debitCreditNoteItem;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchDebitCreditNoteItem(MainView main, String viewType) {
+  public String switchDebitCreditNoteItem(MainView main, String viewType) {
     if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
@@ -83,40 +85,44 @@ public class DebitCreditNoteItemView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create debitCreditNoteItemLazyModel.
+   *
    * @param main
    */
   private void loadDebitCreditNoteItemList(final MainView main) {
     if (debitCreditNoteItemLazyModel == null) {
       debitCreditNoteItemLazyModel = new LazyDataModel<DebitCreditNoteItem>() {
-      private List<DebitCreditNoteItem> list;      
-      @Override
-      public List<DebitCreditNoteItem> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = DebitCreditNoteItemService.listPaged(main);
-          main.commit(debitCreditNoteItemLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<DebitCreditNoteItem> list;
+
+        @Override
+        public List<DebitCreditNoteItem> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = DebitCreditNoteItemService.listPaged(main);
+            main.commit(debitCreditNoteItemLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(DebitCreditNoteItem debitCreditNoteItem) {
-        return debitCreditNoteItem.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(DebitCreditNoteItem debitCreditNoteItem) {
+          return debitCreditNoteItem.getId();
+        }
+
+        @Override
         public DebitCreditNoteItem getRowData(String rowKey) {
           if (list != null) {
             for (DebitCreditNoteItem obj : list) {
@@ -132,11 +138,12 @@ public class DebitCreditNoteItemView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "fin_debit_credit_note_item/";	
+    String SUB_FOLDER = "fin_debit_credit_note_item/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -152,7 +159,7 @@ public class DebitCreditNoteItemView implements Serializable{
    */
   public String cloneDebitCreditNoteItem(MainView main) {
     main.setViewType(ViewTypes.newform);
-    return saveOrCloneDebitCreditNoteItem(main, "clone"); 
+    return saveOrCloneDebitCreditNoteItem(main, "clone");
   }
 
   /**
@@ -178,14 +185,13 @@ public class DebitCreditNoteItemView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many DebitCreditNoteItem.
    *
@@ -201,7 +207,7 @@ public class DebitCreditNoteItemView implements Serializable{
       } else {
         DebitCreditNoteItemService.deleteByPk(main, getDebitCreditNoteItem());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (main.isEdit()){
+        if (main.isEdit()) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -215,55 +221,59 @@ public class DebitCreditNoteItemView implements Serializable{
 
   /**
    * Return LazyDataModel of DebitCreditNoteItem.
+   *
    * @return
    */
   public LazyDataModel<DebitCreditNoteItem> getDebitCreditNoteItemLazyModel() {
     return debitCreditNoteItemLazyModel;
   }
 
- /**
-  * Return DebitCreditNoteItem[].
-  * @return 
-  */
+  /**
+   * Return DebitCreditNoteItem[].
+   *
+   * @return
+   */
   public DebitCreditNoteItem[] getDebitCreditNoteItemSelected() {
     return debitCreditNoteItemSelected;
   }
-  
+
   /**
    * Set DebitCreditNoteItem[].
-   * @param debitCreditNoteItemSelected 
+   *
+   * @param debitCreditNoteItemSelected
    */
   public void setDebitCreditNoteItemSelected(DebitCreditNoteItem[] debitCreditNoteItemSelected) {
     this.debitCreditNoteItemSelected = debitCreditNoteItemSelected;
   }
- 
 
-
- /**
-  * DebitCreditNote autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.debitCreditNoteAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.debitCreditNoteAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * DebitCreditNote autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.debitCreditNoteAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.debitCreditNoteAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<DebitCreditNote> debitCreditNoteAuto(String filter) {
     return null;//ScmLookupView.debitCreditNoteAuto(filter);
   }
- /**
-  * ScmTaxCode autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.scmTaxCodeAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.scmTaxCodeAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+
+  /**
+   * ScmTaxCode autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.scmTaxCodeAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.scmTaxCodeAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<TaxCode> scmTaxCodeAuto(String filter) {
     return null;//ScmLookupView.scmTaxCodeAuto(filter);
   }

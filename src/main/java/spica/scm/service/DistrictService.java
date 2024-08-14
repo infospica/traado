@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Company;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -17,8 +16,6 @@ import spica.scm.domain.District;
 import spica.scm.domain.Territory;
 import spica.scm.domain.TerritoryDistrict;
 import spica.scm.validate.ValidateUtil;
-import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -165,6 +162,7 @@ public abstract class DistrictService {
   public static District selectByCompanyRegisteredAddress(Main main, Company parent) {
     return (District) AppService.single(main, District.class, "select * from scm_district where id in (select district_id from scm_company_address where company_id = ? and address_type_id = ?);", new Object[]{parent.getId(), AddressTypeService.REGISTERED_ADDRESS});
   }
+
   /**
    * Validate delete.
    *

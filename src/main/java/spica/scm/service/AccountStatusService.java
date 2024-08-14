@@ -8,13 +8,11 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.AccountStatus;
 import spica.scm.validate.ValidateUtil;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -153,8 +151,8 @@ public abstract class AccountStatusService {
       deleteByPk(main, e);
     }
   }
-  
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main

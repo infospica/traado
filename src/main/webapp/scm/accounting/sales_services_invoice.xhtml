@@ -28,7 +28,7 @@
                        rendered="#{main.isNew() or salesServicesInvoiceView.draft}"  >
         <f:ajax execute="f1" render="f1"  />
       </h:commandButton>
-        
+
       <!-- Reset To Draft -->
       <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
                        action="#{salesServicesInvoiceView.actionResetToDraft(main)}"
@@ -380,8 +380,12 @@
       </div>
 
       <style>
-        .vtop{vertical-align: top;}
-        .col_bottom_color{border-bottom-color: red !important;}
+        .vtop{
+          vertical-align: top;
+        }
+        .col_bottom_color{
+          border-bottom-color: red !important;
+        }
       </style>
       <script type="text/javascript">
         //<![CDATA[

@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.ContractStatusService;
 
 /**
  * ContractStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Apr 07 11:31:23 IST 2016 
+ * @version	1.0, Thu Apr 07 11:31:23 IST 2016
  */
-
-@Named(value="contractStatusView")
+@Named(value = "contractStatusView")
 @ViewScoped
-public class ContractStatusView implements Serializable{
+public class ContractStatusView implements Serializable {
 
   private transient ContractStatus contractStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<ContractStatus> contractStatusLazyModel; 	//For lazy loading datatable.
   private transient ContractStatus[] contractStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ContractStatusView() {
     super();
   }
- 
+
   /**
    * Return ContractStatus.
+   *
    * @return ContractStatus.
-   */  
+   */
   public ContractStatus getContractStatus() {
-    if(contractStatus == null) {
+    if (contractStatus == null) {
       contractStatus = new ContractStatus();
     }
     return contractStatus;
-  }   
-  
+  }
+
   /**
    * Set ContractStatus.
+   *
    * @param contractStatus.
-   */   
+   */
   public void setContractStatus(ContractStatus contractStatus) {
     this.contractStatus = contractStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchContractStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchContractStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class ContractStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create contractStatusLazyModel.
+   *
    * @param main
    */
   private void loadContractStatusList(final MainView main) {
     if (contractStatusLazyModel == null) {
       contractStatusLazyModel = new LazyDataModel<ContractStatus>() {
-      private List<ContractStatus> list;      
-      @Override
-      public List<ContractStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ContractStatusService.listPaged(main);
-          main.commit(contractStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ContractStatus> list;
+
+        @Override
+        public List<ContractStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ContractStatusService.listPaged(main);
+            main.commit(contractStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ContractStatus contractStatus) {
-        return contractStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ContractStatus contractStatus) {
+          return contractStatus.getId();
+        }
+
+        @Override
         public ContractStatus getRowData(String rowKey) {
           if (list != null) {
             for (ContractStatus obj : list) {
@@ -136,11 +139,12 @@ public class ContractStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_contract_status/";	
+    String SUB_FOLDER = "scm_contract_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class ContractStatusView implements Serializable{
    */
   public String cloneContractStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneContractStatus(main, "clone"); 
+    return saveOrCloneContractStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class ContractStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error"+ key);
+      main.rollback(t, "error" + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ContractStatus.
    *
@@ -205,7 +208,7 @@ public class ContractStatusView implements Serializable{
       } else {
         ContractStatusService.deleteByPk(main, getContractStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class ContractStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of ContractStatus.
+   *
    * @return
    */
   public LazyDataModel<ContractStatus> getContractStatusLazyModel() {
     return contractStatusLazyModel;
   }
 
- /**
-  * Return ContractStatus[].
-  * @return 
-  */
+  /**
+   * Return ContractStatus[].
+   *
+   * @return
+   */
   public ContractStatus[] getContractStatusSelected() {
     return contractStatusSelected;
   }
-  
+
   /**
    * Set ContractStatus[].
-   * @param contractStatusSelected 
+   *
+   * @param contractStatusSelected
    */
   public void setContractStatusSelected(ContractStatus[] contractStatusSelected) {
     this.contractStatusSelected = contractStatusSelected;
   }
- 
-
 
 }

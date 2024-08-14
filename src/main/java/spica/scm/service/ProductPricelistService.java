@@ -23,7 +23,6 @@ import spica.scm.domain.ProductMrpAdjustment;
 import spica.scm.domain.ProductMrpAdjustmentItem;
 import spica.scm.domain.ProductPriceListVo;
 import spica.scm.domain.ProductPricelist;
-import spica.scm.util.MathUtil;
 import spica.scm.util.ProductUtil;
 import spica.scm.validate.ProductPricelistIs;
 import spica.sys.SystemConstants;
@@ -32,7 +31,6 @@ import wawo.app.Main;
 import wawo.app.common.AppService;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppDb;
-import wawo.entity.core.SqlPage;
 import wawo.entity.util.StringUtil;
 
 /**

@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -18,7 +18,6 @@ import spica.sys.SystemConstants;
 import wawo.app.Main;
 import wawo.app.common.AppService;
 import wawo.entity.core.AppDb;
-import wawo.entity.util.StringUtil;
 
 /**
  *
@@ -124,7 +123,7 @@ public class SalesReturnSplitService {
 
   private static final void deleteReturnSplit(Main main, SalesReturnSplit salesReturnSplit) {
     if (salesReturnSplit != null) {
-      AppService.delete(main, SalesReturnSplit.class, salesReturnSplit.getId()); 
+      AppService.delete(main, SalesReturnSplit.class, salesReturnSplit.getId());
     }
   }
 
@@ -168,7 +167,7 @@ public class SalesReturnSplitService {
             + "T_SRetIte.hsn_code,T_Prod.product_name,T_ProdEnDet.pack_size,T_Man.name,T_Man.code,\n"
             + "T_ProdBat.batch_no,T_ProdBat.expiry_date_actual,T_SRetIte.value_mrp,T_SRetIte.value_ptr,T_SRetIte.value_pts,T_SRetIte.value_rate,\n"
             + "T_SRetIte.value_goods ,T_SRetIte.value_igst ,T_SRetIte.ref_invoice_date,T_SRetIte.ref_invoice_no,\n"
-            + "T_SRetIte.value_cgst ,T_SRetIte.value_sgst , T_igst.rate_percentage\n"  
+            + "T_SRetIte.value_cgst ,T_SRetIte.value_sgst , T_igst.rate_percentage\n"
             + ",T_cgst.rate_percentage ,T_sgst.rate_percentage  ";
     List<InvoiceItem> list = null;
     list = AppDb.getList(main.dbConnector(), InvoiceItem.class, sql, new Object[]{AccountingConstant.TAX_TYPE_CGST, AccountingConstant.TAX_TYPE_SGST, salesReturnSplit.getId()});

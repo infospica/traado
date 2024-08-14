@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.view;
 
@@ -22,7 +22,6 @@ import spica.scm.domain.ProductEntryDetail;
 import spica.scm.domain.ProductPreset;
 import spica.scm.domain.SalesInvoice;
 import spica.scm.domain.SalesInvoiceItem;
-import spica.scm.service.ProductEntryService;
 import spica.scm.service.ProductPresetService;
 import spica.scm.service.PurchaseFromSalesService;
 import spica.scm.service.SalesInvoiceItemService;
@@ -32,7 +31,6 @@ import spica.sys.UserRuntimeView;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppPage;
-import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
 /**
@@ -42,7 +40,7 @@ import wawo.entity.util.StringUtil;
 @Named(value = "purchaseFromSalesView")
 @ViewScoped
 public class PurchaseFromSalesView implements Serializable {
-  
+
   private ProductEntry productEntry;
   private transient TaxCalculator taxCalculator;
   private transient List<SalesInvoice> salesInvoiceList;
@@ -53,60 +51,60 @@ public class PurchaseFromSalesView implements Serializable {
   @PostConstruct
   public void init() {
     productEntry = (ProductEntry) Jsf.dialogParent(ProductEntry.class);
-    
+
   }
-  
+
   public ProductEntry getProductEntry() {
     return productEntry;
   }
-  
+
   public void setProductEntry(ProductEntry productEntry) {
     this.productEntry = productEntry;
   }
-  
+
   public TaxCalculator getTaxCalculator() {
     if (productEntry.getTaxProcessorId() != null) {
       taxCalculator = (SystemRuntimeConfig.getTaxCalculator(productEntry.getTaxProcessorId().getProcessorClass()));
     }
     return taxCalculator;
   }
-  
+
   public void setTaxCalculator(TaxCalculator taxCalculator) {
     this.taxCalculator = taxCalculator;
   }
-  
+
   public List<SalesInvoice> getSalesInvoiceList() {
     return salesInvoiceList;
   }
-  
+
   public void setSalesInvoiceList(List<SalesInvoice> salesInvoiceList) {
     this.salesInvoiceList = salesInvoiceList;
   }
-  
+
   public SalesInvoice getSalesInvoiceSelected() {
     return salesInvoiceSelected;
   }
-  
+
   public void setSalesInvoiceSelected(SalesInvoice salesInvoiceSelected) {
     this.salesInvoiceSelected = salesInvoiceSelected;
   }
-  
+
   public LazyDataModel<SalesInvoice> getSalesInvoiceLazyModel() {
     return salesInvoiceLazyModel;
   }
-  
+
   public void setSalesInvoiceLazyModel(LazyDataModel<SalesInvoice> salesInvoiceLazyModel) {
     this.salesInvoiceLazyModel = salesInvoiceLazyModel;
   }
-  
+
   public List<Product> getProductList() {
     return productList;
   }
-  
+
   public void setProductList(List<Product> productList) {
     this.productList = productList;
   }
-  
+
   public String switchPurchaseFromSales(MainView main, String viewType) {
     //this.main = main;
     if (!StringUtil.isEmpty(viewType)) {
@@ -130,7 +128,7 @@ public class PurchaseFromSalesView implements Serializable {
     if (salesInvoiceLazyModel == null) {
       salesInvoiceLazyModel = new LazyDataModel<SalesInvoice>() {
         private List<SalesInvoice> list;
-        
+
         @Override
         public List<SalesInvoice> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -145,12 +143,12 @@ public class PurchaseFromSalesView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(SalesInvoice salesInvoice) {
           return salesInvoice.getId();
         }
-        
+
         @Override
         public SalesInvoice getRowData(String rowKey) {
           if (list != null) {
@@ -165,11 +163,11 @@ public class PurchaseFromSalesView implements Serializable {
       };
     }
   }
-  
+
   public void purchaseFromSalesPopupClose() {
     Jsf.popupReturn(getProductEntry(), null);
   }
-  
+
   public void addProductEntryListFromSales(MainView main) {
     productEntry.setProductEntryDetailList(new ArrayList<>());
     PurchaseFromSalesService.deleteProductEntryDetailByEntry(main, productEntry);
@@ -262,7 +260,7 @@ public class PurchaseFromSalesView implements Serializable {
       main.close();
     }
   }
-  
+
   private void secondaryAndTertiaryQtyCalculation(ProductEntryDetail productEntryDetail) {
     double totalQty = (productEntryDetail.getProductQuantity() != null ? productEntryDetail.getProductQuantity() : 0)
             + (productEntryDetail.getProductQuantityFree() != null ? productEntryDetail.getProductQuantityFree() : 0);
@@ -272,7 +270,7 @@ public class PurchaseFromSalesView implements Serializable {
         productEntryDetail.setProductSecondaryQuantity(sQty);
         productEntryDetail.setValueBoxRate(productEntryDetail.getPackSecondaryPrimaryQty() * productEntryDetail.getValueRate());
       }
-      
+
       if (productEntryDetail.getPackTertiary() != null && productEntryDetail.getPackTertiarySecondaryQty() != null) {
         Double tQty = productEntryDetail.getProductSecondaryQuantity() / productEntryDetail.getPackTertiarySecondaryQty();
         productEntryDetail.setProductTertairyQuantity(tQty);

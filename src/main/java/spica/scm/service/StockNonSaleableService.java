@@ -106,7 +106,7 @@ public abstract class StockNonSaleableService {
   public static final void insert(Main main, StockNonSaleable stockNonSaleable) {
     StockNonSaleableIs.insertAble(main, stockNonSaleable);  //Validating
     AppService.insert(main, stockNonSaleable);
-    
+
   }
 
   /**
@@ -190,7 +190,7 @@ public abstract class StockNonSaleableService {
     } else {
       params = new Object[]{accountId, null, null, stockCategoryId};
     }
-    
+
     List<ReturnItem> list = AppDb.getList(main.dbConnector(), ReturnItem.class, sql, params);
     return list;
   }
@@ -256,17 +256,17 @@ public abstract class StockNonSaleableService {
    */
   public static void deleteByPurchaseReturnAndProductDetail(MainView main, PurchaseReturnItemReplica purchaseReturnItem, ProductDetail productDetailId) {
     for (String id : purchaseReturnItem.getPurchaseReturnItemHash().split("#")) {
-      AppService.deleteSql(main, StockNonSaleable.class, "delete from scm_stock_non_saleable where purchase_return_item_id = ? and product_detail_id = ?", new Object[]{Integer.parseInt(id), productDetailId.getId()});      
-    }    
+      AppService.deleteSql(main, StockNonSaleable.class, "delete from scm_stock_non_saleable where purchase_return_item_id = ? and product_detail_id = ?", new Object[]{Integer.parseInt(id), productDetailId.getId()});
+    }
   }
-  
+
   public static void adjustDamagedStock(Main main, StockAdjustmentItem stockAdjustmentItem) {
     StockNonSaleable stockNonSaleable = new StockNonSaleable();
     stockNonSaleable.setAccountId(stockAdjustmentItem.getProductDetailId().getAccountId());
     stockNonSaleable.setEntryDate(stockAdjustmentItem.getStockAdjustmentId().getEntryDate());
     stockNonSaleable.setProductDetailId(stockAdjustmentItem.getProductDetailId());
     stockNonSaleable.setRefProductEntryDetailId(stockAdjustmentItem.getProductEntryDetailId());
-    
+
     stockNonSaleable.setStockStatusId(new StockStatus(StockStatusService.STOCK_STATUS_DAMAGED));
     stockNonSaleable.setStockType(0);
     stockNonSaleable.setStockAdjustmentItemId(stockAdjustmentItem);
@@ -277,7 +277,7 @@ public abstract class StockNonSaleableService {
     }
     insert(main, stockNonSaleable);
   }
-  
+
   public static void stockMovementDamagedToSaleable(Main main, StockMovementItem stockMovementItem) {
     StockNonSaleable stockNonSaleable = new StockNonSaleable();
     stockNonSaleable.setAccountId(stockMovementItem.getProductDetailId().getAccountId());
@@ -290,7 +290,7 @@ public abstract class StockNonSaleableService {
     stockNonSaleable.setStockStatusId(new StockStatus(StockStatusService.STOCK_STATUS_SALEABLE));
     stockNonSaleable.setStockMovementItemId(stockMovementItem);
     insert(main, stockNonSaleable);
-    
+
     StockSaleable stockSaleable = new StockSaleable();
     stockSaleable.setAccountId(stockMovementItem.getProductDetailId().getAccountId());
     stockSaleable.setEntryDate(stockMovementItem.getStockMovementId().getEntryDate());
@@ -313,11 +313,11 @@ public abstract class StockNonSaleableService {
       StockNonSaleable stockNonSaleable = new StockNonSaleable(stockAdjustmentItem, StockStatusService.STOCK_STATUS_EXCESS, SystemConstants.PRODUCT_QTY_TYPE_SALEABLE);
       stockNonSaleable.setQuantityOut(stockAdjustmentItem.getQuantityExcessActual().doubleValue());
       insertOrUpdate(main, stockNonSaleable);
-      
+
       StockSaleable stockSaleable = new StockSaleable(stockAdjustmentItem, StockStatusService.STOCK_STATUS_SALEABLE, SystemConstants.PRODUCT_QTY_TYPE_SALEABLE);
       stockSaleable.setQuantityIn(stockAdjustmentItem.getQuantityExcessActual().doubleValue());
       StockSaleableService.insertOrUpdate(main, stockSaleable);
-      
+
       PlatformService.insertPurchase(main, stockSaleable.getAccountId(), SystemRuntimeConfig.EXCESS, null, (stockSaleable.getQuantityIn() * stockAdjustmentItem.getProductEntryDetailId().getExpectedLandingRate()), stockAdjustmentItem.getProductEntryDetailId().getProductEntryId(), stockAdjustmentItem.getProductEntryDetailId(), PlatformService.NORMAL_FUND_STATE);
     }
   }
@@ -334,6 +334,6 @@ public abstract class StockNonSaleableService {
       stockNonSaleable.setQuantityOut(stockAdjustmentItem.getQuantityExcessActual().doubleValue());
       insertOrUpdate(main, stockNonSaleable);
     }
-    
+
   }
 }

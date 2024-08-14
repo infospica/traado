@@ -94,7 +94,7 @@
         <!-- Manufacturer -->
         <p:outputLabel value="#{lang.manufacturer}" for="manufactureId"/>
         <h:panelGroup>
-            <p:selectOneMenu value="#{productBatchView.productBatch.manufactureId}"  id="manufactureId" styleClass="fw"    required="true"                         
+          <p:selectOneMenu value="#{productBatchView.productBatch.manufactureId}"  id="manufactureId" styleClass="fw"    required="true"                         
                            converter="omnifaces.SelectItemsConverter" >
             <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
             <f:selectItems value="#{productBatchView.lookupManufacturer()}" var="m" itemValue="#{m}" itemLabel="#{m.name}" />              

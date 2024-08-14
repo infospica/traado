@@ -105,9 +105,9 @@
           </p:column>
 
           <p:column headerText="#{lang.tax}" styleClass="w-40">
-             <h:panelGroup layout="block" id="taxAmountDiv">
-            <h:outputText id="taxAmountId" value="#{appView.decimal(row.igstAmount)}" escape="false" />
-             </h:panelGroup>
+            <h:panelGroup layout="block" id="taxAmountDiv">
+              <h:outputText id="taxAmountId" value="#{appView.decimal(row.igstAmount)}" escape="false" />
+            </h:panelGroup>
           </p:column>   
           <p:column headerText="#{lang.debit}" style="text-align: right;"><h:outputText  rendered="#{row.isReciept(bankChargesView.selectedLedger.id)}" value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
           <p:column headerText="#{lang.credit}" style="text-align: right;"><h:outputText rendered="#{row.isPayment(bankChargesView.selectedLedger.id)}" value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>

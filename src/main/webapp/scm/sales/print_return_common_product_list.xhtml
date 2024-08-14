@@ -23,7 +23,7 @@
                 <td class="cellTable" style="width:23px;"><b>Qty<br/></b></td>
                 <td class="cellTable" style="width:28px;"><b>MRP<br/>(Rs.)</b></td>
                 <td class="cellTable" style="width:35px;"><b>PTR<br/>(Rs.)</b></td>
-<!--                <td class="cellTable" style="width:20px;"><b>Dis.<br/>%</b></td>-->
+                <!--                <td class="cellTable" style="width:20px;"><b>Dis.<br/>%</b></td>-->
                 <td class="cellTable" style="width:35px;"><b>Rate<br /> (Rs.)</b></td>
                 <td class="cellTable" style="width:35px;"><b>Dis.<br />(Rs.)</b></td>
                 <td class="cellTable" style="width:40px;"><b>Goods <br/> Value</b></td>
@@ -46,14 +46,14 @@
               <td class="verticalLine" align="right">#{inv.productQty}<h:outputText value=" +#{inv.productQtyFree}" rendered="#{inv.productQtyFree>0}" /></td>
               <td class="verticalLine" align="right">#{appView.decimal(inv.valueMrp)}&#160;</td>
               <td class="verticalLine" align="right">#{appView.decimal(inv.valuePtr)}&#160;</td>
-<!--              <td class="verticalLine" align="right">                 
-                
-                <h:outputText value=" +" rendered="#{inv.schemeDiscountPercentage gt 0 and inv.productDiscountPercentage gt 0}" />
-                <h:outputText value="#{appView.decimal(inv.productDiscountPercentage)}" rendered="#{inv.productDiscountPercentage gt 0.0}"/>
-              </td>-->
+              <!--              <td class="verticalLine" align="right">                 
+                              
+                              <h:outputText value=" +" rendered="#{inv.schemeDiscountPercentage gt 0 and inv.productDiscountPercentage gt 0}" />
+                              <h:outputText value="#{appView.decimal(inv.productDiscountPercentage)}" rendered="#{inv.productDiscountPercentage gt 0.0}"/>
+                            </td>-->
               <td class="verticalLine" align="right">#{appView.decimal(inv.valueRate)}&#160;</td>
               <td class="verticalLine" align="right">
-                
+
 <!--                <h:outputText value=" +" rendered="#{inv.schemeDiscountValue gt 0 and inv.productDiscountValue gt 0}" />-->
                 <h:outputText value="#{appView.decimal(inv.productDiscountValue + inv.schemeDiscountValue)}"/>
               </td>
@@ -105,7 +105,7 @@
                 <td class="cellTable" style="width:35px;"><b>MRP<br/>(Rs.)</b></td>
                 <td class="cellTable" style="width:35px;"><b>PTR<br/>(Rs.)</b></td>
                 <td class="cellTable" style="width:35px;"><b>PTS<br/>(Rs.)</b></td>
-                
+
                 <td class="cellTable" style="width:35px;"><b>Rate<br /> (Rs.)</b></td>
                 <td class="cellTable"  style="width:35px;"><b>Dis.<br />(Rs.)</b></td>
 
@@ -136,8 +136,8 @@
               <!--<td class="verticalLine"  align="right">#{appView.decimal(inv.schemeDiscountPercentage)}<h:outputText value=" +" rendered="#{inv.schemeDiscountPercentage gt 0 and inv.productDiscountPercentage gt 0}" /><h:outputText value="#{appView.decimal(inv.productDiscountPercentage)}" rendered="#{inv.productDiscountPercentage gt 0.0}"/>           </td>-->
               <td class="verticalLine"  align="right">#{appView.decimal(inv.valueRate)}&#160;</td>
               <td class="verticalLine"  align="right">
-                
-                <!--<h:outputText value=" +" rendered="#{inv.schemeDiscountValue gt 0 and inv.productDiscountValue gt 0}" /><h:outputText value="#{appView.decimal(inv.productDiscountValue)}" rendered="#{inv.productDiscountValue gt 0.0}"/>-->
+
+<!--<h:outputText value=" +" rendered="#{inv.schemeDiscountValue gt 0 and inv.productDiscountValue gt 0}" /><h:outputText value="#{appView.decimal(inv.productDiscountValue)}" rendered="#{inv.productDiscountValue gt 0.0}"/>-->
                 <h:outputText value="#{appView.decimal(inv.productDiscountValue+inv.schemeDiscountValue)}"/>
               </td>
 

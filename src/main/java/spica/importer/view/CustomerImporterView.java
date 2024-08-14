@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.importer.view;
 
@@ -9,18 +9,10 @@ import java.io.Serializable;
 import java.util.List;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
-import spica.scm.domain.Country;
-import spica.scm.domain.CustomerImporter;
 import spica.scm.domain.Customer;
-import spica.scm.domain.CustomerAddress;
-import spica.scm.domain.District;
-import spica.scm.domain.State;
-import spica.scm.domain.Territory;
-import spica.scm.domain.TradeProfile;
 import spica.scm.service.CustomerImporterService;
 import spica.scm.view.ScmLookupExtView;
 import spica.sys.UserRuntimeView;
-import wawo.app.Main;
 import wawo.app.faces.MainView;
 
 /**
@@ -74,15 +66,13 @@ public class CustomerImporterView implements Serializable {
   public CustomerImporterView() {
   }
 
-
-
   public void actionCompanyDelete(MainView main) {
     try {
       CustomerImporterService.deleteCompanyById(main, UserRuntimeView.instance().getCompany().getId());
       main.commit("success.delete");
-    } catch (Throwable t) {      
+    } catch (Throwable t) {
       main.rollback(t, "error.delete", null);
-    }finally{
+    } finally {
       main.close();
     }
   }

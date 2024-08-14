@@ -29,7 +29,7 @@
                    tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
         <p:ajax event="rowEdit" update="agentCommissionRangeTable" listener="#{agentCommissionRangeView.onRowEdit}"/>
 
-       
+
 
         <p:column headerText="#{lang.rangeFrom}" sortBy="#{agentCommissionRangeVar.rangeFrom}" field="range_from" style="text-align: right">
           <p:cellEditor >
@@ -60,7 +60,7 @@
             </f:facet>
           </p:cellEditor>
         </p:column>
-        
+
         <p:column headerText="#{lang.valueFixed}" sortBy="#{agentCommissionRangeVar.valueFixed}" field="value_fixed" style="text-align: right">
           <p:cellEditor rendered="#{agentCommissionRangeVar.salesAgentContractId.commissionType==1}">
             <f:facet name="output">
@@ -92,8 +92,8 @@
             </f:facet>
           </p:cellEditor>
         </p:column>
-        
-         <p:column >
+
+        <p:column >
           <p:rowEditor />
         </p:column>
 

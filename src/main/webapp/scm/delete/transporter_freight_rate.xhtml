@@ -103,7 +103,7 @@
               <p:message for="freightRateByBaseUomrange" display="text"/>
             </h:panelGroup>
             <h:panelGroup id="uomDiv1">
-            <p:outputLabel value="#{lang.rate}" for="freightRateFixedPerBaseuom" rendered="#{transporterFreightRateView.isRange()}"/>
+              <p:outputLabel value="#{lang.rate}" for="freightRateFixedPerBaseuom" rendered="#{transporterFreightRateView.isRange()}"/>
             </h:panelGroup>
             <h:panelGroup id="uomDiv" >
               <p:inputNumber value="#{transporterFreightRateView.transporterFreightRate.freightRateFixedPerBaseuom}" converterMessage="#{lang.rate} #{lang.invalidNumber}" 
@@ -111,7 +111,7 @@
                              required="true" requiredMessage="#{lang.rate} #{lang.isRequired}" rendered="#{transporterFreightRateView.isRange()}"/>
               <p:message for="freightRateFixedPerBaseuom" display="text"/>
             </h:panelGroup>
-             
+
           </ui:define>
         </ui:decorate>
       </h:form>

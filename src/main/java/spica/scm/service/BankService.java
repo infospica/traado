@@ -15,7 +15,6 @@ import spica.scm.domain.Bank;
 import spica.scm.domain.Company;
 import spica.scm.validate.ValidateUtil;
 
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 
@@ -154,8 +153,8 @@ public abstract class BankService {
       deleteByPk(main, e);
     }
   }
-  
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main

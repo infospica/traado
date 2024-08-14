@@ -30,7 +30,7 @@
       <p:outputLabel value="#{lang.accountingHead}" for="accountingLedgerAccountingHeadId"/>
       <h:panelGroup>
         <p:autoComplete value="#{accountingTransactionView.accountingHeadId}" completeMethod="#{accountingTransactionView.accountingHeadAuto}" converter="wawo.LookupIntConverter"   
-                         id="accountingLedgerAccountingHeadId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                        id="accountingLedgerAccountingHeadId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
                         style="position: relative" >
           <f:attribute name="clazz" value="#{scmLookupView.accountingHeadClass()}"/>

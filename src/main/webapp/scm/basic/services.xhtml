@@ -55,12 +55,12 @@
             </p:inputText>
             <p:message for="sacCode" display="text"/>
           </h:panelGroup>  
-          
+
           <p:outputLabel value="#{lang.rate}" for="rate" rendered="#{userRuntimeView.company.companySettings.serviceBusiness eq 1}"/>
           <h:panelGroup rendered="#{userRuntimeView.company.companySettings.serviceBusiness eq 1}">
-                  <p:inputNumber value="#{servicesView.commodity.rate}" converterMessage="#{lang.rate} #{lang.invalidNumber}" decimalPlaces="2" 
-                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999.00" minValue="0.0" symbol="#{appView.currencySymbol}" maxlength="15" required="true" requiredMessage="#{lang.rate} #{lang.isRequired}" 
-                       id="rate" />
+            <p:inputNumber value="#{servicesView.commodity.rate}" converterMessage="#{lang.rate} #{lang.invalidNumber}" decimalPlaces="2" 
+                           onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999.00" minValue="0.0" symbol="#{appView.currencySymbol}" maxlength="15" required="true" requiredMessage="#{lang.rate} #{lang.isRequired}" 
+                           id="rate" />
             <p:message for="rate" display="text"/>
           </h:panelGroup> 
 
@@ -147,9 +147,9 @@
           <f:facet name="header"><h:outputText value="#{lang.serviceTax}" title="#{lang.salesTax}"/></f:facet>
           <h:outputText value="#{appView.display(commodityVar.salesTaxCodeId.code)}" title="#{appView.title(commodityVar.salesTaxCodeId.code)}" escape="false" />
         </p:column>
-        
+
         <p:column sortBy="#{commodityVar.rate}" field="commodity.rate" rendered="#{userRuntimeView.company.companySettings.serviceBusiness eq 1}">
-           <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+          <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
           <h:outputText value="#{appView.display(commodityVar.salesTaxCodeId.code)}" title="#{appView.title(commodityVar.salesTaxCodeId.code)}" escape="false" />
         </p:column>
 

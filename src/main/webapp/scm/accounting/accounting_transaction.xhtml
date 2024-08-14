@@ -35,21 +35,20 @@
     <ui:define name="save" >       
       <p:commandButton actionListener="#{journalView.save(main,true)}" value="#{lang.confirm}" process="f1" update="f1" onclick="block()" styleClass="btn btn-primary" rendered="#{main.isNew()}"/>
       <p:commandButton actionListener="#{journalView.save(main,false)}" value="#{lang.confirm} #{lang.andAdd}"  process="f1" update="f1" onclick="block()" styleClass="btn btn-primary" rendered="#{main.isNew()}"/>
-             <script type="text/javascript">
-              //<![CDATA[     
-              function docItemFocus(dr, index) {
-                if(dr){
-                   $('#journalTable\\:'+index+'\\:debit_input').focus();
-                 $('#journalTable\\:'+index+'\\:debit_input').change();
-                }
-                 else {
-                   $('#journalTable\\:'+index+'\\:credit_input').focus();
-                 $('#journalTable\\:'+index+'\\:credit_input').change();
-               }
-                return false;
-              }
-              //]]>
-            </script>
+      <script type="text/javascript">
+        //<![CDATA[     
+        function docItemFocus(dr, index) {
+          if (dr) {
+            $('#journalTable\\:' + index + '\\:debit_input').focus();
+            $('#journalTable\\:' + index + '\\:debit_input').change();
+          } else {
+            $('#journalTable\\:' + index + '\\:credit_input').focus();
+            $('#journalTable\\:' + index + '\\:credit_input').change();
+          }
+          return false;
+        }
+        //]]>
+      </script>
     </ui:define>
     <ui:define name="more">
       <div class="L g" style="padding-left: 5%">

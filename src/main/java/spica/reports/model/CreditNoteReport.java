@@ -1,17 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.model;
-
-import java.util.Date;
 
 /**
  *
  * @author Godson Joseph
  */
 public class CreditNoteReport {
+
   private Integer id;
   private Double ratePercentage;
   private String customerName;

@@ -146,7 +146,6 @@ public abstract class VendorContactService {
 //      AppService.updateSql(main, VendorContact.class, "update scm_vendor_contact set modified_by = ?,modified_at = ?, sort_order = ? where vendor_id = ? and id <> ? and sort_order = ?", true);
 //    }
 //  }
-
   /**
    * Clone and existing object
    *

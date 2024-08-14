@@ -1,13 +1,13 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
   #{productPackingUnitView.switchProductPackingUnit(main, viewType)}
 
- <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.productPackingUnit}" />
     <ui:param name="ids" value="productPackingUnit" />
 
     <ui:define name="deleteList" >
       <p:commandButton action="#{productPackingUnitView.deleteProductPackingUnit(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productPackingUnitWidgetDelConf')" process="f1" update="f1" >
-	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
       </p:commandButton>
     </ui:define>
 
@@ -24,31 +24,31 @@
     </ui:define>   
 
     <ui:define name="form">
-        <p:outputLabel value="#{lang.unit}" for="productUnitId" />
-        <h:panelGroup>
-          <p:autoComplete value="#{productPackingUnitView.productPackingUnit.productUnitId}" completeMethod="#{productPackingUnitView.productUnitAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productPackingUnitProductPackingId} #{lang.isRequired}" id="productUnitId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.productUnitClass()}"/>
+      <p:outputLabel value="#{lang.unit}" for="productUnitId" />
+      <h:panelGroup>
+        <p:autoComplete value="#{productPackingUnitView.productPackingUnit.productUnitId}" completeMethod="#{productPackingUnitView.productUnitAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productPackingUnitProductPackingId} #{lang.isRequired}" id="productUnitId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productUnitClass()}"/>
           <f:attribute name="byid" value="#{scmLookupView.productUnitById()}"/>
         </p:autoComplete>
-          
-          <p:message for="productUnitId" display="text"/></h:panelGroup>
 
-        <p:outputLabel value="#{lang.productPacking}" for="productPackingUnitProductPackingId"/><h:panelGroup>
-          <p:autoComplete value="#{productPackingUnitView.productPackingUnit.productPackingId}" completeMethod="#{productPackingUnitView.productPackingAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productPackingUnitProductPackingId} #{lang.isRequired}" id="productPackingUnitProductPackingId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.productPackingClass()}"/>
+        <p:message for="productUnitId" display="text"/></h:panelGroup>
+
+      <p:outputLabel value="#{lang.productPacking}" for="productPackingUnitProductPackingId"/><h:panelGroup>
+        <p:autoComplete value="#{productPackingUnitView.productPackingUnit.productPackingId}" completeMethod="#{productPackingUnitView.productPackingAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productPackingUnitProductPackingId} #{lang.isRequired}" id="productPackingUnitProductPackingId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productPackingClass()}"/>
           <f:attribute name="byid" value="#{scmLookupView.productPackingById()}"/>
         </p:autoComplete><p:message for="productPackingUnitProductPackingId" display="text" /></h:panelGroup>
     </ui:define>
-	
+
     <ui:define name="list">
       <p:dataTable id="productPackingUnitTable" var="productPackingUnitVar" widgetVar="productPackingUnitWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-        lazy="true" value="#{productPackingUnitView.productPackingUnitLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productPackingUnitVar.id}"
-        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
-        selection="#{productPackingUnitView.productPackingUnitSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+                   lazy="true" value="#{productPackingUnitView.productPackingUnitLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productPackingUnitVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productPackingUnitView.productPackingUnitSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
         <p:column selectionMode="multiple" exportable="false" />
         <p:column headerText="#{lang.id}" sortBy="#{productPackingUnitVar.id}" field="id" >
           <p:commandLink action="#{main.setViewType(editform)}" value="#{productPackingUnitVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
-        <f:setPropertyActionListener target="#{productPackingUnitView.productPackingUnit}" value="#{productPackingUnitVar}" />
+            <f:setPropertyActionListener target="#{productPackingUnitView.productPackingUnit}" value="#{productPackingUnitVar}" />
           </p:commandLink>
         </p:column>
         <p:column headerText="#{lang.productUnitId}" sortBy="#{productPackingUnitVar.productUnitId}" field="product_unit_id" style="text-align: right"><h:outputText value="#{appView.display(productPackingUnitVar.productUnitId.title)}" escape="false" /></p:column>

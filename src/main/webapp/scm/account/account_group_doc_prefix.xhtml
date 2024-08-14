@@ -62,14 +62,14 @@
       <h:panelGroup>
         <p:inputNumber value="#{accountGroupDocPrefixView.accountGroupDocPrefix.docNumberCounter}" converterMessage="#{lang.invoiceNoCounter} #{lang.invalidNumber}" 
                        decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="docNumberCounter" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="docNumberCounter" />
         <p:message for="docNumberCounter" display="text"/>
       </h:panelGroup>
 
       <p:outputLabel value="#{lang.padding}" for="padding" />
       <h:panelGroup>
         <p:inputNumber value="#{accountGroupDocPrefixView.accountGroupDocPrefix.padding}" converterMessage="#{lang.padding} #{lang.invalidNumber}" decimalPlaces="0" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="padding" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="padding" />
         <p:message for="padding" display="text"/>
       </h:panelGroup>
 
@@ -96,7 +96,7 @@
         <p:message for="yearPadding" display="text" />
       </h:panelGroup>
 
-       <h:panelGroup id="yearStartLabel">
+      <h:panelGroup id="yearStartLabel">
         <p:outputLabel value="#{lang.startYearOnlyLabel}" for="yearStart" rendered="#{accountGroupDocPrefixView.yearSequence}" />
       </h:panelGroup>
       <h:panelGroup id="yearStartDiv">
@@ -107,8 +107,8 @@
         </p:selectOneRadio>
         <p:message for="yearStart" display="text" />
       </h:panelGroup>
-      
-      
+
+
       <!--status-->
       <p:outputLabel value="#{lang.status}" for="accountGroupStatusId"/>
       <h:panelGroup>
@@ -125,10 +125,10 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" rendered="false" />
       <h:panelGroup rendered="false">
         <p:inputNumber value="#{accountGroupDocPrefixView.accountGroupDocPrefix.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder"  thousandSeparator=""/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder"  thousandSeparator=""/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
-      
+
       <h:panelGroup></h:panelGroup>
       <h:panelGroup></h:panelGroup>
     </ui:define>    

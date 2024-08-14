@@ -24,17 +24,17 @@
     </ui:define>   
 
     <ui:define name="form">  
-      
+
       <!--Title-->
       <p:outputLabel value="#{lang.title}" for="title" />
       <h:panelGroup><p:inputText styleClass="fw" value="#{salesReqStatusView.salesReqStatus.title}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text"/></h:panelGroup>
-      
+
       <!--Sort Order-->
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup><p:inputNumber value="#{salesReqStatusView.salesReqStatus.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="sortOrder" /><p:message for="sortOrder" display="text"/></h:panelGroup>            
-    
+
     </ui:define>
-    
+
     <ui:define name="after">
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
         <ui:define name="cby">#{appView.display(salesReqStatusView.salesReqStatus.createdBy)}</ui:define>
@@ -43,7 +43,7 @@
         <ui:define name="uat">#{appView.dateTime(salesReqStatusView.salesReqStatus.modifiedAt)}</ui:define>
       </ui:decorate>
     </ui:define>
-    
+
     <ui:define name="list">
       <p:dataTable id="salesReqStatusTable" var="salesReqStatusVar" widgetVar="salesReqStatusWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                    lazy="true" value="#{salesReqStatusView.salesReqStatusLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesReqStatusVar.id}"
@@ -62,7 +62,7 @@
             <ui:define name="cat">#{appView.dateTime(salesReqStatusVar.createdAt)}</ui:define>
             <ui:define name="uby">#{appView.display(salesReqStatusVar.modifiedBy)}</ui:define>
             <ui:define name="uat">#{appView.dateTime(salesReqStatusVar.modifiedAt)}</ui:define>
-             <ui:define name="id">#{appView.display(salesReqStatusVar.id)}</ui:define>
+            <ui:define name="id">#{appView.display(salesReqStatusVar.id)}</ui:define>
           </ui:decorate>
         </p:column>  
       </p:dataTable> 	

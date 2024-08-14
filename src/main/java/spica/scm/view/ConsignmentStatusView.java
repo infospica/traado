@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.ConsignmentStatusService;
 
 /**
  * ConsignmentStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Jul 22 10:57:43 IST 2016 
+ * @version	1.0, Fri Jul 22 10:57:43 IST 2016
  */
-
-@Named(value="consignmentStatusView")
+@Named(value = "consignmentStatusView")
 @ViewScoped
-public class ConsignmentStatusView implements Serializable{
+public class ConsignmentStatusView implements Serializable {
 
   private transient ConsignmentStatus consignmentStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<ConsignmentStatus> consignmentStatusLazyModel; 	//For lazy loading datatable.
   private transient ConsignmentStatus[] consignmentStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ConsignmentStatusView() {
     super();
   }
- 
+
   /**
    * Return ConsignmentStatus.
+   *
    * @return ConsignmentStatus.
-   */  
+   */
   public ConsignmentStatus getConsignmentStatus() {
-    if(consignmentStatus == null) {
+    if (consignmentStatus == null) {
       consignmentStatus = new ConsignmentStatus();
     }
     return consignmentStatus;
-  }   
-  
+  }
+
   /**
    * Set ConsignmentStatus.
+   *
    * @param consignmentStatus.
-   */   
+   */
   public void setConsignmentStatus(ConsignmentStatus consignmentStatus) {
     this.consignmentStatus = consignmentStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchConsignmentStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchConsignmentStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class ConsignmentStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create consignmentStatusLazyModel.
+   *
    * @param main
    */
   private void loadConsignmentStatusList(final MainView main) {
     if (consignmentStatusLazyModel == null) {
       consignmentStatusLazyModel = new LazyDataModel<ConsignmentStatus>() {
-      private List<ConsignmentStatus> list;      
-      @Override
-      public List<ConsignmentStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ConsignmentStatusService.listPaged(main);
-          main.commit(consignmentStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ConsignmentStatus> list;
+
+        @Override
+        public List<ConsignmentStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ConsignmentStatusService.listPaged(main);
+            main.commit(consignmentStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ConsignmentStatus consignmentStatus) {
-        return consignmentStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ConsignmentStatus consignmentStatus) {
+          return consignmentStatus.getId();
+        }
+
+        @Override
         public ConsignmentStatus getRowData(String rowKey) {
           if (list != null) {
             for (ConsignmentStatus obj : list) {
@@ -136,11 +139,12 @@ public class ConsignmentStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_consignment_status/";	
+    String SUB_FOLDER = "scm_consignment_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class ConsignmentStatusView implements Serializable{
    */
   public String cloneConsignmentStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneConsignmentStatus(main, "clone"); 
+    return saveOrCloneConsignmentStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class ConsignmentStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ConsignmentStatus.
    *
@@ -205,7 +208,7 @@ public class ConsignmentStatusView implements Serializable{
       } else {
         ConsignmentStatusService.deleteByPk(main, getConsignmentStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class ConsignmentStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of ConsignmentStatus.
+   *
    * @return
    */
   public LazyDataModel<ConsignmentStatus> getConsignmentStatusLazyModel() {
     return consignmentStatusLazyModel;
   }
 
- /**
-  * Return ConsignmentStatus[].
-  * @return 
-  */
+  /**
+   * Return ConsignmentStatus[].
+   *
+   * @return
+   */
   public ConsignmentStatus[] getConsignmentStatusSelected() {
     return consignmentStatusSelected;
   }
-  
+
   /**
    * Set ConsignmentStatus[].
-   * @param consignmentStatusSelected 
+   *
+   * @param consignmentStatusSelected
    */
   public void setConsignmentStatusSelected(ConsignmentStatus[] consignmentStatusSelected) {
     this.consignmentStatusSelected = consignmentStatusSelected;
   }
- 
-
 
 }

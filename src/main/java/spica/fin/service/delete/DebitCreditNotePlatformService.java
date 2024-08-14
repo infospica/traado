@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.service.delete;
 
 import java.util.List;
@@ -17,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * DebitCreditNotePlatformService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Tue Feb 27 12:40:25 IST 2018 
+ * @version	1.0, Tue Feb 27 12:40:25 IST 2018
  */
+public abstract class DebitCreditNotePlatformService {
 
-public abstract class DebitCreditNotePlatformService {  
- 
- /**
+  /**
    * DebitCreditNotePlatform paginated query.
    *
    * @param main
@@ -36,18 +35,19 @@ public abstract class DebitCreditNotePlatformService {
     sql.join("left outer join fin_debit_credit_note fin_debit_credit_note_platformfin_debit_credit_note_id on (fin_debit_credit_note_platformfin_debit_credit_note_id.id = fin_debit_credit_note_platform.fin_debit_credit_note_id) left outer join scm_platform fin_debit_credit_note_platformplatform_id on (fin_debit_credit_note_platformplatform_id.id = fin_debit_credit_note_platform.platform_id)"); //Join Query
 
     sql.string(null); //String search or sort fields
-    sql.number(new String[]{"fin_debit_credit_note_platform.id","fin_debit_credit_note_platformfin_debit_credit_note_id.company_id","fin_debit_credit_note_platformplatform_id.credit_amount_required"}); //Numeric search or sort fields
+    sql.number(new String[]{"fin_debit_credit_note_platform.id", "fin_debit_credit_note_platformfin_debit_credit_note_id.company_id", "fin_debit_credit_note_platformplatform_id.credit_amount_required"}); //Numeric search or sort fields
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of DebitCreditNotePlatform.
-  * @param main
-  * @return List of DebitCreditNotePlatform
-  */
+
+  /**
+   * Return List of DebitCreditNotePlatform.
+   *
+   * @param main
+   * @return List of DebitCreditNotePlatform
+   */
   public static final List<DebitCreditNotePlatform> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getDebitCreditNotePlatformSqlPaged(main));
+    return AppService.listPagedJpa(main, getDebitCreditNotePlatformSqlPaged(main));
   }
 
 //  /**
@@ -63,34 +63,36 @@ public abstract class DebitCreditNotePlatformService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select DebitCreditNotePlatform by key.
-  * @param main
-  * @param debitCreditNotePlatform
-  * @return DebitCreditNotePlatform
-  */
+  /**
+   * Select DebitCreditNotePlatform by key.
+   *
+   * @param main
+   * @param debitCreditNotePlatform
+   * @return DebitCreditNotePlatform
+   */
   public static final DebitCreditNotePlatform selectByPk(Main main, DebitCreditNotePlatform debitCreditNotePlatform) {
     return (DebitCreditNotePlatform) AppService.find(main, DebitCreditNotePlatform.class, debitCreditNotePlatform.getId());
   }
 
- /**
-  * Insert DebitCreditNotePlatform.
-  * @param main
-  * @param debitCreditNotePlatform
-  */
+  /**
+   * Insert DebitCreditNotePlatform.
+   *
+   * @param main
+   * @param debitCreditNotePlatform
+   */
   public static final void insert(Main main, DebitCreditNotePlatform debitCreditNotePlatform) {
     insertAble(main, debitCreditNotePlatform);  //Validating
     AppService.insert(main, debitCreditNotePlatform);
 
   }
 
- /**
-  * Update DebitCreditNotePlatform by key.
-  * @param main
-  * @param debitCreditNotePlatform
-  * @return DebitCreditNotePlatform
-  */
+  /**
+   * Update DebitCreditNotePlatform by key.
+   *
+   * @param main
+   * @param debitCreditNotePlatform
+   * @return DebitCreditNotePlatform
+   */
   public static final DebitCreditNotePlatform updateByPk(Main main, DebitCreditNotePlatform debitCreditNotePlatform) {
     updateAble(main, debitCreditNotePlatform); //Validating
     return (DebitCreditNotePlatform) AppService.update(main, debitCreditNotePlatform);
@@ -105,8 +107,7 @@ public abstract class DebitCreditNotePlatformService {
   public static void insertOrUpdate(Main main, DebitCreditNotePlatform debitCreditNotePlatform) {
     if (debitCreditNotePlatform.getId() == null) {
       insert(main, debitCreditNotePlatform);
-    }
-    else{
+    } else {
       updateByPk(main, debitCreditNotePlatform);
     }
   }
@@ -122,26 +123,29 @@ public abstract class DebitCreditNotePlatformService {
     insert(main, debitCreditNotePlatform);
   }
 
- /**
-  * Delete DebitCreditNotePlatform.
-  * @param main
-  * @param debitCreditNotePlatform
-  */
+  /**
+   * Delete DebitCreditNotePlatform.
+   *
+   * @param main
+   * @param debitCreditNotePlatform
+   */
   public static final void deleteByPk(Main main, DebitCreditNotePlatform debitCreditNotePlatform) {
     deleteAble(main, debitCreditNotePlatform); //Validation
     AppService.delete(main, DebitCreditNotePlatform.class, debitCreditNotePlatform.getId());
   }
-	
- /**
-  * Delete Array of DebitCreditNotePlatform.
-  * @param main
-  * @param debitCreditNotePlatform
-  */
+
+  /**
+   * Delete Array of DebitCreditNotePlatform.
+   *
+   * @param main
+   * @param debitCreditNotePlatform
+   */
   public static final void deleteByPkArray(Main main, DebitCreditNotePlatform[] debitCreditNotePlatform) {
     for (DebitCreditNotePlatform e : debitCreditNotePlatform) {
       deleteByPk(main, e);
     }
   }
+
   /**
    * Validate delete.
    *

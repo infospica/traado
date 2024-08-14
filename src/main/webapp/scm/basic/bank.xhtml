@@ -55,7 +55,7 @@
         <p:column selectionMode="multiple" exportable="false" />        
         <p:column  sortBy="#{bankVar.name}" field="name" filterBy="#{bankVar.name}" filterStyle="display:none">
           <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(bankVar.name)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(bankVar.name)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{bankView.bank}" value="#{bankVar}" />
           </p:commandLink>            
         </p:column>   

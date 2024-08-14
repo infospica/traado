@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -15,15 +14,11 @@ import java.util.Map;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -38,54 +33,58 @@ import spica.sys.UserRuntimeView;
 
 /**
  * TerritoryView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Oct 19 11:15:18 IST 2016 
+ * @version	1.0, Wed Oct 19 11:15:18 IST 2016
  */
-
-@Named(value="territoryView")
+@Named(value = "territoryView")
 @ViewScoped
-public class TerritoryView implements Serializable{
+public class TerritoryView implements Serializable {
 
   private transient Territory territory;	//Domain object/selected Domain.
   private transient LazyDataModel<Territory> territoryLazyModel; 	//For lazy loading datatable.
   private transient Territory[] territorySelected;	 //Selected Domain Array
   private List<District> districtSelected;
   private List<State> stateSelected;
+
   /**
    * Default Constructor.
-   */   
+   */
   public TerritoryView() {
     super();
   }
- 
+
   /**
    * Return Territory.
+   *
    * @return Territory.
-   */  
+   */
   public Territory getTerritory() {
-    if(territory == null) {
+    if (territory == null) {
       territory = new Territory();
     }
     return territory;
-  }   
-  
+  }
+
   /**
    * Set Territory.
+   *
    * @param territory.
-   */   
+   */
   public void setTerritory(Territory territory) {
     this.territory = territory;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchTerritory(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchTerritory(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -102,40 +101,44 @@ public class TerritoryView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create territoryLazyModel.
+   *
    * @param main
    */
   private void loadTerritoryList(final MainView main) {
     if (territoryLazyModel == null) {
       territoryLazyModel = new LazyDataModel<Territory>() {
-      private List<Territory> list;      
-      @Override
-      public List<Territory> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = TerritoryService.listPaged(main, UserRuntimeView.instance().getCompany());
-          main.commit(territoryLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<Territory> list;
+
+        @Override
+        public List<Territory> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = TerritoryService.listPaged(main, UserRuntimeView.instance().getCompany());
+            main.commit(territoryLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(Territory territory) {
-        return territory.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(Territory territory) {
+          return territory.getId();
+        }
+
+        @Override
         public Territory getRowData(String rowKey) {
           if (list != null) {
             for (Territory obj : list) {
@@ -151,11 +154,12 @@ public class TerritoryView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_territory/";	
+    String SUB_FOLDER = "scm_territory/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -171,7 +175,7 @@ public class TerritoryView implements Serializable{
    */
   public String cloneTerritory(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneTerritory(main, "clone"); 
+    return saveOrCloneTerritory(main, "clone");
   }
 
   /**
@@ -188,24 +192,23 @@ public class TerritoryView implements Serializable{
         switch (key) {
           case "save":
             getTerritory().setCompanyId(UserRuntimeView.instance().getCompany());
-            TerritoryService.insertOrUpdate(main, getTerritory(),districtSelected,stateSelected);
+            TerritoryService.insertOrUpdate(main, getTerritory(), districtSelected, stateSelected);
             break;
           case "clone":
-            TerritoryService.clone(main, getTerritory(),districtSelected,stateSelected);
+            TerritoryService.clone(main, getTerritory(), districtSelected, stateSelected);
             break;
         }
         main.commit("success." + key);
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many Territory.
    *
@@ -221,7 +224,7 @@ public class TerritoryView implements Serializable{
       } else {
         TerritoryService.deleteByPk(main, getTerritory());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -235,41 +238,43 @@ public class TerritoryView implements Serializable{
 
   /**
    * Return LazyDataModel of Territory.
+   *
    * @return
    */
   public LazyDataModel<Territory> getTerritoryLazyModel() {
     return territoryLazyModel;
   }
 
- /**
-  * Return Territory[].
-  * @return 
-  */
+  /**
+   * Return Territory[].
+   *
+   * @return
+   */
   public Territory[] getTerritorySelected() {
     return territorySelected;
   }
-  
+
   /**
    * Set Territory[].
-   * @param territorySelected 
+   *
+   * @param territorySelected
    */
   public void setTerritorySelected(Territory[] territorySelected) {
     this.territorySelected = territorySelected;
   }
- 
 
-
- /**
-  * Country autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.countryAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.countryAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * Country autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.countryAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.countryAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<Country> countryAuto(String filter) {
     return ScmLookupView.countryAuto(filter);
   }
@@ -281,12 +286,12 @@ public class TerritoryView implements Serializable{
     }
     return null;
   }
-  public void clearStateDistrict(AjaxBehaviorEvent event) {
-   stateSelected=null;
-   districtSelected=null;
-}
 
-  
+  public void clearStateDistrict(AjaxBehaviorEvent event) {
+    stateSelected = null;
+    districtSelected = null;
+  }
+
   public List<District> districtAuto() {
     List<District> dt = new ArrayList<>();
     if (stateSelected != null) {

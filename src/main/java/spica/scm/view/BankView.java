@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -31,52 +26,56 @@ import spica.sys.UserRuntimeView;
 
 /**
  * BankView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Mar 30 12:35:25 IST 2016 
+ * @version	1.0, Wed Mar 30 12:35:25 IST 2016
  */
-
-@Named(value="bankView")
+@Named(value = "bankView")
 @ViewScoped
-public class BankView implements Serializable{
+public class BankView implements Serializable {
 
   private transient Bank bank;	//Domain object/selected Domain.
   private transient LazyDataModel<Bank> bankLazyModel; 	//For lazy loading datatable.
   private transient Bank[] bankSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public BankView() {
     super();
   }
- 
+
   /**
    * Return Bank.
+   *
    * @return Bank.
-   */  
+   */
   public Bank getBank() {
-    if(bank == null) {
+    if (bank == null) {
       bank = new Bank();
     }
     return bank;
-  }   
-  
+  }
+
   /**
    * Set Bank.
+   *
    * @param bank.
-   */   
+   */
   public void setBank(Bank bank) {
     this.bank = bank;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchBank(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchBank(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -88,40 +87,44 @@ public class BankView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create bankLazyModel.
+   *
    * @param main
    */
   private void loadBankList(final MainView main) {
     if (bankLazyModel == null) {
       bankLazyModel = new LazyDataModel<Bank>() {
-      private List<Bank> list;      
-      @Override
-      public List<Bank> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = BankService.listPaged(main, UserRuntimeView.instance().getCompany());
-          main.commit(bankLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<Bank> list;
+
+        @Override
+        public List<Bank> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = BankService.listPaged(main, UserRuntimeView.instance().getCompany());
+            main.commit(bankLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(Bank bank) {
-        return bank.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(Bank bank) {
+          return bank.getId();
+        }
+
+        @Override
         public Bank getRowData(String rowKey) {
           if (list != null) {
             for (Bank obj : list) {
@@ -137,11 +140,12 @@ public class BankView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_bank/";	
+    String SUB_FOLDER = "scm_bank/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -157,7 +161,7 @@ public class BankView implements Serializable{
    */
   public String cloneBank(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneBank(main, "clone"); 
+    return saveOrCloneBank(main, "clone");
   }
 
   /**
@@ -184,14 +188,13 @@ public class BankView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error"+ key);
+      main.rollback(t, "error" + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many Bank.
    *
@@ -207,7 +210,7 @@ public class BankView implements Serializable{
       } else {
         BankService.deleteByPk(main, getBank());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -221,28 +224,29 @@ public class BankView implements Serializable{
 
   /**
    * Return LazyDataModel of Bank.
+   *
    * @return
    */
   public LazyDataModel<Bank> getBankLazyModel() {
     return bankLazyModel;
   }
 
- /**
-  * Return Bank[].
-  * @return 
-  */
+  /**
+   * Return Bank[].
+   *
+   * @return
+   */
   public Bank[] getBankSelected() {
     return bankSelected;
   }
-  
+
   /**
    * Set Bank[].
-   * @param bankSelected 
+   *
+   * @param bankSelected
    */
   public void setBankSelected(Bank[] bankSelected) {
     this.bankSelected = bankSelected;
   }
- 
-
 
 }

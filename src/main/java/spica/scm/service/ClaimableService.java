@@ -8,7 +8,6 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -169,6 +168,7 @@ public abstract class ClaimableService {
     sql.param(contract.getId());
     return AppService.listAllJpa(main, sql);
   }
+
   /**
    * Validate delete.
    *

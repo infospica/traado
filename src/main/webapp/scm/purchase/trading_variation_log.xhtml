@@ -6,21 +6,21 @@
     <ui:param name="ids" value="tradingVariationLog" />
     <ui:param name="search" value="false" />
 
-<!--    <ui:define name="leftLeftList" >
-      <h:panelGroup styleClass="searchBox m m-r-5"  >
-        <p:inputText styleClass="fw" id="search" value="#{main.pageData.searchKeyWord}" placeholder="#{lang.search}"  />
-        <p:commandButton styleClass="btn" onclick="block()" oncomplete="unblock();" update="tables" process="search,@this" title="#{lang.search}" id="btnSkw" partialSubmit="true" icon="fa fa-search" iconPos="left" >
-          <f:setPropertyActionListener target="#{tradingVariationLogView.rootDebit}" value="#{null}" />
-          <f:setPropertyActionListener target="#{tradingVariationLogView.rootCredit}" value="#{null}" />
-          <f:setPropertyActionListener target="#{tradingVariationLogView.debitTotalRecords}" value="#{null}" />
-          <f:setPropertyActionListener target="#{tradingVariationLogView.creditTotalRecords}" value="#{null}" />
-          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
-        </p:commandButton>
-        <ui:insert name="defaultCommand" >
-          <p:defaultCommand target="btnSkw"/>
-        </ui:insert>
-      </h:panelGroup>
-    </ui:define>-->
+    <!--    <ui:define name="leftLeftList" >
+          <h:panelGroup styleClass="searchBox m m-r-5"  >
+            <p:inputText styleClass="fw" id="search" value="#{main.pageData.searchKeyWord}" placeholder="#{lang.search}"  />
+            <p:commandButton styleClass="btn" onclick="block()" oncomplete="unblock();" update="tables" process="search,@this" title="#{lang.search}" id="btnSkw" partialSubmit="true" icon="fa fa-search" iconPos="left" >
+              <f:setPropertyActionListener target="#{tradingVariationLogView.rootDebit}" value="#{null}" />
+              <f:setPropertyActionListener target="#{tradingVariationLogView.rootCredit}" value="#{null}" />
+              <f:setPropertyActionListener target="#{tradingVariationLogView.debitTotalRecords}" value="#{null}" />
+              <f:setPropertyActionListener target="#{tradingVariationLogView.creditTotalRecords}" value="#{null}" />
+              <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+            </p:commandButton>
+            <ui:insert name="defaultCommand" >
+              <p:defaultCommand target="btnSkw"/>
+            </ui:insert>
+          </h:panelGroup>
+        </ui:define>-->
 
     <ui:define name="rightList" >
       <p:selectOneMenu styleClass="L" id="summary" value="#{tradingVariationLogView.selectedSummary}" >
@@ -36,7 +36,9 @@
 
     <ui:define name="list">
       <style>
-        .vtop{vertical-align: top;}
+        .vtop{
+          vertical-align: top;
+        }
         .ui-treetable-toggler.ui-icon.ui-icon-triangle-1-e.ui-c {
           visibility: visible !important;
         }
@@ -84,7 +86,7 @@
             </p:column>
           </p:treeTable>
         </h:panelGroup>
-        
+
         <h:panelGroup layout="block" id="debitDetailDiv">
           <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
           <!-- Detail Left Data Table (Debit) -->

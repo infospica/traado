@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.fin.view;
 
@@ -113,19 +113,17 @@ public class FinalStatementView implements Serializable {
     fs.setTrtype("exp");
     fs.setTotalAmount(openingBalance);
     fs.setTitle("Opening Stock");
-    Double openingDamageExpiry =  FinalStatementService.getOpeningDamageAndExpiry(main,UserRuntimeView.instance().getCompany().getId(),accountingMainView);
-    getTradingaccountExpenseList().add(0, new FinalStatement("dr",openingDamageExpiry,null,"Opening Stock Damage & Expiry "));
-    getTradingaccountExpenseList().add(1, new FinalStatement("dr",openingBalance,openingBalance+openingDamageExpiry,"Opening Stock "));    
-    
-    
-    
+    Double openingDamageExpiry = FinalStatementService.getOpeningDamageAndExpiry(main, UserRuntimeView.instance().getCompany().getId(), accountingMainView);
+    getTradingaccountExpenseList().add(0, new FinalStatement("dr", openingDamageExpiry, null, "Opening Stock Damage & Expiry "));
+    getTradingaccountExpenseList().add(1, new FinalStatement("dr", openingBalance, openingBalance + openingDamageExpiry, "Opening Stock "));
+
     tradingLeftTotal = tradingLeftTotal + openingBalance + openingDamageExpiry;
 
     Double closingBalance = FinalStatementService.getClosingBalance(main, UserRuntimeView.instance().getCompany(), accountingMainView);
-    Double closingDamageExpiry =  FinalStatementService.getClosingDamageAndExpiry(main,UserRuntimeView.instance().getCompany().getId(),accountingMainView);
-    getTradingaccountIncomeList().add(new FinalStatement("dr",closingDamageExpiry,null,"Closing Stock Damage & Expiry"));
-    getTradingaccountIncomeList().add(new FinalStatement("dr",closingBalance,closingBalance+closingDamageExpiry,"Closing Stock"));
-   
+    Double closingDamageExpiry = FinalStatementService.getClosingDamageAndExpiry(main, UserRuntimeView.instance().getCompany().getId(), accountingMainView);
+    getTradingaccountIncomeList().add(new FinalStatement("dr", closingDamageExpiry, null, "Closing Stock Damage & Expiry"));
+    getTradingaccountIncomeList().add(new FinalStatement("dr", closingBalance, closingBalance + closingDamageExpiry, "Closing Stock"));
+
     tradingRightTotal = tradingRightTotal + closingBalance + closingDamageExpiry;
 
     profitAndLoss = tradingRightTotal - tradingLeftTotal;

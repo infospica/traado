@@ -27,7 +27,6 @@ import spica.scm.domain.TransportMode;
 import spica.fin.domain.VendorClaimStatus;
 import spica.scm.domain.Company;
 import spica.scm.domain.PlatformSettlementType;
-import spica.scm.service.AccountService;
 import spica.scm.tax.TaxCalculator;
 import spica.scm.view.ScmLookupView;
 import spica.sys.domain.Role;

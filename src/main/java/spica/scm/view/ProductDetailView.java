@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -29,52 +28,56 @@ import wawo.app.faces.Jsf;
 
 /**
  * ProductDetailView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Aug 08 17:59:15 IST 2016 
+ * @version	1.0, Mon Aug 08 17:59:15 IST 2016
  */
-
-@Named(value="productDetailView")
+@Named(value = "productDetailView")
 @ViewScoped
-public class ProductDetailView implements Serializable{
+public class ProductDetailView implements Serializable {
 
   private transient ProductDetail productDetail;	//Domain object/selected Domain.
   private transient LazyDataModel<ProductDetail> productDetailLazyModel; 	//For lazy loading datatable.
   private transient ProductDetail[] productDetailSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ProductDetailView() {
     super();
   }
- 
+
   /**
    * Return ProductDetail.
+   *
    * @return ProductDetail.
-   */  
+   */
   public ProductDetail getProductDetail() {
-    if(productDetail == null) {
+    if (productDetail == null) {
       productDetail = new ProductDetail();
     }
     return productDetail;
-  }   
-  
+  }
+
   /**
    * Set ProductDetail.
+   *
    * @param productDetail.
-   */   
+   */
   public void setProductDetail(ProductDetail productDetail) {
     this.productDetail = productDetail;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchProductDetail(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchProductDetail(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -86,40 +89,44 @@ public class ProductDetailView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create productDetailLazyModel.
+   *
    * @param main
    */
   private void loadProductDetailList(final MainView main) {
     if (productDetailLazyModel == null) {
       productDetailLazyModel = new LazyDataModel<ProductDetail>() {
-      private List<ProductDetail> list;      
-      @Override
-      public List<ProductDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ProductDetailService.listPaged(main);
-          main.commit(productDetailLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ProductDetail> list;
+
+        @Override
+        public List<ProductDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ProductDetailService.listPaged(main);
+            main.commit(productDetailLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ProductDetail productDetail) {
-        return productDetail.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ProductDetail productDetail) {
+          return productDetail.getId();
+        }
+
+        @Override
         public ProductDetail getRowData(String rowKey) {
           if (list != null) {
             for (ProductDetail obj : list) {
@@ -135,11 +142,12 @@ public class ProductDetailView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_product_detail/";	
+    String SUB_FOLDER = "scm_product_detail/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -155,7 +163,7 @@ public class ProductDetailView implements Serializable{
    */
   public String cloneProductDetail(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneProductDetail(main, "clone"); 
+    return saveOrCloneProductDetail(main, "clone");
   }
 
   /**
@@ -181,14 +189,13 @@ public class ProductDetailView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ProductDetail.
    *
@@ -204,7 +211,7 @@ public class ProductDetailView implements Serializable{
       } else {
         ProductDetailService.deleteByPk(main, getProductDetail());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -218,42 +225,47 @@ public class ProductDetailView implements Serializable{
 
   /**
    * Return LazyDataModel of ProductDetail.
+   *
    * @return
    */
   public LazyDataModel<ProductDetail> getProductDetailLazyModel() {
     return productDetailLazyModel;
   }
 
- /**
-  * Return ProductDetail[].
-  * @return 
-  */
+  /**
+   * Return ProductDetail[].
+   *
+   * @return
+   */
   public ProductDetail[] getProductDetailSelected() {
     return productDetailSelected;
   }
-  
+
   /**
    * Set ProductDetail[].
-   * @param productDetailSelected 
+   *
+   * @param productDetailSelected
    */
   public void setProductDetailSelected(ProductDetail[] productDetailSelected) {
     this.productDetailSelected = productDetailSelected;
   }
 
- /**
-  * ProdDetailStatus autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.prodDetailStatusAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.prodDetailStatusAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * ProdDetailStatus autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.prodDetailStatusAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.prodDetailStatusAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<ProductDetailStatus> prodDetailStatusAuto(String filter) {
     return ScmLookupView.prodDetailStatusAuto(filter);
   }
+
   public void onRowEdit(RowEditEvent event) {
     MainView main = Jsf.getMain();
     try {

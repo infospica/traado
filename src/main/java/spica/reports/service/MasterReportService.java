@@ -20,9 +20,9 @@ import wawo.app.common.AppService;
 import wawo.entity.core.AppDb;
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 /**
  *
@@ -227,7 +227,7 @@ public class MasterReportService {
       main.param(company.getId());
     }
     if (accountGroup != null && accountGroup.getId() != null) {
-      sql +=" and scm_product_preset.account_id in(select account_id from scm_account_group_detail where account_group_id=?)\n";
+      sql += " and scm_product_preset.account_id in(select account_id from scm_account_group_detail where account_group_id=?)\n";
       main.param(accountGroup.getId());
     }
     if (account != null && account.getId() != null) {
@@ -248,7 +248,7 @@ public class MasterReportService {
       sql += " AND prod.product_category_id = ? ";
       main.param(productCategory.getId());
     }
-    sql += groupBy +" order by prod.product_name";
+    sql += groupBy + " order by prod.product_name";
     return sql;
   }
 

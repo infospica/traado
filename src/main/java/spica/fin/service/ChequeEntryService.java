@@ -8,7 +8,6 @@
 package spica.fin.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +19,10 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.fin.domain.ChequeEntry;
 import spica.fin.domain.ChequeReceiptTransactionDetail;
-import spica.reports.model.FilterParameters;
 import spica.scm.domain.AccountGroup;
 import spica.scm.domain.Company;
 import spica.sys.SystemConstants;
 import spica.sys.SystemRuntimeConfig;
-import static wawo.app.common.AppService.sql;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 

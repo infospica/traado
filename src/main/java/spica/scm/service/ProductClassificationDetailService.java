@@ -1,12 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
 import java.util.List;
-import spica.scm.domain.Manufacture;
 import spica.scm.domain.ManufactureProduct;
 import spica.scm.domain.Product;
 import spica.scm.domain.ProductClassification;

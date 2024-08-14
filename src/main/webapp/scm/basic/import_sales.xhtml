@@ -3,8 +3,8 @@
   #{importSalesView.switchImportSales(main, viewType)} 
   <style>
     .ui-datatable table {
-      table-layout: auto; 
-    } 
+      table-layout: auto;
+    }
   </style>
 
   <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
@@ -131,8 +131,13 @@
     <ui:define name="after" >
       <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
       <style>
-        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
-        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+        .mDataTable td, .themeTable td, .dataTable td{
+          border-top:none;
+          border-bottom: none;
+        }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{
+          border: none;
+        }
 
         .bg-danger {
           color: #fff;

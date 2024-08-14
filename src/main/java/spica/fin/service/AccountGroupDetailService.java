@@ -86,7 +86,7 @@ public abstract class AccountGroupDetailService {
   public static final void insert(Main main, AccountGroupDetail accountGroupDetail) {
     insertAble(main, accountGroupDetail);  //Validating
     AppService.insert(main, accountGroupDetail);
-    
+
   }
 
   /**
@@ -157,19 +157,19 @@ public abstract class AccountGroupDetailService {
   public static void deleteAccountGroupRelation(MainView main, AccountGroup accountGroup, Account account) {
     AppService.deleteSql(main, AccountGroupDetail.class, "delete from scm_account_group_detail where account_group_id = ? and account_id = ?", new Object[]{accountGroup.getId(), account.getId()});
   }
-  
+
   public static void insertPrimaryVendorsAccountGroup(Main main, Account account, AccountGroup accountGroup) {
     AccountGroupDetail agd = new AccountGroupDetail();
     agd.setAccountGroupId(accountGroup);
     agd.setAccountId(account);
     insert(main, agd);
   }
-  
+
   /**
    * Method to insert AccountGroupDetail of secondary vendor account.
-   * 
+   *
    * @param main
-   * @param account 
+   * @param account
    */
   public static void insertSecondaryVendorsAccountGroup(Main main, Account account) {
     AccountGroup defaultAccountGroup = (AccountGroup) AppService.single(main, AccountGroup.class, "select scm_account_group.* from scm_account_group_detail JOIN scm_account_group ON scm_account_group_detail.account_group_id = scm_account_group.id \n"
@@ -179,8 +179,8 @@ public abstract class AccountGroupDetailService {
     agd.setAccountId(account);
     insert(main, agd);
   }
-  
-   private static final void deleteAble(Main main, AccountGroupDetail accountGroupDetail) throws UserMessageException {
+
+  private static final void deleteAble(Main main, AccountGroupDetail accountGroupDetail) throws UserMessageException {
 
   }
 
@@ -209,5 +209,5 @@ public abstract class AccountGroupDetailService {
     //  throw new UserMessageException("name.exist");
     //}
   }
-  
+
 }

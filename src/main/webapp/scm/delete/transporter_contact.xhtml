@@ -56,13 +56,13 @@
               <p:inputText styleClass="fw" value="#{transporterContactView.transporterContact.phone2}" maxlength="10" id="phone2" />
               <p:message for="phone2" display="text"/>
             </h:panelGroup>            
-            
+
             <p:outputLabel value="#{lang.fax1}" for="fax1" />
             <h:panelGroup>
               <p:inputText styleClass="fw" value="#{transporterContactView.transporterContact.fax1}" maxlength="20" id="fax1" />
               <p:message for="fax1" display="text"/>
             </h:panelGroup>  
-            
+
             <p:outputLabel value="#{lang.email}" for="email" />
             <h:panelGroup>
               <p:inputText styleClass="fw" value="#{transporterContactView.transporterContact.email}" maxlength="50" id="email" validator="wawo.EmailValidator"/>

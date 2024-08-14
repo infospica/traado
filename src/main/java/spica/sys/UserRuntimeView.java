@@ -19,8 +19,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.model.SelectItem;
-import javax.faces.view.ViewScoped;
-import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import org.primefaces.PrimeFaces;
 import spica.constant.AccountingConstant;
@@ -551,7 +549,7 @@ public class UserRuntimeView extends ViewRuntimeView implements Serializable {
         if (menuActive.getId() == MENU_STOCK_AND_SALES_ID || menuActive.getId() == MENU_STOCK_LEDGER_ID || menuActive.getId() == MENU_PRODUCT_CATEGORY_TAX
                 || menuActive.getId() == MENU_MRP_ADJUSTMENT || menuActive.getId() == MENU_STOCK_ADJUSTMENT || menuActive.getId() == MENU_STOCK_MOVEMENT
                 || menuActive.getId() == MENU_IMPORT_SALES_ID || menuActive.getId() == MENU_PRODUCT_INVENTORY || menuActive.getId() == MENU_STOCK_AUDIT
-                || menuActive.getId() == MENU_PURCHASE_REGISTER ) {
+                || menuActive.getId() == MENU_PURCHASE_REGISTER) {
           accountRender = false;
         } else {
           accountRender = true;

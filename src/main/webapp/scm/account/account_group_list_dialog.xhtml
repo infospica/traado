@@ -63,7 +63,7 @@
       <p:outputLabel value="#{lang.invoiceNoCounter}" for="invoiceNoCounter" />
       <h:panelGroup>
         <p:inputNumber value="#{accountGroupView.accountGroup.invoiceNoCounter}" converterMessage="#{lang.invoiceNoCounter} #{lang.invalidNumber}" decimalPlaces="0" 
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="invoiceNoCounter" />
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="invoiceNoCounter" />
         <p:message for="invoiceNoCounter" display="text"/>
       </h:panelGroup>
 
@@ -83,7 +83,7 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{accountGroupView.accountGroup.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" thousandSeparator=""/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" thousandSeparator=""/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 

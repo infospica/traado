@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,10 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +24,56 @@ import spica.scm.service.CurrencyService;
 
 /**
  * CurrencyView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Apr 28 12:24:49 IST 2017 
+ * @version	1.0, Fri Apr 28 12:24:49 IST 2017
  */
-
-@Named(value="currencyView")
+@Named(value = "currencyView")
 @ViewScoped
-public class CurrencyView implements Serializable{
+public class CurrencyView implements Serializable {
 
   private transient Currency currency;	//Domain object/selected Domain.
   private transient LazyDataModel<Currency> currencyLazyModel; 	//For lazy loading datatable.
   private transient Currency[] currencySelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public CurrencyView() {
     super();
   }
- 
+
   /**
    * Return Currency.
+   *
    * @return Currency.
-   */  
+   */
   public Currency getCurrency() {
-    if(currency == null) {
+    if (currency == null) {
       currency = new Currency();
     }
     return currency;
-  }   
-  
+  }
+
   /**
    * Set Currency.
+   *
    * @param currency.
-   */   
+   */
   public void setCurrency(Currency currency) {
     this.currency = currency;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchCurrency(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchCurrency(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewTypes.isNew(viewType) && !main.hasError()) {
@@ -87,40 +85,44 @@ public class CurrencyView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create currencyLazyModel.
+   *
    * @param main
    */
   private void loadCurrencyList(final MainView main) {
     if (currencyLazyModel == null) {
       currencyLazyModel = new LazyDataModel<Currency>() {
-      private List<Currency> list;      
-      @Override
-      public List<Currency> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = CurrencyService.listPaged(main);
-          main.commit(currencyLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<Currency> list;
+
+        @Override
+        public List<Currency> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = CurrencyService.listPaged(main);
+            main.commit(currencyLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(Currency currency) {
-        return currency.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(Currency currency) {
+          return currency.getId();
+        }
+
+        @Override
         public Currency getRowData(String rowKey) {
           if (list != null) {
             for (Currency obj : list) {
@@ -136,11 +138,12 @@ public class CurrencyView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "fin_currency/";	
+    String SUB_FOLDER = "fin_currency/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +159,7 @@ public class CurrencyView implements Serializable{
    */
   public String cloneCurrency(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneCurrency(main, "clone"); 
+    return saveOrCloneCurrency(main, "clone");
   }
 
   /**
@@ -182,14 +185,13 @@ public class CurrencyView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many Currency.
    *
@@ -205,7 +207,7 @@ public class CurrencyView implements Serializable{
       } else {
         CurrencyService.deleteByPk(main, getCurrency());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (ViewTypes.isEdit(main.getViewType())){
+        if (ViewTypes.isEdit(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +221,29 @@ public class CurrencyView implements Serializable{
 
   /**
    * Return LazyDataModel of Currency.
+   *
    * @return
    */
   public LazyDataModel<Currency> getCurrencyLazyModel() {
     return currencyLazyModel;
   }
 
- /**
-  * Return Currency[].
-  * @return 
-  */
+  /**
+   * Return Currency[].
+   *
+   * @return
+   */
   public Currency[] getCurrencySelected() {
     return currencySelected;
   }
-  
+
   /**
    * Set Currency[].
-   * @param currencySelected 
+   *
+   * @param currencySelected
    */
   public void setCurrencySelected(Currency[] currencySelected) {
     this.currencySelected = currencySelected;
   }
- 
-
 
 }

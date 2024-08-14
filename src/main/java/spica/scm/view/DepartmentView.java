@@ -13,15 +13,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -39,7 +35,7 @@ import wawo.app.faces.Jsf;
 @Named(value = "departmentView")
 @ViewScoped
 public class DepartmentView implements Serializable {
-  
+
   private transient Department department;	//Domain object/selected Domain.
   private transient LazyDataModel<Department> departmentLazyModel; 	//For lazy loading datatable.
   private transient Department[] departmentSelected;	 //Selected Domain Array
@@ -115,7 +111,7 @@ public class DepartmentView implements Serializable {
     if (departmentLazyModel == null) {
       departmentLazyModel = new LazyDataModel<Department>() {
         private List<Department> list;
-        
+
         @Override
         public List<Department> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -130,12 +126,12 @@ public class DepartmentView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(Department department) {
           return department.getId();
         }
-        
+
         @Override
         public Department getRowData(String rowKey) {
           if (list != null) {
@@ -150,7 +146,7 @@ public class DepartmentView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_department/";
   }
@@ -259,9 +255,9 @@ public class DepartmentView implements Serializable {
   public void setDepartmentSelected(Department[] departmentSelected) {
     this.departmentSelected = departmentSelected;
   }
-  
+
   public List<SystemContext> systemContextAuto(String filter) {
     return ScmLookupView.systemContextAuto(filter);
   }
-  
+
 }

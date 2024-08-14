@@ -143,7 +143,7 @@ public abstract class CompanyBankContactService {
    * @param companyBankContact
    */
   public static void makeDefault(Main main, CompanyBankContact companyBankContact) {
-    if (companyBankContact.getSortOrder()== 0) {
+    if (companyBankContact.getSortOrder() == 0) {
       main.param(1);
       main.param(companyBankContact.getCompanyBankId().getId());
       main.param(companyBankContact.getId());

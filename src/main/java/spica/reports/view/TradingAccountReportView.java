@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -35,13 +35,13 @@ public class TradingAccountReportView implements Serializable {
   public List<TradingAccountReport> getTradingAccountReportList(MainView main) {
     if (StringUtil.isEmpty(tradingAccountReportList) && !main.hasError()) {
       setFinancialYear(UserRuntimeView.instance().getCompany().getCurrentFinancialYear());
-      try  {
+      try {
         if (getCompany() != null && reportType != null) {
           tradingAccountReportList = TradingAccountReportService.getTradingAccountReportList(main, getCompany(), account, financialYear, reportType);
         }
       } catch (Throwable t) {
         main.rollback(t, "error.select");
-      }finally{
+      } finally {
         main.close();
       }
     }
@@ -66,7 +66,6 @@ public class TradingAccountReportView implements Serializable {
 //    }
 //    return financialYearList;
 //  }
-
 //  Getters and Setters
   public Company getCompany() {
     if (company == null) {

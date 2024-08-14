@@ -8,7 +8,6 @@
 package spica.scm.service;
 
 import java.util.List;
-import spica.scm.domain.Company;
 import spica.scm.domain.Customer;
 import wawo.app.common.AppService;
 import wawo.app.Main;
@@ -16,7 +15,6 @@ import wawo.entity.core.SqlPage;
 import spica.scm.domain.CustomerLicense;
 import spica.scm.validate.CustomerLicenseIs;
 import spica.sys.UserRuntimeView;
-import wawo.app.faces.AppLookup;
 
 /**
  * CustomerLicenseService

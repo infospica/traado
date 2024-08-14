@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.ProdEntDetRtnStatusService;
 
 /**
  * ProdEntDetRtnStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Thu Sep 08 18:33:15 IST 2016 
+ * @version	1.0, Thu Sep 08 18:33:15 IST 2016
  */
-
-@Named(value="prodEntDetRtnStatusView")
+@Named(value = "prodEntDetRtnStatusView")
 @ViewScoped
-public class ProdEntDetRtnStatusView implements Serializable{
+public class ProdEntDetRtnStatusView implements Serializable {
 
   private transient ProdEntDetRtnStatus prodEntDetRtnStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<ProdEntDetRtnStatus> prodEntDetRtnStatusLazyModel; 	//For lazy loading datatable.
   private transient ProdEntDetRtnStatus[] prodEntDetRtnStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ProdEntDetRtnStatusView() {
     super();
   }
- 
+
   /**
    * Return ProdEntDetRtnStatus.
+   *
    * @return ProdEntDetRtnStatus.
-   */  
+   */
   public ProdEntDetRtnStatus getProdEntDetRtnStatus() {
-    if(prodEntDetRtnStatus == null) {
+    if (prodEntDetRtnStatus == null) {
       prodEntDetRtnStatus = new ProdEntDetRtnStatus();
     }
     return prodEntDetRtnStatus;
-  }   
-  
+  }
+
   /**
    * Set ProdEntDetRtnStatus.
+   *
    * @param prodEntDetRtnStatus.
-   */   
+   */
   public void setProdEntDetRtnStatus(ProdEntDetRtnStatus prodEntDetRtnStatus) {
     this.prodEntDetRtnStatus = prodEntDetRtnStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchProdEntDetRtnStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchProdEntDetRtnStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class ProdEntDetRtnStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create prodEntDetRtnStatusLazyModel.
+   *
    * @param main
    */
   private void loadProdEntDetRtnStatusList(final MainView main) {
     if (prodEntDetRtnStatusLazyModel == null) {
       prodEntDetRtnStatusLazyModel = new LazyDataModel<ProdEntDetRtnStatus>() {
-      private List<ProdEntDetRtnStatus> list;      
-      @Override
-      public List<ProdEntDetRtnStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ProdEntDetRtnStatusService.listPaged(main);
-          main.commit(prodEntDetRtnStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ProdEntDetRtnStatus> list;
+
+        @Override
+        public List<ProdEntDetRtnStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ProdEntDetRtnStatusService.listPaged(main);
+            main.commit(prodEntDetRtnStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ProdEntDetRtnStatus prodEntDetRtnStatus) {
-        return prodEntDetRtnStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ProdEntDetRtnStatus prodEntDetRtnStatus) {
+          return prodEntDetRtnStatus.getId();
+        }
+
+        @Override
         public ProdEntDetRtnStatus getRowData(String rowKey) {
           if (list != null) {
             for (ProdEntDetRtnStatus obj : list) {
@@ -136,11 +139,12 @@ public class ProdEntDetRtnStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_prod_ent_det_rtn_status/";	
+    String SUB_FOLDER = "scm_prod_ent_det_rtn_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class ProdEntDetRtnStatusView implements Serializable{
    */
   public String cloneProdEntDetRtnStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneProdEntDetRtnStatus(main, "clone"); 
+    return saveOrCloneProdEntDetRtnStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class ProdEntDetRtnStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ProdEntDetRtnStatus.
    *
@@ -205,7 +208,7 @@ public class ProdEntDetRtnStatusView implements Serializable{
       } else {
         ProdEntDetRtnStatusService.deleteByPk(main, getProdEntDetRtnStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class ProdEntDetRtnStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of ProdEntDetRtnStatus.
+   *
    * @return
    */
   public LazyDataModel<ProdEntDetRtnStatus> getProdEntDetRtnStatusLazyModel() {
     return prodEntDetRtnStatusLazyModel;
   }
 
- /**
-  * Return ProdEntDetRtnStatus[].
-  * @return 
-  */
+  /**
+   * Return ProdEntDetRtnStatus[].
+   *
+   * @return
+   */
   public ProdEntDetRtnStatus[] getProdEntDetRtnStatusSelected() {
     return prodEntDetRtnStatusSelected;
   }
-  
+
   /**
    * Set ProdEntDetRtnStatus[].
-   * @param prodEntDetRtnStatusSelected 
+   *
+   * @param prodEntDetRtnStatusSelected
    */
   public void setProdEntDetRtnStatusSelected(ProdEntDetRtnStatus[] prodEntDetRtnStatusSelected) {
     this.prodEntDetRtnStatusSelected = prodEntDetRtnStatusSelected;
   }
- 
-
 
 }

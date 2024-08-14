@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Vendor;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -37,9 +36,9 @@ public abstract class VendorLicenseService {
     sql.count("select count(scm_vendor_license.id) as total from scm_vendor_license scm_vendor_license "); //Count query
     sql.join("left outer join scm_vendor scm_vendor_licensevendor_id on (scm_vendor_licensevendor_id.id = scm_vendor_license.vendor_id) left outer join scm_license_type scm_vendor_licenselicense_type_id on (scm_vendor_licenselicense_type_id.id = scm_vendor_license.license_type_id) left outer join scm_status scm_vendor_licensestatus_id on (scm_vendor_licensestatus_id.id = scm_vendor_license.status_id)"); //Join Query
 
-    sql.string(new String[]{"scm_vendor_licensevendor_id.vendor_name","scm_vendor_licenselicense_type_id.title","scm_vendor_license.description","scm_vendor_license.license_key","scm_vendor_license.file_path","scm_vendor_licensestatus_id.title","scm_vendor_license.created_by","scm_vendor_license.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_vendor_license.id","scm_vendor_license.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_vendor_license.issued_at","scm_vendor_license.valid_from","scm_vendor_license.valid_to","scm_vendor_license.created_at","scm_vendor_license.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_vendor_licensevendor_id.vendor_name", "scm_vendor_licenselicense_type_id.title", "scm_vendor_license.description", "scm_vendor_license.license_key", "scm_vendor_license.file_path", "scm_vendor_licensestatus_id.title", "scm_vendor_license.created_by", "scm_vendor_license.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_vendor_license.id", "scm_vendor_license.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_vendor_license.issued_at", "scm_vendor_license.valid_from", "scm_vendor_license.valid_to", "scm_vendor_license.created_at", "scm_vendor_license.modified_at"});  //Date search or sort fields
     return sql;
   }
 
@@ -148,8 +147,8 @@ public abstract class VendorLicenseService {
       deleteByPk(main, e);
     }
   }
-  
-    /**
+
+  /**
    * Return all license of a vendor.
    *
    * @param main

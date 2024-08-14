@@ -4,35 +4,35 @@
     <ui:param name="label" value="#{lang.dashboard}" />
     <ui:param name="deleteListMenu" value="false"/>
     <ui:param name="search" value="false"/>
-       
-      
+
+
     <ui:define name="deleteList"/>    
     <ui:define name="menu1"/>
     <ui:define name="deleteForm"/>
     <ui:define name="save"/>
     <ui:define name="newList"/>
-  
+
     <ui:define name="form">
     </ui:define>
     <ui:define name="rightList" >
-    <h:panelGroup id="accountGroupDiv" styleClass="w-200 ib-m">
+      <h:panelGroup id="accountGroupDiv" styleClass="w-200 ib-m">
         <p:autoComplete id='accountGroup'  value="#{companyDashboardView.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
                         var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
                         converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off"  required="false"
                         title="#{lang.accountGroup}">
-            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
-            <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
-            <p:column style="width:250px;">
-              <h:outputText value="#{e.groupName}" />
-            </p:column>
-            <p:column style="width: 40px;">
-              <h:outputText value="#{e.groupCode}" />
-            </p:column>
-            <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv " listener="#{companyDashboardView.accountGroupSelectEvent}"/>
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv " listener="#{companyDashboardView.accountGroupSelectEvent}"/>
         </p:autoComplete>
         <p:message for="accountGroup" />
       </h:panelGroup>
-      
+
       <h:panelGroup id="accountDiv" >
         <p:autoComplete id='account'  value="#{companyDashboardView.account}" completeMethod="#{companyDashboardView.accountAuto}" converter="wawo.LookupIntConverter" 
                         var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
@@ -51,86 +51,86 @@
           </p:column>
         </p:autoComplete>
       </h:panelGroup>
-      
-       <!-- As on Date -->
+
+      <!-- As on Date -->
       <p:calendar value="#{companyDashboardView.selectedDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}" maxlength="13" showOn="button"
                   id="selectedDate" showButtonPanel="true" mask="true" navigator="true" maxdate="#{companyDashboardView.maxDate}" >
       </p:calendar>
-      
-       <p:commandButton value="#{lang.ok}" styleClass="btn btn-info" actionListener="#{companyDashboardView.submitForm}"  update="board" style="margin-left: 3px; margin-bottom: 4px;"  >
+
+      <p:commandButton value="#{lang.ok}" styleClass="btn btn-info" actionListener="#{companyDashboardView.submitForm}"  update="board" style="margin-left: 3px; margin-bottom: 4px;"  >
       </p:commandButton>
-      
-     </ui:define> 
-    
-     <ui:define name="list">           
-        <p:dashboard id="board" model="#{companyDashboardView.dashboard}"  style="height:100%;width:100%" >             
-           
-          <p:panel id="sales" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
-            <p:chart type="bar" model="#{companyDashboardView.getSalesBar(main)}" responsive="true" style="min-width: 600px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel>
-          <p:panel id="salesoutstanding" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
-            <p:chart type="pie" model="#{companyDashboardView.getSalesOutstandingAge(main)}" responsive="true" style="min-width: 240px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel>
-          <p:panel id="topsellingbyqty" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
-              <p:chart type="pie" model="#{companyDashboardView.getTopSellingProductsByQty(main)}" responsive="true" style="min-width: 420px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel> 
-          <p:panel id="topsellingbyrate" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
-            <p:chart type="pie" model="#{companyDashboardView.getTopSellingProductsByRate(main)}" responsive="true" style="min-width: 420px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel>             
-          <p:panel id="purchase" header="#{lang.purchase}" toggleable="true" closable="true" styleClass="card m-r-15">
-            <p:chart type="bar" model="#{companyDashboardView.getPurchaseBar(main)}" responsive="true" style="min-width: 600px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel>          
-          <p:panel id="purchaseoutstanding" header="#{lang.purchase}" toggleable="true" closable="true" styleClass="card m-r-15">
-            <p:chart type="pie" model="#{companyDashboardView.getPurchaseOutstandingAge(main)}" responsive="true" style="min-width: 240px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel> 
-          <p:panel id="purchaseandsales" header="#{lang.summary}" toggleable="true" closable="true" styleClass="card m-r-15 fw">
-            <p:chart type="line" model="#{companyDashboardView.getLineChart(main)}"  style="width:840px;"/>
-            <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
-          </p:panel>
-        
-          <p:panel id="volume" header="Volume" toggleable="true" closable="true" styleClass="card m-r-15">
-            
-            <p:panelGrid columns="5" style="width:840px;">
-                
-                <h:outputText style="font-size: 14px;font-weight: bold;" value="" />
-                <h:outputText style="font-size: 14px;font-weight: bold;" value="Purchase" />
-                <h:outputText style="font-size: 14px;font-weight: bold;" value="Purchase Return" />
-                <h:outputText style="font-size: 14px;font-weight: bold;" value="Sales" />
-                <h:outputText style="font-size: 14px;font-weight: bold;" value="Sales Return" />
-                
-                <h:outputText style="font-size: 14px;font-weight: bold;color:#FFA07A; " value="Today" />
+
+    </ui:define> 
+
+    <ui:define name="list">           
+      <p:dashboard id="board" model="#{companyDashboardView.dashboard}"  style="height:100%;width:100%" >             
+
+        <p:panel id="sales" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
+          <p:chart type="bar" model="#{companyDashboardView.getSalesBar(main)}" responsive="true" style="min-width: 600px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel>
+        <p:panel id="salesoutstanding" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
+          <p:chart type="pie" model="#{companyDashboardView.getSalesOutstandingAge(main)}" responsive="true" style="min-width: 240px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel>
+        <p:panel id="topsellingbyqty" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
+          <p:chart type="pie" model="#{companyDashboardView.getTopSellingProductsByQty(main)}" responsive="true" style="min-width: 420px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel> 
+        <p:panel id="topsellingbyrate" header="#{lang.sales}" toggleable="true" closable="true" styleClass="card m-r-15">
+          <p:chart type="pie" model="#{companyDashboardView.getTopSellingProductsByRate(main)}" responsive="true" style="min-width: 420px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel>             
+        <p:panel id="purchase" header="#{lang.purchase}" toggleable="true" closable="true" styleClass="card m-r-15">
+          <p:chart type="bar" model="#{companyDashboardView.getPurchaseBar(main)}" responsive="true" style="min-width: 600px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel>          
+        <p:panel id="purchaseoutstanding" header="#{lang.purchase}" toggleable="true" closable="true" styleClass="card m-r-15">
+          <p:chart type="pie" model="#{companyDashboardView.getPurchaseOutstandingAge(main)}" responsive="true" style="min-width: 240px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel> 
+        <p:panel id="purchaseandsales" header="#{lang.summary}" toggleable="true" closable="true" styleClass="card m-r-15 fw">
+          <p:chart type="line" model="#{companyDashboardView.getLineChart(main)}"  style="width:840px;"/>
+          <p:ajax event="toggle" process="@this" update="@this" oncomplete="unblock();" />
+        </p:panel>
+
+        <p:panel id="volume" header="Volume" toggleable="true" closable="true" styleClass="card m-r-15">
+
+          <p:panelGrid columns="5" style="width:840px;">
+
+            <h:outputText style="font-size: 14px;font-weight: bold;" value="" />
+            <h:outputText style="font-size: 14px;font-weight: bold;" value="Purchase" />
+            <h:outputText style="font-size: 14px;font-weight: bold;" value="Purchase Return" />
+            <h:outputText style="font-size: 14px;font-weight: bold;" value="Sales" />
+            <h:outputText style="font-size: 14px;font-weight: bold;" value="Sales Return" />
+
+            <h:outputText style="font-size: 14px;font-weight: bold;color:#FFA07A; " value="Today" />
 <!--                <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysPurchase(main)}" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysPurchaseReturn(main)}" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysSales(main)}" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysSalesReturn(main)}" />-->
-                
-                <h:outputText style="font-size: 14px;font-weight: bold;color:#2E86C1;" value="This Month" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="111" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="1111" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="11111" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="111111" />
-                
-                <h:outputText style="font-size: 14px;font-weight: bold;color:#27AE60;" value="Prev. Month" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="111" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="1111" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="11111" />
-                <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="111111" />
-                
-                
-            </p:panelGrid>
-            
-          </p:panel>
-          
-        </p:dashboard>
-        #{main.close()}
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysPurchaseReturn(main)}" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysSales(main)}" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#FFA07A;" value="#{companyDashboardView.getTodaysSalesReturn(main)}" />-->
+
+            <h:outputText style="font-size: 14px;font-weight: bold;color:#2E86C1;" value="This Month" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="111" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="1111" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="11111" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#2E86C1;" value="111111" />
+
+            <h:outputText style="font-size: 14px;font-weight: bold;color:#27AE60;" value="Prev. Month" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="111" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="1111" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="11111" />
+            <h:outputText style="font-size: 20px;font-weight: bold;color:#27AE60;" value="111111" />
+
+
+          </p:panelGrid>
+
+        </p:panel>
+
+      </p:dashboard>
+      #{main.close()}
     </ui:define>
- 
+
   </ui:decorate>
- 
+
 </ui:composition>

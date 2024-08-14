@@ -29,7 +29,7 @@
         <f:ajax execute="f1" render="f1"  />
       </h:commandButton>
     </ui:define>
-    
+
     <ui:define name="form">
 
       <!--address Type-->
@@ -126,7 +126,7 @@
         <p:inputText styleClass="fw" value="#{vendorAddressView.vendorAddress.phone1}" maxlength="13" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" 
                      validatorMessage="#{lang.errorInvalidPhoneNo}" autocomplete="off"
                      id="phone1" validator="wawo.WhiteSpaceValidator">
-                    <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
         </p:inputText>
         <p:message for="phone1" display="text"/>
       </h:panelGroup>
@@ -171,7 +171,7 @@
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{vendorAddressView.vendorAddress.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"  autocomplete="off"
-                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" required="true" requiredMessage="#{lang.sortOrder} #{lang.isRequired}"/>
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" required="true" requiredMessage="#{lang.sortOrder} #{lang.isRequired}"/>
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
 

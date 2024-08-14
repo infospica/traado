@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.ProductUnitService;
 
 /**
  * ProductUnitView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Oct 19 11:15:18 IST 2016 
+ * @version	1.0, Wed Oct 19 11:15:18 IST 2016
  */
-
-@Named(value="productUnitView")
+@Named(value = "productUnitView")
 @ViewScoped
-public class ProductUnitView implements Serializable{
+public class ProductUnitView implements Serializable {
 
   private transient ProductUnit productUnit;	//Domain object/selected Domain.
   private transient LazyDataModel<ProductUnit> productUnitLazyModel; 	//For lazy loading datatable.
   private transient ProductUnit[] productUnitSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public ProductUnitView() {
     super();
   }
- 
+
   /**
    * Return ProductUnit.
+   *
    * @return ProductUnit.
-   */  
+   */
   public ProductUnit getProductUnit() {
-    if(productUnit == null) {
+    if (productUnit == null) {
       productUnit = new ProductUnit();
     }
     return productUnit;
-  }   
-  
+  }
+
   /**
    * Set ProductUnit.
+   *
    * @param productUnit.
-   */   
+   */
   public void setProductUnit(ProductUnit productUnit) {
     this.productUnit = productUnit;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchProductUnit(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchProductUnit(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType) && !main.hasError()) {
@@ -87,40 +86,44 @@ public class ProductUnitView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create productUnitLazyModel.
+   *
    * @param main
    */
   private void loadProductUnitList(final MainView main) {
     if (productUnitLazyModel == null) {
       productUnitLazyModel = new LazyDataModel<ProductUnit>() {
-      private List<ProductUnit> list;      
-      @Override
-      public List<ProductUnit> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = ProductUnitService.listPaged(main);
-          main.commit(productUnitLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<ProductUnit> list;
+
+        @Override
+        public List<ProductUnit> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = ProductUnitService.listPaged(main);
+            main.commit(productUnitLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(ProductUnit productUnit) {
-        return productUnit.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(ProductUnit productUnit) {
+          return productUnit.getId();
+        }
+
+        @Override
         public ProductUnit getRowData(String rowKey) {
           if (list != null) {
             for (ProductUnit obj : list) {
@@ -136,11 +139,12 @@ public class ProductUnitView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_product_unit/";	
+    String SUB_FOLDER = "scm_product_unit/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class ProductUnitView implements Serializable{
    */
   public String cloneProductUnit(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneProductUnit(main, "clone"); 
+    return saveOrCloneProductUnit(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class ProductUnitView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many ProductUnit.
    *
@@ -205,7 +208,7 @@ public class ProductUnitView implements Serializable{
       } else {
         ProductUnitService.deleteByPk(main, getProductUnit());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class ProductUnitView implements Serializable{
 
   /**
    * Return LazyDataModel of ProductUnit.
+   *
    * @return
    */
   public LazyDataModel<ProductUnit> getProductUnitLazyModel() {
     return productUnitLazyModel;
   }
 
- /**
-  * Return ProductUnit[].
-  * @return 
-  */
+  /**
+   * Return ProductUnit[].
+   *
+   * @return
+   */
   public ProductUnit[] getProductUnitSelected() {
     return productUnitSelected;
   }
-  
+
   /**
    * Set ProductUnit[].
-   * @param productUnitSelected 
+   *
+   * @param productUnitSelected
    */
   public void setProductUnitSelected(ProductUnit[] productUnitSelected) {
     this.productUnitSelected = productUnitSelected;
   }
- 
-
 
 }

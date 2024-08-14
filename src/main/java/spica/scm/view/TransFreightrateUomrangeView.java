@@ -327,6 +327,7 @@ public class TransFreightrateUomrangeView implements Serializable {
     return null;
 
   }
+
   public void uomRangePopupClose() {
     Jsf.popupClose(parent);
   }

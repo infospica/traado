@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.export;
 
@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -19,7 +18,6 @@ import spica.reports.model.FilterParameters;
 import spica.reports.model.ReceiptReport;
 import spica.scm.domain.Company;
 import spica.scm.domain.Territory;
-import static spica.scm.export.ExcelUtil.FILL_ORANGE;
 import spica.sys.SystemRuntimeConfig;
 import wawo.app.faces.MainView;
 
@@ -74,7 +72,7 @@ public class ExcelReports {
       for (String obj : arr) {
         cell = row.createCell(cellId++);
         cell.setCellValue(obj);
-        cell.setCellStyle(ExcelUtil.styleBold(workbook,HorizontalAlignment.LEFT));
+        cell.setCellStyle(ExcelUtil.styleBold(workbook, HorizontalAlignment.LEFT));
         sheet.autoSizeColumn(size);
         size++;
       }

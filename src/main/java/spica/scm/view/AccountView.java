@@ -38,7 +38,6 @@ import spica.scm.domain.AccountGroupDocPrefix;
 import spica.scm.domain.AccountGroupPriceList;
 import spica.scm.domain.AccountStatus;
 import spica.fin.domain.AccountingLedger;
-import spica.scm.domain.Company;
 import spica.scm.domain.CompanyAddress;
 import spica.scm.domain.CompanyBank;
 import spica.scm.domain.Contract;

@@ -24,50 +24,94 @@ $jqThumb	:	rgba(194,194,194,.5);
 
 /* Layout helpers
 ----------------------------------*/
-.ui-helper-hidden { display: none; }
-
-.ui-helper-hidden-accessible {
-	border: 0;
-	clip: rect(0 0 0 0);
-	height: 0px;
-	margin: -1px;
-	overflow: hidden;
-	padding: 0;
-	position:absolute;
-	width: 0px;
+.ui-helper-hidden {
+  display: none;
 }
 
-.ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
+.ui-helper-hidden-accessible {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 0px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position:absolute;
+  width: 0px;
+}
 
-.ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.ui-helper-reset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  line-height: 1.3;
+  text-decoration: none;
+  font-size: 100%;
+  list-style: none;
+}
 
-.ui-helper-clearfix { display: inline-block; }
+.ui-helper-clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+.ui-helper-clearfix {
+  display: inline-block;
+}
 
 /* required comment for clearfix to work in Opera \*/
 
-* html .ui-helper-clearfix { height:1%; }
+* html .ui-helper-clearfix {
+  height:1%;
+}
 
-.ui-helper-clearfix { display:block; }
+.ui-helper-clearfix {
+  display:block;
+}
 
 /* end clearfix */
 
-.ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter:Alpha(Opacity=0); }
+.ui-helper-zfix {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  opacity: 0;
+  filter:Alpha(Opacity=0);
+}
 
 /* Interaction Cues
 ----------------------------------*/
-.ui-state-disabled { cursor: default !important; }
+.ui-state-disabled {
+  cursor: default !important;
+}
 
 /* Icons
 ----------------------------------*/
 
 /* states and images */
-.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
+.ui-icon {
+  display: block;
+  text-indent: -99999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+}
 
 /* Misc visuals
 ----------------------------------*/
 
 /* Overlays */
-.ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.ui-widget-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 /*!
  * jQuery UI Resizable 1.8.20
  *
@@ -78,17 +122,73 @@ $jqThumb	:	rgba(194,194,194,.5);
  * http://docs.jquery.com/UI/Resizable#theming
  */
 
-.ui-resizable { position: relative;}
-.ui-resizable-handle { position: absolute;font-size: 0.1px; display: block; }
-.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
-.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }
-.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: -5px; left: 0; }
-.ui-resizable-e { cursor: e-resize; width: 7px; right: -5px; top: 0; height: 100%; }
-.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }
-.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
-.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
-.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
-.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+.ui-resizable {
+  position: relative;
+}
+.ui-resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+}
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle {
+  display: none;
+}
+.ui-resizable-n {
+  cursor: n-resize;
+  height: 7px;
+  width: 100%;
+  top: -5px;
+  left: 0;
+}
+.ui-resizable-s {
+  cursor: s-resize;
+  height: 7px;
+  width: 100%;
+  bottom: -5px;
+  left: 0;
+}
+.ui-resizable-e {
+  cursor: e-resize;
+  width: 7px;
+  right: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-w {
+  cursor: w-resize;
+  width: 7px;
+  left: -5px;
+  top: 0;
+  height: 100%;
+}
+.ui-resizable-se {
+  cursor: se-resize;
+  width: 12px;
+  height: 12px;
+  right: 1px;
+  bottom: 1px;
+}
+.ui-resizable-sw {
+  cursor: sw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  bottom: -5px;
+}
+.ui-resizable-nw {
+  cursor: nw-resize;
+  width: 9px;
+  height: 9px;
+  left: -5px;
+  top: -5px;
+}
+.ui-resizable-ne {
+  cursor: ne-resize;
+  width: 9px;
+  height: 9px;
+  right: -5px;
+  top: -5px;
+}
 /*!
 
  * jQuery UI Selectable 1.8.20
@@ -100,7 +200,11 @@ $jqThumb	:	rgba(194,194,194,.5);
  * http://docs.jquery.com/UI/Selectable#theming
  */
 
-.ui-selectable-helper { position: absolute; z-index: 100; border:1px dotted black; }
+.ui-selectable-helper {
+  position: absolute;
+  z-index: 100;
+  border:1px dotted black;
+}
 /*!
  * jQuery UI Slider 1.8.20
  *
@@ -111,31 +215,73 @@ $jqThumb	:	rgba(194,194,194,.5);
  * http://docs.jquery.com/UI/Slider#theming
  */
 
-.ui-slider { position: relative; text-align: left; }
+.ui-slider {
+  position: relative;
+  text-align: left;
+}
 
-.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.ui-slider .ui-slider-handle {
+  position: absolute;
+  z-index: 2;
+  width: 1.2em;
+  height: 1.2em;
+  cursor: default;
+}
 
-.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+.ui-slider .ui-slider-range {
+  position: absolute;
+  z-index: 1;
+  font-size: .7em;
+  display: block;
+  border: 0;
+  background-position: 0 0;
+}
 
-.ui-slider-horizontal { height: .8em; }
+.ui-slider-horizontal {
+  height: .8em;
+}
 
-.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+.ui-slider-horizontal .ui-slider-handle {
+  top: -.3em;
+  margin-left: -.6em;
+}
 
-.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
+.ui-slider-horizontal .ui-slider-range {
+  top: 0;
+  height: 100%;
+}
 
-.ui-slider-horizontal .ui-slider-range-min { left: 0; }
+.ui-slider-horizontal .ui-slider-range-min {
+  left: 0;
+}
 
-.ui-slider-horizontal .ui-slider-range-max { right: 0; }
+.ui-slider-horizontal .ui-slider-range-max {
+  right: 0;
+}
 
-.ui-slider-vertical { width: .8em; height: 100px; }
+.ui-slider-vertical {
+  width: .8em;
+  height: 100px;
+}
 
-.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
+.ui-slider-vertical .ui-slider-handle {
+  left: -.3em;
+  margin-left: 0;
+  margin-bottom: -.6em;
+}
 
-.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.ui-slider-vertical .ui-slider-range {
+  left: 0;
+  width: 100%;
+}
 
-.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.ui-slider-vertical .ui-slider-range-min {
+  bottom: 0;
+}
 
-.ui-slider-vertical .ui-slider-range-max { top: 0; }
+.ui-slider-vertical .ui-slider-range-max {
+  top: 0;
+}
 
 /*!
  * jQuery UI Datepicker 1.8.20
@@ -147,710 +293,880 @@ $jqThumb	:	rgba(194,194,194,.5);
  * http://docs.jquery.com/UI/Datepicker#theming
  */
 
-.ui-datepicker { width: 17em; padding: .2em .2em 0; display: none; }
-.ui-datepicker .ui-datepicker-header { position:relative; padding:.2em 0; }
-.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next { position:absolute; top: 2px; width: 1.8em; height: 1.8em; }
-.ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover { top: 1px; }
-.ui-datepicker .ui-datepicker-prev { left:2px; }
-.ui-datepicker .ui-datepicker-next { right:2px; }
-.ui-datepicker .ui-datepicker-prev-hover { left:1px; }
-.ui-datepicker .ui-datepicker-next-hover { right:1px; }
-.ui-datepicker .ui-datepicker-prev span, .ui-datepicker .ui-datepicker-next span { display: block; position: absolute; left: 50%; margin-left: -8px; top: 50%; margin-top: -8px;  }
-.ui-datepicker .ui-datepicker-title { margin: 0 2.3em; line-height: 1.8em; text-align: center; }
-.ui-datepicker .ui-datepicker-title select { font-size:1em; margin:1px 0; }
-.ui-datepicker select.ui-datepicker-month-year {width: 100%;}
-.ui-datepicker select.ui-datepicker-month, 
-.ui-datepicker select.ui-datepicker-year { width: 49%;}
-.ui-datepicker table {width: 100%; font-size: .9em; border-collapse: collapse; margin:0 0 .4em; }
-.ui-datepicker th { padding: .7em .3em; text-align: center; font-weight: bold; border: 0;  }
-.ui-datepicker td { border: 0; padding: 1px; }
-.ui-datepicker td span, .ui-datepicker td a { display: block; padding: .2em; text-align: right; text-decoration: none; }
-.ui-datepicker .ui-datepicker-buttonpane { background-image: none; margin: .7em 0 0 0; padding:0 .2em; border-left: 0; border-right: 0; border-bottom: 0; }
-.ui-datepicker .ui-datepicker-buttonpane button { float: right; margin: .5em .2em .4em; cursor: pointer; padding: .2em .6em .3em .6em; width:auto; overflow:visible; }
-.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current { float:left; }
+.ui-datepicker {
+  width: 17em;
+  padding: .2em .2em 0;
+  display: none;
+}
+.ui-datepicker .ui-datepicker-header {
+  position:relative;
+  padding:.2em 0;
+}
+.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next {
+  position:absolute;
+  top: 2px;
+  width: 1.8em;
+  height: 1.8em;
+}
+.ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover {
+  top: 1px;
+}
+.ui-datepicker .ui-datepicker-prev {
+  left:2px;
+}
+.ui-datepicker .ui-datepicker-next {
+  right:2px;
+}
+.ui-datepicker .ui-datepicker-prev-hover {
+  left:1px;
+}
+.ui-datepicker .ui-datepicker-next-hover {
+  right:1px;
+}
+.ui-datepicker .ui-datepicker-prev span, .ui-datepicker .ui-datepicker-next span {
+  display: block;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-title {
+  margin: 0 2.3em;
+  line-height: 1.8em;
+  text-align: center;
+}
+.ui-datepicker .ui-datepicker-title select {
+  font-size:1em;
+  margin:1px 0;
+}
+.ui-datepicker select.ui-datepicker-month-year {
+  width: 100%;
+}
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+  width: 49%;
+}
+.ui-datepicker table {
+  width: 100%;
+  font-size: .9em;
+  border-collapse: collapse;
+  margin:0 0 .4em;
+}
+.ui-datepicker th {
+  padding: .7em .3em;
+  text-align: center;
+  font-weight: bold;
+  border: 0;
+}
+.ui-datepicker td {
+  border: 0;
+  padding: 1px;
+}
+.ui-datepicker td span, .ui-datepicker td a {
+  display: block;
+  padding: .2em;
+  text-align: right;
+  text-decoration: none;
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+  background-image: none;
+  margin: .7em 0 0 0;
+  padding:0 .2em;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.ui-datepicker .ui-datepicker-buttonpane button {
+  float: right;
+  margin: .5em .2em .4em;
+  cursor: pointer;
+  padding: .2em .6em .3em .6em;
+  width:auto;
+  overflow:visible;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+  float:left;
+}
 
 /* with multiple calendars */
-.ui-datepicker.ui-datepicker-multi { width:auto; }
-.ui-datepicker-multi .ui-datepicker-group { float:left; }
-.ui-datepicker-multi .ui-datepicker-group table { width:95%; margin:0 auto .4em; }
-.ui-datepicker-multi-2 .ui-datepicker-group { width:50%; }
-.ui-datepicker-multi-3 .ui-datepicker-group { width:33.3%; }
-.ui-datepicker-multi-4 .ui-datepicker-group { width:25%; }
-.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header { border-left-width:0; }
-.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header { border-left-width:0; }
-.ui-datepicker-multi .ui-datepicker-buttonpane { clear:left; }
-.ui-datepicker-row-break { clear:both; width:100%; font-size:0em; }
+.ui-datepicker.ui-datepicker-multi {
+  width:auto;
+}
+.ui-datepicker-multi .ui-datepicker-group {
+  float:left;
+}
+.ui-datepicker-multi .ui-datepicker-group table {
+  width:95%;
+  margin:0 auto .4em;
+}
+.ui-datepicker-multi-2 .ui-datepicker-group {
+  width:50%;
+}
+.ui-datepicker-multi-3 .ui-datepicker-group {
+  width:33.3%;
+}
+.ui-datepicker-multi-4 .ui-datepicker-group {
+  width:25%;
+}
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header {
+  border-left-width:0;
+}
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
+  border-left-width:0;
+}
+.ui-datepicker-multi .ui-datepicker-buttonpane {
+  clear:left;
+}
+.ui-datepicker-row-break {
+  clear:both;
+  width:100%;
+  font-size:0em;
+}
 
 /* RTL support */
-.ui-datepicker-rtl { direction: rtl; }
-.ui-datepicker-rtl .ui-datepicker-prev { right: 2px; left: auto; }
-.ui-datepicker-rtl .ui-datepicker-next { left: 2px; right: auto; }
-.ui-datepicker-rtl .ui-datepicker-prev:hover { right: 1px; left: auto; }
-.ui-datepicker-rtl .ui-datepicker-next:hover { left: 1px; right: auto; }
-.ui-datepicker-rtl .ui-datepicker-buttonpane { clear:right; }
-.ui-datepicker-rtl .ui-datepicker-buttonpane button { float: left; }
-.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current { float:right; }
-.ui-datepicker-rtl .ui-datepicker-group { float:right; }
-.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header { border-right-width:0; border-left-width:1px; }
-.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header { border-right-width:0; border-left-width:1px; }
+.ui-datepicker-rtl {
+  direction: rtl;
+}
+.ui-datepicker-rtl .ui-datepicker-prev {
+  right: 2px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next {
+  left: 2px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-prev:hover {
+  right: 1px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next:hover {
+  left: 1px;
+  right: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane {
+  clear:right;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button {
+  float: left;
+}
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current {
+  float:right;
+}
+.ui-datepicker-rtl .ui-datepicker-group {
+  float:right;
+}
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header {
+  border-right-width:0;
+  border-left-width:1px;
+}
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
+  border-right-width:0;
+  border-left-width:1px;
+}
 
 /* IE6 IFRAME FIX (taken from datepicker 1.5.3 */
 
 .ui-datepicker-cover {
-    display: none; /*sorry for IE5*/
-    display/**/: block; /*sorry for IE5*/
-    position: absolute; /*must have*/
-    z-index: -1; /*must have*/
-    filter: mask(); /*must have*/
-    top: -4px; /*must have*/
-    left: -4px; /*must have*/
-    width: 200px; /*must have*/
-    height: 200px; /*must have*/
+  display: none; /*sorry for IE5*/
+  display/**/: block; /*sorry for IE5*/
+  position: absolute; /*must have*/
+  z-index: -1; /*must have*/
+  filter: mask(); /*must have*/
+  top: -4px; /*must have*/
+  left: -4px; /*must have*/
+  width: 200px; /*must have*/
+  height: 200px; /*must have*/
 }
 
 /* css for timepicker */
-.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-.ui-timepicker-div dl { text-align: left; }
-.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-.ui-timepicker-div td { font-size: 90%; }
-.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
-.ui-timepicker-rtl{ direction: rtl; }
-.ui-timepicker-rtl dl { text-align: right; }
-.ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
+.ui-timepicker-div .ui-widget-header {
+  margin-bottom: 8px;
+}
+.ui-timepicker-div dl {
+  text-align: left;
+}
+.ui-timepicker-div dl dt {
+  height: 25px;
+  margin-bottom: -25px;
+}
+.ui-timepicker-div dl dd {
+  margin: 0 10px 10px 65px;
+}
+.ui-timepicker-div td {
+  font-size: 90%;
+}
+.ui-tpicker-grid-label {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.ui-timepicker-rtl{
+  direction: rtl;
+}
+.ui-timepicker-rtl dl {
+  text-align: right;
+}
+.ui-timepicker-rtl dl dd {
+  margin: 0 65px 10px 10px;
+}
 
 /* PrimeFaces Extensions */
 
 .ui-datepicker-trigger.ui-button-icon-only .ui-button-text {
-    padding: 0.3em;
+  padding: 0.3em;
 }
 
-.ui-accordion .ui-accordion-header { cursor: pointer; position: relative; margin-top: 1px; min-height: 0; padding: .5em .5em .5em 2.2em;}
-.ui-accordion .ui-accordion-header .ui-icon { position: absolute; left: .5em; top: 50%; margin-top: -8px; }
-.ui-accordion .ui-accordion-content { padding: 1em 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: auto; zoom: 1; }
-.ui-accordion .ui-accordion-header.ui-state-disabled, .ui-accordion .ui-accordion-header.ui-state-disabled a { cursor: default; }
+.ui-accordion .ui-accordion-header {
+  cursor: pointer;
+  position: relative;
+  margin-top: 1px;
+  min-height: 0;
+  padding: .5em .5em .5em 2.2em;
+}
+.ui-accordion .ui-accordion-header .ui-icon {
+  position: absolute;
+  left: .5em;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-accordion .ui-accordion-content {
+  padding: 1em 2.2em;
+  border-top: 0;
+  margin-top: -2px;
+  position: relative;
+  top: 1px;
+  margin-bottom: 2px;
+  overflow: auto;
+  zoom: 1;
+}
+.ui-accordion .ui-accordion-header.ui-state-disabled, .ui-accordion .ui-accordion-header.ui-state-disabled a {
+  cursor: default;
+}
 
 /** RTL **/
 
 .ui-accordion.ui-accordion-rtl {
-    direction: rtl;
+  direction: rtl;
 }
 
 
 
 .ui-accordion.ui-accordion-rtl .ui-accordion-header .ui-icon {
-    right: 0.5m;
-    left: auto;
+  right: 0.5m;
+  left: auto;
 }
 
 .ui-accordion.ui-accordion-rtl .ui-accordion-header a {
-    padding: 0.5em 2.2em 0.5em 0.5em;
+  padding: 0.5em 2.2em 0.5em 0.5em;
 }
 
 
 
 .ui-tabs-outline {
-    outline: dotted thin;
-    z-index: 1;
+  outline: dotted thin;
+  z-index: 1;
 }
 
 .ui-autocomplete {
-    width: auto;
-    zoom: 1;
-    cursor: pointer;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    position: relative;
-    display: inline-block;
+  width: auto;
+  zoom: 1;
+  cursor: pointer;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  position: relative;
+  display: inline-block;
 }
 
 
 
 .ui-autocomplete .ui-autocomplete-dropdown {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    height: 100%;
-    width: 2.4em;
-    right: -2.4em;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 2.4em;
+  right: -2.4em;
 }
 
 .ui-autocomplete-query{
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .ui-autocomplete-panel {
-    position: absolute;
-    overflow: auto;
+  position: absolute;
+  overflow: auto;
 }
 
 .ui-autocomplete-panel .ui-autocomplete-item {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-autocomplete-panel .ui-autocomplete-list {
-    padding: 0.4em;
-    border: 0 none;
+  padding: 0.4em;
+  border: 0 none;
 }
 
 .ui-autocomplete-panel .ui-autocomplete-list-item {
-    border:0px none;
-    font-weight:normal;
-    margin:1px 0;
-    padding:3px 5px;
-    text-align:left;
+  border:0px none;
+  font-weight:normal;
+  margin:1px 0;
+  padding:3px 5px;
+  text-align:left;
 }
 
 .ui-autocomplete-panel .ui-autocomplete-table {
-    border-collapse:collapse;
-    width: 100%;
+  border-collapse:collapse;
+  width: 100%;
 }
 
 .ui-autocomplete-panel .ui-autocomplete-table th,
 .ui-autocomplete-panel .ui-autocomplete-table td {
-    border-width: 1px;
-    border-style: solid;
-    border-color: inherit;
-    padding:4px 10px 4px 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: inherit;
+  padding:4px 10px 4px 10px;
 }
 
 .ui-autocomplete .ui-button-icon-only .ui-button-text {
-    padding: 0.29em;
+  padding: 0.29em;
 }
 
 /* Multiple Selection */
 .ui-autocomplete-multiple-container {
-    clear: left;
-    cursor: text;
-    list-style-type: none;
-    margin: 0;
-    min-height: 1px;
-    overflow: hidden;
-    width: 400px;
+  clear: left;
+  cursor: text;
+  list-style-type: none;
+  margin: 0;
+  min-height: 1px;
+  overflow: hidden;
+  width: 400px;
 }
 
 .ui-autocomplete-multiple-container.ui-inputfield {
-    padding:0;
+  padding:0;
 }
 
 .ui-autocomplete-token {
-    cursor: default;
-    float: left;
-    overflow: hidden;
-    padding: 1px 3px;
-    white-space: nowrap;
-    position: relative;
-    margin:2px;
+  cursor: default;
+  float: left;
+  overflow: hidden;
+  padding: 1px 3px;
+  white-space: nowrap;
+  position: relative;
+  margin:2px;
 }
 
 .ui-autocomplete-token-label {
-    display: block;
-    padding: 0em 2.1em 0em 0.5em;
+  display: block;
+  padding: 0em 2.1em 0em 0.5em;
 }
 
 .ui-autocomplete-token-icon {
-    margin-top: -9px;
-    position: absolute;
-    right: 0.2em;
-    top: 50%;
-    cursor: pointer;
+  margin-top: -9px;
+  position: absolute;
+  right: 0.2em;
+  top: 50%;
+  cursor: pointer;
 }
 
 .ui-autocomplete-input-token {
-    float: left;
-    list-style-type: none;
-    margin: 1px;
-    padding: 0;
+  float: left;
+  list-style-type: none;
+  margin: 1px;
+  padding: 0;
 }
 
 .ui-autocomplete-input-token input {
-    border: 0 none;
-    width: 140px;
-    outline: medium none;
-    background-color: transparent;
-    margin:2px;
+  border: 0 none;
+  width: 140px;
+  outline: medium none;
+  background-color: transparent;
+  margin:2px;
 }
 
 .ui-autocomplete-itemtip-content {
-    display:none;
+  display:none;
 }
 
 .ui-autocomplete-itemtip {
-    position: absolute;
-    display: none;
-    padding: 0.4em;
+  position: absolute;
+  display: none;
+  padding: 0.4em;
 }
 
 .ui-autocomplete-emptyMessage {
-    padding:3px 5px;
+  padding:3px 5px;
 }
 
 .ui-autocomplete-panel .ui-autocomplete-group {
-    font-weight: bold;
-    cursor: default;
+  font-weight: bold;
+  cursor: default;
 }
 
 .ui-blockui {
-    position: absolute;
-    top: 0;
-    left: 0;
-    text-align: center;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  width: 100%;
+  height: 100%;
 }
 
 .ui-blockui-content {
-    position: absolute;
-    text-align: center;
-    padding:1em;
+  position: absolute;
+  text-align: center;
+  padding:1em;
 }
 
 .ui-carousel {
-    position: relative;
-    padding: 1px;
+  position: relative;
+  padding: 1px;
 }
 
 .ui-carousel .ui-carousel-viewport .ui-carousel-items {
-    list-style: none outside none;
-    margin: 0;
-    padding:0;
-    position: relative;
-    width: 32000px;
-    left: 0;
+  list-style: none outside none;
+  margin: 0;
+  padding:0;
+  position: relative;
+  width: 32000px;
+  left: 0;
 }
 
 .ui-carousel .ui-carousel-viewport .ui-carousel-items .ui-carousel-item {
-    margin: 1px;
-    padding: 0;
-    float: left;
+  margin: 1px;
+  padding: 0;
+  float: left;
 }
 
 .ui-carousel .ui-carousel-viewport {
-    overflow: hidden;
-    position: relative;
-    border: 0;
+  overflow: hidden;
+  position: relative;
+  border: 0;
 }
 
 .ui-carousel .ui-carousel-footer {
-    margin: 1px 1px 0px 1px;
-    padding-top: 9px;
-    padding-bottom: 6px;
-    padding-right: 10px;
-    padding-left: 10px;
-    overflow: hidden;
+  margin: 1px 1px 0px 1px;
+  padding-top: 9px;
+  padding-bottom: 6px;
+  padding-right: 10px;
+  padding-left: 10px;
+  overflow: hidden;
 }
 
 .ui-carousel .ui-carousel-header {
-    margin: 0 1px;
-    overflow: hidden;
-    padding-top: 7px;
-    padding-bottom: 8px;
-    padding-right: 10px;
-    padding-left: 10px;
+  margin: 0 1px;
+  overflow: hidden;
+  padding-top: 7px;
+  padding-bottom: 8px;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 
 .ui-carousel .ui-carousel-header .ui-carousel-header-title {
-    display: inline-block;
-    width: 30%;
-    padding-top: 2px;
-    overflow: hidden;
+  display: inline-block;
+  width: 30%;
+  padding-top: 2px;
+  overflow: hidden;
 }
 
 .ui-carousel .ui-carousel-dropdown,
 .ui-carousel .ui-carousel-mobiledropdown {
-    float: right;
-    margin: 0px 10px;
-    background-image: none;
+  float: right;
+  margin: 0px 10px;
+  background-image: none;
 }
 
 .ui-carousel .ui-carousel-dropdown option,
 .ui-carousel .ui-carousel-mobiledropdown option{
-    background-image: none;
-    border:0 none;
-    box-shadow:none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
+  background-image: none;
+  border:0 none;
+  box-shadow:none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
 .ui-carousel .ui-carousel-button {
-    float: right;
-    margin: 2px;
+  float: right;
+  margin: 2px;
 }
 
 .ui-carousel .ui-carousel-page-link {
-    float: left;
-    margin: 0 2px;
+  float: left;
+  margin: 0 2px;
 }
 
-.ui-carousel .ui-carousel-page-link, 
+.ui-carousel .ui-carousel-page-link,
 .ui-carousel .ui-carousel-button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-carousel .ui-carousel-page-links {
-    margin: 0px 9px;
-    margin-top: 1px;
-    display: inline-table;
-    float: right;
+  margin: 0px 9px;
+  margin-top: 1px;
+  display: inline-table;
+  float: right;
 }
 
 .ui-carousel .ui-carousel-mobiledropdown {
-    display: none;
+  display: none;
 }
 
 .ui-columntoggler {
-    padding: 0;
-    position: absolute;
-    overflow: auto;
-    display: none;
+  padding: 0;
+  position: absolute;
+  overflow: auto;
+  display: none;
 }
 
 .ui-columntoggler .ui-columntoggler-items {
-    border: 0 none;
-    padding: 0.4em;
-    margin: 0;
+  border: 0 none;
+  padding: 0.4em;
+  margin: 0;
 }
 
 .ui-columntoggler .ui-columntoggler-item {
-    border:0px none;
-    cursor:pointer;
-    font-weight:normal;
-    margin:1px 0;
-    padding:3px 5px;
-    text-align:left;
-    white-space: nowrap;
-    display: block;
-    position: relative;
+  border:0px none;
+  cursor:pointer;
+  font-weight:normal;
+  margin:1px 0;
+  padding:3px 5px;
+  text-align:left;
+  white-space: nowrap;
+  display: block;
+  position: relative;
 }
 
 .ui-columntoggler .ui-columntoggler-item .ui-chkbox {
-    position: absolute;
-    top:50%;
-    margin-top:-8px;
+  position: absolute;
+  top:50%;
+  margin-top:-8px;
 }
 
 .ui-columntoggler .ui-columntoggler-item label {
-    display: block;
-    padding-left: 2.2em;
+  display: block;
+  padding-left: 2.2em;
 }
 
 .ui-shadow {
-    -moz-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
-    -webkit-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
-    box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
+  -moz-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
+  -webkit-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
+  box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
 }
 
 .ui-overlay-visible {
-    visibility: visible;
+  visibility: visible;
 }
 
 ui-overlay-visible * {
-    visibility: visible !important;
+  visibility: visible !important;
 }
 
 .ui-overlay-hidden {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .ui-overlay-hidden * {
-    visibility: hidden !important;;
+  visibility: hidden !important;
+  ;
 }
 
 /* IE7 Fixes */
 .ui-overlay-visible table {
-    *border-collapse: collapse !important;
+  *border-collapse: collapse !important;
 
 }
 
 .ui-overlay-hidden table {
-    *border-collapse: separate !important;
+  *border-collapse: separate !important;
 }
 
 .ui-datepicker .ui-datepicker-current.ui-priority-secondary {
-    opacity: 1;
+  opacity: 1;
 }
 
-.ui-icon-blank { 
-    background-position: 16px 16px; 
+.ui-icon-blank {
+  background-position: 16px 16px;
 }
 
 .ui-fluid * {
-    box-sizing: border-box;
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
 }
 
 /* Column Priorities */
 @media only all {
-	th.ui-column-p-6,
-	td.ui-column-p-6,
-	th.ui-column-p-5,
-	td.ui-column-p-5,
-	th.ui-column-p-4,
-	td.ui-column-p-4,
-	th.ui-column-p-3,
-	td.ui-column-p-3,
-	th.ui-column-p-2,
-	td.ui-column-p-2,
-	th.ui-column-p-1,
-	td.ui-column-p-1 {
-		display: none;
-	}
+  th.ui-column-p-6,
+  td.ui-column-p-6,
+  th.ui-column-p-5,
+  td.ui-column-p-5,
+  th.ui-column-p-4,
+  td.ui-column-p-4,
+  th.ui-column-p-3,
+  td.ui-column-p-3,
+  th.ui-column-p-2,
+  td.ui-column-p-2,
+  th.ui-column-p-1,
+  td.ui-column-p-1 {
+    display: none;
+  }
 }
 
 /* Show priority 1 at 320px (20em x 16px) */
 @media screen and (min-width: 20em) {
-	th.ui-column-p-1,
-	td.ui-column-p-1 {
-		display: table-cell;
-	}
+  th.ui-column-p-1,
+  td.ui-column-p-1 {
+    display: table-cell;
+  }
 }
 
 /* Show priority 2 at 480px (30em x 16px) */
 @media screen and (min-width: 30em) {
-	th.ui-column-p-2,
-	td.ui-column-p-2 {
-		display: table-cell;
-	}
+  th.ui-column-p-2,
+  td.ui-column-p-2 {
+    display: table-cell;
+  }
 }
 
 /* Show priority 3 at 640px (40em x 16px) */
 @media screen and (min-width: 40em) {
-	th.ui-column-p-3,
-	td.ui-column-p-3 {
-		display: table-cell;
-	}
+  th.ui-column-p-3,
+  td.ui-column-p-3 {
+    display: table-cell;
+  }
 }
 
 /* Show priority 4 at 800px (50em x 16px) */
 @media screen and (min-width: 50em) {
-	th.ui-column-p-4,
-	td.ui-column-p-4 {
-		display: table-cell;
-	}
+  th.ui-column-p-4,
+  td.ui-column-p-4 {
+    display: table-cell;
+  }
 }
 
 /* Show priority 5 at 960px (60em x 16px) */
 @media screen and (min-width: 60em) {
-	th.ui-column-p-5,
-	td.ui-column-p-5 {
-		display: table-cell;
-	}
+  th.ui-column-p-5,
+  td.ui-column-p-5 {
+    display: table-cell;
+  }
 }
 
 /* Show priority 6 at 1,120px (70em x 16px) */
 @media screen and (min-width: 70em) {
-	th.ui-column-p-6,
-	td.ui-column-p-6 {
-		display: table-cell;
-	}
+  th.ui-column-p-6,
+  td.ui-column-p-6 {
+    display: table-cell;
+  }
 }
 .ui-dashboard-column {
-    float: left;
-    padding-bottom: 100px;
+  float: left;
+  padding-bottom: 100px;
 }
 
 .ui-dashboard-column .ui-panel-titlebar {
-    cursor: move;
+  cursor: move;
 }
 .ui-datalist .ui-datalist-header,
 .ui-datalist .ui-datalist-footer {
-    text-align:center;
-    padding:4px 10px;
+  text-align:center;
+  padding:4px 10px;
 }
 
 .ui-datalist .ui-datalist-header {
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 }
 
 .ui-datalist .ui-datalist-footer {
-    border-top: 0px none;
+  border-top: 0px none;
 }
 
 .ui-datalist .ui-paginator-top {
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 }
 
 .ui-datalist .ui-paginator-bottom {
-    border-top: 0px none;
+  border-top: 0px none;
 }
 
 .ui-datalist .ui-datalist-empty-message {
-    padding: 4px 10px;
+  padding: 4px 10px;
 }
 
 .ui-datalist .ui-datalist-nobullets {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 .ui-datagrid .ui-paginator {
-	text-align: center;
+  text-align: center;
 }
 
 .ui-datagrid-column {
-	padding: 3px;
+  padding: 3px;
 }
 
 .ui-datagrid-content-empty {
-    padding: 4px 10px;
+  padding: 4px 10px;
 }
 
 .ui-datagrid .ui-datagrid-header,
 .ui-datagrid .ui-datagrid-footer {
-    text-align:center;
-    padding:4px 10px;
+  text-align:center;
+  padding:4px 10px;
 }
 
 .ui-datagrid .ui-datagrid-header {
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 }
 
 .ui-datagrid .ui-datagrid-footer {
-    border-top: 0px none;
+  border-top: 0px none;
 }
 
 .ui-datagrid .ui-paginator-top {
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 }
 
 .ui-datagrid .ui-paginator-bottom {
-    border-top: 0px none;
+  border-top: 0px none;
 }
 
 /** Table Layout **/
 .ui-datagrid-data {
-	width: 100%;
+  width: 100%;
 }
 .ui-datascroller {
 }
 
 .ui-datascroller .ui-datascroller-header {
-    text-align: center;
-    padding: 4px 10px;
-    border-bottom: 0px none;
+  text-align: center;
+  padding: 4px 10px;
+  border-bottom: 0px none;
 }
 
 .ui-datascroller .ui-datascroller-content {
-    padding:4px 10px;
+  padding:4px 10px;
 }
 
 .ui-datascroller-inline .ui-datascroller-content {
-    overflow: auto;
+  overflow: auto;
 }
 
 .ui-datascroller .ui-datascroller-list {
-    list-style-type: none; 
-    margin: 0;
-    padding: 0;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 .ui-datascroller .ui-datascroller-item {
-    border: 0 none;
+  border: 0 none;
 }
 
 .ui-datascroller .ui-datascroller-loader {
-    text-align: center;
-    padding: 4px 10px;
+  text-align: center;
+  padding: 4px 10px;
 }
 
 .ui-datascroller .ui-datascroller-loading {
-    background: url("#{$img}/images/loading.gif") center center no-repeat;
-    width: 220px;
-    height: 19px;
-    padding: 0;
-    margin: 0;
-    display: inline-block;
+  background: url("#{$img}/images/loading.gif") center center no-repeat;
+  width: 220px;
+  height: 19px;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
 }
 .ui-datatable table {
-	border-collapse:collapse;
-    width: 100%;
-    table-layout: fixed;
+  border-collapse:collapse;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .ui-datatable-tablewrapper {
-    overflow: auto;
+  overflow: auto;
 }
 
 .ui-datatable .ui-datatable-header,
 .ui-datatable .ui-datatable-footer {
-    text-align: center;
-    padding: 4px 10px;
+  text-align: center;
+  padding: 4px 10px;
 }
 
 .ui-datatable .ui-datatable-header {
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 }
 
 .ui-datatable .ui-datatable-footer {
-    border-top: 0px none;
+  border-top: 0px none;
 }
 
 .ui-datatable thead th, .ui-datatable tfoot td {
-    text-align: center;
+  text-align: center;
 }
 
 .ui-datatable thead th,
 .ui-datatable tbody td,
 .ui-datatable tfoot td,
 .ui-datatable tfoot th{
-    padding: 4px 10px;
-    overflow: hidden;
-    border-width: 1px;
-    border-style: solid;
+  padding: 4px 10px;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
 }
 
 .ui-datatable tbody td {
-    border-color: inherit;
+  border-color: inherit;
 }
 
 .ui-datatable .ui-sortable-column {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-datatable div.ui-dt-c {
-    position: relative;
+  position: relative;
 }
 
 .ui-datatable .ui-sortable-column-icon {
-    display: inline-block;
-    margin: -3px 0px -3px 2px;
+  display: inline-block;
+  margin: -3px 0px -3px 2px;
 }
 
 .ui-datatable .ui-column-filter {
-    display: block;
-    width:100px;
-    margin:auto;
+  display: block;
+  width:100px;
+  margin:auto;
 }
 
 .ui-datatable .ui-row-toggler {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-datatable tr.ui-state-highlight {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-datatable .ui-selection-column .ui-chkbox-all {
-    display: block;
-    margin: 0px auto;
-    width: 16px;
-    height: 16px;
+  display: block;
+  margin: 0px auto;
+  width: 16px;
+  height: 16px;
 }
 
 /* Scrollable */
 .ui-datatable-scrollable table,
 .ui-datatable-sticky table{
-    table-layout: fixed;
+  table-layout: fixed;
 }
 
 .ui-datatable-scrollable-body {
-    overflow:auto;
+  overflow:auto;
 }
 .ui-datatable-scrollable-header,
 .ui-datatable-scrollable-footer {
-    overflow: hidden;
-    border: 0px none;
+  overflow: hidden;
+  border: 0px none;
 }
 
 
@@ -859,15 +1175,15 @@ ui-overlay-visible * {
 
 .ui-datatable-scrollable .ui-datatable-scrollable-footer {
 
-    position: relative;
+  position: relative;
 
-} 
+}
 
 
 
 .ui-datatable-scrollable .ui-datatable-scrollable-header td {
 
-    font-weight: normal;
+  font-weight: normal;
 
 }
 
@@ -875,11 +1191,11 @@ ui-overlay-visible * {
 
 .ui-datatable-scrollable-body::-webkit-scrollbar {
 
-    -webkit-appearance: none;
+  -webkit-appearance: none;
 
-    width: 15px;
+  width: 15px;
 
-    background-color: transparent;
+  background-color: transparent;
 
 }
 
@@ -887,11 +1203,11 @@ ui-overlay-visible * {
 
 .ui-datatable-scrollable-body::-webkit-scrollbar-thumb {
 
-    border-radius: 8px;
+  border-radius: 8px;
 
-    border: 1px solid white;
+  border: 1px solid white;
 
-    background-color: rgba(194,194,194,.5);
+  background-color: rgba(194,194,194,.5);
 
 }
 
@@ -899,7 +1215,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-scrollable-body  {
 
-    min-height: 0%;
+  min-height: 0%;
 
 }
 
@@ -907,11 +1223,11 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-data tr.ui-state-hover {
 
-    border-color: inherit;
+  border-color: inherit;
 
-    font-weight: inherit;
+  font-weight: inherit;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -919,7 +1235,7 @@ ui-overlay-visible * {
 
 .ui-datatable-scrollable-theadclone {
 
-    height:0px;
+  height:0px;
 
 }
 
@@ -927,7 +1243,7 @@ ui-overlay-visible * {
 
 .ui-datatable-scrollable-theadclone tr {
 
-    height:0px;
+  height:0px;
 
 }
 
@@ -935,17 +1251,17 @@ ui-overlay-visible * {
 
 .ui-datatable-scrollable-theadclone th.ui-state-default {
 
-    height:0px;
+  height:0px;
 
-    border-bottom-width: 0px;
+  border-bottom-width: 0px;
 
-    border-top-width: 0px;
+  border-top-width: 0px;
 
-    padding-top: 0px;
+  padding-top: 0px;
 
-    padding-bottom: 0px;
+  padding-bottom: 0px;
 
-    outline: 0 none;
+  outline: 0 none;
 
 }
 
@@ -965,7 +1281,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-paginator {
 
-    padding: 2px;
+  padding: 2px;
 
 }
 
@@ -975,7 +1291,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-cell-editor-input {
 
-    display: none;
+  display: none;
 
 }
 
@@ -983,13 +1299,13 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-row-editing .ui-cell-editor .ui-cell-editor-output {
 
-    display:none;
+  display:none;
 
 }
 
 .ui-datatable .ui-row-editing .ui-cell-editor .ui-cell-editor-input {
 
-    display:block;
+  display:block;
 
 }
 
@@ -997,9 +1313,9 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-row-editor span {
 
-    cursor: pointer;
+  cursor: pointer;
 
-    float: left;
+  float: left;
 
 }
 
@@ -1007,13 +1323,13 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-row-editor .ui-icon-pencil {
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
 .ui-datatable .ui-row-editing .ui-row-editor .ui-icon-pencil {
 
-    display: none;
+  display: none;
 
 }
 
@@ -1023,7 +1339,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-row-editor .ui-icon-close {
 
-    display: none;
+  display: none;
 
 }
 
@@ -1033,7 +1349,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-row-editing .ui-row-editor .ui-icon-close {
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
@@ -1043,9 +1359,9 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-data td.ui-cell-editing {
 
-    padding:0;
+  padding:0;
 
-    margin:0;
+  margin:0;
 
 }
 
@@ -1055,25 +1371,25 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-column-resizer {
 
-    position: absolute;
+  position: absolute;
 
-    top: 0px;
+  top: 0px;
 
-    right: 0px;
+  right: 0px;
 
-    margin: 0;
+  margin: 0;
 
-    width:8px;
+  width:8px;
 
-    height:20px;
+  height:20px;
 
-    padding:0px;
+  padding:0px;
 
-    cursor:col-resize;
+  cursor:col-resize;
 
-    background-image: url("#{$img}/dot_clear.gif");
+  background-image: url("#{$img}/dot_clear.gif");
 
-    border: 1px solid transparent;
+  border: 1px solid transparent;
 
 }
 
@@ -1081,7 +1397,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-filter-column .ui-column-resizer {
 
-    height:45px;
+  height:45px;
 
 }
 
@@ -1089,13 +1405,13 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-column-resizer-helper {
 
-    width: 1px;
+  width: 1px;
 
-    position: absolute;
+  position: absolute;
 
-    z-index: 10;
+  z-index: 10;
 
-    display: none;
+  display: none;
 
 }
 
@@ -1103,9 +1419,9 @@ ui-overlay-visible * {
 
 .ui-datatable-resizable {
 
-    padding-bottom:1px;     /*fix for webkit overlow*/
+  padding-bottom:1px;     /*fix for webkit overlow*/
 
-    overflow:auto;
+  overflow:auto;
 
 }
 
@@ -1117,7 +1433,7 @@ ui-overlay-visible * {
 
 .ui-datatable-resizable tfoot td {
 
-    white-space: nowrap;
+  white-space: nowrap;
 
 }
 
@@ -1125,7 +1441,7 @@ ui-overlay-visible * {
 
 .ui-datatable-resizable table {
 
-    table-layout: fixed;
+  table-layout: fixed;
 
 }
 
@@ -1133,9 +1449,9 @@ ui-overlay-visible * {
 
 .ui-datatable-resizable th.ui-resizable-column {
 
-    background-clip: padding-box;
+  background-clip: padding-box;
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -1143,17 +1459,17 @@ ui-overlay-visible * {
 
 .ui-datatable-rtl {
 
-    direction: rtl;
+  direction: rtl;
 
 }
 
 
 
-.ui-datatable-rtl.ui-datatable thead th, 
+.ui-datatable-rtl.ui-datatable thead th,
 
 .ui-datatable-rtl.ui-datatable tfoot td {
 
-    text-align: right;
+  text-align: right;
 
 }
 
@@ -1163,7 +1479,7 @@ ui-overlay-visible * {
 
 .ui-datatable table.ui-datatable-fs {
 
-    width:auto;
+  width:auto;
 
 }
 
@@ -1173,11 +1489,11 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-frozenlayout-right {
 
-    padding: 0;
+  padding: 0;
 
-    border: 0 none;
+  border: 0 none;
 
-    vertical-align: top;
+  vertical-align: top;
 
 }
 
@@ -1185,7 +1501,7 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-frozen-container {
 
-    margin-right: -1px;
+  margin-right: -1px;
 
 }
 
@@ -1193,7 +1509,7 @@ ui-overlay-visible * {
 
 .ui-datatable-frozen-container .ui-datatable-scrollable-body {
 
-    overflow: hidden;
+  overflow: hidden;
 
 }
 
@@ -1201,9 +1517,9 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-frozen-container .ui-row-toggler {
 
-    margin-top: -2px;
+  margin-top: -2px;
 
-    margin-bottom: -2px;
+  margin-bottom: -2px;
 
 }
 
@@ -1211,9 +1527,9 @@ ui-overlay-visible * {
 
 .ui-datatable .ui-datatable-frozen-container .ui-row-editor {
 
-    margin-top: -2px;
+  margin-top: -2px;
 
-    margin-bottom: -2px;
+  margin-bottom: -2px;
 
 }
 
@@ -1221,7 +1537,7 @@ ui-overlay-visible * {
 
 .ui-datatable-frozenlayout-right .ui-datatable-empty-message td {
 
-    visibility: hidden;
+  visibility: hidden;
 
 }
 
@@ -1231,7 +1547,7 @@ ui-overlay-visible * {
 
 .ui-datatable-reflow .ui-datatable-data td .ui-column-title {
 
-    display: none;
+  display: none;
 
 }
 
@@ -1239,105 +1555,166 @@ ui-overlay-visible * {
 
 @media ( max-width: 35em ) {
 
-    .ui-datatable-reflow thead th,
+  .ui-datatable-reflow thead th,
 
-    .ui-datatable-reflow tfoot td {
+  .ui-datatable-reflow tfoot td {
 
-        display: none;
+    display: none;
 
-    }
-
-
-
-    .ui-datatable-reflow .ui-datatable-data td { 
-
-        text-align: left;
-
-        display: block;
-
-        border: 0px none;
-
-        width: 100%;
-
-		-webkit-box-sizing: border-box;
-
-		-moz-box-sizing: border-box;
-
-		box-sizing: border-box;
-
-		float: left;
-
-		clear: left;
-
-    }
-
-    
-
-    .ui-datatable-reflow .ui-datatable-data.ui-widget-content {
-
-        border: 0px none;
-
-    }
-
-    
-
-    .ui-datatable-reflow .ui-datatable-data tr.ui-widget-content {
-
-        border-left: 0px none;
-
-        border-right: 0px none;
-
-    }
+  }
 
 
 
-    .ui-datatable-reflow .ui-datatable-data td .ui-column-title { 
+  .ui-datatable-reflow .ui-datatable-data td {
 
-        padding: .4em; 
+    text-align: left;
 
-        min-width: 30%; 
+    display: block;
 
-        display: inline-block;
+    border: 0px none;
 
-        margin: -.4em 1em -.4em -.4em;
+    width: 100%;
 
-    }
+    -webkit-box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+
+    box-sizing: border-box;
+
+    float: left;
+
+    clear: left;
+
+  }
+
+
+
+  .ui-datatable-reflow .ui-datatable-data.ui-widget-content {
+
+    border: 0px none;
+
+  }
+
+
+
+  .ui-datatable-reflow .ui-datatable-data tr.ui-widget-content {
+
+    border-left: 0px none;
+
+    border-right: 0px none;
+
+  }
+
+
+
+  .ui-datatable-reflow .ui-datatable-data td .ui-column-title {
+
+    padding: .4em;
+
+    min-width: 30%;
+
+    display: inline-block;
+
+    margin: -.4em 1em -.4em -.4em;
+
+  }
 
 }
 
-.ui-dialog { position: fixed; padding: 0; overflow: hidden; display:none; }
+.ui-dialog {
+  position: fixed;
+  padding: 0;
+  overflow: hidden;
+  display:none;
+}
 
-.ui-dialog.ui-dialog-absolute { position: absolute; }
+.ui-dialog.ui-dialog-absolute {
+  position: absolute;
+}
 
-.ui-dialog.ui-overlay-hidden {display:block;}
+.ui-dialog.ui-overlay-hidden {
+  display:block;
+}
 
-.ui-dialog .ui-dialog-titlebar { padding: .4em .4em .4em 1em; position: relative; border:0px; }
+.ui-dialog .ui-dialog-titlebar {
+  padding: .4em .4em .4em 1em;
+  position: relative;
+  border:0px;
+}
 
-.ui-dialog .ui-dialog-title { float: left; margin: .3em 16px .1em 0; } 
+.ui-dialog .ui-dialog-title {
+  float: left;
+  margin: .3em 16px .1em 0;
+}
 
-.ui-dialog .ui-dialog-content {position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  border: 0;
+  padding: .5em 1em;
+  background: none;
+  overflow: auto;
+  zoom: 1;
+}
 
-.ui-dialog .ui-dialog-footer {padding: .4em 1em; border-width: 1px 0 0 0; text-align:left;}
+.ui-dialog .ui-dialog-footer {
+  padding: .4em 1em;
+  border-width: 1px 0 0 0;
+  text-align:left;
+}
 
-.ui-dialog .ui-dialog-buttonpane { text-align: left; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
+.ui-dialog .ui-dialog-buttonpane {
+  text-align: left;
+  background-image: none;
+  margin: .5em 0 0 0;
+  padding: .3em 1em .5em .4em;
+}
 
-.ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
+.ui-dialog .ui-dialog-buttonpane button {
+  margin: .5em .4em .5em 0;
+  cursor: pointer;
+}
 
-.ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
+.ui-dialog .ui-resizable-se {
+  width: 14px;
+  height: 14px;
+  right: 3px;
+  bottom: 3px;
+}
 
-.ui-draggable .ui-dialog-titlebar { cursor: move; }
+.ui-draggable .ui-dialog-titlebar {
+  cursor: move;
+}
 
-.ui-dialog .ui-dialog-titlebar-close, .ui-dialog .ui-dialog-titlebar-minimize,.ui-dialog .ui-dialog-titlebar-maximize { float: right; margin: 0px; top:0px; padding: 1px; cursor:pointer; }
+.ui-dialog .ui-dialog-titlebar-close, .ui-dialog .ui-dialog-titlebar-minimize,.ui-dialog .ui-dialog-titlebar-maximize {
+  float: right;
+  margin: 0px;
+  top:0px;
+  padding: 1px;
+  cursor:pointer;
+}
 
-.ui-dialog .ui-dialog-titlebar-close span, .ui-dialog .ui-dialog-titlebar-minimize span, .ui-dialog .ui-dialog-titlebar-maximize span { display: block; margin: 0px; }
+.ui-dialog .ui-dialog-titlebar-close span, .ui-dialog .ui-dialog-titlebar-minimize span, .ui-dialog .ui-dialog-titlebar-maximize span {
+  display: block;
+  margin: 0px;
+}
 
-.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus, .ui-dialog .ui-dialog-titlebar-minimize:hover, .ui-dialog .ui-dialog-titlebar-minimize:focus, .ui-dialog .ui-dialog-titlebar-maximize:hover, .ui-dialog .ui-dialog-titlebar-maximize:focus   { padding: 0; }
+.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus, .ui-dialog .ui-dialog-titlebar-minimize:hover, .ui-dialog .ui-dialog-titlebar-minimize:focus, .ui-dialog .ui-dialog-titlebar-maximize:hover, .ui-dialog .ui-dialog-titlebar-maximize:focus   {
+  padding: 0;
+}
 
-.ui-dialog-docking-zone {position: fixed;bottom: 0;left: 0;}
+.ui-dialog-docking-zone {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
 
-.ui-dialog-minimizing {border: 2px dotted gray;}
+.ui-dialog-minimizing {
+  border: 2px dotted gray;
+}
 
-.ui-dialog .ui-dialog-message {margin-right:.5em}
+.ui-dialog .ui-dialog-message {
+  margin-right:.5em
+}
 
 
 
@@ -1345,13 +1722,19 @@ ui-overlay-visible * {
 
 .ui-confirm-dialog .ui-dialog-content {
 
-    padding: 1em;
+  padding: 1em;
 
 }
 
-.ui-confirm-dialog-severity {float: left; margin-right: 4px;}
+.ui-confirm-dialog-severity {
+  float: left;
+  margin-right: 4px;
+}
 
-.ui-confirm-dialog-message {display: inline-block; margin-top: 1px;}
+.ui-confirm-dialog-message {
+  display: inline-block;
+  margin-top: 1px;
+}
 
 
 
@@ -1359,7 +1742,7 @@ ui-overlay-visible * {
 
 .ui-dialog-rtl {
 
-    direction: rtl;
+  direction: rtl;
 
 }
 
@@ -1367,7 +1750,7 @@ ui-overlay-visible * {
 
 .ui-dialog.ui-dialog-rtl .ui-dialog-title {
 
-    float: right;
+  float: right;
 
 }
 
@@ -1379,7 +1762,7 @@ ui-overlay-visible * {
 
 .ui-dialog.ui-dialog-rtl .ui-dialog-titlebar-maximize {
 
-    float: left;
+  float: left;
 
 }
 
@@ -1387,7 +1770,7 @@ ui-overlay-visible * {
 
 .ui-dialog.ui-dialog-rtl .ui-dialog-footer {
 
-    text-align: right;
+  text-align: right;
 
 }
 
@@ -1397,13 +1780,13 @@ ui-overlay-visible * {
 
 .ui-message-dialog .ui-dialog-content {
 
-    padding: 1em;
+  padding: 1em;
 
 }
 
 .ui-fieldset, .ui-fieldset .ui-fieldset-legend {
 
-    padding:0.6em 1em;
+  padding:0.6em 1em;
 
 }
 
@@ -1411,9 +1794,9 @@ ui-overlay-visible * {
 
 .ui-fieldset-toggleable .ui-fieldset-legend {
 
-    padding: 0.5em 1em 0.5em 0.5em;
+  padding: 0.5em 1em 0.5em 0.5em;
 
-    cursor:pointer;
+  cursor:pointer;
 
 }
 
@@ -1421,23 +1804,23 @@ ui-overlay-visible * {
 
 .ui-fieldset .ui-fieldset-toggler {
 
-    padding-right: .1em;
+  padding-right: .1em;
 
-    margin-top: -0.1em;
+  margin-top: -0.1em;
 
-    float:left;
+  float:left;
 
 }
 
 .ui-inputfield {
 
-    margin: 0;
+  margin: 0;
 
-    outline: medium none;
+  outline: medium none;
 
-    padding: 4px;
+  padding: 4px;
 
-    font-weight: normal;
+  font-weight: normal;
 
 }
 
@@ -1447,7 +1830,7 @@ ui-overlay-visible * {
 
 .ui-widget-content .ui-inputfield {
 
-    font-weight: normal;
+  font-weight: normal;
 
 }
 
@@ -1455,45 +1838,45 @@ ui-overlay-visible * {
 
 .ui-inputtextarea-resizable {
 
-    overflow: hidden;
+  overflow: hidden;
 
-    resize:none;
+  resize:none;
 
 }
 
 
 
-.ui-selectonelistbox, 
+.ui-selectonelistbox,
 
 .ui-selectmanymenu,
 
 .ui-multiselectlistbox-listcontainer {
 
-    padding: 2px;
+  padding: 2px;
 
-    width: 150px;
+  width: 150px;
 
 }
 
 
 
-.ui-selectonelistbox .ui-selectlistbox-listcontainer, 
+.ui-selectonelistbox .ui-selectlistbox-listcontainer,
 
 .ui-selectmanymenu .ui-selectlistbox-listcontainer,
 
 .ui-multiselectlistbox-listcontainer {
 
-    overflow:auto;
+  overflow:auto;
 
 }
 
 
 
-.ui-selectonelistbox.ui-state-disabled .ui-selectlistbox-listcontainer, 
+.ui-selectonelistbox.ui-state-disabled .ui-selectlistbox-listcontainer,
 
 .ui-selectmanymenu.ui-state-disabled .ui-selectlistbox-listcontainer {
 
-    overflow:hidden;
+  overflow:hidden;
 
 }
 
@@ -1505,11 +1888,11 @@ ui-overlay-visible * {
 
 .ui-multiselectlistbox .ui-multiselectlistbox-list {
 
-    list-style-type: none; 
+  list-style-type: none;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
 }
 
@@ -1521,13 +1904,13 @@ ui-overlay-visible * {
 
 .ui-multiselectlistbox .ui-multiselectlistbox-item {
 
-    margin: 2px;
+  margin: 2px;
 
-    border: 0 none;
+  border: 0 none;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    font-weight: normal;
+  font-weight: normal;
 
 }
 
@@ -1537,9 +1920,9 @@ ui-overlay-visible * {
 
 .ui-selectmanymenu table.ui-selectlistbox-list {
 
-    border-collapse:collapse;
+  border-collapse:collapse;
 
-    width:100%;
+  width:100%;
 
 }
 
@@ -1547,17 +1930,17 @@ ui-overlay-visible * {
 
 .ui-selectlistbox-filter.ui-inputfield {
 
-    padding-right: 12%;
+  padding-right: 12%;
 
-    padding-left: 2%;
+  padding-left: 2%;
 
-    width: 85%;
+  width: 85%;
 
-    -moz-box-shadow: none;
+  -moz-box-shadow: none;
 
-    -webkit-box-shadow: none;
+  -webkit-box-shadow: none;
 
-    box-shadow: none;
+  box-shadow: none;
 
 }
 
@@ -1565,11 +1948,11 @@ ui-overlay-visible * {
 
 .ui-selectlistbox-filter-container {
 
-    position: relative;
+  position: relative;
 
-    margin: 0.1em 0 0.1em 0;
+  margin: 0.1em 0 0.1em 0;
 
-    padding: 0;
+  padding: 0;
 
 }
 
@@ -1577,11 +1960,11 @@ ui-overlay-visible * {
 
 .ui-selectlistbox-filter-container .ui-icon {
 
-    position: absolute;
+  position: absolute;
 
-    top: 5px;
+  top: 5px;
 
-    right: 2px;
+  right: 2px;
 
 }
 
@@ -1589,9 +1972,9 @@ ui-overlay-visible * {
 
 .ui-multiselectlistbox .ui-multiselectlistbox-listcontainer {
 
-    float: left;
+  float: left;
 
-    margin-right: 4px;
+  margin-right: 4px;
 
 }
 
@@ -1599,7 +1982,7 @@ ui-overlay-visible * {
 
 .ui-multiselectlistbox .ui-multiselectlistbox-item {
 
-    white-space: nowrap;
+  white-space: nowrap;
 
 }
 
@@ -1607,7 +1990,7 @@ ui-overlay-visible * {
 
 .ui-multiselectlistbox.ui-state-disabled .ui-multiselectlistbox-item {
 
-    cursor: default;
+  cursor: default;
 
 }
 
@@ -1615,11 +1998,11 @@ ui-overlay-visible * {
 
 .ui-multiselectlistbox .ui-multiselectlistbox-header {
 
-    text-align: center;
+  text-align: center;
 
-    padding: 2px 10px;
+  padding: 2px 10px;
 
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 
 }
 
@@ -1633,7 +2016,7 @@ ui-overlay-visible * {
 
 .ui-chkbox {
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
@@ -1641,17 +2024,17 @@ ui-overlay-visible * {
 
 .ui-chkbox .ui-chkbox-box {
 
-    width: 16px;
+  width: 16px;
 
-    height: 16px;
+  height: 16px;
 
-    display: inline-block;
+  display: inline-block;
 
-    -moz-border-radius: 2px;
+  -moz-border-radius: 2px;
 
-    -webkit-border-radius: 2px;
+  -webkit-border-radius: 2px;
 
-    border-radius: 2px;
+  border-radius: 2px;
 
 }
 
@@ -1659,7 +2042,7 @@ ui-overlay-visible * {
 
 .ui-chkbox-icon.ui-icon {
 
-    overflow: visible;
+  overflow: visible;
 
 }
 
@@ -1667,17 +2050,17 @@ ui-overlay-visible * {
 
 .ui-chkbox .ui-chkbox-label {
 
-    cursor: pointer;
+  cursor: pointer;
 
-    margin: 3px 0 0 3px;
+  margin: 3px 0 0 3px;
 
-    outline: medium none;
+  outline: medium none;
 
-    z-index: 1;
+  z-index: 1;
 
-    display: inline-block;
+  display: inline-block;
 
-    vertical-align: top;
+  vertical-align: top;
 
 }
 
@@ -1685,9 +2068,9 @@ ui-overlay-visible * {
 
 .ui-selectoneradio label {
 
-    display: block;
+  display: block;
 
-    margin-top: 4px;
+  margin-top: 4px;
 
 }
 
@@ -1697,7 +2080,7 @@ ui-overlay-visible * {
 
 .ui-selectoneradio.ui-widget td {
 
-    border: 0 none;
+  border: 0 none;
 
 }
 
@@ -1707,11 +2090,11 @@ ui-overlay-visible * {
 
 .ui-selectoneradio.ui-grid label {
 
-    display: inline-block;
+  display: inline-block;
 
-    margin-left: 4px;
+  margin-left: 4px;
 
-    vertical-align: top;
+  vertical-align: top;
 
 }
 
@@ -1721,7 +2104,7 @@ ui-overlay-visible * {
 
 .ui-panelgrid .ui-selectmanycheckbox.ui-grid-responsive .ui-grid-row {
 
-    border-top: 0px none;
+  border-top: 0px none;
 
 }
 
@@ -1731,35 +2114,35 @@ ui-overlay-visible * {
 
 .ui-radiobutton {
 
-    margin: 3px 0;
+  margin: 3px 0;
 
-    width: 16px;
+  width: 16px;
 
-    line-height: 16px;
+  line-height: 16px;
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
 .ui-radiobutton .ui-radiobutton-box {
 
-    width: 16px;
+  width: 16px;
 
-    height: 16px;
+  height: 16px;
 
-    line-height: 16px;
+  line-height: 16px;
 
-    -moz-border-radius: 10px;
+  -moz-border-radius: 10px;
 
-    -webkit-border-radius: 10px;
+  -webkit-border-radius: 10px;
 
-    border-radius: 10px;
+  border-radius: 10px;
 
 }
 
 .ui-radiobutton-icon {
 
-    margin-left: 1px;
+  margin-left: 1px;
 
 }
 
@@ -1767,9 +2150,9 @@ ui-overlay-visible * {
 
 .ui-radiobutton.ui-radiobutton-native {
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
 }
 
@@ -1777,19 +2160,19 @@ ui-overlay-visible * {
 
 .ui-radiobutton.ui-radiobutton-native  .ui-helper-hidden-accessible {
 
-    clip: auto;
+  clip: auto;
 
-    position: static !important;
+  position: static !important;
 
-    width: auto;
+  width: auto;
 
-    height: auto;
+  height: auto;
 
-    overflow: visible;
+  overflow: visible;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
 }
 
@@ -1797,7 +2180,7 @@ ui-overlay-visible * {
 
 .ui-radiobutton.ui-radiobutton-native  .ui-radiobutton-box {
 
-    display:none;
+  display:none;
 
 }
 
@@ -1805,7 +2188,7 @@ ui-overlay-visible * {
 
 .ui-radiobutton.ui-radiobutton-native .ui-helper-hidden-accessible input {
 
-    margin: 0;
+  margin: 0;
 
 }
 
@@ -1813,7 +2196,7 @@ ui-overlay-visible * {
 
 .ui-selectoneradio-native label {
 
-    margin: 0;
+  margin: 0;
 
 }
 
@@ -1823,17 +2206,17 @@ ui-overlay-visible * {
 
 .ui-selectonemenu {
 
-    display: inline-block;
+  display: inline-block;
 
-    position: relative;
+  position: relative;
 
-    width: auto;
+  width: auto;
 
-    zoom: 1;
+  zoom: 1;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    padding-right: 2em;
+  padding-right: 2em;
 
 }
 
@@ -1841,25 +2224,25 @@ ui-overlay-visible * {
 
 .ui-selectonemenu .ui-selectonemenu-trigger {
 
-    border-right: none;
+  border-right: none;
 
-    border-top: none;
+  border-top: none;
 
-    border-bottom: none;
+  border-bottom: none;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    width: 16px;
+  width: 16px;
 
-    height: 100%;
+  height: 100%;
 
-    position: absolute;
+  position: absolute;
 
-    right: 0;
+  right: 0;
 
-    top: 0;
+  top: 0;
 
-    padding: 0 3px;
+  padding: 0 3px;
 
 }
 
@@ -1867,7 +2250,7 @@ ui-overlay-visible * {
 
 .ui-selectonemenu .ui-selectonemenu-trigger  .ui-icon {
 
-    margin-top: 3px;
+  margin-top: 3px;
 
 }
 
@@ -1875,19 +2258,19 @@ ui-overlay-visible * {
 
 .ui-selectonemenu .ui-selectonemenu-label  {
 
-    display: block;
+  display: block;
 
-    border: none;
+  border: none;
 
-    white-space: nowrap;
+  white-space: nowrap;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    font-weight: normal;
+  font-weight: normal;
 
-    width: 100%;
+  width: 100%;
 
-    text-align: left;
+  text-align: left;
 
 }
 
@@ -1897,7 +2280,7 @@ ui-overlay-visible * {
 
 .ui-selectonemenu.ui-state-disabled .ui-selectonemenu-label {
 
-    cursor: default;
+  cursor: default;
 
 }
 
@@ -1905,7 +2288,7 @@ ui-overlay-visible * {
 
 .ui-selectonemenu label.ui-selectonemenu-label  {
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -1913,7 +2296,7 @@ ui-overlay-visible * {
 
 .ui-selectonemenu input.ui-selectonemenu-label  {
 
-    cursor: default;
+  cursor: default;
 
 }
 
@@ -1921,9 +2304,9 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel {
 
-    position: absolute;
+  position: absolute;
 
-    height: auto;
+  height: auto;
 
 }
 
@@ -1931,7 +2314,7 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-items-wrapper {
 
-    overflow: auto;
+  overflow: auto;
 
 }
 
@@ -1939,9 +2322,9 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-item {
 
-    font-weight: normal;
+  font-weight: normal;
 
-    cursor:pointer;
+  cursor:pointer;
 
 }
 
@@ -1949,7 +2332,7 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-item-group {
 
-    font-weight: bold;
+  font-weight: bold;
 
 }
 
@@ -1957,9 +2340,9 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-list {
 
-    padding: 0.4em;
+  padding: 0.4em;
 
-    border: 0 none;
+  border: 0 none;
 
 }
 
@@ -1967,15 +2350,15 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-list-item {
 
-    border:0px none;
+  border:0px none;
 
-    margin:1px 0;
+  margin:1px 0;
 
-    padding:3px 5px;
+  padding:3px 5px;
 
-    text-align:left;
+  text-align:left;
 
-    white-space: nowrap;
+  white-space: nowrap;
 
 }
 
@@ -1983,9 +2366,9 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-table {
 
-    border-collapse:collapse;
+  border-collapse:collapse;
 
-    width:100%;
+  width:100%;
 
 }
 
@@ -1993,13 +2376,13 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-table td {
 
-    border-width: 1px;
+  border-width: 1px;
 
-    border-style: solid;
+  border-style: solid;
 
-    border-color: inherit;
+  border-color: inherit;
 
-    padding:4px 10px 4px 10px;
+  padding:4px 10px 4px 10px;
 
 }
 
@@ -2007,9 +2390,9 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-filter {
 
-    width: 85%;
+  width: 85%;
 
-    padding-right:15px;
+  padding-right:15px;
 
 }
 
@@ -2017,13 +2400,13 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-filter-container {
 
-    position: relative;
+  position: relative;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0.4em;
+  padding: 0.4em;
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
@@ -2031,84 +2414,86 @@ ui-overlay-visible * {
 
 .ui-selectonemenu-panel .ui-selectonemenu-filter-container .ui-icon {
 
-    position: absolute;
+  position: absolute;
 
-    top: 10px;
+  top: 10px;
 
-    right: 10px;
+  right: 10px;
 
 }
 
 
 
-.ui-state-disabled a{outline: none;}
+.ui-state-disabled a{
+  outline: none;
+}
 
 
 
 /* Button */
 
-.ui-button { 
+.ui-button {
 
-    display: inline-block; 
+  display: inline-block;
 
-    position: relative; 
+  position: relative;
 
-    padding: 0; 
+  padding: 0;
 
-    margin-right: .1em; 
+  margin-right: .1em;
 
-    text-decoration: none !important; 
+  text-decoration: none !important;
 
-    cursor: pointer; 
+  cursor: pointer;
 
-    text-align: center; 
+  text-align: center;
 
-    zoom: 1; 
+  zoom: 1;
 
-    overflow: visible; /* the overflow property removes extra width in IE */
+  overflow: visible; /* the overflow property removes extra width in IE */
 
-} 
+}
 
 
 
-.ui-button-icon-only { 
+.ui-button-icon-only {
 
-    width: 2.4em;
+  width: 2.4em;
 
-} 
+}
 
 
 
 /*button text element */
 
-.ui-button .ui-button-text { 
+.ui-button .ui-button-text {
 
-    display: block; 
+  display: block;
 
-    line-height: normal;
+  line-height: normal;
 
 }
 ///*CHANGED*/
-.ui-button-text-only .ui-button-text { 
-    padding: .3em 1em; 
+.ui-button-text-only .ui-button-text {
+  padding: .3em 1em;
 }
 
-.ui-button-icon-only .ui-button-text { 
-    padding: .3em; 
-    text-indent: -9999999px; 
+.ui-button-icon-only .ui-button-text {
+  padding: .3em;
+  text-indent: -9999999px;
 }
 
-.ui-button-text-icon-left .ui-button-text { 
+.ui-button-text-icon-left .ui-button-text {
 
-    padding: .3em 1em .3em 2.1em; 
+  padding: .3em 1em .3em 2.1em;
 
 }
 
 
 
-.ui-button-text-icon-right .ui-button-text { 
+.ui-button-text-icon-right .ui-button-text {
 
-    padding: .3em 2.1em .3em 1em; 
+  padding: .3em 2.1em .3em 1em;
 
 }
 
@@ -2116,17 +2501,17 @@ ui-overlay-visible * {
 
 /*button icon element(s) */
 
-.ui-button-icon-only .ui-icon, 
+.ui-button-icon-only .ui-icon,
 
-.ui-button-text-icon-left .ui-icon, 
+.ui-button-text-icon-left .ui-icon,
 
-.ui-button-text-icon-right .ui-icon { 
+.ui-button-text-icon-right .ui-icon {
 
-    position: absolute; 
+  position: absolute;
 
-    top: 50%; 
+  top: 50%;
 
-    margin-top: -8px; 
+  margin-top: -8px;
 
 }
 
@@ -2134,23 +2519,23 @@ ui-overlay-visible * {
 
 /* FontAwesome icon */
 
-.ui-button-icon-only .ui-icon.fa, 
+.ui-button-icon-only .ui-icon.fa,
 
-.ui-button-text-icon-left .ui-icon.fa, 
+.ui-button-text-icon-left .ui-icon.fa,
 
-.ui-button-text-icon-right .ui-icon.fa {  
+.ui-button-text-icon-right .ui-icon.fa {
 
-    margin-top: -7px; 
+  margin-top: -7px;
 
 }
 
 
 
-.ui-button-icon-only .ui-icon { 
+.ui-button-icon-only .ui-icon {
 
-    left: 50%; 
+  left: 50%;
 
-    margin-left: -8px; 
+  margin-left: -8px;
 
 }
 
@@ -2158,7 +2543,7 @@ ui-overlay-visible * {
 
 .ui-button-icon-left {
 
-    left: .5em; 
+  left: .5em;
 
 }
 
@@ -2166,7 +2551,7 @@ ui-overlay-visible * {
 
 .ui-button-icon-right {
 
-    right: .5em; 
+  right: .5em;
 
 }
 
@@ -2174,17 +2559,17 @@ ui-overlay-visible * {
 
 /*button sets*/
 
-.ui-buttonset { 
+.ui-buttonset {
 
-    margin-right: 7px; 
+  margin-right: 7px;
 
 }
 
-.ui-buttonset .ui-button { 
+.ui-buttonset .ui-button {
 
-    margin-left: 0; 
+  margin-left: 0;
 
-    margin-right: 0;
+  margin-right: 0;
 
 }
 
@@ -2192,9 +2577,10 @@ ui-overlay-visible * {
 
 /* workarounds */
 
-button.ui-button::-moz-focus-inner { 
+button.ui-button::-moz-focus-inner {
 
-    border: 0; padding: 0; /* reset extra padding in Firefox */
+  border: 0;
+  padding: 0; /* reset extra padding in Firefox */
 
 }
 
@@ -2204,15 +2590,15 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu {
 
-    display: inline-block;
+  display: inline-block;
 
-    position: relative;
+  position: relative;
 
-    width: auto;
+  width: auto;
 
-    zoom: 1;
+  zoom: 1;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -2220,25 +2606,25 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu .ui-selectcheckboxmenu-trigger {
 
-    border-right: none;
+  border-right: none;
 
-    border-top: none;
+  border-top: none;
 
-    border-bottom: none;
+  border-bottom: none;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    width: 16px;
+  width: 16px;
 
-    height: 100%;
+  height: 100%;
 
-    position: absolute;
+  position: absolute;
 
-    right: 0;
+  right: 0;
 
-    top: 0;
+  top: 0;
 
-    padding: 0 3px;
+  padding: 0 3px;
 
 }
 
@@ -2246,7 +2632,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu .ui-selectcheckboxmenu-trigger  .ui-icon {
 
-    margin-top: 3px;
+  margin-top: 3px;
 
 }
 
@@ -2254,15 +2640,15 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu .ui-selectcheckboxmenu-label  {
 
-    display: block;
+  display: block;
 
-    padding: 3px 26px 3px 5px;
+  padding: 3px 26px 3px 5px;
 
-    width: auto;
+  width: auto;
 
-    border: none;
+  border: none;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -2272,7 +2658,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu.ui-state-disabled .ui-selectcheckboxmenu-label {
 
-    cursor: auto
+  cursor: auto
 
 }
 
@@ -2280,17 +2666,17 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel {
 
-    padding: 0.2em;
+  padding: 0.2em;
 
-    position: absolute;
+  position: absolute;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    -moz-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
+  -moz-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
 
-    -webkit-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
+  -webkit-box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
 
-    box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
+  box-shadow: 0px 5px 10px rgba(0,0,0,0.8);
 
 }
 
@@ -2298,11 +2684,11 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items-wrapper {
 
-    overflow: auto;
+  overflow: auto;
 
-    position: relative;
+  position: relative;
 
-    padding: 0.2em 0;
+  padding: 0.2em 0;
 
 }
 
@@ -2310,7 +2696,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list {
 
-    border: 0 none;
+  border: 0 none;
 
 }
 
@@ -2318,19 +2704,19 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
 
-    border:0px none;
+  border:0px none;
 
-    cursor:pointer;
+  cursor:pointer;
 
-    font-weight:normal;
+  font-weight:normal;
 
-    margin:1px 0;
+  margin:1px 0;
 
-    padding:3px 5px;
+  padding:3px 5px;
 
-    text-align:left;
+  text-align:left;
 
-    white-space: nowrap;
+  white-space: nowrap;
 
 }
 
@@ -2338,9 +2724,9 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
 
-    display: block;
+  display: block;
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -2348,11 +2734,11 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox {
 
-    position: absolute;
+  position: absolute;
 
-    top:50%;
+  top:50%;
 
-    margin-top:-8px;
+  margin-top:-8px;
 
 }
 
@@ -2360,9 +2746,9 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
 
-    display: block;
+  display: block;
 
-    padding-left: 2.2em;
+  padding-left: 2.2em;
 
 }
 
@@ -2370,9 +2756,9 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header {
 
-    margin-bottom: 0.3em;
+  margin-bottom: 0.3em;
 
-    padding: 0.3em 0 0.3em 0.4em
+  padding: 0.3em 0 0.3em 0.4em
 
 }
 
@@ -2380,9 +2766,9 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header .ui-chkbox {
 
-    float:left;
+  float:left;
 
-    cursor:pointer;
+  cursor:pointer;
 
 }
 
@@ -2390,11 +2776,11 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-filter-container {
 
-    float: left;
+  float: left;
 
-    position: relative;
+  position: relative;
 
-    margin-left: 5px;
+  margin-left: 5px;
 
 }
 
@@ -2402,19 +2788,19 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-filter-container .ui-icon{
 
-    position: absolute;
+  position: absolute;
 
-    right: 5px;
+  right: 5px;
 
-    top: 2px;
+  top: 2px;
 
 }
 
-            
+
 
 .ui-selectcheckboxmenu-header .ui-inputfield {
 
-    padding: 1px 20px 1px 2px;
+  padding: 1px 20px 1px 2px;
 
 }
 
@@ -2422,7 +2808,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header span.ui-icon {
 
-    float:left;
+  float:left;
 
 }
 
@@ -2432,11 +2818,11 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header a.ui-selectcheckboxmenu-none {
 
-    float:left;
+  float:left;
 
-    margin-right: 10px;
+  margin-right: 10px;
 
-    display: block;
+  display: block;
 
 }
 
@@ -2444,13 +2830,13 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-close {
 
-    float:right;
+  float:right;
 
-    padding:1px;
+  padding:1px;
 
-    margin-right:0.2em;
+  margin-right:0.2em;
 
-    display: block;
+  display: block;
 
 }
 
@@ -2458,7 +2844,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-close.ui-state-hover {
 
-    padding:0px;
+  padding:0px;
 
 }
 
@@ -2466,9 +2852,9 @@ button.ui-button::-moz-focus-inner {
 
 .ui-splitbutton {
 
-    position: relative;
+  position: relative;
 
-    padding-right: 2em;
+  padding-right: 2em;
 
 }
 
@@ -2476,13 +2862,13 @@ button.ui-button::-moz-focus-inner {
 
 .ui-splitbutton .ui-button.ui-splitbutton-menubutton {
 
-    width: 32px;
+  width: 32px;
 
-    position: absolute;
+  position: absolute;
 
-    right: 0px;
+  right: 0px;
 
-    top: 0px;
+  top: 0px;
 
 }
 
@@ -2492,9 +2878,9 @@ button.ui-button::-moz-focus-inner {
 
 div.ui-button, .ui-splitbutton {
 
-    display: inline-block;
+  display: inline-block;
 
-    zoom: 1;
+  zoom: 1;
 
 }
 
@@ -2504,41 +2890,41 @@ div.ui-button, .ui-splitbutton {
 
 .ui-password-panel {
 
-    padding: 4px 10px;
+  padding: 4px 10px;
 
-    width: 150px;
+  width: 150px;
 
-    margin-top: 2px;
-
-}
-
-
-
-.ui-password-panel .ui-password-meter { 
-
-    height: 10px; 
-
-    background:transparent url("#{$img}/password-meter.png']") no-repeat left top; 
-
-    padding: 0;
-
-    margin: 0;
+  margin-top: 2px;
 
 }
 
 
 
-.ui-password-info { 
+.ui-password-panel .ui-password-meter {
 
-    margin-top: 4px;
+  height: 10px;
+
+  background:transparent url("#{$img}/password-meter.png']") no-repeat left top;
+
+  padding: 0;
+
+  margin: 0;
 
 }
 
 
 
-.ui-password-panel-overlay { 
+.ui-password-info {
 
-    position: absolute; 
+  margin-top: 4px;
+
+}
+
+
+
+.ui-password-panel-overlay {
+
+  position: absolute;
 
 }
 
@@ -2548,7 +2934,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-outputlabel.ui-state-error {
 
-    border:0 none;
+  border:0 none;
 
 }
 
@@ -2556,7 +2942,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-outputlabel .ui-outputlabel-rfi {
 
-    margin-left: 0.4em;
+  margin-left: 0.4em;
 
 }
 
@@ -2564,17 +2950,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-selectonebutton{
 
-    display: inline-block;
+  display: inline-block;
 
-    padding:1px;
+  padding:1px;
 
 }
 
-            
+
 
 .ui-selectonebutton.ui-state-error{
 
-    padding:0px;
+  padding:0px;
 
 }
 
@@ -2582,17 +2968,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-selectmanybutton{
 
-    display: inline-block;
+  display: inline-block;
 
-    padding:1px;
+  padding:1px;
 
 }
 
-            
+
 
 .ui-selectmanybutton.ui-state-error{
 
-    padding:0px;
+  padding:0px;
 
 }
 
@@ -2604,7 +2990,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-inputtext {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2614,7 +3000,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-inputtextarea {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2624,15 +3010,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-selectonemenu {
 
-    width: 100%;
+  width: 100%;
 
 }
 
 .ui-fluid .ui-selectonemenu .ui-selectonemenu-trigger {
 
-    width: 32px;
+  width: 32px;
 
-    padding: 0 6px;
+  padding: 0 6px;
 
 }
 
@@ -2642,7 +3028,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-calendar, .ui-fluid .ui-calendar input {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2652,11 +3038,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-radiobutton .ui-radiobutton-box {
 
-    width: 18px;
+  width: 18px;
 
-    height: 18px;
+  height: 18px;
 
-    line-height: 18px;
+  line-height: 18px;
 
 }
 
@@ -2664,9 +3050,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-chkbox .ui-chkbox-box {
 
-    width: 18px;
+  width: 18px;
 
-    height: 18px;
+  height: 18px;
 
 }
 
@@ -2676,27 +3062,27 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-spinner {
 
-    width: 100%;
+  width: 100%;
 
 }
 
 .ui-fluid .ui-spinner .ui-spinner-input {
 
-    padding-right: 36px;
+  padding-right: 36px;
 
-    width: 100%;
+  width: 100%;
 
 }
 
 .ui-fluid .ui-spinner .ui-spinner-button {
 
-    width: auto;
+  width: auto;
 
 }
 
 .ui-fluid .ui-spinner .ui-spinner-button .ui-icon {
 
-    left: 6px;
+  left: 6px;
 
 }
 
@@ -2708,7 +3094,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-autocomplete-input {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2718,7 +3104,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-inputmask {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2728,7 +3114,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-password {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2738,7 +3124,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-keyboard-input {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2748,7 +3134,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-selectcheckboxmenu {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2756,9 +3142,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-selectcheckboxmenu .ui-selectcheckboxmenu-trigger .ui-icon {
 
-    margin-left: auto;
+  margin-left: auto;
 
-    margin-right: auto;
+  margin-right: auto;
 
 }
 
@@ -2768,7 +3154,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-selectcheckboxmenu-trigger {
 
-    width: 32px;
+  width: 32px;
 
 }
 
@@ -2778,7 +3164,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-button {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2788,43 +3174,55 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-buttonset {
 
-    width: 100%;
+  width: 100%;
 
 }
 
 
 
-.ui-fluid .ui-buttonset.ui-buttonset-1 .ui-button {width: 100%;}
+.ui-fluid .ui-buttonset.ui-buttonset-1 .ui-button {
+  width: 100%;
+}
 
-.ui-fluid .ui-buttonset.ui-buttonset-2 .ui-button {width: 50%;}
+.ui-fluid .ui-buttonset.ui-buttonset-2 .ui-button {
+  width: 50%;
+}
 
-.ui-fluid .ui-buttonset.ui-buttonset-3 .ui-button {width: 33%;}
+.ui-fluid .ui-buttonset.ui-buttonset-3 .ui-button {
+  width: 33%;
+}
 
-.ui-fluid .ui-buttonset.ui-buttonset-4 .ui-button {width: 25%;}
+.ui-fluid .ui-buttonset.ui-buttonset-4 .ui-button {
+  width: 25%;
+}
 
-.ui-fluid .ui-buttonset.ui-buttonset-5 .ui-button {width: 20%;}
+.ui-fluid .ui-buttonset.ui-buttonset-5 .ui-button {
+  width: 20%;
+}
 
-.ui-fluid .ui-buttonset.ui-buttonset-6 .ui-button {width: 16%;}
+.ui-fluid .ui-buttonset.ui-buttonset-6 .ui-button {
+  width: 16%;
+}
 
 
 
 @media (max-width: 35em) {
 
-    .ui-fluid .ui-buttonset.ui-buttonset-1 .ui-button,
+  .ui-fluid .ui-buttonset.ui-buttonset-1 .ui-button,
 
-    .ui-fluid .ui-buttonset.ui-buttonset-2 .ui-button,
+  .ui-fluid .ui-buttonset.ui-buttonset-2 .ui-button,
 
-    .ui-fluid .ui-buttonset.ui-buttonset-3 .ui-button,
+  .ui-fluid .ui-buttonset.ui-buttonset-3 .ui-button,
 
-    .ui-fluid .ui-buttonset.ui-buttonset-4 .ui-button,
+  .ui-fluid .ui-buttonset.ui-buttonset-4 .ui-button,
 
-    .ui-fluid .ui-buttonset.ui-buttonset-5 .ui-button,
+  .ui-fluid .ui-buttonset.ui-buttonset-5 .ui-button,
 
-    .ui-fluid .ui-buttonset.ui-buttonset-6 .ui-button {
+  .ui-fluid .ui-buttonset.ui-buttonset-6 .ui-button {
 
-        width: 100%;
+    width: 100%;
 
-    }
+  }
 
 }
 
@@ -2834,7 +3232,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-splitbutton {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2842,7 +3240,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-splitbutton .ui-button {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2850,7 +3248,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-splitbutton .ui-button.ui-splitbutton-menubutton {
 
-    width: 32px;
+  width: 32px;
 
 }
 
@@ -2862,7 +3260,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-selectmanymenu {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -2872,11 +3270,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid {
 
-    clear: both;
+  clear: both;
 
-    padding: 0px;
+  padding: 0px;
 
-    margin: 0px;
+  margin: 0px;
 
 }
 
@@ -2886,9 +3284,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid:after {
 
-    content:"";
+  content:"";
 
-    display:table;
+  display:table;
 
 }
 
@@ -2896,7 +3294,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid:after {
 
-    clear:both;
+  clear:both;
 
 }
 
@@ -2904,17 +3302,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid .ui-grid-row {
 
-    display: -webkit-box;
+  display: -webkit-box;
 
-    display: -moz-box;
+  display: -moz-box;
 
-    display: -ms-flexbox;
+  display: -ms-flexbox;
 
-    display: -webkit-flex;
+  display: -webkit-flex;
 
-    display: flex;
+  display: flex;
 
-    clear:both;
+  clear:both;
 
 }
 
@@ -2922,11 +3320,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-row:after {
 
-    clear: both;
+  clear: both;
 
-    content: "";
+  content: "";
 
-    display: table;
+  display: table;
 
 }
 
@@ -2956,9 +3354,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-12 {
 
-    float: left;
+  float: left;
 
-    box-sizing: border-box;
+  box-sizing: border-box;
 
 }
 
@@ -2966,7 +3364,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-1 {
 
-    width: 8.33333%;
+  width: 8.33333%;
 
 }
 
@@ -2974,7 +3372,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-2 {
 
-    width: 16.66666%;
+  width: 16.66666%;
 
 }
 
@@ -2982,7 +3380,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-3 {
 
-    width: 25%;
+  width: 25%;
 
 }
 
@@ -2990,7 +3388,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-4 {
 
-    width: 33.33333%;
+  width: 33.33333%;
 
 }
 
@@ -2998,7 +3396,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-5 {
 
-    width: 41.66666%;
+  width: 41.66666%;
 
 }
 
@@ -3006,7 +3404,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-6 {
 
-    width: 50%;
+  width: 50%;
 
 }
 
@@ -3014,7 +3412,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-7 {
 
-    width: 58.33333%;
+  width: 58.33333%;
 
 }
 
@@ -3022,7 +3420,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-8 {
 
-    width: 66.66666%;
+  width: 66.66666%;
 
 }
 
@@ -3030,7 +3428,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-9 {
 
-    width: 75%;
+  width: 75%;
 
 }
 
@@ -3038,7 +3436,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-10 {
 
-    width: 83.33333%;
+  width: 83.33333%;
 
 }
 
@@ -3046,7 +3444,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-11 {
 
-    width: 91.66666%;
+  width: 91.66666%;
 
 }
 
@@ -3054,7 +3452,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-grid-col-12 {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -3062,11 +3460,11 @@ div.ui-button, .ui-splitbutton {
 
 @media (min-width: 480px) {
 
-    .ui-grid-fixed {
+  .ui-grid-fixed {
 
-        width: 480px;
+    width: 480px;
 
-    }
+  }
 
 }
 
@@ -3074,11 +3472,11 @@ div.ui-button, .ui-splitbutton {
 
 @media (min-width: 768px) {
 
-    .ui-grid-fixed {
+  .ui-grid-fixed {
 
-        width: 768px;
+    width: 768px;
 
-    }
+  }
 
 }
 
@@ -3086,11 +3484,11 @@ div.ui-button, .ui-splitbutton {
 
 @media (min-width: 960px) {
 
-    .ui-grid-fixed {
+  .ui-grid-fixed {
 
-        width: 960px;
+    width: 960px;
 
-    }
+  }
 
 }
 
@@ -3098,11 +3496,11 @@ div.ui-button, .ui-splitbutton {
 
 @media (min-width: 1024px) {
 
-    .ui-grid-fixed {
+  .ui-grid-fixed {
 
-        width: 1024px;
+    width: 1024px;
 
-    }
+  }
 
 }
 
@@ -3112,43 +3510,43 @@ div.ui-button, .ui-splitbutton {
 
 @media (max-width: 35em) {
 
-    .ui-grid-responsive .ui-grid-row {
+  .ui-grid-responsive .ui-grid-row {
 
-        display: block;
+    display: block;
 
-    }
+  }
 
-    
 
-    .ui-grid-responsive .ui-grid-col-1,
 
-    .ui-grid-responsive .ui-grid-col-2,
+  .ui-grid-responsive .ui-grid-col-1,
 
-    .ui-grid-responsive .ui-grid-col-3,
+  .ui-grid-responsive .ui-grid-col-2,
 
-    .ui-grid-responsive .ui-grid-col-4,
+  .ui-grid-responsive .ui-grid-col-3,
 
-    .ui-grid-responsive .ui-grid-col-5,
+  .ui-grid-responsive .ui-grid-col-4,
 
-    .ui-grid-responsive .ui-grid-col-6,
+  .ui-grid-responsive .ui-grid-col-5,
 
-    .ui-grid-responsive .ui-grid-col-7,
+  .ui-grid-responsive .ui-grid-col-6,
 
-    .ui-grid-responsive .ui-grid-col-8,
+  .ui-grid-responsive .ui-grid-col-7,
 
-    .ui-grid-responsive .ui-grid-col-9,
+  .ui-grid-responsive .ui-grid-col-8,
 
-    .ui-grid-responsive .ui-grid-col-10,
+  .ui-grid-responsive .ui-grid-col-9,
 
-    .ui-grid-responsive .ui-grid-col-11,
+  .ui-grid-responsive .ui-grid-col-10,
 
-    .ui-grid-responsive .ui-grid-col-12 {
+  .ui-grid-responsive .ui-grid-col-11,
 
-        width: 100%;
+  .ui-grid-responsive .ui-grid-col-12 {
 
-        float: none;
+    width: 100%;
 
-    }
+    float: none;
+
+  }
 
 }
 
@@ -3156,21 +3554,21 @@ div.ui-button, .ui-splitbutton {
 
 * html .ui-growl {
 
-	position:absolute; 
+  position:absolute;
 
 }
 
 * html .ui-growl-item {
 
-	padding-bottom:0;
+  padding-bottom:0;
 
 }
 
 * html .ui-growl-icon-close {
 
-	top:7px;
+  top:7px;
 
-	right:7px;
+  right:7px;
 
 }
 
@@ -3178,81 +3576,81 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl {
 
-	position:fixed;
+  position:fixed;
 
-	top:20px;
+  top:20px;
 
-	right:20px;
+  right:20px;
 
-	width:301px;
+  width:301px;
 
 }
 
 .ui-growl-item-container {
 
-	position:relative;
+  position:relative;
 
-	margin:0 0 10px 0;
+  margin:0 0 10px 0;
 
-	opacity:0.85;
+  opacity:0.85;
 
-	filter:alpha(opacity=85);
+  filter:alpha(opacity=85);
 
 }
 
 .ui-growl-item {
 
-	display:block;
+  display:block;
 
-	padding:10px 15px;
+  padding:10px 15px;
 
 }
 
 .ui-growl-item p {
 
-	padding:0;
+  padding:0;
 
-	margin:0;
+  margin:0;
 
 }
 
 .ui-growl-icon-close {
 
-	position:absolute;
+  position:absolute;
 
-	top:5px;
+  top:5px;
 
-	right:3px;
+  right:3px;
 
-	cursor:pointer;
+  cursor:pointer;
 
 }
 
 .ui-growl-title {
 
-	font-weight:bold;
+  font-weight:bold;
 
-	padding:0 0 7px 0;
+  padding:0 0 7px 0;
 
-	display:block;
+  display:block;
 
 }
 
 .ui-growl-image {
 
-	width:32px;
+  width:32px;
 
-	height:32px;
+  height:32px;
 
-	float:left;
+  float:left;
 
-    margin:0;
+  margin:0;
 
-    padding:0;
+  padding:0;
 
-    display: block;
+  display: block;
 
-    background: url("#{$img}/messages.png") no-repeat;
+  background: url("#{$img}/messages.png") no-repeat;
 
 }
 
@@ -3260,7 +3658,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl-image-info {
 
-	background-position: 0 -264px;
+  background-position: 0 -264px;
 
 }
 
@@ -3268,7 +3666,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl-image-warn {
 
-	background-position: 0 -396px;
+  background-position: 0 -396px;
 
 }
 
@@ -3276,7 +3674,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl-image-error {
 
-	background-position: 0 0;
+  background-position: 0 0;
 
 }
 
@@ -3284,7 +3682,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl-image-fatal {
 
-	background-position: 0 -132px;
+  background-position: 0 -132px;
 
 }
 
@@ -3292,11 +3690,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl-message {
 
-	padding:0 0 5px 0;
+  padding:0 0 5px 0;
 
-	width:220px;
+  width:220px;
 
-	float:right;
+  float:right;
 
 }
 
@@ -3304,23 +3702,33 @@ div.ui-button, .ui-splitbutton {
 
 .ui-growl-message p {
 
-	font-weight: normal;
+  font-weight: normal;
 
 }
 
-.ui-inplace .ui-inplace-display {cursor: pointer;border:0px none !important;}
+.ui-inplace .ui-inplace-display {
+  cursor: pointer;
+  border:0px none !important;
+}
 
-.ui-inplace .ui-inplace-disabled {cursor: default;}
+.ui-inplace .ui-inplace-disabled {
+  cursor: default;
+}
 
-.ui-inplace .ui-inplace-content {}
+.ui-inplace .ui-inplace-content {
+}
 
-.ui-inplace .ui-inplace-editor {margin-left:0.1em;}
+.ui-inplace .ui-inplace-editor {
+  margin-left:0.1em;
+}
 
-.ui-inplace .ui-inplace-editor .ui-button-icon-only .ui-button-text {padding:0}
+.ui-inplace .ui-inplace-editor .ui-button-icon-only .ui-button-text {
+  padding:0
+}
 
 .ui-lightbox {
 
-    position: fixed;
+  position: fixed;
 
 }
 
@@ -3328,7 +3736,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-content-wrapper {
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -3336,13 +3744,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-content {
 
-    position: relative;
+  position: relative;
 
-    margin:0;
+  margin:0;
 
-    padding: 0;
+  padding: 0;
 
-    background-color: #000000;
+  background-color: #000000;
 
 }
 
@@ -3350,11 +3758,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-nav-right, .ui-lightbox-nav-left {
 
-   position: absolute;
+  position: absolute;
 
-   top:50%;
+  top:50%;
 
-   cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -3362,7 +3770,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-nav-left {
 
-   left:0;
+  left:0;
 
 }
 
@@ -3370,7 +3778,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-nav-right {
 
-   right:0;
+  right:0;
 
 }
 
@@ -3378,7 +3786,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-loading {
 
-    background: url("#{$img}/loading.gif") #000000 center center no-repeat;
+  background: url("#{$img}/loading.gif") #000000 center center no-repeat;
 
 }
 
@@ -3386,9 +3794,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-caption {
 
-    padding: 0.2em 0.4em;
+  padding: 0.2em 0.4em;
 
-    display: none;
+  display: none;
 
 }
 
@@ -3396,9 +3804,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-caption-text {
 
-    margin: 0.3em 0 0.1em 0;
+  margin: 0.3em 0 0.1em 0;
 
-    float:left;
+  float:left;
 
 }
 
@@ -3406,11 +3814,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-close {
 
-    float:right;
+  float:right;
 
-    margin:0;
+  margin:0;
 
-    padding:1px;
+  padding:1px;
 
 }
 
@@ -3418,19 +3826,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-lightbox-close.ui-state-hover {
 
-    padding: 0;
+  padding: 0;
 
 }
 
 .ui-menu {
 
-    width: 12.5em;
+  width: 12.5em;
 
-    padding:0.3em;
+  padding:0.3em;
 
-    position:relative;
+  position:relative;
 
-    outline: 0 none;
+  outline: 0 none;
 
 }
 
@@ -3438,11 +3846,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu.ui-menu-dynamic {
 
-    position: absolute;
+  position: absolute;
 
-    display: none;
+  display: none;
 
-    z-index: 100000;
+  z-index: 100000;
 
 }
 
@@ -3450,7 +3858,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu-list {
 
-    position:static;
+  position:static;
 
 }
 
@@ -3458,7 +3866,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menu-list .ui-menuitem {
 
-    border:none;
+  border:none;
 
 }
 
@@ -3466,13 +3874,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menu-list .ui-widget-header {
 
-    clear:both;
+  clear:both;
 
-    float:left;
+  float:left;
 
-    width:98%;
+  width:98%;
 
-    margin:1px 0;
+  margin:1px 0;
 
 }
 
@@ -3480,15 +3888,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menuitem {
 
-    width:100%;
+  width:100%;
 
-    float:left;
+  float:left;
 
-    clear:both;
+  clear:both;
 
-    margin:1px 0;
+  margin:1px 0;
 
-    padding:0;
+  padding:0;
 
 }
 
@@ -3496,15 +3904,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menuitem-parent {
 
-    width:100%;
+  width:100%;
 
-    float:left;
+  float:left;
 
-    clear:both;
+  clear:both;
 
-    margin:1px 0;
+  margin:1px 0;
 
-    padding:0;
+  padding:0;
 
 }
 
@@ -3512,25 +3920,25 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menuitem-link {
 
-    display:block;
+  display:block;
 
-    width:92%;
+  width:92%;
 
-    outline:none;
+  outline:none;
 
-    text-decoration:none;
+  text-decoration:none;
 
-    font-weight:400;
+  font-weight:400;
 
-    border:solid 1px transparent;
+  border:solid 1px transparent;
 
-    float:left;
+  float:left;
 
-    line-height:16px;
+  line-height:16px;
 
-    padding:0.3em;
+  padding:0.3em;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -3538,9 +3946,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menuitem-link .ui-menuitem-icon {
 
-    display:inline-block;
+  display:inline-block;
 
-    float:left;
+  float:left;
 
 }
 
@@ -3548,7 +3956,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menuitem-text {
 
-    float:left;
+  float:left;
 
 }
 
@@ -3566,15 +3974,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-widget-header h6 {
 
-    float:left;
+  float:left;
 
-    display:block;
+  display:block;
 
-    font-size:1em;
+  font-size:1em;
 
-    margin:0 auto;
+  margin:0 auto;
 
-    padding:0.3em 3%;
+  padding:0.3em 3%;
 
 }
 
@@ -3582,25 +3990,25 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menu-parent .ui-menu-child {
 
-    display:none;
+  display:none;
 
-    width:12.5em;
+  width:12.5em;
 
-    padding:0.3em;
+  padding:0.3em;
 
-    position:absolute;
+  position:absolute;
 
-    margin:0; 
+  margin:0;
 
-    outline:0; 
+  outline:0;
 
-    line-height:1.3; 
+  line-height:1.3;
 
-    text-decoration:none; 
+  text-decoration:none;
 
-    font-size:100%; 
+  font-size:100%;
 
-    list-style:none;
+  list-style:none;
 
 }
 
@@ -3608,7 +4016,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-menu-parent {
 
-    position:relative;
+  position:relative;
 
 }
 
@@ -3616,41 +4024,41 @@ div.ui-button, .ui-splitbutton {
 
 /* Toggleable Menu */
 
-.ui-menu.ui-menu-toggleable li.ui-widget-header { 
+.ui-menu.ui-menu-toggleable li.ui-widget-header {
 
-    position: relative; 
+  position: relative;
 
-    min-height: 0; 
-
-}
-
-
-
-.ui-menu.ui-menu-toggleable li.ui-widget-header h3 { 
-
-    padding-left: 2em;
+  min-height: 0;
 
 }
 
 
 
-.ui-menu.ui-menu-toggleable li.ui-widget-header.ui-state-hover { 
+.ui-menu.ui-menu-toggleable li.ui-widget-header h3 {
 
-    cursor: pointer; 
+  padding-left: 2em;
 
 }
 
-    
 
-.ui-menu.ui-menu-toggleable li.ui-widget-header .ui-icon { 
 
-    position: absolute; 
+.ui-menu.ui-menu-toggleable li.ui-widget-header.ui-state-hover {
 
-    left: .5em; 
+  cursor: pointer;
 
-    top: 50%; 
+}
 
-    margin-top: -8px; 
+
+
+.ui-menu.ui-menu-toggleable li.ui-widget-header .ui-icon {
+
+  position: absolute;
+
+  left: .5em;
+
+  top: 50%;
+
+  margin-top: -8px;
 
 }
 
@@ -3664,7 +4072,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menu-child .ui-icon-triangle-1-s {
 
-    float:right;
+  float:right;
 
 }
 
@@ -3672,11 +4080,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubutton {
 
-    padding:0;
+  padding:0;
 
-    position: relative;
+  position: relative;
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
@@ -3684,7 +4092,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubutton .ui-button {
 
-    margin:0;
+  margin:0;
 
 }
 
@@ -3694,7 +4102,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar {
 
-    width:auto;
+  width:auto;
 
 }
 
@@ -3702,9 +4110,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menuitem {
 
-    width:auto;
+  width:auto;
 
-    clear:none;
+  clear:none;
 
 }
 
@@ -3712,7 +4120,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menu-child .ui-menuitem {
 
-    width:100%;
+  width:100%;
 
 }
 
@@ -3720,9 +4128,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menu-child {
 
-    top:25px;
+  top:25px;
 
-    left:0;
+  left:0;
 
 }
 
@@ -3730,9 +4138,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menuitem-link {
 
-    width:auto;
+  width:auto;
 
-    padding:0.4em 0.3em;
+  padding:0.4em 0.3em;
 
 }
 
@@ -3740,7 +4148,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menu-child .ui-menuitem-link {
 
-    width:92%;
+  width:92%;
 
 }
 
@@ -3748,11 +4156,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-widget-header {
 
-    clear:none;
+  clear:none;
 
-    width:auto;
+  width:auto;
 
-    margin:0 3px 0 0;
+  margin:0 3px 0 0;
 
 }
 
@@ -3770,7 +4178,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-widget-header h6 {
 
-    padding:0.4em 0.3em;
+  padding:0.4em 0.3em;
 
 }
 
@@ -3778,7 +4186,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar .ui-menubar-options {
 
-    float: right;
+  float: right;
 
 }
 
@@ -3788,7 +4196,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menubar > .ui-menu-list > .ui-menuitem > .ui-menuitem-link span.ui-icon-triangle-1-s{
 
-    *float: none;
+  *float: none;
 
 }
 
@@ -3796,19 +4204,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu .ui-separator {
 
-    width:98%;
+  width:98%;
 
-    height:0px;
+  height:0px;
 
-    float:left;
+  float:left;
 
-    clear:both;
+  clear:both;
 
-    margin:1px 0 0 0;
+  margin:1px 0 0 0;
 
-    padding:0;
+  padding:0;
 
-    border-top: 0px none;
+  border-top: 0px none;
 
 }
 
@@ -3818,7 +4226,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-megamenu td {
 
-    vertical-align: top;
+  vertical-align: top;
 
 }
 
@@ -3826,7 +4234,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu.ui-megamenu .ui-menu-parent .ui-menu-child {
 
-    width:auto;
+  width:auto;
 
 }
 
@@ -3834,7 +4242,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu.ui-megamenu .ui-menu-child > table {
 
-    width:auto;
+  width:auto;
 
 }
 
@@ -3842,7 +4250,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-menu.ui-megamenu .ui-menu-child .ui-menu-list {
 
-    width: 12.5em;
+  width: 12.5em;
 
 }
 
@@ -3850,15 +4258,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-megamenu-vertical {
 
-    width: 12.5em;
+  width: 12.5em;
 
 }
 
 .ui-megamenu-vertical .ui-menu-parent {
 
-    clear: both;
+  clear: both;
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -3866,7 +4274,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-megamenu-vertical .ui-submenu-link.ui-menuitem-link {
 
-    width: 92%;
+  width: 92%;
 
 }
 
@@ -3876,13 +4284,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb {
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    padding: 5px 5px 7px 5px;
+  padding: 5px 5px 7px 5px;
 
 }
 
@@ -3890,11 +4298,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb ul {
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
-    display: block;
+  display: block;
 
 }
 
@@ -3902,13 +4310,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb ul li {
 
-    display: block;
+  display: block;
 
-    float: left;
+  float: left;
 
-    position: relative;
+  position: relative;
 
-    overflow: hidden;
+  overflow: hidden;
 
 }
 
@@ -3916,9 +4324,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb ul li span {
 
-    display: block;
+  display: block;
 
-    overflow: hidden;
+  overflow: hidden;
 
 }
 
@@ -3926,17 +4334,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb ul li .ui-menuitem-link {
 
-    display: block;
+  display: block;
 
-    position: relative;
+  position: relative;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    float: left; 
+  float: left;
 
-    *cursor: pointer;
+  *cursor: pointer;
 
-    margin-top:3px;
+  margin-top:3px;
 
 }
 
@@ -3944,11 +4352,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb ul li a.ui-icon-home {
 
-    padding: 0;
+  padding: 0;
 
-    margin-top: 1px;
+  margin-top: 1px;
 
-    overflow: hidden;
+  overflow: hidden;
 
 }
 
@@ -3956,19 +4364,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-breadcrumb-chevron{
 
-    float:left;
+  float:left;
 
-    margin-top:2px;
+  margin-top:2px;
 
 }
 
-           
+
 
 /** SlideMenu **/
 
 .ui-slidemenu .ui-slidemenu-wrapper {
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -3976,11 +4384,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-slidemenu .ui-slidemenu-content {
 
-    overflow-x: hidden;
+  overflow-x: hidden;
 
-    overflow-y: auto;
+  overflow-y: auto;
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -3988,9 +4396,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-slidemenu .ui-menu-list {
 
-    position: absolute;
+  position: absolute;
 
-    top: 0;
+  top: 0;
 
 }
 
@@ -3998,7 +4406,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-slidemenu .ui-menu-parent {
 
-    position: static;
+  position: static;
 
 }
 
@@ -4006,11 +4414,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-slidemenu .ui-menu-child {
 
-    box-shadow : none;
+  box-shadow : none;
 
-    border: 0 none;
+  border: 0 none;
 
-    background: none repeat scroll 0 0 transparent;
+  background: none repeat scroll 0 0 transparent;
 
 }
 
@@ -4018,19 +4426,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-slidemenu-backward {
 
-    position: absolute;
+  position: absolute;
 
-    bottom: 0;
+  bottom: 0;
 
-    width: 95%;
+  width: 95%;
 
-    margin-bottom: 0.4em;
+  margin-bottom: 0.4em;
 
-    padding: 0.2em;
+  padding: 0.2em;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    display: none;
+  display: none;
 
 }
 
@@ -4038,7 +4446,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-slidemenu-backward .ui-icon {
 
-    float:left;
+  float:left;
 
 }
 
@@ -4046,95 +4454,95 @@ div.ui-button, .ui-splitbutton {
 
 /** PanelMenu **/
 
-.ui-panelmenu { 
+.ui-panelmenu {
 
-    width: auto; 
-
-}
-
-
-
-.ui-panelmenu .ui-panelmenu-panel { 
-
-    padding: 0;
-
-    margin: 0;
+  width: auto;
 
 }
 
 
 
-.ui-panelmenu .ui-panelmenu-header { 
+.ui-panelmenu .ui-panelmenu-panel {
 
-    cursor: pointer; 
+  padding: 0;
 
-    position: relative; 
-
-    margin: 0;
-
-    zoom: 1; 
+  margin: 0;
 
 }
 
 
 
-.ui-panelmenu .ui-panelmenu-header a { 
+.ui-panelmenu .ui-panelmenu-header {
 
-    display: block;
+  cursor: pointer;
 
-    padding: .5em .5em .5em 2.2em; 
+  position: relative;
 
-}
+  margin: 0;
 
-
-
-.ui-panelmenu .ui-panelmenu-header .ui-icon { 
-
-    position: absolute;
-
-    left: .5em;
-
-    top: 50%;
-
-    margin-top: -8px;
+  zoom: 1;
 
 }
 
 
 
-.ui-panelmenu .ui-panelmenu-content { 
+.ui-panelmenu .ui-panelmenu-header a {
 
-    padding: 0.2em 0;
+  display: block;
 
-    border-top: 0; 
-
-    margin-top: -2px; 
-
-    position: relative; 
-
-    top: 1px; 
-
-    overflow: auto; 
-
-    zoom: 1; 
+  padding: .5em .5em .5em 2.2em;
 
 }
 
 
 
-.ui-panelmenu .ui-panelmenu-header.ui-state-disabled, 
+.ui-panelmenu .ui-panelmenu-header .ui-icon {
 
-.ui-panelmenu .ui-panelmenu-header.ui-state-disabled a { 
+  position: absolute;
 
-    cursor: default; 
+  left: .5em;
+
+  top: 50%;
+
+  margin-top: -8px;
 
 }
 
 
 
-.ui-panelmenu .ui-menu-list { 
+.ui-panelmenu .ui-panelmenu-content {
 
-    position: static; 
+  padding: 0.2em 0;
+
+  border-top: 0;
+
+  margin-top: -2px;
+
+  position: relative;
+
+  top: 1px;
+
+  overflow: auto;
+
+  zoom: 1;
+
+}
+
+
+
+.ui-panelmenu .ui-panelmenu-header.ui-state-disabled,
+
+.ui-panelmenu .ui-panelmenu-header.ui-state-disabled a {
+
+  cursor: default;
+
+}
+
+
+
+.ui-panelmenu .ui-menu-list {
+
+  position: static;
 
 }
 
@@ -4142,9 +4550,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menuitem {
 
-    margin:1px 0;
+  margin:1px 0;
 
-    padding:0;
+  padding:0;
 
 }
 
@@ -4152,23 +4560,23 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menuitem-link {
 
-    display:block;
+  display:block;
 
-    outline:none;
+  outline:none;
 
-    text-decoration:none;
+  text-decoration:none;
 
-    font-weight:400;
+  font-weight:400;
 
-    border:solid 1px transparent;
+  border:solid 1px transparent;
 
-    line-height:16px;
+  line-height:16px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    position: relative;
+  position: relative;
 
-    padding: 0.3em 0.3em 0.3em 2em;
+  padding: 0.3em 0.3em 0.3em 2em;
 
 }
 
@@ -4176,7 +4584,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menu-parent .ui-menuitem-link-hasicon {
 
-    padding-left: 2.8em;
+  padding-left: 2.8em;
 
 }
 
@@ -4184,17 +4592,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-icon {
 
-    position: absolute;
+  position: absolute;
 
-    right: auto;
+  right: auto;
 
-    top: 0;
+  top: 0;
 
-    bottom: 0;
+  bottom: 0;
 
-    margin: auto 0;
+  margin: auto 0;
 
-    left: 0.5em;
+  left: 0.5em;
 
 }
 
@@ -4202,7 +4610,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menu-parent > .ui-menuitem-link > .ui-icon {
 
-    left: 1.5em;
+  left: 1.5em;
 
 }
 
@@ -4210,7 +4618,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menu-parent .ui-panelmenu-icon.ui-icon {
 
-    left: 0.5em;
+  left: 0.5em;
 
 }
 
@@ -4218,7 +4626,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menuitem-text {
 
-    float: none;
+  float: none;
 
 }
 
@@ -4226,7 +4634,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelmenu .ui-menu-parent .ui-menu-list {
 
-    margin-left: 20px;
+  margin-left: 20px;
 
 }
 
@@ -4234,75 +4642,75 @@ div.ui-button, .ui-splitbutton {
 
 /** TabMenu **/
 
-.ui-tabmenu { 
+.ui-tabmenu {
 
-    position: relative; 
+  position: relative;
 
-    zoom: 1; 
-
-}
-
-
-
-.ui-tabmenu .ui-tabmenu-nav { 
-
-    margin: 0;
-
-    padding: .2em .2em 0; 
+  zoom: 1;
 
 }
 
 
 
-.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem { 
+.ui-tabmenu .ui-tabmenu-nav {
 
-    list-style: none; 
+  margin: 0;
 
-    float: left; 
-
-    position: relative; 
-
-    margin: 0 .2em 1px 0;  
-
-    padding: 0; 
-
-    white-space: nowrap;
-
-    display: block;
-
-    border-bottom: 0;
-
-    top: 1px; 
+  padding: .2em .2em 0;
 
 }
 
 
 
-.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a { 
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
 
-    float: left; 
+  list-style: none;
 
-    padding: 0.5em 1em;
+  float: left;
 
-    text-decoration: none; 
+  position: relative;
+
+  margin: 0 .2em 1px 0;
+
+  padding: 0;
+
+  white-space: nowrap;
+
+  display: block;
+
+  border-bottom: 0;
+
+  top: 1px;
 
 }
 
 
 
-.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem-hasicon a { 
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
 
-    padding: 0.5em 1em 0.5em 0.2em;
+  float: left;
+
+  padding: 0.5em 1em;
+
+  text-decoration: none;
 
 }
 
 
 
-.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem .ui-icon { 
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem-hasicon a {
 
-    float: left; 
+  padding: 0.5em 1em 0.5em 0.2em;
 
-    cursor: pointer; 
+}
+
+
+
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem .ui-icon {
+
+  float: left;
+
+  cursor: pointer;
 
 }
 
@@ -4312,19 +4720,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-steps ul {
 
-    list-style-type: none;
+  list-style-type: none;
 
-    padding: 0;
+  padding: 0;
 
-    margin: 0;
+  margin: 0;
 
-}     
+}
 
 
 
 .ui-steps .ui-steps-item {
 
-    float: left;
+  float: left;
 
 }
 
@@ -4332,15 +4740,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-steps .ui-steps-item .ui-menuitem-link {
 
-    text-decoration: none;
+  text-decoration: none;
 
-    display: block;
+  display: block;
 
-    padding: 1em;
+  padding: 1em;
 
-    position: relative;
+  position: relative;
 
-    text-align: center;
+  text-align: center;
 
 }
 
@@ -4348,7 +4756,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-steps.ui-steps-readonly .ui-steps-item .ui-menuitem-link {
 
-    cursor: default;
+  cursor: default;
 
 }
 
@@ -4356,9 +4764,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-steps .ui-steps-number {
 
-    font-size: 200%; 
+  font-size: 200%;
 
-    display: block;
+  display: block;
 
 }
 
@@ -4366,11 +4774,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-steps .ui-steps-title {
 
-    margin-left:10px;
+  margin-left:10px;
 
-    display: block;
+  display: block;
 
-    white-space: nowrap;
+  white-space: nowrap;
 
 }
 
@@ -4378,21 +4786,21 @@ div.ui-button, .ui-splitbutton {
 
 /* Responsive */
 
-@media (max-width: 35em) {    
+@media (max-width: 35em) {
 
-    .ui-steps .ui-steps-item .ui-menuitem-link {
+  .ui-steps .ui-steps-item .ui-menuitem-link {
 
-        padding: 0.5em;
+    padding: 0.5em;
 
-    }
+  }
 
-    
 
-    .ui-steps .ui-steps-item .ui-steps-title {
 
-        display: none;
+  .ui-steps .ui-steps-item .ui-steps-title {
 
-    }
+    display: none;
+
+  }
 
 }
 
@@ -4402,17 +4810,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-fluid .ui-menu {
 
-    width: 100%;
+  width: 100%;
 
 }
 
 .ui-messages-info, .ui-messages-warn, .ui-messages-error, .ui-messages-fatal {
 
-    border: 1px solid;
+  border: 1px solid;
 
-    margin: 10px 0px;
+  margin: 10px 0px;
 
-    padding:10px 10px 10px 10px;
+  padding:10px 10px 10px 10px;
 
 }
 
@@ -4420,11 +4828,12 @@ div.ui-button, .ui-splitbutton {
 
 .ui-message-info, .ui-message-error, .ui-message-warn, .ui-message-fatal {
 
-    border: 1px solid;;
+  border: 1px solid;
+  ;
 
-    margin: 0px 5px;
+  margin: 0px 5px;
 
-    padding:2px 5px;
+  padding:2px 5px;
 
 }
 
@@ -4434,17 +4843,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-message-info-icon, .ui-message-warn-icon, .ui-message-error-icon, .ui-message-fatal-icon {
 
-    background: url("#{$img}/messages.png") no-repeat;
+  background: url("#{$img}/messages.png") no-repeat;
 
-    display:block;
+  display:block;
 
-    float:left;
+  float:left;
 
-    margin:0;
+  margin:0;
 
-    padding:0;
+  padding:0;
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -4452,11 +4861,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-messages-info-icon, .ui-messages-warn-icon, .ui-messages-error-icon, .ui-messages-fatal-icon {
 
-    height:24px;
+  height:24px;
 
-    width:24px;
+  width:24px;
 
-    margin-top:-4px;
+  margin-top:-4px;
 
 }
 
@@ -4464,21 +4873,21 @@ div.ui-button, .ui-splitbutton {
 
 .ui-message-info-icon, .ui-message-warn-icon, .ui-message-error-icon, .ui-message-fatal-icon {
 
-    height:16px;
+  height:16px;
 
-    width:16px;
+  width:16px;
 
 }
 
 
 
-.ui-messages-info-summary, .ui-messages-warn-summary, .ui-messages-error-summary, .ui-messages-fatal-summary, 
+.ui-messages-info-summary, .ui-messages-warn-summary, .ui-messages-error-summary, .ui-messages-fatal-summary,
 
 .ui-message-info-summary, .ui-message-warn-summary, .ui-message-error-summary, .ui-message-fatal-summary {
 
-    margin-left:10px;
+  margin-left:10px;
 
-    font-weight:bold;
+  font-weight:bold;
 
 }
 
@@ -4488,27 +4897,27 @@ div.ui-button, .ui-splitbutton {
 
 .ui-message-info-detail, .ui-message-warn-detail, .ui-message-error-detail, .ui-message-fatal-detail {
 
-    margin-left:5px;
+  margin-left:5px;
 
 }
 
 
 
 .ui-messages-info, .ui-message-info {
-    color: #3a87ad;
-    background-color: #d9edf7;
-    border-color: #bce8f1;
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
 }
 
 
 
 .ui-messages-warn, .ui-message-warn {
 
-    color: #c09853;
+  color: #c09853;
 
-    background-color: #fcf8e3;
+  background-color: #fcf8e3;
 
-    border-color: #fbeed5;
+  border-color: #fbeed5;
 
 }
 
@@ -4516,11 +4925,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-messages-error, .ui-message-error {
 
-    color: #b94a48;
+  color: #b94a48;
 
-    background-color: #f2dede;
+  background-color: #f2dede;
 
-    border-color: #eed3d7;
+  border-color: #eed3d7;
 
 }
 
@@ -4528,11 +4937,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-messages-fatal, .ui-message-fatal {
 
-    color: #b94a48;
+  color: #b94a48;
 
-    background-color: #f2dede;
+  background-color: #f2dede;
 
-    border-color: #eed3d7;
+  border-color: #eed3d7;
 
 }
 
@@ -4540,11 +4949,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-messages ul {
 
-    margin: 0 25px;
+  margin: 0 25px;
 
-    padding:0;
+  padding:0;
 
-    list-style-type:none;
+  list-style-type:none;
 
 }
 
@@ -4552,7 +4961,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-messages.ui-messages-noicon ul {
 
-    margin: 0 25px 0 0;
+  margin: 0 25px 0 0;
 
 }
 
@@ -4560,51 +4969,67 @@ div.ui-button, .ui-splitbutton {
 
 .ui-message-icon-only {
 
-    width:16px;
+  width:16px;
 
-    height:16px
+  height:16px
 
 }
 
 
 
-.ui-messages-info-icon {background-position: 0px -316px;}
+.ui-messages-info-icon {
+  background-position: 0px -316px;
+}
 
-.ui-messages-warn-icon {background-position: 0px -448px;}
+.ui-messages-warn-icon {
+  background-position: 0px -448px;
+}
 
-.ui-messages-error-icon {background-position: 0px -52px;}
+.ui-messages-error-icon {
+  background-position: 0px -52px;
+}
 
-.ui-messages-fatal-icon {background-position: 0px -184px;}
+.ui-messages-fatal-icon {
+  background-position: 0px -184px;
+}
 
-.ui-message-info-icon {background-position: 0px -360px;}
+.ui-message-info-icon {
+  background-position: 0px -360px;
+}
 
-.ui-message-warn-icon {background-position: 0px -492px;}
+.ui-message-warn-icon {
+  background-position: 0px -492px;
+}
 
-.ui-message-error-icon {background-position: 0px -96px;}
+.ui-message-error-icon {
+  background-position: 0px -96px;
+}
 
-.ui-message-fatal-icon {background-position: 0px -228px;}
+.ui-message-fatal-icon {
+  background-position: 0px -228px;
+}
 
 
 
 .ui-messages .ui-messages-close {
 
-    float:right;
+  float:right;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
 .ui-notificationbar {
 
-	position:fixed;
+  position:fixed;
 
-	width:100%;
+  width:100%;
 
-	height:100px;
+  height:100px;
 
-	display:none;
+  display:none;
 
-	padding:10px;
+  padding:10px;
 
 }
 
@@ -4612,19 +5037,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-notificationbar-close {
 
-	position:absolute;
+  position:absolute;
 
-	right:3em;
+  right:3em;
 
-	top:1em;
+  top:1em;
 
-	cursor:pointer;
+  cursor:pointer;
 
 }
 
 .ui-orderlist {
 
-    display: table;
+  display: table;
 
 }
 
@@ -4632,7 +5057,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-orderlist-caption {
 
-    width: 180px;
+  width: 180px;
 
 }
 
@@ -4640,17 +5065,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-orderlist-list {
 
-    list-style-type: none;
+  list-style-type: none;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
-    overflow:auto;
+  overflow:auto;
 
-    height:200px;
+  height:200px;
 
-    width:200px;
+  width:200px;
 
 }
 
@@ -4658,9 +5083,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-orderlist-list li {
 
-    margin: 1px;
+  margin: 1px;
 
-    padding: 2px;
+  padding: 2px;
 
 }
 
@@ -4668,9 +5093,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-button {
 
-    display:block;
+  display:block;
 
-    margin-bottom:0.3em;
+  margin-bottom:0.3em;
 
 }
 
@@ -4678,7 +5103,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-orderlist-button.ui-button-text-icon-primary {
 
-    width:100%;
+  width:100%;
 
 }
 
@@ -4686,11 +5111,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-orderlist-item {
 
-    cursor:pointer;
+  cursor:pointer;
 
-    border:0px none;
+  border:0px none;
 
-    font-weight: inherit;
+  font-weight: inherit;
 
 }
 
@@ -4698,11 +5123,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist .ui-orderlist-caption {
 
-    text-align: center;
+  text-align: center;
 
-    padding:4px 0px;
+  padding:4px 0px;
 
-    border-bottom:0px none;
+  border-bottom:0px none;
 
 }
 
@@ -4710,9 +5135,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist table {
 
-    width:100%;
+  width:100%;
 
-    border-collapse:collapse;
+  border-collapse:collapse;
 
 }
 
@@ -4722,7 +5147,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist.ui-state-disabled .ui-button {
 
-    cursor: default;
+  cursor: default;
 
 }
 
@@ -4730,7 +5155,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist.ui-state-disabled .ui-orderlist-list {
 
-    overflow:hidden;
+  overflow:hidden;
 
 }
 
@@ -4740,9 +5165,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist.ui-grid-responsive {
 
-    display: block;
+  display: block;
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -4750,7 +5175,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist.ui-grid-responsive .ui-orderlist-controls {
 
-    margin-right: 10px;
+  margin-right: 10px;
 
 }
 
@@ -4760,57 +5185,57 @@ div.ui-button, .ui-splitbutton {
 
 .ui-orderlist.ui-grid-responsive .ui-orderlist-caption {
 
-    width: 100%;
+  width: 100%;
 
-}  
+}
 
 
 
 .ui-orderlist.ui-grid-responsive .ui-orderlist-controls .ui-button {
 
-    width: 100%;
+  width: 100%;
 
 }
 
 
 
-@media (max-width: 35em) { 
+@media (max-width: 35em) {
 
-    .ui-orderlist.ui-grid-responsive .ui-orderlist-controls {
+  .ui-orderlist.ui-grid-responsive .ui-orderlist-controls {
 
-        text-align: center;
+    text-align: center;
 
-    }
+  }
 
 
 
-    .ui-orderlist.ui-grid-responsive .ui-orderlist-controls .ui-button {
+  .ui-orderlist.ui-grid-responsive .ui-orderlist-controls .ui-button {
 
-        display: inline;
+    display: inline;
 
-        width: 20%;
+    width: 20%;
 
-    }
+  }
 
 }
 
 .ui-outputpanel-loading {
 
-    background: url("#{$img}/loading.gif") center center no-repeat;
+  background: url("#{$img}/loading.gif") center center no-repeat;
 
-    width: 32px;
+  width: 32px;
 
-    height: 32px;
+  height: 32px;
 
 }
 
 .ui-overlaypanel {
 
-    padding: 0;
+  padding: 0;
 
-    margin: 0;
+  margin: 0;
 
-    position: absolute;
+  position: absolute;
 
 }
 
@@ -4818,7 +5243,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-overlaypanel-content {
 
-    padding: 0.5em 1em;
+  padding: 0.5em 1em;
 
 }
 
@@ -4826,23 +5251,23 @@ div.ui-button, .ui-splitbutton {
 
 .ui-overlaypanel-close {
 
-    position: absolute;
+  position: absolute;
 
-    top: -10px;
+  top: -10px;
 
-    right: -10px;
+  right: -10px;
 
-    -moz-border-radius: 10px;
+  -moz-border-radius: 10px;
 
-    -webkit-border-radius: 10px;
+  -webkit-border-radius: 10px;
 
-    border-radius: 10px;
+  border-radius: 10px;
 
 }
 
 .ui-panel {
 
-	padding: 0.2em;
+  padding: 0.2em;
 
 }
 
@@ -4850,7 +5275,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel .ui-panel-titlebar {
 
-	padding: 0.5em 1em 0.3em;
+  padding: 0.5em 1em 0.3em;
 
 }
 
@@ -4858,7 +5283,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel .ui-panel-title {
 
-	margin: 0.1em 16px 0.2em 0;
+  margin: 0.1em 16px 0.2em 0;
 
 }
 
@@ -4866,9 +5291,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel .ui-panel-titlebar-icon {
 
-	float: right;
+  float: right;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -4880,11 +5305,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel .ui-panel-titlebar-icon:focus {
 
-	margin-left:0.2em;
+  margin-left:0.2em;
 
-    margin-top:-0.2em;
+  margin-top:-0.2em;
 
-    *margin:-1.5em 0em 0em 0.2em;
+  *margin:-1.5em 0em 0em 0.2em;
 
 }
 
@@ -4892,11 +5317,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel .ui-panel-content {
 
-	border: 0;
+  border: 0;
 
-    background: none;
+  background: none;
 
-	padding: 0.5em 1em;
+  padding: 0.5em 1em;
 
 }
 
@@ -4904,13 +5329,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel .ui-panel-footer {
 
-	border-width:1px 0 0;
+  border-width:1px 0 0;
 
-	margin:0.5em 0 0;
+  margin:0.5em 0 0;
 
-	padding:0.5em 1em;
+  padding:0.5em 1em;
 
-	text-align:left;
+  text-align:left;
 
 }
 
@@ -4922,7 +5347,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel-collapsed-h .ui-panel-titlebar-icon:focus {
 
-    *margin:-0.2em 0em 0em 0.1em;
+  *margin:-0.2em 0em 0em 0.1em;
 
 }
 
@@ -4930,7 +5355,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel.ui-panel-collapsed-h {
 
-    width: 42px;
+  width: 42px;
 
 }
 
@@ -4938,13 +5363,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panel.ui-panel-collapsed-h .ui-panel-title {
 
-    display:none;
+  display:none;
 
-}            
+}
 
 .ui-panelgrid {
 
-    border-collapse: collapse;
+  border-collapse: collapse;
 
 }
 
@@ -4952,9 +5377,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid .ui-panelgrid-header {
 
-    text-align: center;
+  text-align: center;
 
-    padding: 4px 10px;
+  padding: 4px 10px;
 
 }
 
@@ -4962,9 +5387,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid .ui-panelgrid-footer {
 
-    text-align: left;
+  text-align: left;
 
-    padding: 2px 5px;
+  padding: 2px 5px;
 
 }
 
@@ -4972,13 +5397,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid .ui-panelgrid-cell {
 
-    border-width: 1px;
+  border-width: 1px;
 
-    border-style: solid;
+  border-style: solid;
 
-    border-color: inherit;
+  border-color: inherit;
 
-    padding: 4px 10px;
+  padding: 4px 10px;
 
 }
 
@@ -4986,7 +5411,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid.ui-noborder .ui-panelgrid-cell {
 
-    border: 0px none;
+  border: 0px none;
 
 }
 
@@ -4996,19 +5421,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid.ui-noborder tr.ui-widget-header {
 
-    border: 0px none;
+  border: 0px none;
 
 }
 
 
 
-.ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-content.ui-widget-content, 
+.ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-content.ui-widget-content,
 
 .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-header.ui-widget-header,
 
 .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-footer.ui-widget-header,
 
-.ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-header > tr.ui-widget-header, 
+.ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-header > tr.ui-widget-header,
 
 .ui-panelgrid.ui-panelgrid-blank tbody > tr.ui-widget-content,
 
@@ -5016,9 +5441,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-footer > tr.ui-widget-footer {
 
-    background: none;
+  background: none;
 
-    border: 0 none;
+  border: 0 none;
 
 }
 
@@ -5028,7 +5453,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-panelgrid .ui-grid-responsive .ui-panelgrid-cell {
 
-    border: 0 none;
+  border: 0 none;
 
 }
 
@@ -5036,31 +5461,31 @@ div.ui-button, .ui-splitbutton {
 
 /* Responsive */
 
-@media (max-width: 35em) {       
+@media (max-width: 35em) {
 
-    .ui-panelgrid .ui-grid-responsive .ui-grid-row {
+  .ui-panelgrid .ui-grid-responsive .ui-grid-row {
 
-        border-top: 1px solid #BCC7CF;
+    border-top: 1px solid #BCC7CF;
 
-    }
+  }
 
-    
 
-    .ui-panelgrid .ui-grid-responsive .ui-grid-row:first-child {
 
-        border-top: 0 none;
+  .ui-panelgrid .ui-grid-responsive .ui-grid-row:first-child {
 
-    }
+    border-top: 0 none;
+
+  }
 
 }
 
 .ui-paginator {
 
-    margin:0px;
+  margin:0px;
 
-    text-align: center;
+  text-align: center;
 
-    padding:2px;
+  padding:2px;
 
 }
 
@@ -5068,7 +5493,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator.ui-paginator-top {
 
-    border-bottom:0px none;
+  border-bottom:0px none;
 
 }
 
@@ -5076,7 +5501,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator.ui-paginator-bottom {
 
-    border-top:0px none;
+  border-top:0px none;
 
 }
 
@@ -5096,19 +5521,19 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator .ui-paginator-current {
 
-	display: inline-block;
+  display: inline-block;
 
-	padding: 2px 6px;
+  padding: 2px 6px;
 
-	zoom: 1;
+  zoom: 1;
 
-	margin-left: 1px;
+  margin-left: 1px;
 
-	margin-right: 1px;
+  margin-right: 1px;
 
-	text-decoration: none;
+  text-decoration: none;
 
-	outline: none;
+  outline: none;
 
 }
 
@@ -5124,7 +5549,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator .ui-paginator-prev{
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -5134,11 +5559,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator .ui-paginator-rpp-options {
 
-	margin-left: 1em;
+  margin-left: 1em;
 
-	margin-right: 1em;
+  margin-right: 1em;
 
-    background-image: none;
+  background-image: none;
 
 }
 
@@ -5152,9 +5577,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator .ui-paginator-last .ui-icon {
 
-	height: auto;
+  height: auto;
 
-	overflow: inherit;
+  overflow: inherit;
 
 }
 
@@ -5164,15 +5589,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-paginator .ui-paginator-rpp-options option {
 
-    background-image: none;
+  background-image: none;
 
-    border:0 none;
+  border:0 none;
 
-    box-shadow:none;
+  box-shadow:none;
 
-    -moz-box-shadow: none;
+  -moz-box-shadow: none;
 
-    -webkit-box-shadow: none;
+  -webkit-box-shadow: none;
 
 }
 
@@ -5182,17 +5607,17 @@ div.ui-button, .ui-splitbutton {
 
 @media (max-width: 35em) {
 
-    .ui-paginator .ui-paginator-pages {
+  .ui-paginator .ui-paginator-pages {
 
-        display: none;
+    display: none;
 
-    }
+  }
 
 }
 
 .ui-picklist > div {
 
-    float: left;
+  float: left;
 
 }
 
@@ -5200,9 +5625,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-buttons {
 
-    height: 200px;
+  height: 200px;
 
-    padding: 0px 5px;
+  padding: 0px 5px;
 
 }
 
@@ -5210,17 +5635,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-list {
 
-    list-style-type: none;
+  list-style-type: none;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
-    overflow:auto;
+  overflow:auto;
 
-    height:200px;
+  height:200px;
 
-    width:200px;
+  width:200px;
 
 }
 
@@ -5228,9 +5653,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-list li {
 
-    margin: 1px;
+  margin: 1px;
 
-    padding: 2px;
+  padding: 2px;
 
 }
 
@@ -5238,9 +5663,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-button {
 
-    display:block;
+  display:block;
 
-    margin-bottom:0.3em;
+  margin-bottom:0.3em;
 
 }
 
@@ -5248,7 +5673,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-button-text-icon-left {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -5256,11 +5681,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-item {
 
-    cursor:pointer;
+  cursor:pointer;
 
-    border:0px none;
+  border:0px none;
 
-    font-weight: inherit;
+  font-weight: inherit;
 
 }
 
@@ -5268,11 +5693,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-caption {
 
-    text-align: center;
+  text-align: center;
 
-    padding: 4px 0px;
+  padding: 4px 0px;
 
-    border-bottom:0px none;
+  border-bottom:0px none;
 
 }
 
@@ -5280,9 +5705,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist table {
 
-    width:100%;
+  width:100%;
 
-    border-collapse:collapse;
+  border-collapse:collapse;
 
 }
 
@@ -5290,9 +5715,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-filter {
 
-    padding-right: 15px;
+  padding-right: 15px;
 
-    width: 90%;
+  width: 90%;
 
 }
 
@@ -5300,11 +5725,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-filter-container {
 
-    position: relative;
+  position: relative;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
 }
 
@@ -5312,11 +5737,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-filter-container .ui-icon {
 
-    position: absolute;
+  position: absolute;
 
-    top: 5px;
+  top: 5px;
 
-    right: 2px;
+  right: 2px;
 
 }
 
@@ -5324,7 +5749,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist {
 
-    display: table;
+  display: table;
 
 }
 
@@ -5332,11 +5757,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist > div {
 
-    float: none;
+  float: none;
 
-    display: table-cell;
+  display: table-cell;
 
-    vertical-align: top;
+  vertical-align: top;
 
 }
 
@@ -5344,7 +5769,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-buttons {
 
-    vertical-align: middle;
+  vertical-align: middle;
 
 }
 
@@ -5354,7 +5779,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-vertical {
 
-    display: table;
+  display: table;
 
 }
 
@@ -5362,11 +5787,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-vertical > div {
 
-    float: none;
+  float: none;
 
-    display: table-row;
+  display: table-row;
 
-    vertical-align: top;
+  vertical-align: top;
 
 }
 
@@ -5374,9 +5799,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-vertical .ui-picklist-buttons {
 
-    text-align:center;
+  text-align:center;
 
-    height: auto;
+  height: auto;
 
 }
 
@@ -5384,7 +5809,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-vertical .ui-picklist-buttons .ui-button {
 
-    display: inline-block;
+  display: inline-block;
 
 }
 
@@ -5392,7 +5817,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-vertical .ui-button {
 
-    margin-top: 0.3em;
+  margin-top: 0.3em;
 
 }
 
@@ -5402,7 +5827,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-responsive * {
 
-    box-sizing: border-box;
+  box-sizing: border-box;
 
 }
 
@@ -5410,7 +5835,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-responsive {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -5418,7 +5843,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-responsive .ui-picklist-list-wrapper {
 
-    width: 35%;
+  width: 35%;
 
 }
 
@@ -5426,7 +5851,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-responsive .ui-picklist-buttons {
 
-    width: 10%;
+  width: 10%;
 
 }
 
@@ -5434,7 +5859,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-responsive .ui-picklist-buttons button {
 
-    width: 100%;
+  width: 100%;
 
 }
 
@@ -5442,7 +5867,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist.ui-picklist-responsive .ui-picklist-list {
 
-    width: auto;
+  width: auto;
 
 }
 
@@ -5450,113 +5875,113 @@ div.ui-button, .ui-splitbutton {
 
 .ui-picklist .ui-picklist-filter {
 
-    width: 100%;
+  width: 100%;
 
 }
 
-        
+
 
 /* Responsive */
 
 @media (max-width: 35em) {
 
-    .ui-picklist.ui-picklist-responsive {
+  .ui-picklist.ui-picklist-responsive {
 
-        display: block;
+    display: block;
 
-    }
+  }
 
-    
 
-    .ui-picklist.ui-picklist-responsive > div {
 
-        display: block;
+  .ui-picklist.ui-picklist-responsive > div {
 
-        width: 100% !important;
+    display: block;
 
-    }
+    width: 100% !important;
 
-    
+  }
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-buttons {
 
-        text-align: center;
 
-        height: auto;
+  .ui-picklist.ui-picklist-responsive .ui-picklist-buttons {
 
-        padding: 5px 0px;
+    text-align: center;
 
-    }
+    height: auto;
 
-    
+    padding: 5px 0px;
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-buttons button {
+  }
 
-        display: inline;
 
-        width: 20%;
 
-    }
+  .ui-picklist.ui-picklist-responsive .ui-picklist-buttons button {
 
-    
+    display: inline;
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-source-controls.ui-picklist-buttons {
+    width: 20%;
 
-        padding-bottom: 5px;
+  }
 
-    }
 
-    
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-target-controls.ui-picklist-buttons {
+  .ui-picklist.ui-picklist-responsive .ui-picklist-source-controls.ui-picklist-buttons {
 
-        padding-top: 5px;
+    padding-bottom: 5px;
 
-    }
+  }
 
-    
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrow-1-e {
 
-        background-position: -64px -32px
+  .ui-picklist.ui-picklist-responsive .ui-picklist-target-controls.ui-picklist-buttons {
 
-    }
+    padding-top: 5px;
 
-    
+  }
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrowstop-1-e {
 
-        background-position: -224px -32px;
 
-    }
+  .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrow-1-e {
 
-    
+    background-position: -64px -32px
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrow-1-w {
+  }
 
-        background-position:  0 -32px;
 
-    }
 
-    
+  .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrowstop-1-e {
 
-    .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrowstop-1-w {
+    background-position: -224px -32px;
 
-        background-position: -192px -32px;
+  }
 
-    }
+
+
+  .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrow-1-w {
+
+    background-position:  0 -32px;
+
+  }
+
+
+
+  .ui-picklist.ui-picklist-responsive .ui-picklist-buttons .ui-icon-arrowstop-1-w {
+
+    background-position: -192px -32px;
+
+  }
 
 }
 
 
 
-.ui-progressbar { 
+.ui-progressbar {
 
-    height: 1.2em; 
+  height: 1.2em;
 
-    text-align: left; 
+  text-align: left;
 
-    position: relative;
+  position: relative;
 
 }
 
@@ -5564,15 +5989,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-progressbar .ui-progressbar-value {
 
-    margin: -1px; 
+  margin: -1px;
 
-    height: 100%;
+  height: 100%;
 
-    width: 0%;
+  width: 0%;
 
-    position: absolute;
+  position: absolute;
 
-    display: none;
+  display: none;
 
 }
 
@@ -5580,17 +6005,17 @@ div.ui-button, .ui-splitbutton {
 
 .ui-progressbar .ui-progressbar-label {
 
-    text-align: center;
+  text-align: center;
 
-    height: 100%;
+  height: 100%;
 
-    width: 100%;
+  width: 100%;
 
-    position: absolute;
+  position: absolute;
 
-    display: none;
+  display: none;
 
-    font-weight: bold;
+  font-weight: bold;
 
 }
 
@@ -5598,15 +6023,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating-cancel {
 
-    float: left;
+  float: left;
 
-    display: block;
+  display: block;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    text-indent: -999em;
+  text-indent: -999em;
 
-    cursor: pointer;
+  cursor: pointer;
 
 }
 
@@ -5616,13 +6041,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating-cancel a {
 
-    width: 16px;
+  width: 16px;
 
-    height: 15px;
+  height: 15px;
 
-    display: block;
+  display: block;
 
-    background: url("#{$img}/rating.png") no-repeat 0 0;
+  background: url("#{$img}/rating.png") no-repeat 0 0;
 
 }
 
@@ -5630,7 +6055,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating-star a {
 
-    background-position: 0 -32px;
+  background-position: 0 -32px;
 
 }
 
@@ -5638,7 +6063,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating-star-on a {
 
-    background-position: 0 -48px;
+  background-position: 0 -48px;
 
 }
 
@@ -5646,7 +6071,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating-star-hover a {
 
-    background-position: 0 -64px;
+  background-position: 0 -64px;
 
 }
 
@@ -5654,7 +6079,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating-cancel-hover a {
 
-    background-position: 0 -16px;
+  background-position: 0 -16px;
 
 }
 
@@ -5664,91 +6089,91 @@ div.ui-button, .ui-splitbutton {
 
 .ui-rating.ui-state-disabled .ui-rating-cancel {
 
-    cursor: default;    
+  cursor: default;
 
 }
 
 .ui-spinner {
 
-    display: inline-block;
+  display: inline-block;
 
-    overflow: visible;
+  overflow: visible;
 
-    padding: 0;
+  padding: 0;
 
-    position: relative;
+  position: relative;
 
-    vertical-align: middle;
+  vertical-align: middle;
 
 }
 
 .ui-spinner-input {
 
-    vertical-align: middle;
+  vertical-align: middle;
 
-    text-align: right;
+  text-align: right;
 
-    padding-right: 20px;
+  padding-right: 20px;
 
 }
 
 .ui-spinner-button {
 
-    cursor: default;
+  cursor: default;
 
-    display: block;
+  display: block;
 
-    font-size: 0.5em;
+  font-size: 0.5em;
 
-    height: 50%;
+  height: 50%;
 
-    margin: 0;
+  margin: 0;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    padding: 0;
+  padding: 0;
 
-    position: absolute;
+  position: absolute;
 
-    right: 0;
+  right: 0;
 
-    text-align: center;
+  text-align: center;
 
-    vertical-align: middle;
+  vertical-align: middle;
 
-    width: 16px;
+  width: 16px;
 
-    z-index: 100;
+  z-index: 100;
 
 }
 
 .ui-spinner .ui-icon {
 
-    left: 0;
+  left: 0;
 
-    margin-top: -8px;
+  margin-top: -8px;
 
-    position: absolute;
+  position: absolute;
 
-    top: 50%;
+  top: 50%;
 
 }
 
 .ui-spinner-up {
 
-    top: 0;
+  top: 0;
 
 }
 
 .ui-spinner-down {
 
-    bottom: 0;
+  bottom: 0;
 
 }
 
 .ui-spinner .ui-icon-triangle-1-s {
 
-    background-position: -65px -16px;
+  background-position: -65px -16px;
 
 }
 
@@ -5756,7 +6181,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-spinner .ui-icon-triangle-1-n {
 
-    margin-top: -9px;
+  margin-top: -9px;
 
 }
 
@@ -5764,109 +6189,109 @@ div.ui-button, .ui-splitbutton {
 
 .ui-spinner-input::-ms-clear {
 
-    display: none;
+  display: none;
 
 }
 
-.ui-tabs { 
+.ui-tabs {
 
-    position: relative; 
+  position: relative;
 
-    padding: .2em; 
+  padding: .2em;
 
-    zoom: 1; 
+  zoom: 1;
 
 } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 
 
 
-.ui-tabs .ui-tabs-nav { 
+.ui-tabs .ui-tabs-nav {
 
-    margin: 0;
-
-}
-
-
-
-.ui-tabs .ui-tabs-nav li { 
-
-    list-style: none; 
-
-    float: left; 
-
-    position: relative; 
-
-    margin: 0 .2em 1px 0;  
-
-    padding: 0; 
-
-    white-space: nowrap; 
+  margin: 0;
 
 }
 
 
 
-.ui-tabs .ui-tabs-nav li a { 
+.ui-tabs .ui-tabs-nav li {
 
-    float: left; 
+  list-style: none;
 
-    padding: .5em 1em; 
+  float: left;
 
-    text-decoration: none; 
+  position: relative;
 
-}
+  margin: 0 .2em 1px 0;
 
+  padding: 0;
 
-
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, 
-
-.ui-tabs .ui-tabs-nav li.ui-state-disabled a, 
-
-.ui-tabs .ui-tabs-nav li.ui-state-processing a { 
-
-    cursor: text; 
+  white-space: nowrap;
 
 }
 
 
 
-.ui-tabs .ui-tabs-nav li a, 
+.ui-tabs .ui-tabs-nav li a {
 
-.ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { 
+  float: left;
 
-    cursor: pointer; 
+  padding: .5em 1em;
+
+  text-decoration: none;
+
+}
+
+
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a,
+
+.ui-tabs .ui-tabs-nav li.ui-state-disabled a,
+
+.ui-tabs .ui-tabs-nav li.ui-state-processing a {
+
+  cursor: text;
+
+}
+
+
+
+.ui-tabs .ui-tabs-nav li a,
+
+.ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+
+  cursor: pointer;
 
 } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 
 
 
-.ui-tabs .ui-tabs-panel { 
+.ui-tabs .ui-tabs-panel {
 
-    border-width: 0; 
+  border-width: 0;
 
-    padding: 1em 1.4em; 
+  padding: 1em 1.4em;
 
-    background: none; 
-
-}
-
-
-
-.ui-tabs .ui-tabs-nav li { 
-
-    display: block; 
+  background: none;
 
 }
 
 
 
-.ui-tabs .ui-tabs-nav li .ui-icon { 
+.ui-tabs .ui-tabs-nav li {
 
-    float: left; 
+  display: block;
 
-    margin: 0.4em 0.2em 0 0; 
+}
 
-    cursor: pointer; 
+
+
+.ui-tabs .ui-tabs-nav li .ui-icon {
+
+  float: left;
+
+  margin: 0.4em 0.2em 0 0;
+
+  cursor: pointer;
 
 }
 
@@ -5876,35 +6301,35 @@ div.ui-button, .ui-splitbutton {
 
 /* top and bottom */
 
-.ui-tabs.ui-tabs-top > .ui-tabs-nav li { 
+.ui-tabs.ui-tabs-top > .ui-tabs-nav li {
 
-    border-bottom: 0;
+  border-bottom: 0;
 
-    top: 1px; 
-
-}
-
-
-
-.ui-tabs.ui-tabs-top > .ui-tabs-nav { 
-
-    padding: .2em .2em 0; 
+  top: 1px;
 
 }
 
 
 
-.ui-tabs.ui-tabs-bottom > .ui-tabs-nav { 
+.ui-tabs.ui-tabs-top > .ui-tabs-nav {
 
-    padding: 0 .2em .2em; 
+  padding: .2em .2em 0;
 
 }
 
 
 
-.ui-tabs.ui-tabs-bottom > .ui-tabs-nav li { 
+.ui-tabs.ui-tabs-bottom > .ui-tabs-nav {
 
-    border-top: 0;
+  padding: 0 .2em .2em;
+
+}
+
+
+
+.ui-tabs.ui-tabs-bottom > .ui-tabs-nav li {
+
+  border-top: 0;
 
 }
 
@@ -5916,15 +6341,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-right:after {
 
-    clear:both;
+  clear:both;
 
-    content: ".";
+  content: ".";
 
-    display: block;
+  display: block;
 
-    height: 0;
+  height: 0;
 
-    visibility: hidden;
+  visibility: hidden;
 
 }
 
@@ -5932,15 +6357,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-left > .ui-tabs-nav {
 
-    float:left;
+  float:left;
 
-    width:23%;
+  width:23%;
 
-    height:300px;
+  height:300px;
 
-    background-image: none;
+  background-image: none;
 
-    padding-top:1px;
+  padding-top:1px;
 
 }
 
@@ -5948,9 +6373,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-left > .ui-tabs-panels {
 
-    float:right;
+  float:right;
 
-    width:75%;
+  width:75%;
 
 }
 
@@ -5960,11 +6385,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-right > .ui-tabs-nav li{
 
-    display: block;
+  display: block;
 
-    white-space: normal;
+  white-space: normal;
 
-    width: 98%;
+  width: 98%;
 
 }
 
@@ -5974,7 +6399,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-right > .ui-tabs-nav li a {
 
-    width: 90%;
+  width: 90%;
 
 }
 
@@ -5982,7 +6407,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-left > .ui-tabs-nav li {
 
-    float: right;
+  float: right;
 
 }
 
@@ -5990,7 +6415,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-right > .ui-tabs-nav li {
 
-    float: left;
+  float: left;
 
 }
 
@@ -5998,9 +6423,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-left > .ui-tabs-nav li {
 
-    margin:0 0 1px 0.2em;
+  margin:0 0 1px 0.2em;
 
-    border-right:0 none;
+  border-right:0 none;
 
 }
 
@@ -6008,15 +6433,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-right > .ui-tabs-nav {
 
-    float:right;
+  float:right;
 
-    width:23%;
+  width:23%;
 
-    height:300px;
+  height:300px;
 
-    background-image: none;
+  background-image: none;
 
-    padding-top:1px;
+  padding-top:1px;
 
 }
 
@@ -6024,9 +6449,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-right > .ui-tabs-panels {
 
-    float:left;
+  float:left;
 
-    width:75%;
+  width:75%;
 
 }
 
@@ -6034,9 +6459,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs.ui-tabs-right > .ui-tabs-nav li {
 
-    margin:0 0.2em 1px 0;
+  margin:0 0.2em 1px 0;
 
-    border-left:0 none;
+  border-left:0 none;
 
 }
 
@@ -6044,9 +6469,9 @@ div.ui-button, .ui-splitbutton {
 
 /** RTL **/
 
-.ui-tabs-rtl { 
+.ui-tabs-rtl {
 
-    direction: rtl; 
+  direction: rtl;
 
 }
 
@@ -6054,7 +6479,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-rtl .ui-tabs-nav li, .ui-tabs-rtl .ui-tabs-nav li a {
 
-    float: right;
+  float: right;
 
 }
 
@@ -6064,7 +6489,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-scrollable .ui-tabs-nav {
 
-    width:5000px;
+  width:5000px;
 
 }
 
@@ -6072,7 +6497,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs .ui-tabs-navscroller {
 
-    overflow: hidden;
+  overflow: hidden;
 
 }
 
@@ -6080,7 +6505,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-scrollable .ui-tabs-nav li {
 
-    margin: 0 .2em -1px 0;
+  margin: 0 .2em -1px 0;
 
 }
 
@@ -6088,15 +6513,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs .ui-tabs-navscroller-btn {
 
-    position: absolute;
+  position: absolute;
 
-    height: 28px;
+  height: 28px;
 
-    z-index: 100;
+  z-index: 100;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    display: none;
+  display: none;
 
 }
 
@@ -6104,7 +6529,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs .ui-tabs-navscroller-btn-left {
 
-    left: 0.2em;
+  left: 0.2em;
 
 }
 
@@ -6112,7 +6537,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs .ui-tabs-navscroller-btn-right {
 
-    right: 0.2em;
+  right: 0.2em;
 
 }
 
@@ -6122,7 +6547,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs .ui-tabs-navscroller-btn-right .ui-icon {
 
-    margin-top: 5px;
+  margin-top: 5px;
 
 }
 
@@ -6130,15 +6555,15 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tabs-outline {
 
-    outline: dotted thin;
+  outline: dotted thin;
 
-    z-index: 1;
+  z-index: 1;
 
 }
 
 .ui-tagcloud {
 
-    width:250px;
+  width:250px;
 
 }
 
@@ -6146,11 +6571,11 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud ul {
 
-    margin:1em;
+  margin:1em;
 
-    padding:0.1em;
+  padding:0.1em;
 
-    text-align:center;
+  text-align:center;
 
 }
 
@@ -6158,13 +6583,13 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud li {
 
-    margin:0;
+  margin:0;
 
-    padding:0;
+  padding:0;
 
-    list-style:none;
+  list-style:none;
 
-    display:inline-block;
+  display:inline-block;
 
 }
 
@@ -6172,9 +6597,9 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud li a {
 
-    text-decoration:none;
+  text-decoration:none;
 
-    padding:0 5px;
+  padding:0 5px;
 
 }
 
@@ -6182,7 +6607,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud-strength-1{
 
-    font-size:100%;
+  font-size:100%;
 
 }
 
@@ -6190,7 +6615,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud-strength-2{
 
-    font-size:120%;
+  font-size:120%;
 
 }
 
@@ -6198,7 +6623,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud-strength-3{
 
-    font-size:140%;
+  font-size:140%;
 
 }
 
@@ -6206,7 +6631,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud-strength-4{
 
-    font-size:160%;
+  font-size:160%;
 
 }
 
@@ -6214,7 +6639,7 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud-strength-5{
 
-    font-size:180%;
+  font-size:180%;
 
 }
 
@@ -6222,408 +6647,417 @@ div.ui-button, .ui-splitbutton {
 
 .ui-tagcloud li a.ui-state-hover {
 
-    border: 0px none;
+  border: 0px none;
 
-    font-weight: inherit;
+  font-weight: inherit;
 
 }
 
-.ui-toolbar {padding:0.2em;}
+.ui-toolbar {
+  padding:0.2em;
+}
 
-.ui-toolbar .ui-separator {display: inline-block;vertical-align: middle;}
+.ui-toolbar .ui-separator {
+  display: inline-block;
+  vertical-align: middle;
+}
 
-.ui-toolbar-group-left {float:left;}
+.ui-toolbar-group-left {
+  float:left;
+}
 
-.ui-toolbar-group-right {float:right;}
+.ui-toolbar-group-right {
+  float:right;
+}
 
 .ui-tooltip {
 
-    position:absolute;
+  position:absolute;
 
-    display:none;
+  display:none;
 
-    padding:3px 5px;
+  padding:3px 5px;
 
 }
 
 .ui-tree {
-    width: 300px;
-    position: relative;
+  width: 300px;
+  position: relative;
 }
 
 .ui-tree .ui-tree-container {
-    margin: 0;
-    padding: 3px;
-    white-space: nowrap;
-    overflow: auto;
+  margin: 0;
+  padding: 3px;
+  white-space: nowrap;
+  overflow: auto;
 }
 
 .ui-tree .ui-treenode-children {
-    margin: 0;
-    padding: 0 0 0 16px;
+  margin: 0;
+  padding: 0 0 0 16px;
 }
 
 .ui-tree .ui-treenode {
-    background-attachment: scroll;
-    background-color: transparent;
-    background-image: none;
-    background-position: 0 0;
-    background-repeat: repeat-y;
-    list-style: none outside none;
-    margin: 0;
-    padding: 1px 0 0;
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position: 0 0;
+  background-repeat: repeat-y;
+  list-style: none outside none;
+  margin: 0;
+  padding: 1px 0 0;
 }
 
 .ui-tree .ui-treenode-content {
 }
 
 .ui-tree .ui-tree-toggler {
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: top;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .ui-tree .ui-treenode-icon {
-    display: inline-block;
-    vertical-align: top;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .ui-tree .ui-treenode-label {
-    display: inline-block;
-    margin: 2px 0 0 0;
-    vertical-align: top;
-    padding: 0 3px;
+  display: inline-block;
+  margin: 2px 0 0 0;
+  vertical-align: top;
+  padding: 0 3px;
 }
 
 .ui-tree .ui-tree-selectable .ui-treenode-label,
 .ui-tree .ui-tree-selectable .ui-treenode-icon {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-tree .ui-treenode-label.ui-state-hover,
 .ui-tree .ui-treenode-label.ui-state-highlight {
-    font-weight: normal;
-    border: 0 none;
+  font-weight: normal;
+  border: 0 none;
 }
 
 .ui-tree .ui-treenode-leaf-icon {
-    width: 16px;
-    height: 16px;
-    display: inline-block;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
 }
 
 .ui-tree .ui-chkbox-box {
-    cursor: pointer;
-    width: 15px;
-    height: 15px;
-    float: left;
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  float: left;
 }
 
 .ui-tree .ui-chkbox {
-    display: inline-block;
-    zoom: 1;
+  display: inline-block;
+  zoom: 1;
 }
 
 /** Horizontal Tree **/
 .ui-tree-horizontal {
-    width:auto;
-    padding:10px 0px;
-    overflow:auto;
+  width:auto;
+  padding:10px 0px;
+  overflow:auto;
 }
 
 .ui-tree.ui-tree-horizontal table,
 .ui-tree.ui-tree-horizontal tr,
 .ui-tree.ui-tree-horizontal td {
-    border-collapse: collapse;
-    margin:0;
-    padding:0;
-    vertical-align: middle;
+  border-collapse: collapse;
+  margin:0;
+  padding:0;
+  vertical-align: middle;
 }
 
 .ui-tree.ui-tree-horizontal .ui-tree-toggler {
-    vertical-align: bottom;
+  vertical-align: bottom;
 }
 
 .ui-tree-horizontal .ui-treenode-content {
-    font-weight: normal;
+  font-weight: normal;
 }
 
 .ui-tree-horizontal .ui-treenode-content.ui-tree-selectable {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-tree-horizontal .ui-treenode-parent .ui-treenode-content {
-    font-weight: normal;
-    white-space: nowrap;
+  font-weight: normal;
+  white-space: nowrap;
 }
 
 .ui-tree-horizontal .ui-treenode-parent .ui-treenode-content {
-    padding: 0.4em 1em 0.4em 0.2em;
+  padding: 0.4em 1em 0.4em 0.2em;
 }
 
 .ui-tree-horizontal .ui-treenode-leaf .ui-treenode-content {
-    padding: 0.4em 1em;
+  padding: 0.4em 1em;
 }
 
 .ui-tree.ui-tree-horizontal .ui-treenode {
-    background: url("#{$img}/line.gif") repeat-x scroll center center transparent;
-    padding: 5px 40px;
+  background: url("#{$img}/line.gif") repeat-x scroll center center transparent;
+  padding: 5px 40px;
 }
 
 .ui-tree.ui-tree-horizontal .ui-treenode.ui-treenode-leaf,
 .ui-tree.ui-tree-horizontal .ui-treenode.ui-treenode-collapsed {
-    padding-right:0px;
+  padding-right:0px;
 }
 
 .ui-tree.ui-tree-horizontal .ui-treenode-children {
-    padding:0;
-    margin:0;
+  padding:0;
+  margin:0;
 }
 
 .ui-tree.ui-tree-horizontal .ui-treenode-connector {
-    width: 1px;
+  width: 1px;
 }
 
 .ui-tree.ui-tree-horizontal .ui-treenode-connector-table {
-    height: 100%;
-    width: 1px;
+  height: 100%;
+  width: 1px;
 }
 
 .ui-tree.ui-tree-horizontal .ui-treenode-connector-line {
-    background: url("#{$img}/line.gif") repeat-y scroll 0 0 transparent;
-    width: 1px;
+  background: url("#{$img}/line.gif") repeat-y scroll 0 0 transparent;
+  width: 1px;
 }
 
 .ui-tree.ui-tree-horizontal table {
-	height:0px;
+  height:0px;
 }
 
 .ui-tree.ui-tree-horizontal .ui-chkbox {
-    vertical-align: bottom;
-    margin-right: 3px;
+  vertical-align: bottom;
+  margin-right: 3px;
 }
 
 /** RTL **/
 .ui-tree.ui-tree-rtl {
-    direction: rtl;
+  direction: rtl;
 }
 
 .ui-tree.ui-tree-rtl .ui-treenode-children {
-    padding: 0 16px 0 0;
+  padding: 0 16px 0 0;
 }
 
 /** DragDrop **/
 .ui-tree-droppoint {
-    list-style: none outside none;
-    height: 4px;
-    margin: 0;
-    padding: 0;
+  list-style: none outside none;
+  height: 4px;
+  margin: 0;
+  padding: 0;
 }
 
 .ui-tree-droppoint.ui-state-hover {
-    border: 0 none;
+  border: 0 none;
 }
 
 .ui-treenode-content.ui-state-hover {
-    font-weight: inherit;
+  font-weight: inherit;
 }
 
 .ui-tree-draghelper.ui-state-highlight {
-    background: none transparent;
+  background: none transparent;
 }
 
 .ui-tree .ui-tree-scrollertop,
 .ui-tree .ui-tree-scrollerbottom {
-    height: 10px;
-    width: 100%;
-    position: absolute;
+  height: 10px;
+  width: 100%;
+  position: absolute;
 }
 
 .ui-tree .ui-tree-scrollertop {
-    top: 0;
+  top: 0;
 }
 
 .ui-tree .ui-tree-scrollerbottom {
-    bottom: 0;
+  bottom: 0;
 }
 
 .ui-tree .ui-treenode-content .ui-chkbox.ui-selection {
-    display: none;
+  display: none;
 }
 
 .ui-tree .ui-treenode-content.ui-tree-selectable .ui-chkbox.ui-selection {
-    display: inline-block;
+  display: inline-block;
 }
 
 .ui-tree.ui-tree-checkbox-all .ui-treenode-content .ui-chkbox.ui-selection {
-    display: inline-block;
+  display: inline-block;
 }
 
 .ui-tree .ui-treenode-outline {
-    outline: 1px dotted;
+  outline: 1px dotted;
 }
 
 /** Fluid **/
 .ui-fluid .ui-tree {
-    width: 100%;
+  width: 100%;
 }
 .ui-treetable table {
-	border-collapse:collapse;
-    width: 100%;
-    table-layout: fixed;
+  border-collapse:collapse;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .ui-treetable .ui-treetable-header,
 .ui-treetable .ui-treetable-footer {
-    text-align:center;
-    padding: 4px 10px;
+  text-align:center;
+  padding: 4px 10px;
 }
 
 .ui-treetable .ui-treetable-header {
-    border-bottom: 0px none;
+  border-bottom: 0px none;
 }
 
 .ui-treetable .ui-treetable-footer {
-    border-top: 0px none;
+  border-top: 0px none;
 }
 
 .ui-treetable th, .ui-treetable tfoot td {
-    text-align: center;
+  text-align: center;
 }
 
 .ui-treetable thead th,
 .ui-treetable tbody td,
 .ui-treetable tfoot td {
-    padding: 4px 10px;
-    overflow: hidden;
-    white-space: nowrap;
-    border-width: 1px;
-    border-style: solid;
+  padding: 4px 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
 }
 
 .ui-treetable tbody td {
-    border-color: inherit;
+  border-color: inherit;
 }
 
 .ui-treetable .ui-treetable-toggler {
-    float: left;
-    margin-top: -2px;
-    cursor: pointer;
+  float: left;
+  margin-top: -2px;
+  cursor: pointer;
 }
 
 .ui-treetable .ui-treetable-data tr.ui-state-highlight,
 .ui-treetable .ui-treetable-data tr.ui-state-hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-treetable-scrollable-body {
-    overflow:auto;
+  overflow:auto;
 }
 
 .ui-treetable-scrollable-header,
 .ui-treetable-scrollable-footer {
-    overflow: hidden;
-    border:0 none;
+  overflow: hidden;
+  border:0 none;
 }
 
 .ui-treetable.ui-treetable-scrollable table {
-    table-layout: fixed;
+  table-layout: fixed;
 }
 .ui-treetable-scrollable .ui-treetable-scrollable-header,
 .ui-treetable-scrollable .ui-treetable-scrollable-footer {
-    position: relative;
-} 
+  position: relative;
+}
 
 .ui-treetable .ui-treetable-data tr.ui-state-hover {
-    border-color: inherit;
-    font-weight: inherit
+  border-color: inherit;
+  font-weight: inherit
 }
 
 /** Resizable Columns **/
 .ui-treetable-resizable {
-    padding-bottom:1px;     /*fix for webkit overlow*/
-    overflow:auto;
+  padding-bottom:1px;     /*fix for webkit overlow*/
+  overflow:auto;
 }
 
 .ui-treetable.ui-treetable-resizable table {
-    table-layout: fixed;
+  table-layout: fixed;
 }
 
 .ui-treetable .ui-column-resizer {
-    width:8px;
-    height:20px;
-    padding:0px;
-    cursor:col-resize;
-    background-image: url("#{$img}/dot_clear.gif");
-    margin: -4px -10px -4px 0px;
-    float: right;
+  width:8px;
+  height:20px;
+  padding:0px;
+  cursor:col-resize;
+  background-image: url("#{$img}/dot_clear.gif");
+  margin: -4px -10px -4px 0px;
+  float: right;
 }
 
 .ui-treetable .ui-column-resizer-helper {
-    width: 1px;
-    position: absolute;
-    z-index: 10;
-    display: none;
+  width: 1px;
+  position: absolute;
+  z-index: 10;
+  display: none;
 }
 
 .ui-treetable .ui-chkbox {
-    margin-right: 3px;
+  margin-right: 3px;
 }
 
 .ui-treetable .ui-treetable-indent {
-    width: 16px;
-    height: 16px;
-    float: left;
+  width: 16px;
+  height: 16px;
+  float: left;
 }
 
 .ui-treetable-scrollable-body::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 15px;
-    background-color: transparent;
+  -webkit-appearance: none;
+  width: 15px;
+  background-color: transparent;
 }
 
 .ui-treetable-scrollable-body::-webkit-scrollbar-thumb {
-    border-radius: 8px;
-    border: 1px solid white;
-    background-color: rgba(194,194,194,.5);
+  border-radius: 8px;
+  border: 1px solid white;
+  background-color: rgba(194,194,194,.5);
 }
 
 .ui-treetable .ui-sortable-column {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-treetable .ui-sortable-column-icon {
-    display: inline-block;
-    margin: -3px 0px -3px 2px;
+  display: inline-block;
+  margin: -3px 0px -3px 2px;
 }
 
 .ui-treetable .ui-chkbox.ui-selection {
-    display: none;
+  display: none;
 }
 
 .ui-treetable .ui-treetable-selectable-node .ui-chkbox.ui-selection {
-    display: inline-block;
+  display: inline-block;
 }
 
 .ui-treetable.ui-treetable-checkbox-all  .ui-chkbox.ui-selection {
-    display: inline-block;
+  display: inline-block;
 }
 
 .ui-treetable-scrollable-theadclone {
-    height:0px;
+  height:0px;
 }
 
 .ui-treetable-scrollable-theadclone tr {
-    height:0px;
+  height:0px;
 }
 
 .ui-treetable-scrollable-theadclone th.ui-state-default {
-    height:0px;
-    border-bottom-width: 0px;
-    border-top-width: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    outline: 0 none;
+  height:0px;
+  border-bottom-width: 0px;
+  border-top-width: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  outline: 0 none;
 }
 
 .ui-treetable-scrollable-theadclone th span {
@@ -6633,75 +7067,75 @@ div.ui-button, .ui-splitbutton {
 
 /** Reflow **/
 .ui-treetable-reflow .ui-treetable-data td .ui-column-title {
-    display: none;
+  display: none;
 }
 
 @media ( max-width: 35em ) {
-    .ui-treetable-reflow thead th,
-    .ui-treetable-reflow tfoot td {
-        display: none;
-    }
+  .ui-treetable-reflow thead th,
+  .ui-treetable-reflow tfoot td {
+    display: none;
+  }
 
-    .ui-treetable-reflow .ui-treetable-data td { 
-        text-align: left;
-        display: block;
-        border: 0px none;
-        width: 100%;
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		box-sizing: border-box;
-		float: left;
-		clear: left;
-    }
+  .ui-treetable-reflow .ui-treetable-data td {
+    text-align: left;
+    display: block;
+    border: 0px none;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    clear: left;
+  }
 
-    .ui-treetable-reflow .ui-treetable-data.ui-widget-content {
-        border: 0px none;
-    }
-	
-    .ui-treetable-reflow .ui-treetable-data tr.ui-widget-content {
-        border-left: 0px none;
-        border-right: 0px none;
-    }
+  .ui-treetable-reflow .ui-treetable-data.ui-widget-content {
+    border: 0px none;
+  }
 
-    .ui-treetable-reflow .ui-treetable-data td .ui-column-title { 
-        padding: .4em; 
-        min-width: 30%; 
-        display: inline-block;
-        margin: -.4em 1em -.4em -.4em;
-    }
+  .ui-treetable-reflow .ui-treetable-data tr.ui-widget-content {
+    border-left: 0px none;
+    border-right: 0px none;
+  }
+
+  .ui-treetable-reflow .ui-treetable-data td .ui-column-title {
+    padding: .4em;
+    min-width: 30%;
+    display: inline-block;
+    margin: -.4em 1em -.4em -.4em;
+  }
 }
 
 .ui-wizard {
-	margin:0;
-	padding:0;
+  margin:0;
+  padding:0;
 }
 
 .ui-wizard-content {
-	margin:3px 0;
+  margin:3px 0;
 }
 
 .ui-wizard-navbar {
-	text-align: right;
+  text-align: right;
 }
 
-.ui-wizard-nav-back, 
+.ui-wizard-nav-back,
 .ui-wizard-nav-next {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .ui-wizard-nav-back {
-	float:left;
+  float:left;
 }
 
 .ui-wizard-nav-next {
-	float:right;
+  float:right;
 }
 
 .ui-wizard-step-title {
-    font-size: 18px;
-    margin:0 3px 0 0;
-    padding:0.4em;
-    float:left;
+  font-size: 18px;
+  margin:0 3px 0 0;
+  padding:0.4em;
+  float:left;
 }
 
 

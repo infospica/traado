@@ -42,7 +42,7 @@ public abstract class SalesAgentClaimDetailService {
   public static final void insert(Main main, SalesAgentClaimDetail scmSalesAgentClaimDetail) {
     SalesAgentClaimDetailIs.insertAble(main, scmSalesAgentClaimDetail);  //Validating
     AppService.insert(main, scmSalesAgentClaimDetail);
-    
+
   }
 
   /**
@@ -108,7 +108,7 @@ public abstract class SalesAgentClaimDetailService {
   public static final List<SalesAgentClaimDetail> selectBySalesAgentClaim(Main main, SalesAgentClaim salesAgentClaim) {
     return AppService.list(main, SalesAgentClaimDetail.class, "select * from scm_sales_agent_claim_detail where sales_agent_claim_id=?", new Object[]{salesAgentClaim.getId()});
   }
-  
+
   public static final void insertOrUpdate(Main main, List<SalesAgentClaimDetail> scmSalesAgentClaimDetail, SalesAgentClaim salesAgentClaim) {
     for (SalesAgentClaimDetail list : scmSalesAgentClaimDetail) {
       list.setSalesAgentClaimId(salesAgentClaim);

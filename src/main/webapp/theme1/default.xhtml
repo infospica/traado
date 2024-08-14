@@ -468,7 +468,7 @@
                       <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
                         <f:facet name="header">
                           <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_IN),list)}" process="@this" update="f1" immediate="true"  >
-                           <i class="fa fa-arrow-left" aria-hidden="true"></i> <h:outputText value=" #{lang.chequeInHand}" title="#{lang.chequeInHand}" />
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i> <h:outputText value=" #{lang.chequeInHand}" title="#{lang.chequeInHand}" />
                           </p:commandLink>
                         </f:facet>
                         <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_IN),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
@@ -490,31 +490,31 @@
                       </p:panelGrid>
                     </p:panel>
 
-<!--                    <p:panel id="chequePdc"  class="dashBox m-l-10" >
-                      <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
-                        <f:facet name="header">
-                          <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_OUT),list)}" process="@this" update="f1" immediate="true"  >
-                            <h:outputText value="#{lang.chequeIssued}" title="#{lang.chequeIssued}" /> <i class="fa fa-arrow-right" aria-hidden="true"></i>
-                          </p:commandLink>
-                        </f:facet>
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
-                        </p:commandLink>
-                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
-                        </p:commandLink>
-                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
-                        </p:commandLink>
-                        <h:outputText value="#{companyDashboardView.chequeIssued.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.cheque} #{lang.payment}" title="#{lang.cheque} #{lang.payment}" />
-                        </p:commandLink>                
-                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
-                       </p:panelGrid>
-                    </p:panel>-->
+                    <!--                    <p:panel id="chequePdc"  class="dashBox m-l-10" >
+                                          <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
+                                            <f:facet name="header">
+                                              <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_OUT),list)}" process="@this" update="f1" immediate="true"  >
+                                                <h:outputText value="#{lang.chequeIssued}" title="#{lang.chequeIssued}" /> <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                              </p:commandLink>
+                                            </f:facet>
+                                            <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
+                                              <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
+                                            </p:commandLink>
+                                            <h:outputText value="#{companyDashboardView.chequeIssued.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
+                                            <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
+                                              <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
+                                            </p:commandLink>
+                                            <h:outputText value="#{companyDashboardView.chequeIssued.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
+                                            <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
+                                              <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
+                                            </p:commandLink>
+                                            <h:outputText value="#{companyDashboardView.chequeIssued.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
+                                            <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
+                                              <h:outputText value="#{lang.cheque} #{lang.payment}" title="#{lang.cheque} #{lang.payment}" />
+                                            </p:commandLink>                
+                                            <h:outputText value="#{companyDashboardView.chequeIssued.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
+                                           </p:panelGrid>
+                                        </p:panel>-->
 
                   </ul>
 
@@ -523,43 +523,43 @@
 
                 </div>
                 <!--Cheque issued-->
+
+                <!--                <div class="popContent">
                 
-<!--                <div class="popContent">
-
-                  <ul class="menu m-t-5 grid-4">
-                    Cheque in Hand
-                    <p:panel id="chequeIssuedId"  class="dashBox" >
-                      <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
-                        <f:facet name="header">
-                          <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_OUT),list)}" process="@this" update="f1" immediate="true"  >
-                            <h:outputText value="#{lang.chequeIssued}" title="#{lang.chequeIssued}" />
-                          </p:commandLink>
-                        </f:facet>
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
-                        </p:commandLink>
-                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
-                        </p:commandLink>
-                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
-                        </p:commandLink>
-                        <h:outputText value="#{companyDashboardView.chequeIssued.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
-                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
-                          <h:outputText value="#{lang.cheque} #{lang.receipt}" title="#{lang.cheque} #{lang.receipt}" />
-                        </p:commandLink>                
-                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
-                      </p:panelGrid>
-                    </p:panel>
-
-                  </ul>
-
-
-
-
-                </div>-->
+                                  <ul class="menu m-t-5 grid-4">
+                                    Cheque in Hand
+                                    <p:panel id="chequeIssuedId"  class="dashBox" >
+                                      <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
+                                        <f:facet name="header">
+                                          <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_OUT),list)}" process="@this" update="f1" immediate="true"  >
+                                            <h:outputText value="#{lang.chequeIssued}" title="#{lang.chequeIssued}" />
+                                          </p:commandLink>
+                                        </f:facet>
+                                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
+                                          <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
+                                        </p:commandLink>
+                                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
+                                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
+                                          <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
+                                        </p:commandLink>
+                                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
+                                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
+                                          <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
+                                        </p:commandLink>
+                                        <h:outputText value="#{companyDashboardView.chequeIssued.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
+                                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
+                                          <h:outputText value="#{lang.cheque} #{lang.receipt}" title="#{lang.cheque} #{lang.receipt}" />
+                                        </p:commandLink>                
+                                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
+                                      </p:panelGrid>
+                                    </p:panel>
+                
+                                  </ul>
+                
+                
+                
+                
+                                </div>-->
               </div>
 
 

@@ -12,17 +12,12 @@ import java.util.List;
 import spica.constant.AccountingConstant;
 import wawo.app.common.AppService;
 import wawo.app.Main;
-import wawo.entity.core.SqlPage;
 import spica.fin.domain.AccountingBankCharges;
 import spica.fin.domain.AccountingLedger;
-import spica.scm.domain.Company;
 import spica.fin.common.FilterObjects;
 import spica.fin.domain.AccountingTransaction;
-import spica.fin.domain.AccountingTransactionDetail;
 import spica.fin.domain.AccountingTransactionDetailItem;
 import spica.fin.common.BankReconciliation;
-import static spica.fin.service.LedgerExternalDataService.getDetailItemNew;
-import wawo.app.faces.MainView;
 import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 

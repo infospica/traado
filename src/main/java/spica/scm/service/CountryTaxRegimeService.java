@@ -153,6 +153,7 @@ public abstract class CountryTaxRegimeService {
     CountryTaxRegime ctr = (CountryTaxRegime) AppService.single(main, CountryTaxRegime.class, "select * from scm_country_tax_regime where country_id = ? limit 1", new Object[]{country.getId()});
     return ctr;
   }
+
   /**
    * Validate delete.
    *

@@ -9,7 +9,6 @@ package spica.fin.service;
 
 import java.util.List;
 import spica.fin.domain.AccountingTransactionDetail;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -79,28 +78,27 @@ public abstract class AccountingTransactionSettlementService {
   public static final List<AccountingTransactionSettlement> selectByTransactionDetail(Main main, int transactionDetailItemId) {
     return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where transaction_detail_item_id = ?", new Object[]{transactionDetailItemId});
   }
-   public static final List<AccountingTransactionSettlement> selectDetailItemUsedIn(Main main, int transactionDetailItemId) {
-    return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where adjusted_transaction_detail_item_id in (select id from fin_accounting_transaction_detail_item where parent_id =?)", new Object[]{ transactionDetailItemId});
+
+  public static final List<AccountingTransactionSettlement> selectDetailItemUsedIn(Main main, int transactionDetailItemId) {
+    return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where adjusted_transaction_detail_item_id in (select id from fin_accounting_transaction_detail_item where parent_id =?)", new Object[]{transactionDetailItemId});
   }
-   
-  public static final List<AccountingTransactionSettlement> selectByTransactionDetailPayment(Main main, int transactionDetailItemId ) {
+
+  public static final List<AccountingTransactionSettlement> selectByTransactionDetailPayment(Main main, int transactionDetailItemId) {
     return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where adjusted_transaction_detail_item_id = ?", new Object[]{transactionDetailItemId});
-  } 
-  
-  public static final List<AccountingTransactionSettlement> selectByTransactionDetailPaymentAndAdjusted(Main main, int transactionDetailItemId ,AccountingTransactionDetail detail ) {
+  }
+
+  public static final List<AccountingTransactionSettlement> selectByTransactionDetailPaymentAndAdjusted(Main main, int transactionDetailItemId, AccountingTransactionDetail detail) {
     return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where adjusted_transaction_detail_item_id = ? or (transaction_detail_id = ? or adjusted_transaction_detail_id = ?)", new Object[]{transactionDetailItemId, detail.getId(), detail.getId()});
-  } 
-   
-  public static final List<AccountingTransactionSettlement> selectAdjustedOnly(Main main, int transactionDetailItemId,AccountingTransactionDetail detail ) {
-    return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where adjusted_transaction_detail_item_id != ? and (transaction_detail_id = ? or adjusted_transaction_detail_id = ?)", new Object[]{transactionDetailItemId, detail.getId(), detail.getId()});  
-  }  
-   
+  }
+
+  public static final List<AccountingTransactionSettlement> selectAdjustedOnly(Main main, int transactionDetailItemId, AccountingTransactionDetail detail) {
+    return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where adjusted_transaction_detail_item_id != ? and (transaction_detail_id = ? or adjusted_transaction_detail_id = ?)", new Object[]{transactionDetailItemId, detail.getId(), detail.getId()});
+  }
+
   public static final List<AccountingTransactionSettlement> selectByTransactionDetailReciept(Main main, int transactionDetailItemId) {
     return AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where transaction_detail_item_id = ?", new Object[]{transactionDetailItemId});
-     
-  }
- 
 
+  }
 
   /**
    * Insert AccountingTransactionSettlement.
@@ -173,7 +171,8 @@ public abstract class AccountingTransactionSettlementService {
       deleteByPk(main, e);
     }
   }
-    /**
+
+  /**
    * Validate delete.
    *
    * @param main

@@ -14,7 +14,6 @@ import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.CompanyAddress;
 import spica.scm.validate.CompanyAddressIs;
-import wawo.app.faces.MainView;
 
 /**
  * CompanyAddressService

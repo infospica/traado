@@ -10,7 +10,6 @@ package spica.fin.service;
 import java.util.List;
 import spica.fin.domain.AccountingGroup;
 import spica.fin.domain.AccountingHead;
-import static wawo.entity.util.Secure.main;
 
 import wawo.app.Main;
 import wawo.app.common.AppService;

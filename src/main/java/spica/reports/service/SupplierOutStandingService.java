@@ -1,26 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import spica.constant.AccountingConstant;
 import spica.reports.model.FilterParameters;
 import spica.reports.model.SupplierOutstanding;
-import spica.scm.common.Dashboard;
-import spica.scm.domain.Account;
 import spica.scm.domain.AccountGroup;
 import spica.scm.domain.Company;
-import spica.scm.domain.Customer;
 import spica.scm.domain.Vendor;
 import wawo.app.Main;
 import wawo.app.common.AppService;
-import wawo.app.config.AppConfig;
-import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppDb;
 

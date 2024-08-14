@@ -1,13 +1,13 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
   #{scmSalesAgentServicesView.switchScmSalesAgentServices(main, viewType)}
 
- <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
     <ui:param name="label" value="#{lang.scmSalesAgentServices}" />
     <ui:param name="ids" value="scmSalesAgentServices" />
 
     <ui:define name="deleteList" >
       <p:commandButton action="#{scmSalesAgentServicesView.deleteScmSalesAgentServices(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('scmSalesAgentServicesWidgetDelConf')" process="f1" update="f1" >
-	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
       </p:commandButton>
     </ui:define>
 
@@ -24,68 +24,68 @@
     </ui:define>   
 
     <ui:define name="form">
-	<!-- Small list combo -->
-  <!--	<p:outputLabel value="#{lang.scmSalesAgentServicesUserProfileId}" for="scmSalesAgentServicesUserProfileId" /><h:panelGroup>
-         <p:selectOneMenu value="#{scmSalesAgentServicesView.scmSalesAgentServices.userProfileId}"  id="scmSalesAgentServicesUserProfileId" converter="omnifaces.SelectItemsConverter">
-          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
-          <f:selectItems value="#{scmLookupView.scmUserProfile(main)}" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" />
-        </p:selectOneMenu><p:message for="scmSalesAgentServicesUserProfileId" display="text" /></h:panelGroup>	-->
-	<!-- Small list autocomplete -->
-	<!--  <p:outputLabel value="#{lang.scmSalesAgentServicesUserProfileId}" for="scmSalesAgentServicesUserProfileId" /><h:panelGroup>
-          <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.userProfileId}" completeMethod="#{scmLookupView.scmUserProfileAuto}"  id="scmSalesAgentServicesUserProfileId" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
-          <o:converter list="#{scmLookupView.scmUserProfile(main)}" converterId="omnifaces.ListConverter"  />
-        </p:autoComplete><p:message for="scmSalesAgentServicesUserProfileId" display="text" /></h:panelGroup> 	-->
-	<!-- Big list autocomplete -->
-        <p:outputLabel value="#{lang.scmSalesAgentServicesUserProfileId}" for="scmSalesAgentServicesUserProfileId"/><h:panelGroup>
-          <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.userProfileId}" completeMethod="#{scmSalesAgentServicesView.scmUserProfileAuto}" converter="wawo.LookupIntConverter"   id="scmSalesAgentServicesUserProfileId" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.scmUserProfileClass()}"/>
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.scmSalesAgentServicesUserProfileId}" for="scmSalesAgentServicesUserProfileId" /><h:panelGroup>
+             <p:selectOneMenu value="#{scmSalesAgentServicesView.scmSalesAgentServices.userProfileId}"  id="scmSalesAgentServicesUserProfileId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.scmUserProfile(main)}" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" />
+            </p:selectOneMenu><p:message for="scmSalesAgentServicesUserProfileId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.scmSalesAgentServicesUserProfileId}" for="scmSalesAgentServicesUserProfileId" /><h:panelGroup>
+              <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.userProfileId}" completeMethod="#{scmLookupView.scmUserProfileAuto}"  id="scmSalesAgentServicesUserProfileId" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+              <o:converter list="#{scmLookupView.scmUserProfile(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="scmSalesAgentServicesUserProfileId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+      <p:outputLabel value="#{lang.scmSalesAgentServicesUserProfileId}" for="scmSalesAgentServicesUserProfileId"/><h:panelGroup>
+        <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.userProfileId}" completeMethod="#{scmSalesAgentServicesView.scmUserProfileAuto}" converter="wawo.LookupIntConverter"   id="scmSalesAgentServicesUserProfileId" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.scmUserProfileClass()}"/>
           <f:attribute name="byid" value="#{scmLookupView.scmUserProfileById()}"/>
         </p:autoComplete><p:message for="scmSalesAgentServicesUserProfileId" display="text" /></h:panelGroup>
-	<!-- Small list combo -->
-  <!--	<p:outputLabel value="#{lang.scmSalesAgentServicesServicesId}" for="scmSalesAgentServicesServicesId" /><h:panelGroup>
-         <p:selectOneMenu value="#{scmSalesAgentServicesView.scmSalesAgentServices.servicesId}"  id="scmSalesAgentServicesServicesId" converter="omnifaces.SelectItemsConverter">
-          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
-          <f:selectItems value="#{scmLookupView.scmServices(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
-        </p:selectOneMenu><p:message for="scmSalesAgentServicesServicesId" display="text" /></h:panelGroup>	-->
-	<!-- Small list autocomplete -->
-	<!--  <p:outputLabel value="#{lang.scmSalesAgentServicesServicesId}" for="scmSalesAgentServicesServicesId" /><h:panelGroup>
-          <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.servicesId}" completeMethod="#{scmLookupView.scmServicesAuto}"  id="scmSalesAgentServicesServicesId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
-          <o:converter list="#{scmLookupView.scmServices(main)}" converterId="omnifaces.ListConverter"  />
-        </p:autoComplete><p:message for="scmSalesAgentServicesServicesId" display="text" /></h:panelGroup> 	-->
-	<!-- Big list autocomplete -->
-        <p:outputLabel value="#{lang.scmSalesAgentServicesServicesId}" for="scmSalesAgentServicesServicesId"/><h:panelGroup>
-          <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.servicesId}" completeMethod="#{scmSalesAgentServicesView.scmServicesAuto}" converter="wawo.LookupIntConverter"   id="scmSalesAgentServicesServicesId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
-            <f:attribute name="clazz" value="#{scmLookupView.scmServicesClass()}"/>
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.scmSalesAgentServicesServicesId}" for="scmSalesAgentServicesServicesId" /><h:panelGroup>
+             <p:selectOneMenu value="#{scmSalesAgentServicesView.scmSalesAgentServices.servicesId}"  id="scmSalesAgentServicesServicesId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.scmServices(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            </p:selectOneMenu><p:message for="scmSalesAgentServicesServicesId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.scmSalesAgentServicesServicesId}" for="scmSalesAgentServicesServicesId" /><h:panelGroup>
+              <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.servicesId}" completeMethod="#{scmLookupView.scmServicesAuto}"  id="scmSalesAgentServicesServicesId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+              <o:converter list="#{scmLookupView.scmServices(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="scmSalesAgentServicesServicesId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+      <p:outputLabel value="#{lang.scmSalesAgentServicesServicesId}" for="scmSalesAgentServicesServicesId"/><h:panelGroup>
+        <p:autoComplete value="#{scmSalesAgentServicesView.scmSalesAgentServices.servicesId}" completeMethod="#{scmSalesAgentServicesView.scmServicesAuto}" converter="wawo.LookupIntConverter"   id="scmSalesAgentServicesServicesId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.scmServicesClass()}"/>
           <f:attribute name="byid" value="#{scmLookupView.scmServicesById()}"/>
         </p:autoComplete><p:message for="scmSalesAgentServicesServicesId" display="text" /></h:panelGroup>
-<!--
-        <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
-        <h:panelGroup><p:calendar value="#{scmSalesAgentServicesView.scmSalesAgentServices.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
--->
-<!--
-        <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
-        <h:panelGroup><p:calendar value="#{scmSalesAgentServicesView.scmSalesAgentServices.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>
--->
-<!--            
-        <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
-        <h:panelGroup><p:inputText value="#{scmSalesAgentServicesView.scmSalesAgentServices.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>
--->
-<!--            
-        <p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
-        <h:panelGroup><p:inputText value="#{scmSalesAgentServicesView.scmSalesAgentServices.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
--->
+      <!--
+              <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+              <h:panelGroup><p:calendar value="#{scmSalesAgentServicesView.scmSalesAgentServices.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+      -->
+      <!--
+              <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+              <h:panelGroup><p:calendar value="#{scmSalesAgentServicesView.scmSalesAgentServices.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>
+      -->
+      <!--            
+              <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+              <h:panelGroup><p:inputText value="#{scmSalesAgentServicesView.scmSalesAgentServices.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>
+      -->
+      <!--            
+              <p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
+              <h:panelGroup><p:inputText value="#{scmSalesAgentServicesView.scmSalesAgentServices.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+      -->
     </ui:define>
-	
+
     <ui:define name="list">
       <p:dataTable id="scmSalesAgentServicesTable" var="scmSalesAgentServicesVar" widgetVar="scmSalesAgentServicesWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
-        lazy="true" value="#{scmSalesAgentServicesView.scmSalesAgentServicesLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{scmSalesAgentServicesVar.id}"
-        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
-        selection="#{scmSalesAgentServicesView.scmSalesAgentServicesSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+                   lazy="true" value="#{scmSalesAgentServicesView.scmSalesAgentServicesLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{scmSalesAgentServicesVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{scmSalesAgentServicesView.scmSalesAgentServicesSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{scmSalesAgentServicesVar.id}" field="scm_sales_agent_services.id" >
           <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
           <p:commandLink action="#{main.setViewType(editform)}" value="#{scmSalesAgentServicesVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
-        <f:setPropertyActionListener target="#{scmSalesAgentServicesView.scmSalesAgentServices}" value="#{scmSalesAgentServicesVar}" />
+            <f:setPropertyActionListener target="#{scmSalesAgentServicesView.scmSalesAgentServices}" value="#{scmSalesAgentServicesVar}" />
           </p:commandLink>
         </p:column>
         <p:column sortBy="#{scmSalesAgentServicesVar.userProfileId.userCode}" field="user_profile_id.user_code">
@@ -96,29 +96,29 @@
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
           <h:outputText value="#{appView.display(scmSalesAgentServicesVar.servicesId.title)}" title="#{appView.title(scmSalesAgentServicesVar.servicesId.title)}" escape="false" />
         </p:column>
-<!-- 
-        <p:column sortBy="#{scmSalesAgentServicesVar.createdAt}" field="scm_sales_agent_services.created_at" >
-          <f:facet name="header"><h:outputText value="#{lang.createdAt}" title="#{lang.createdAt}"/></f:facet>
-          <h:outputText value="#{appView.dateTime(scmSalesAgentServicesVar.createdAt)}" escape="false" />
-        </p:column> -->
+        <!-- 
+                <p:column sortBy="#{scmSalesAgentServicesVar.createdAt}" field="scm_sales_agent_services.created_at" >
+                  <f:facet name="header"><h:outputText value="#{lang.createdAt}" title="#{lang.createdAt}"/></f:facet>
+                  <h:outputText value="#{appView.dateTime(scmSalesAgentServicesVar.createdAt)}" escape="false" />
+                </p:column> -->
 
-<!-- 
-        <p:column sortBy="#{scmSalesAgentServicesVar.modifiedAt}" field="scm_sales_agent_services.modified_at" >
-          <f:facet name="header"><h:outputText value="#{lang.modifiedAt}" title="#{lang.modifiedAt}"/></f:facet>
-          <h:outputText value="#{appView.dateTime(scmSalesAgentServicesVar.modifiedAt)}" escape="false" />
-        </p:column> -->
+        <!-- 
+                <p:column sortBy="#{scmSalesAgentServicesVar.modifiedAt}" field="scm_sales_agent_services.modified_at" >
+                  <f:facet name="header"><h:outputText value="#{lang.modifiedAt}" title="#{lang.modifiedAt}"/></f:facet>
+                  <h:outputText value="#{appView.dateTime(scmSalesAgentServicesVar.modifiedAt)}" escape="false" />
+                </p:column> -->
 
-<!-- 
-        <p:column sortBy="#{scmSalesAgentServicesVar.createdBy}" field="scm_sales_agent_services.created_by">
-          <f:facet name="header"><h:outputText value="#{lang.createdBy}" title="#{lang.createdBy}"/></f:facet>
-          <h:outputText value="#{appView.display(scmSalesAgentServicesVar.createdBy)}" title="#{appView.title(scmSalesAgentServicesVar.createdBy)}" escape="false" />
-        </p:column> -->
+        <!-- 
+                <p:column sortBy="#{scmSalesAgentServicesVar.createdBy}" field="scm_sales_agent_services.created_by">
+                  <f:facet name="header"><h:outputText value="#{lang.createdBy}" title="#{lang.createdBy}"/></f:facet>
+                  <h:outputText value="#{appView.display(scmSalesAgentServicesVar.createdBy)}" title="#{appView.title(scmSalesAgentServicesVar.createdBy)}" escape="false" />
+                </p:column> -->
 
-<!-- 
-        <p:column sortBy="#{scmSalesAgentServicesVar.modifiedBy}" field="scm_sales_agent_services.modified_by">
-          <f:facet name="header"><h:outputText value="#{lang.modifiedBy}" title="#{lang.modifiedBy}"/></f:facet>
-          <h:outputText value="#{appView.display(scmSalesAgentServicesVar.modifiedBy)}" title="#{appView.title(scmSalesAgentServicesVar.modifiedBy)}" escape="false" />
-        </p:column> -->
+        <!-- 
+                <p:column sortBy="#{scmSalesAgentServicesVar.modifiedBy}" field="scm_sales_agent_services.modified_by">
+                  <f:facet name="header"><h:outputText value="#{lang.modifiedBy}" title="#{lang.modifiedBy}"/></f:facet>
+                  <h:outputText value="#{appView.display(scmSalesAgentServicesVar.modifiedBy)}" title="#{appView.title(scmSalesAgentServicesVar.modifiedBy)}" escape="false" />
+                </p:column> -->
 
       </p:dataTable> 	
     </ui:define>   

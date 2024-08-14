@@ -390,8 +390,8 @@ public abstract class UserProfileService {
   public static UserProfile getUserProfileForSalesAgent(Main main, SalesAgent salesAgent) {
     return (UserProfile) AppService.single(main, UserProfile.class, "select * from scm_user_profile where sales_agent_id=?", new Object[]{salesAgent.getId()});
   }
-  
-    public static UserProfile getUserProfileForExternalUser(Main main, ExternalUser externalUser) {
+
+  public static UserProfile getUserProfileForExternalUser(Main main, ExternalUser externalUser) {
     return (UserProfile) AppService.single(main, UserProfile.class, "select * from scm_user_profile where external_user_id=?", new Object[]{externalUser.getId()});
   }
 }

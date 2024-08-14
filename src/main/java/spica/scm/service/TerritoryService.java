@@ -23,7 +23,6 @@ import spica.scm.domain.UserProfile;
 import spica.scm.validate.ValidateUtil;
 import wawo.app.faces.AppLookup;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.core.UserMessageException;
 import wawo.entity.util.StringUtil;
 

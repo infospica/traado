@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.notification;
 
@@ -135,10 +135,11 @@ public class Notify {
           //TODO if the company setting email is empty use Default mail send
           SmtpMail m = new SmtpMail(AppConfig.mailSetting);
           m.setSubject(subject);
-          if(html)
-          m.addContentHtml(content);
-          else
+          if (html) {
+            m.addContentHtml(content);
+          } else {
             m.addContentText(content);
+          }
           if (filePath != null) {
             m.addAttachment(AppIo.getPrivateFolder("") + filePath);
           }

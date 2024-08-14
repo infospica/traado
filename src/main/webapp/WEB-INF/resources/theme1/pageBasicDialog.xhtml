@@ -10,20 +10,20 @@
   <ui:include src="com/navDialog.xhtml" />
   <h:panelGroup id="#{ids}F" rendered="#{main.isForm()}" styleClass="card"  layout="block">
     <ui:include src="com/toolForm.xhtml" />
-      <p:panelGrid columns="#{cols eq null ? 2 : cols}" layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
-        <ui:insert name="form" />
-      </p:panelGrid> 
+    <p:panelGrid columns="#{cols eq null ? 2 : cols}" layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+      <ui:insert name="form" />
+    </p:panelGrid> 
     <ui:insert name="afterForm"/>
-    </h:panelGroup>
+  </h:panelGroup>
   <h:panelGroup id="#{ids}L" rendered="#{main.isList()}" styleClass="card p-a-0" layout="block">
     <ui:include src="com/toolList.xhtml" />
-      <ui:insert name="list" />
-    </h:panelGroup>
-    <ui:insert name="after"/>
+    <ui:insert name="list" />
+  </h:panelGroup>
+  <ui:insert name="after"/>
 
   <p:commandButton id="noSubmitF" process="@none" type="button" style="display:none"/>
   <p:defaultCommand target="noSubmitF"/>
-    <ui:include src="com/toolFooter.xhtml"/>
+  <ui:include src="com/toolFooter.xhtml"/>
 </ui:composition>
 
 

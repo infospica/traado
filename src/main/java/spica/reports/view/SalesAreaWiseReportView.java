@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
@@ -128,8 +128,8 @@ public class SalesAreaWiseReportView implements Serializable {
       CellStyle colHeadLeft = ExcelUtil.styleBold(workbook, HorizontalAlignment.LEFT);
       CellStyle groupHead = ExcelUtil.styleBold(workbook, HorizontalAlignment.LEFT);
       CellStyle regular = ExcelUtil.style(workbook, HorizontalAlignment.LEFT);
-      CellStyle regularRightRed =  ExcelUtil.styleRed(workbook, HorizontalAlignment.RIGHT);
-      CellStyle regularRed =  ExcelUtil.styleRed(workbook, HorizontalAlignment.LEFT);
+      CellStyle regularRightRed = ExcelUtil.styleRed(workbook, HorizontalAlignment.RIGHT);
+      CellStyle regularRed = ExcelUtil.styleRed(workbook, HorizontalAlignment.LEFT);
 
       int rowId = 0, colWidth = 1500, size = 1, cellId = 0;
       row = sheet.createRow(rowId);

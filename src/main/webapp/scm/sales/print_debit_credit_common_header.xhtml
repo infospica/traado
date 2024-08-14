@@ -1,141 +1,141 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" > 
   <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANTS" />
-   
-<p:fragment rendered="#{debitCreditNotePrintView.printType eq SYSTEM_CONSTANTS.PRINT_PORTRAIT}">
-     
-        <p:fragment rendered="#{debitCreditNotePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP}" >
-        <tr>
-          <td>
-            <div class="dataTitle" style="text-align: center;border: none;width:100%;padding-bottom:5px;font-size: 12px;">
-              <b> 
-                  #{debitCreditNotePrintView.headerLabel}
-              </b>
-            </div>
-          </td>
-        </tr>
-      </p:fragment> 
+
+  <p:fragment rendered="#{debitCreditNotePrintView.printType eq SYSTEM_CONSTANTS.PRINT_PORTRAIT}">
+
+    <p:fragment rendered="#{debitCreditNotePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP}" >
       <tr>
-        <td>          
-          <div  style="text-align: center;border: solid 1px #000;width:100%; 
-                border-bottom:#{debitCreditNotePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP ? 'none':'solid 1px'};">
-            <table border="0" style="width:100%;">
-              <tr>
-                <td align="left" valign="top" style="width:220px;">
-                  <div class="data" style="padding:5px;">
-                    <table>
-                      <tr>
-                        <td>
-                          <span class="dataTitle" style="font-size: 10px;"><b>#{debitCreditNotePrintView.debitCreditNote.companyId.companyName}</b> </span><br/>
-                          <span>#{debitCreditNotePrintView.companyAddress.address}</span><br/>                    
-                          <span>#{debitCreditNotePrintView.companyAddress.districtId.districtName},</span>
-                          <span>#{debitCreditNotePrintView.companyAddress.stateId.stateName},&#160;</span>
-                          <span>#{lang.pin}: #{debitCreditNotePrintView.companyAddress.pin}</span> <br />
-                          <span>Phone: <span>#{debitCreditNotePrintView.companyAddress.phone1}</span></span><br />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="left"><br />
-                          <table class="data" style="padding-top: 5px;">
-                      <tr>
-                        <td align="left" valign="top">GST No.</td>
-                        <td align="left" valign="top">:</td>
-                        <td align="left" valign="top"><div class="data" style="text-transform: uppercase;" >#{debitCreditNotePrintView.debitCreditNote.companyId.gstNo}</div></td>
-                      </tr>
-                      <tr>
-                        <td align="left" valign="top">PAN No.</td>
-                        <td align="left" valign="top">:</td>
-                        <td align="left" valign="top" style="text-transform: uppercase;">#{debitCreditNotePrintView.debitCreditNote.companyId.panNo}</td>
-                      </tr>
-                      <tr>
-                        <td align="left" valign="top">FSSAI No.</td>
-                        <td align="left" valign="top">:</td>
-                        <td align="left" valign="top" style="text-transform: uppercase;line-height: normal;">
-                          <p:repeat value="#{debitCreditNotePrintView.companyLicenseList}" var="license">
-                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
-                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
-                            </p:fragment>
-                          </p:repeat>  
-                        </td>  
-                      </tr>                     
-                      <tr>
-                        <td align="left" valign="top">D.L NO.</td>
-                        <td align="left" valign="top">:</td>
-                        <td align="left" valign="top" style="line-height: normal;">
-                          <p:repeat value="#{debitCreditNotePrintView.companyLicenseList}" var="license">
-                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
-                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
-                            </p:fragment>
-                          </p:repeat>  
-                        </td>
-                      </tr>
-                    </table>
-                        </td>
-                      </tr>
-                    </table>  
-                    
-                   
-                  </div>
-                </td>
-                <td align="left" valign="top" style="width:190px;">
-                  <div style="padding-right: 5px;padding-left: 30px;padding-top: 5px;" class="data">
-                    <span class="dataTitle"><b>#{debitCreditNotePrintView.debitCreditNote.accountingLedgerId.title}</b></span><br />
-                    <h:outputText value="#{debitCreditNotePrintView.address} , " rendered="#{debitCreditNotePrintView.address != null }" />
-                    <h:outputText value="#{debitCreditNotePrintView.state}" rendered="#{debitCreditNotePrintView.state != null }" /><br/>
-                    <table>                      
-                      <tr>
-                        <td>#{lang.gstNo} #{lang.no}</td><td>:</td><td><h:outputText value="#{debitCreditNotePrintView.gst}" rendered="#{debitCreditNotePrintView.gst != null }" /></td>
-                      </tr>
-                      <tr>
-                        <td>#{lang.fssaiNo}</td><td>:</td><td><h:outputText value="#{debitCreditNotePrintView.fssai}" rendered="#{debitCreditNotePrintView.fssai != null }" /></td>
-                      </tr>
-                      <tr>
-                        <td>#{lang.dlno}</td><td>:</td><td></td>
-                      </tr>
-                    </table>
-                  </div>
-                </td>
-                <td align="right" valign="top" style="">
-                  <div style="padding-top: 5px;width:100%;padding-right:5px;">
-                    <table class="data"  border="0">
-                      <tr>
-                        <td align="left" valign="top" style="width:40px;"><span style="font-size: 10px;"><b>Bill No.</b></span></td>
-                        <td align="left" valign="top">:</td>
-                        <td><span style="font-size: 10px;"><b>#{debitCreditNotePrintView.debitCreditNote.documentNo}</b></span></td>
-                      </tr>
-                      <tr>
-                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Date</b></span></td>
-                        <td align="left" valign="top">:</td>
-                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(debitCreditNotePrintView.debitCreditNote.invoiceDate)}"  /></b></span></td>
-                      </tr>
-                      <tr>
-                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Due Date</b></span></td>
-                        <td align="left" valign="top">:</td>
-                        <td><span style="font-size: 10px;">
-                                <!--<b><h:outputText value="#{appView.date(debitCreditNotePrintView.getDueDate())}" /></b>-->
-                          </span></td>
-                      </tr>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-            </table>
+        <td>
+          <div class="dataTitle" style="text-align: center;border: none;width:100%;padding-bottom:5px;font-size: 12px;">
+            <b> 
+              #{debitCreditNotePrintView.headerLabel}
+            </b>
           </div>
         </td>
       </tr>
-      <p:fragment rendered="#{debitCreditNotePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_MIDDLE}" >
-        <tr>
-          <td>
-            <div class="dataTitle" style="text-align: center;border: solid 1px #000; border-top: none;border-bottom: none;width:100%;padding:5px;font-size: 12px;">
-              <b> 
-                 #{debitCreditNotePrintView.headerLabel}
-              </b>
-            </div>
-          </td>
-        </tr>
-      </p:fragment> 
-      
-      
-      
+    </p:fragment> 
+    <tr>
+      <td>          
+        <div  style="text-align: center;border: solid 1px #000;width:100%;
+              border-bottom:#{debitCreditNotePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP ? 'none':'solid 1px'};">
+          <table border="0" style="width:100%;">
+            <tr>
+              <td align="left" valign="top" style="width:220px;">
+                <div class="data" style="padding:5px;">
+                  <table>
+                    <tr>
+                      <td>
+                        <span class="dataTitle" style="font-size: 10px;"><b>#{debitCreditNotePrintView.debitCreditNote.companyId.companyName}</b> </span><br/>
+                        <span>#{debitCreditNotePrintView.companyAddress.address}</span><br/>                    
+                        <span>#{debitCreditNotePrintView.companyAddress.districtId.districtName},</span>
+                        <span>#{debitCreditNotePrintView.companyAddress.stateId.stateName},&#160;</span>
+                        <span>#{lang.pin}: #{debitCreditNotePrintView.companyAddress.pin}</span> <br />
+                        <span>Phone: <span>#{debitCreditNotePrintView.companyAddress.phone1}</span></span><br />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="left"><br />
+                        <table class="data" style="padding-top: 5px;">
+                          <tr>
+                            <td align="left" valign="top">GST No.</td>
+                            <td align="left" valign="top">:</td>
+                            <td align="left" valign="top"><div class="data" style="text-transform: uppercase;" >#{debitCreditNotePrintView.debitCreditNote.companyId.gstNo}</div></td>
+                          </tr>
+                          <tr>
+                            <td align="left" valign="top">PAN No.</td>
+                            <td align="left" valign="top">:</td>
+                            <td align="left" valign="top" style="text-transform: uppercase;">#{debitCreditNotePrintView.debitCreditNote.companyId.panNo}</td>
+                          </tr>
+                          <tr>
+                            <td align="left" valign="top">FSSAI No.</td>
+                            <td align="left" valign="top">:</td>
+                            <td align="left" valign="top" style="text-transform: uppercase;line-height: normal;">
+                              <p:repeat value="#{debitCreditNotePrintView.companyLicenseList}" var="license">
+                                <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                                  <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                                </p:fragment>
+                              </p:repeat>  
+                            </td>  
+                          </tr>                     
+                          <tr>
+                            <td align="left" valign="top">D.L NO.</td>
+                            <td align="left" valign="top">:</td>
+                            <td align="left" valign="top" style="line-height: normal;">
+                              <p:repeat value="#{debitCreditNotePrintView.companyLicenseList}" var="license">
+                                <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                                  <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                                </p:fragment>
+                              </p:repeat>  
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>  
+
+
+                </div>
+              </td>
+              <td align="left" valign="top" style="width:190px;">
+                <div style="padding-right: 5px;padding-left: 30px;padding-top: 5px;" class="data">
+                  <span class="dataTitle"><b>#{debitCreditNotePrintView.debitCreditNote.accountingLedgerId.title}</b></span><br />
+                  <h:outputText value="#{debitCreditNotePrintView.address} , " rendered="#{debitCreditNotePrintView.address != null }" />
+                  <h:outputText value="#{debitCreditNotePrintView.state}" rendered="#{debitCreditNotePrintView.state != null }" /><br/>
+                  <table>                      
+                    <tr>
+                      <td>#{lang.gstNo} #{lang.no}</td><td>:</td><td><h:outputText value="#{debitCreditNotePrintView.gst}" rendered="#{debitCreditNotePrintView.gst != null }" /></td>
+                    </tr>
+                    <tr>
+                      <td>#{lang.fssaiNo}</td><td>:</td><td><h:outputText value="#{debitCreditNotePrintView.fssai}" rendered="#{debitCreditNotePrintView.fssai != null }" /></td>
+                    </tr>
+                    <tr>
+                      <td>#{lang.dlno}</td><td>:</td><td></td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+              <td align="right" valign="top" style="">
+                <div style="padding-top: 5px;width:100%;padding-right:5px;">
+                  <table class="data"  border="0">
+                    <tr>
+                      <td align="left" valign="top" style="width:40px;"><span style="font-size: 10px;"><b>Bill No.</b></span></td>
+                      <td align="left" valign="top">:</td>
+                      <td><span style="font-size: 10px;"><b>#{debitCreditNotePrintView.debitCreditNote.documentNo}</b></span></td>
+                    </tr>
+                    <tr>
+                      <td align="left" valign="top"><span style="font-size: 10px;"><b>Date</b></span></td>
+                      <td align="left" valign="top">:</td>
+                      <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(debitCreditNotePrintView.debitCreditNote.invoiceDate)}"  /></b></span></td>
+                    </tr>
+                    <tr>
+                      <td align="left" valign="top" ><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                      <td align="left" valign="top">:</td>
+                      <td><span style="font-size: 10px;">
+                              <!--<b><h:outputText value="#{appView.date(debitCreditNotePrintView.getDueDate())}" /></b>-->
+                        </span></td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+    <p:fragment rendered="#{debitCreditNotePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_MIDDLE}" >
+      <tr>
+        <td>
+          <div class="dataTitle" style="text-align: center;border: solid 1px #000; border-top: none;border-bottom: none;width:100%;padding:5px;font-size: 12px;">
+            <b> 
+              #{debitCreditNotePrintView.headerLabel}
+            </b>
+          </div>
+        </td>
+      </tr>
+    </p:fragment> 
+
+
+
   </p:fragment>
 
 </ui:composition>

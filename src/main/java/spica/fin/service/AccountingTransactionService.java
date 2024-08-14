@@ -24,7 +24,6 @@ import spica.fin.domain.TradeOutstanding;
 import spica.fin.domain.VendorClaim;
 
 import static spica.fin.service.AccountingTransactionDetailService.selectByTransaction;
-import spica.sys.UserRuntimeView;
 import wawo.app.Main;
 import wawo.app.common.AppService;
 import wawo.entity.core.SqlPage;
@@ -221,12 +220,12 @@ public abstract class AccountingTransactionService {
             AccountingTransactionDetailItem partItem = new AccountingTransactionDetailItem(item);
             partItem.setAccountingTransactionDetailId(d);
             partItem.setParentId(null);
-              //in case these is adjustment with bill and balance is 0 then making as payable for another party
+            //in case these is adjustment with bill and balance is 0 then making as payable for another party
             partItem.setBalanceAmount(item.getNetAmount());
             partItem.setStatus(AccountingConstant.STATUS_NEW); //setting to new
-             setPayOrReceive(tran, partItem);
+            setPayOrReceive(tran, partItem);
             //  setPayOrReceive(tran, partItem);//  partItem.setStatus(AccountingConstant.STATUS_PARTIAL_PROCESSED);
-           // partItem.setRecordType(item.getRecordType() == AccountingConstant.RECORD_TYPE_RECEIVABLE ? AccountingConstant.RECORD_TYPE_PAYABLE : AccountingConstant.RECORD_TYPE_RECEIVABLE);
+            // partItem.setRecordType(item.getRecordType() == AccountingConstant.RECORD_TYPE_RECEIVABLE ? AccountingConstant.RECORD_TYPE_PAYABLE : AccountingConstant.RECORD_TYPE_RECEIVABLE);
             AccountingTransactionDetailItemService.insertOrUpdate(main, partItem);
             //  partItem.setStatus(AccountingConstant.STATUS_PARTIAL_PROCESSED);
           }
@@ -327,7 +326,7 @@ public abstract class AccountingTransactionService {
     AppService.deleteSql(main, AccountingTransactionDetail.class, "delete from fin_accounting_transaction_detail where accounting_transaction_id=?", new Object[]{accountingTransaction.getId()});
     // AppService.deleteSql(main, AccountingTransaction.class, "delete from fin_accounting_transaction where id=?", new Object[]{accountingTransaction.getId()});
     AppService.deleteSql(main, TradeOutstanding.class, "delete from fin_trade_outstanding where parent_id in (select id from fin_trade_outstanding where accounting_transaction_id=? )",
-      new Object[]{accountingTransaction.getId()});
+            new Object[]{accountingTransaction.getId()});
     AppService.deleteSql(main, TradeOutstanding.class, "delete from fin_trade_outstanding where accounting_transaction_id=?", new Object[]{accountingTransaction.getId()});
     //  AppService.deleteSql(main, TradeOutstandingTax.class, "delete from fin_trade_outstanding_tax where accounting_transaction_id=?", new Object[]{accountingTransaction.getId()});
 
@@ -363,15 +362,16 @@ public abstract class AccountingTransactionService {
     boolean hasOpening = false;
     for (AccountingTransactionDetail detail : detailList) {
       if (AccountingConstant.LEDGER_CODE_OPENING_ENTRY.equalsIgnoreCase(detail.getAccountingLedgerId().getLedgerCode())) {
-        hasOpening = true; break;
+        hasOpening = true;
+        break;
       }
     }
     int i = 0;
     for (AccountingTransactionDetail detail : detailList) {
-  //    if(i == 0)
-  //      main.em().update(detail); //Dummy update to start transaction
+      //    if(i == 0)
+      //      main.em().update(detail); //Dummy update to start transaction
       List<AccountingTransactionSettlement> slist = AppService.list(main, AccountingTransactionSettlement.class, "select * from fin_accounting_transaction_settlement where transaction_detail_id = ?", new Object[]{detail.getId()});
-      
+
       i++;
       updateSettlementBalance(main, slist);
       main.clear();

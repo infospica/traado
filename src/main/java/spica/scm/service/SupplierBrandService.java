@@ -20,7 +20,6 @@ import wawo.entity.core.SqlPage;
 import spica.scm.domain.SupplierBrand;
 import spica.scm.domain.Vendor;
 import spica.scm.validate.SupplierBrandIs;
-import wawo.entity.core.AppDb;
 
 /**
  * SupplierBrandService

@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import wawo.entity.core.UserMessageException;
 
 /**
  * PurchaseReturnStatusService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed May 25 13:23:32 IST 2016 
+ * @version	1.0, Wed May 25 13:23:32 IST 2016
  */
+public abstract class PurchaseReturnStatusService {
 
-public abstract class PurchaseReturnStatusService {  
- 
- /**
+  /**
    * PurchaseReturnStatus paginated query.
    *
    * @param main
@@ -36,19 +34,20 @@ public abstract class PurchaseReturnStatusService {
     sql.count("select count(scm_purchase_return_status.id) from scm_purchase_return_status scm_purchase_return_status"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_purchase_return_status.title","scm_purchase_return_status.created_by","scm_purchase_return_status.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_purchase_return_status.id","scm_purchase_return_status.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_purchase_return_status.created_at","scm_purchase_return_status.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_purchase_return_status.title", "scm_purchase_return_status.created_by", "scm_purchase_return_status.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_purchase_return_status.id", "scm_purchase_return_status.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_purchase_return_status.created_at", "scm_purchase_return_status.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of PurchaseReturnStatus.
-  * @param main
-  * @return List of PurchaseReturnStatus
-  */
+
+  /**
+   * Return List of PurchaseReturnStatus.
+   *
+   * @param main
+   * @return List of PurchaseReturnStatus
+   */
   public static final List<PurchaseReturnStatus> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getPurchaseReturnStatusSqlPaged(main));
+    return AppService.listPagedJpa(main, getPurchaseReturnStatusSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class PurchaseReturnStatusService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select PurchaseReturnStatus by key.
-  * @param main
-  * @param purchaseReturnStatus
-  * @return PurchaseReturnStatus
-  */
+  /**
+   * Select PurchaseReturnStatus by key.
+   *
+   * @param main
+   * @param purchaseReturnStatus
+   * @return PurchaseReturnStatus
+   */
   public static final PurchaseReturnStatus selectByPk(Main main, PurchaseReturnStatus purchaseReturnStatus) {
     return (PurchaseReturnStatus) AppService.find(main, PurchaseReturnStatus.class, purchaseReturnStatus.getId());
   }
 
- /**
-  * Insert PurchaseReturnStatus.
-  * @param main
-  * @param purchaseReturnStatus
-  */
+  /**
+   * Insert PurchaseReturnStatus.
+   *
+   * @param main
+   * @param purchaseReturnStatus
+   */
   public static final void insert(Main main, PurchaseReturnStatus purchaseReturnStatus) {
     insertAble(main, purchaseReturnStatus);  //Validating
     AppService.insert(main, purchaseReturnStatus);
 
   }
 
- /**
-  * Update PurchaseReturnStatus by key.
-  * @param main
-  * @param purchaseReturnStatus
-  * @return PurchaseReturnStatus
-  */
+  /**
+   * Update PurchaseReturnStatus by key.
+   *
+   * @param main
+   * @param purchaseReturnStatus
+   * @return PurchaseReturnStatus
+   */
   public static final PurchaseReturnStatus updateByPk(Main main, PurchaseReturnStatus purchaseReturnStatus) {
     updateAble(main, purchaseReturnStatus); //Validating
     return (PurchaseReturnStatus) AppService.update(main, purchaseReturnStatus);
@@ -106,9 +107,8 @@ public abstract class PurchaseReturnStatusService {
   public static void insertOrUpdate(Main main, PurchaseReturnStatus purchaseReturnStatus) {
     if (purchaseReturnStatus.getId() == null) {
       insert(main, purchaseReturnStatus);
-    }
-    else{
-        updateByPk(main, purchaseReturnStatus);
+    } else {
+      updateByPk(main, purchaseReturnStatus);
     }
   }
 
@@ -123,27 +123,30 @@ public abstract class PurchaseReturnStatusService {
     insert(main, purchaseReturnStatus);
   }
 
- /**
-  * Delete PurchaseReturnStatus.
-  * @param main
-  * @param purchaseReturnStatus
-  */
+  /**
+   * Delete PurchaseReturnStatus.
+   *
+   * @param main
+   * @param purchaseReturnStatus
+   */
   public static final void deleteByPk(Main main, PurchaseReturnStatus purchaseReturnStatus) {
     deleteAble(main, purchaseReturnStatus); //Validation
     AppService.delete(main, PurchaseReturnStatus.class, purchaseReturnStatus.getId());
   }
-	
- /**
-  * Delete Array of PurchaseReturnStatus.
-  * @param main
-  * @param purchaseReturnStatus
-  */
+
+  /**
+   * Delete Array of PurchaseReturnStatus.
+   *
+   * @param main
+   * @param purchaseReturnStatus
+   */
   public static final void deleteByPkArray(Main main, PurchaseReturnStatus[] purchaseReturnStatus) {
     for (PurchaseReturnStatus e : purchaseReturnStatus) {
       deleteByPk(main, e);
     }
   }
-   /**
+
+  /**
    * Validate delete.
    *
    * @param main

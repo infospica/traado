@@ -13,15 +13,12 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -103,11 +100,11 @@ public class ConsignmentReferenceView implements Serializable {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
-          
+
           getConsignmentReference().reset();
 //          getConsignmentReference().setConsignmentId(parent);
-          POList=null;
-          PRList=null;
+          POList = null;
+          PRList = null;
         } else if (ViewType.editform.toString().equals(viewType)) {
           setConsignmentReference((ConsignmentReference) ConsignmentReferenceService.selectByPk(main, getConsignmentReference()));
         } else if (ViewType.list.toString().equals(viewType)) {
@@ -388,7 +385,6 @@ public class ConsignmentReferenceView implements Serializable {
     }
     return null;
   }
-  
 
   public void consignmentPODialogClose() {
     Jsf.popupReturn(parent, null);
@@ -414,10 +410,6 @@ public class ConsignmentReferenceView implements Serializable {
   public void setPurchaseReturnSelected(PurchaseReturn[] purchaseReturnSelected) {
     this.purchaseReturnSelected = purchaseReturnSelected;
   }
-  
-  
-  
-  
 
   public String insertConsignmentPR(MainView main) {
     try {
@@ -430,10 +422,12 @@ public class ConsignmentReferenceView implements Serializable {
     }
     return null;
   }
+
   public void consignmentReferencePOPopupReturned() {
     POList = null; // Reset to null to fetch updated list
   }
- public void consignmentReferencePRDialogReturn(SelectEvent event) {
+
+  public void consignmentReferencePRDialogReturn(SelectEvent event) {
     Jsf.closeDialog(getConsignmentReference());
     PRList = null; // Reset to null to fetch updated list
   }

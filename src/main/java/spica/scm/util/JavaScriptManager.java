@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.util;
 
@@ -18,42 +18,42 @@ import javax.script.ScriptException;
  *
  * @author java-2
  */
-public class JavaScriptManager {  
+public class JavaScriptManager {
 
   /**
    * Returns Java script engine.
-   * 
+   *
    * @param scriptFile
    * @return
    * @throws ScriptException
    * @throws IOException
-   * @throws NoSuchMethodException 
+   * @throws NoSuchMethodException
    */
-  public static  ScriptEngine getScriptEngine(String scriptFile) throws ScriptException, IOException, NoSuchMethodException {
+  public static ScriptEngine getScriptEngine(String scriptFile) throws ScriptException, IOException, NoSuchMethodException {
     ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-    ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");    
+    ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
     // reads java script file
     scriptEngine.eval(Files.newBufferedReader(Paths.get(scriptFile), StandardCharsets.UTF_8));
 
     return scriptEngine;
   }
-  
+
   /**
    * Method calls java script function and returns the returned value from java script function
-   * 
+   *
    * @param scriptEngine
    * @param functionName
    * @param params
    * @return
    * @throws ScriptException
-   * @throws NoSuchMethodException 
+   * @throws NoSuchMethodException
    */
   public static Object invokeFunction(ScriptEngine scriptEngine, String functionName, Object... params) throws ScriptException, NoSuchMethodException {
     Object rvalue = null;
-    if(scriptEngine != null){      
+    if (scriptEngine != null) {
       Invocable invocable = (Invocable) scriptEngine;
       rvalue = invocable.invokeFunction(functionName, params);
     }
-    return rvalue;    
+    return rvalue;
   }
 }

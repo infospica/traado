@@ -76,7 +76,7 @@
                    lazy="true" value="#{taxProcessorView.taxProcessorLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{taxProcessorVar.id}"
                    rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
                    selection="#{taxProcessorView.taxProcessorSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
-        
+
         <p:column selectionMode="multiple" exportable="false" />
 
         <!-- Title -->

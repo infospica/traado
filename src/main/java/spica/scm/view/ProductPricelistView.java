@@ -7,7 +7,6 @@
  */
 package spica.scm.view;
 
-import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import spica.scm.common.PriceListDetails;
 import spica.scm.domain.Account;
 import spica.scm.domain.AccountGroup;
 import wawo.app.config.ViewType;
@@ -33,7 +31,6 @@ import spica.scm.service.ProductPricelistService;
 import spica.scm.domain.AccountGroupPriceList;
 import spica.scm.domain.ProductPriceListVo;
 import spica.scm.service.AccountGroupPriceListService;
-import spica.scm.util.ProductUtil;
 import spica.sys.SystemConstants;
 
 import wawo.app.faces.Jsf;

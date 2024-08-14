@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.service;
 
 import java.util.List;
@@ -19,13 +18,13 @@ import wawo.entity.util.StringUtil;
 
 /**
  * BankAccountTypeService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed Mar 30 12:35:28 IST 2016 
+ * @version	1.0, Wed Mar 30 12:35:28 IST 2016
  */
+public abstract class BankAccountTypeService {
 
-public abstract class BankAccountTypeService {  
- 
- /**
+  /**
    * BankAccountType paginated query.
    *
    * @param main
@@ -37,19 +36,20 @@ public abstract class BankAccountTypeService {
     sql.count("select count(scm_bank_account_type.id) from scm_bank_account_type scm_bank_account_type"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_bank_account_type.title","scm_bank_account_type.created_by","scm_bank_account_type.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_bank_account_type.id","scm_bank_account_type.sort_order"}); //Number search or sort fields
-    sql.date(new String[]{"scm_bank_account_type.created_at","scm_bank_account_type.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_bank_account_type.title", "scm_bank_account_type.created_by", "scm_bank_account_type.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_bank_account_type.id", "scm_bank_account_type.sort_order"}); //Number search or sort fields
+    sql.date(new String[]{"scm_bank_account_type.created_at", "scm_bank_account_type.modified_at"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of BankAccountType.
-  * @param main
-  * @return List of BankAccountType
-  */
+
+  /**
+   * Return List of BankAccountType.
+   *
+   * @param main
+   * @return List of BankAccountType
+   */
   public static final List<BankAccountType> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getBankAccountTypeSqlPaged(main));
+    return AppService.listPagedJpa(main, getBankAccountTypeSqlPaged(main));
   }
 
 //  /**
@@ -65,34 +65,36 @@ public abstract class BankAccountTypeService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select BankAccountType by key.
-  * @param main
-  * @param bankAccountType
-  * @return BankAccountType
-  */
+  /**
+   * Select BankAccountType by key.
+   *
+   * @param main
+   * @param bankAccountType
+   * @return BankAccountType
+   */
   public static final BankAccountType selectByPk(Main main, BankAccountType bankAccountType) {
     return (BankAccountType) AppService.find(main, BankAccountType.class, bankAccountType.getId());
   }
 
- /**
-  * Insert BankAccountType.
-  * @param main
-  * @param bankAccountType
-  */
+  /**
+   * Insert BankAccountType.
+   *
+   * @param main
+   * @param bankAccountType
+   */
   public static final void insert(Main main, BankAccountType bankAccountType) {
     insertAble(main, bankAccountType);  //Validating
     AppService.insert(main, bankAccountType);
 
   }
 
- /**
-  * Update BankAccountType by key.
-  * @param main
-  * @param bankAccountType
-  * @return BankAccountType
-  */
+  /**
+   * Update BankAccountType by key.
+   *
+   * @param main
+   * @param bankAccountType
+   * @return BankAccountType
+   */
   public static final BankAccountType updateByPk(Main main, BankAccountType bankAccountType) {
     updateAble(main, bankAccountType); //Validating
     return (BankAccountType) AppService.update(main, bankAccountType);
@@ -108,7 +110,7 @@ public abstract class BankAccountTypeService {
     if (bankAccountType.getId() == null) {
       insert(main, bankAccountType);
     } else {
-    updateByPk(main, bankAccountType);
+      updateByPk(main, bankAccountType);
     }
   }
 
@@ -123,31 +125,33 @@ public abstract class BankAccountTypeService {
     insert(main, bankAccountType);
   }
 
- /**
-  * Delete BankAccountType.
-  * @param main
-  * @param bankAccountType
-  */
+  /**
+   * Delete BankAccountType.
+   *
+   * @param main
+   * @param bankAccountType
+   */
   public static final void deleteByPk(Main main, BankAccountType bankAccountType) {
     AppService.delete(main, BankAccountType.class, bankAccountType.getId());
   }
-	
- /**
-  * Delete Array of BankAccountType.
-  * @param main
-  * @param bankAccountType
-  */
+
+  /**
+   * Delete Array of BankAccountType.
+   *
+   * @param main
+   * @param bankAccountType
+   */
   public static final void deleteByPkArray(Main main, BankAccountType[] bankAccountType) {
     for (BankAccountType e : bankAccountType) {
       deleteByPk(main, e);
     }
   }
-  
-  public static BankAccountType selectBankAccountTypeBySortOrder(Main main){
+
+  public static BankAccountType selectBankAccountTypeBySortOrder(Main main) {
     // select * from scm_bank_account_type where sort_order = (select min(sort_order) from scm_bank_account_type)
-    return (BankAccountType) AppService.single(main, BankAccountType.class, "select * from scm_bank_account_type where sort_order = ? order by title limit 1 ",new Object[]{1});
+    return (BankAccountType) AppService.single(main, BankAccountType.class, "select * from scm_bank_account_type where sort_order = ? order by title limit 1 ", new Object[]{1});
   }
-  
+
   /**
    * Validate insert.
    *

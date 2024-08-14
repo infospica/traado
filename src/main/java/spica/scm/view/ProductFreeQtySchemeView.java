@@ -585,10 +585,10 @@ public class ProductFreeQtySchemeView implements Serializable {
     try {
       Jsf.addCookie(oldScheme, productId, 0);
       if (getProductFreeQtyScheme() != null && getProductFreeQtyScheme().getId() != null) {
-        setProductFreeSchemeId(getProductFreeQtyScheme().getId().toString());        
+        setProductFreeSchemeId(getProductFreeQtyScheme().getId().toString());
         Jsf.addCallbackParam("schemeId", getProductFreeSchemeId());
         //Jsf.info("success.select");        
-      }else{
+      } else {
         Jsf.addCallbackParam("schemeId", "");
       }
     } catch (Throwable t) {

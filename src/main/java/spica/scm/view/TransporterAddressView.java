@@ -388,7 +388,7 @@ public class TransporterAddressView implements Serializable {
    */
   public List<Territory> territoryAuto(String filter) {
     if (getTransporterAddress().getDistrictId() != null && getTransporterAddress().getDistrictId().getId() != null) {
-      return ScmLookupExtView.addressTerritoryAuto(getParent().getCompanyId().getId(),getTransporterAddress().getDistrictId().getId(), filter);
+      return ScmLookupExtView.addressTerritoryAuto(getParent().getCompanyId().getId(), getTransporterAddress().getDistrictId().getId(), filter);
     }
     return null;
   }

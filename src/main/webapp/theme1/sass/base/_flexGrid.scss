@@ -36,10 +36,10 @@ $fgOffset: 'f-offset' !default;
 //  */
 
 $fgBreakpoints: (
-  (xs),
-  (sm, 768px),
-  (md, 992px),
-  (lg, 1200px)
+(xs),
+(sm, 768px),
+(md, 992px),
+(lg, 1200px)
 ) !default;
 
 // /**
@@ -49,15 +49,17 @@ $fgBreakpoints: (
 //  */
 
 .flex{
-	@extend %flexbox !optional;
-	@include flex-wrap(nowrap);
-	&>.cell{
-		padding: 0px 10px;
-		@include flex-grow(1);
-		@for $i from 0 through 6{
-			&-#{$i}{@include flex-grow($i);}
-		}
-	}
+  @extend %flexbox !optional;
+  @include flex-wrap(nowrap);
+  &>.cell{
+    padding: 0px 10px;
+    @include flex-grow(1);
+    @for $i from 0 through 6{
+      &-#{$i}{
+        @include flex-grow($i);
+      }
+    }
+  }
   &.center{
     @include justify-content(center);
   }
@@ -68,7 +70,9 @@ $fgBreakpoints: (
     @include justify-content(space-between);
   }
   &.L,&.left,
-  &.R,&.right{ float: none; }
+  &.R,&.right{
+    float: none;
+  }
   &.L,&.left{
     @include justify-content(flex-start);
   }
@@ -76,21 +80,31 @@ $fgBreakpoints: (
     @include justify-content(flex-end);
   }
 
-  &.top{ @include align-items(flex-start); }
-  &.bottom{ @include align-items(flex-end); }
-  &.middle{ @include align-items(center); }
-  &.stretch{ @include align-items(stretch); }
-  &.baseline{ @include align-items(baseline); }
-  
+  &.top{
+    @include align-items(flex-start);
+  }
+  &.bottom{
+    @include align-items(flex-end);
+  }
+  &.middle{
+    @include align-items(center);
+  }
+  &.stretch{
+    @include align-items(stretch);
+  }
+  &.baseline{
+    @include align-items(baseline);
+  }
+
   &-wrap{
     @include flex-wrap(wrap);
   }
 }
 
 @media only screen and (max-width: 767px){
-	.flex{
-		@include flex-wrap(wrap);
-	}
+  .flex{
+    @include flex-wrap(wrap);
+  }
 }
 
 // /**
@@ -107,7 +121,8 @@ $fgBreakpoints: (
   @if $orientation == vertical {
     #{ $type }-top: $value;
     #{ $type }-bottom: $value;
-  } @else {
+  }
+  @else {
     #{ $type }-left: $value;
     #{ $type }-right: $value;
   }
@@ -195,7 +210,8 @@ $fgBreakpoints: (
   @if length($val) == 1 {
     $namespace: nth($val, 1);
     @include grid-sizes( $namespace );
-  } @else {
+  }
+  @else {
     $namespace: nth($val, 1);
     $size: nth($val, 2);
     @media only screen and (min-width: #{$size}) {

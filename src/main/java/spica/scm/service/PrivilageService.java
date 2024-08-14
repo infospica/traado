@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import spica.scm.validate.PrivilageIs;
 
 /**
  * PrivilageService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Feb 03 19:15:39 IST 2017 
+ * @version	1.0, Fri Feb 03 19:15:39 IST 2017
  */
+public abstract class PrivilageService {
 
-public abstract class PrivilageService {  
- 
- /**
+  /**
    * SecPrivilage paginated query.
    *
    * @param main
@@ -41,14 +39,15 @@ public abstract class PrivilageService {
     sql.date(null);  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of SecPrivilage.
-  * @param main
-  * @return List of SecPrivilage
-  */
+
+  /**
+   * Return List of SecPrivilage.
+   *
+   * @param main
+   * @return List of SecPrivilage
+   */
   public static final List<Privilage> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getPrivilageSqlPaged(main));
+    return AppService.listPagedJpa(main, getPrivilageSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class PrivilageService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select SecPrivilage by key.
-  * @param main
-  * @param secPrivilage
-  * @return SecPrivilage
-  */
+  /**
+   * Select SecPrivilage by key.
+   *
+   * @param main
+   * @param secPrivilage
+   * @return SecPrivilage
+   */
   public static final Privilage selectByPk(Main main, Privilage Privilage) {
     return (Privilage) AppService.find(main, Privilage.class, Privilage.getId());
   }
 
- /**
-  * Insert SecPrivilage.
-  * @param main
-  * @param secPrivilage
-  */
+  /**
+   * Insert SecPrivilage.
+   *
+   * @param main
+   * @param secPrivilage
+   */
   public static final void insert(Main main, Privilage Privilage) {
     PrivilageIs.insertAble(main, Privilage);  //Validating
     AppService.insert(main, Privilage);
 
   }
 
- /**
-  * Update SecPrivilage by key.
-  * @param main
-  * @param secPrivilage
-  * @return SecPrivilage
-  */
+  /**
+   * Update SecPrivilage by key.
+   *
+   * @param main
+   * @param secPrivilage
+   * @return SecPrivilage
+   */
   public static final Privilage updateByPk(Main main, Privilage Privilage) {
     PrivilageIs.updateAble(main, Privilage); //Validating
     return (Privilage) AppService.update(main, Privilage);
@@ -106,8 +107,7 @@ public abstract class PrivilageService {
   public static void insertOrUpdate(Main main, Privilage Privilage) {
     if (Privilage.getId() == null) {
       insert(main, Privilage);
-    }
-    else{
+    } else {
       updateByPk(main, Privilage);
     }
   }
@@ -123,21 +123,23 @@ public abstract class PrivilageService {
     insert(main, Privilage);
   }
 
- /**
-  * Delete SecPrivilage.
-  * @param main
-  * @param secPrivilage
-  */
+  /**
+   * Delete SecPrivilage.
+   *
+   * @param main
+   * @param secPrivilage
+   */
   public static final void deleteByPk(Main main, Privilage Privilage) {
     PrivilageIs.deleteAble(main, Privilage); //Validation
     AppService.delete(main, Privilage.class, Privilage.getId());
   }
-	
- /**
-  * Delete Array of SecPrivilage.
-  * @param main
-  * @param secPrivilage
-  */
+
+  /**
+   * Delete Array of SecPrivilage.
+   *
+   * @param main
+   * @param secPrivilage
+   */
   public static final void deleteByPkArray(Main main, Privilage[] Privilage) {
     for (Privilage e : Privilage) {
       deleteByPk(main, e);

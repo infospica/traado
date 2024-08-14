@@ -45,7 +45,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column sortBy="#{purchaseEntryStatusVar.title}" field="title" >
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseEntryStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseEntryStatusVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{purchaseEntryStatusView.purchaseEntryStatus}" value="#{purchaseEntryStatusVar}" />
           </p:commandLink>
         </p:column>

@@ -23,7 +23,7 @@
       <h:commandButton action="#{consignmentReceiptDetailView.saveConsignmentReceiptDetail(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
         <f:ajax execute="f1" render="f1"  />
       </h:commandButton>
-          <h:commandButton actionListener="#{consignmentReceiptDetailView.saveConsignmentReceiptDetailClose(main)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" onclick="toTop()"  styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup}"> <f:ajax execute="f1" render="f1"  />
+      <h:commandButton actionListener="#{consignmentReceiptDetailView.saveConsignmentReceiptDetailClose(main)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" onclick="toTop()"  styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup}"> <f:ajax execute="f1" render="f1"  />
       </h:commandButton>
 
     </ui:define>

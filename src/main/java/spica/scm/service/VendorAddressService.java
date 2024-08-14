@@ -8,16 +8,12 @@
 package spica.scm.service;
 
 import java.util.List;
-import spica.scm.domain.Consignment;
 import spica.scm.domain.Vendor;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
 import spica.scm.domain.VendorAddress;
 import spica.scm.validate.VendorAddressIs;
-import wawo.app.faces.MainView;
-import wawo.entity.util.StringUtil;
 
 /**
  * VendorAddressService
@@ -133,7 +129,6 @@ public abstract class VendorAddressService {
       updateByPk(main, vendorAddress);
     }
   }
-
 
   /**
    * Clone and existing object

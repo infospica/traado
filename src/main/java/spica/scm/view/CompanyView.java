@@ -37,12 +37,10 @@ import spica.scm.domain.Country;
 import spica.scm.domain.CountryTaxRegime;
 import spica.scm.domain.Designation;
 import spica.scm.domain.District;
-import spica.scm.domain.Manufacture;
 import spica.scm.domain.SalesAgentContract;
 import spica.scm.domain.State;
 import spica.scm.domain.Status;
 import spica.scm.domain.UserProfile;
-import spica.scm.service.AccountGroupDocPrefixService;
 import spica.scm.service.AccountService;
 import spica.scm.service.AddressTypeService;
 import spica.scm.service.CompanyAddressService;
@@ -53,7 +51,6 @@ import spica.scm.service.CompanyInvestorService;
 import spica.scm.service.CompanyLicenseService;
 import spica.scm.service.CompanyReferenceService;
 import spica.scm.service.CompanyService;
-import spica.scm.service.CompanySettingsService;
 import spica.scm.service.CompanyWarehouseService;
 import spica.scm.service.CountryTaxRegimeService;
 import spica.scm.service.SalesAgentContractService;
@@ -64,7 +61,6 @@ import spica.scm.util.AppUtil;
 import spica.sys.FileConstant;
 import spica.sys.UserRuntimeService;
 import spica.sys.UserRuntimeView;
-import wawo.app.config.AppConfig;
 import wawo.app.faces.Jsf;
 
 /**
@@ -1248,6 +1244,7 @@ public class CompanyView implements Serializable {
     this.wareHouse = wareHouse;
   }
 //FIXME move to popupview
+
   public void stateOpen() {
     if (UserRuntimeView.instance().getReferencePopupAllowed()) {
       Jsf.popupForm(FileConstant.BASIC_STATE, new State()); // opens a new form if id is null else edit

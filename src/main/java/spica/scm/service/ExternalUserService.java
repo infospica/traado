@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.service;
 
@@ -12,7 +12,6 @@ import spica.scm.domain.Designation;
 import spica.scm.domain.ExternalUser;
 import spica.scm.domain.UserProfile;
 import spica.scm.validate.ExternalUserIs;
-import spica.sys.SystemConstants;
 import spica.sys.domain.User;
 import wawo.app.Main;
 import wawo.app.common.AppService;
@@ -126,7 +125,7 @@ public class ExternalUserService {
   public static void clone(Main main, ExternalUser externalUser) {
     main.em().detach(externalUser);
     externalUser.setId(null); //Set to null for insert
-   // insertOrUpdate(main, externalUser);
+    // insertOrUpdate(main, externalUser);
   }
 
   /**

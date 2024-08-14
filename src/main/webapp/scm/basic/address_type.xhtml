@@ -32,14 +32,14 @@
         <p:inputText styleClass="fw" value="#{addressTypeView.addressType.title}" maxlength="200" validator="wawo.WhiteSpaceValidator" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
         <p:message for="title" display="text"/>
       </h:panelGroup>
-      
+
       <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
       <h:panelGroup>
         <p:inputNumber value="#{addressTypeView.addressType.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="5" id="sortOrder" />
         <p:message for="sortOrder" display="text"/>
       </h:panelGroup>
     </ui:define>
-    
+
     <ui:define name="after">
       <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
         <ui:define name="cby">#{appView.display(addressTypeView.addressType.createdBy)}</ui:define>
@@ -48,17 +48,17 @@
         <ui:define name="uat">#{appView.dateTime(addressTypeView.addressType.modifiedAt)}</ui:define>
       </ui:decorate>
     </ui:define>
-    
+
     <ui:define name="list">
       <p:dataTable id="addressTypeTable" var="addressTypeVar" widgetVar="addressTypeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
                    lazy="true" value="#{addressTypeView.addressTypeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{addressTypeVar.id}"
                    rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
                    selection="#{addressTypeView.addressTypeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
         <p:column selectionMode="multiple" exportable="false" />        
-        
+
         <p:column  sortBy="#{addressTypeVar.title}" field="title" filterBy="#{addressTypeVar.title}" filterStyle="display:none">
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(addressTypeVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(addressTypeVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{addressTypeView.addressType}" value="#{addressTypeVar}" />
           </p:commandLink>
         </p:column>       

@@ -110,7 +110,7 @@
 
       <p:outputLabel value="#{lang.status}" for="exDutyStatusId"/>
       <h:panelGroup>
-         <p:selectOneMenu value="#{exciseDutyView.exciseDuty.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
+        <p:selectOneMenu value="#{exciseDutyView.exciseDuty.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
                          id="exDutyStatusId">
           <f:selectItems value="#{exciseDutyView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
         </p:selectOneMenu>
@@ -142,7 +142,7 @@
         <p:column selectionMode="multiple" exportable="false" />
         <p:column  sortBy="#{exciseDutyVar.title}" field="title" style="width:250px">
           <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
-            <p:commandLink action="#{main.setViewType(editform)}" value="#{exciseDutyVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{exciseDutyVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
             <f:setPropertyActionListener target="#{exciseDutyView.exciseDuty}" value="#{exciseDutyVar}" />
           </p:commandLink>
         </p:column>
@@ -150,14 +150,14 @@
         <p:column sortBy="#{exciseDutyVar.percentage}" field="excise_duty_percentage" style="text-align: right">
           <f:facet name="header"><h:outputText value="#{lang.exciseDuty}" title="#{lang.exciseDuty}"/></f:facet>
           <h:outputText value="#{appView.decimal(exciseDutyVar.percentage)} #{appView.percentageSymbol}" escape="false" />
-         </p:column>
-        
+        </p:column>
+
         <p:column  sortBy="#{exciseDutyVar.abatementPercentage}" field="abatement_percentage"  style="text-align: right">
           <f:facet name="header"><h:outputText value="#{lang.abatement} #{lang.percentageSymbol}" title="#{lang.abatement}"/></f:facet>
           <h:outputText value="#{appView.decimal(exciseDutyVar.abatementPercentage)} #{appView.percentageSymbol}" escape="false" rendered="#{appView.decimal(exciseDutyVar.abatementPercentage)!=0.00}"/> 
           <h:outputText value="N/A" escape="false" rendered="#{appView.decimal(exciseDutyVar.abatementPercentage)==0.00}"/>
-          </p:column>
-        
+        </p:column>
+
         <p:column  sortBy="#{exciseDutyVar.applicableOn}" field="excise_duty_applicable_on">
           <f:facet name="header"><h:outputText value="#{lang.applicableOn}" title="#{lang.abatementApplicable} #{lang.on}"/></f:facet>
           <h:outputText value="Goods Value" title="Goods Value" escape="false" rendered="#{exciseDutyVar.applicableOn==1}"/>

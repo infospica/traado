@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.service;
 
@@ -22,8 +22,6 @@ import wawo.entity.core.AppDb;
  * @author sujesh
  */
 public class ReceiptReportService {
-  
-
 
   public static List<ReceiptReport> selectReceiptReportList(Main main, Integer companyId, FilterParameters filterParameters, Territory territory, Integer entityTypeId, District district, Integer status) {
     // List<Object> params = new ArrayList<>();
@@ -43,7 +41,6 @@ public class ReceiptReportService {
             + "fin_accounting_transaction.company_id =? AND fin_accounting_transaction.voucher_type_id =? ";
 
     String where = ") as T2 where T1.accounting_transaction_detail_id =T2.accounting_transaction_detail_id";
-
 
     main.clear();
     main.param(companyId);

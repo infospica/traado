@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.fin.view;
 
 import java.io.IOException;
@@ -15,11 +14,8 @@ import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
 import wawo.app.faces.JsfIo;
@@ -28,60 +24,62 @@ import wawo.entity.util.StringUtil;
 
 import spica.fin.domain.AccountingTransactionDetail;
 import spica.fin.service.AccountingTransactionDetailService;
-import spica.fin.domain.AccountingTransaction;
-import spica.fin.domain.AccountingLedger;
 import spica.fin.domain.AccountingDocType;
 import spica.scm.view.ScmLookupView;
 
 /**
  * AccountingTransactionDetailView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Fri Apr 28 12:24:49 IST 2017 
+ * @version	1.0, Fri Apr 28 12:24:49 IST 2017
  */
-
-@Named(value="accountingTransactionDetailView")
+@Named(value = "accountingTransactionDetailView")
 @ViewScoped
-public class AccountingTransactionDetailView implements Serializable{
+public class AccountingTransactionDetailView implements Serializable {
 
   private transient AccountingTransactionDetail accountingTransactionDetail;	//Domain object/selected Domain.
   private transient LazyDataModel<AccountingTransactionDetail> accountingTransactionDetailLazyModel; 	//For lazy loading datatable.
   private transient AccountingTransactionDetail[] accountingTransactionDetailSelected;	 //Selected Domain Array
   private transient Part referenceDocumentCopyPathPart;
+
   /**
    * Default Constructor.
-   */   
+   */
   public AccountingTransactionDetailView() {
     super();
   }
- 
+
   /**
    * Return AccountingTransactionDetail.
+   *
    * @return AccountingTransactionDetail.
-   */  
+   */
   public AccountingTransactionDetail getAccountingTransactionDetail() {
-    if(accountingTransactionDetail == null) {
+    if (accountingTransactionDetail == null) {
       accountingTransactionDetail = new AccountingTransactionDetail();
     }
     return accountingTransactionDetail;
-  }   
-  
+  }
+
   /**
    * Set AccountingTransactionDetail.
+   *
    * @param accountingTransactionDetail.
-   */   
+   */
   public void setAccountingTransactionDetail(AccountingTransactionDetail accountingTransactionDetail) {
     this.accountingTransactionDetail = accountingTransactionDetail;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchAccountingTransactionDetail(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchAccountingTransactionDetail(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewTypes.isNew(viewType) && !main.hasError()) {
@@ -93,40 +91,44 @@ public class AccountingTransactionDetailView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create accountingTransactionDetailLazyModel.
+   *
    * @param main
    */
   private void loadAccountingTransactionDetailList(final MainView main) {
     if (accountingTransactionDetailLazyModel == null) {
       accountingTransactionDetailLazyModel = new LazyDataModel<AccountingTransactionDetail>() {
-      private List<AccountingTransactionDetail> list;      
-      @Override
-      public List<AccountingTransactionDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = AccountingTransactionDetailService.listPaged(main);
-          main.commit(accountingTransactionDetailLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<AccountingTransactionDetail> list;
+
+        @Override
+        public List<AccountingTransactionDetail> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = AccountingTransactionDetailService.listPaged(main);
+            main.commit(accountingTransactionDetailLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(AccountingTransactionDetail accountingTransactionDetail) {
-        return accountingTransactionDetail.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(AccountingTransactionDetail accountingTransactionDetail) {
+          return accountingTransactionDetail.getId();
+        }
+
+        @Override
         public AccountingTransactionDetail getRowData(String rowKey) {
           if (list != null) {
             for (AccountingTransactionDetail obj : list) {
@@ -142,16 +144,17 @@ public class AccountingTransactionDetailView implements Serializable{
   }
 
   private void uploadFiles() throws IOException {
-    String SUB_FOLDER = "fin_accounting_transaction_detail/";  
+    String SUB_FOLDER = "fin_accounting_transaction_detail/";
     if (referenceDocumentCopyPathPart != null) { //use uploadPrivateUnique for unique file generation and uploadPublic for web page images
-      JsfIo.uploadPrivate(referenceDocumentCopyPathPart, getAccountingTransactionDetail().getReferenceDocumentCopyPath(), SUB_FOLDER); 
+      JsfIo.uploadPrivate(referenceDocumentCopyPathPart, getAccountingTransactionDetail().getReferenceDocumentCopyPath(), SUB_FOLDER);
       getAccountingTransactionDetail().setReferenceDocumentCopyPath(JsfIo.getDbPath(referenceDocumentCopyPathPart, SUB_FOLDER));
       referenceDocumentCopyPathPart = null;	//import to set as null.
-    }	
+    }
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -167,7 +170,7 @@ public class AccountingTransactionDetailView implements Serializable{
    */
   public String cloneAccountingTransactionDetail(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneAccountingTransactionDetail(main, "clone"); 
+    return saveOrCloneAccountingTransactionDetail(main, "clone");
   }
 
   /**
@@ -193,14 +196,13 @@ public class AccountingTransactionDetailView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many AccountingTransactionDetail.
    *
@@ -216,7 +218,7 @@ public class AccountingTransactionDetailView implements Serializable{
       } else {
         AccountingTransactionDetailService.deleteByPk(main, getAccountingTransactionDetail());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (ViewTypes.isEdit(main.getViewType())){
+        if (ViewTypes.isEdit(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -230,38 +232,43 @@ public class AccountingTransactionDetailView implements Serializable{
 
   /**
    * Return LazyDataModel of AccountingTransactionDetail.
+   *
    * @return
    */
   public LazyDataModel<AccountingTransactionDetail> getAccountingTransactionDetailLazyModel() {
     return accountingTransactionDetailLazyModel;
   }
 
- /**
-  * Return AccountingTransactionDetail[].
-  * @return 
-  */
+  /**
+   * Return AccountingTransactionDetail[].
+   *
+   * @return
+   */
   public AccountingTransactionDetail[] getAccountingTransactionDetailSelected() {
     return accountingTransactionDetailSelected;
   }
-  
+
   /**
    * Set AccountingTransactionDetail[].
-   * @param accountingTransactionDetailSelected 
+   *
+   * @param accountingTransactionDetailSelected
    */
   public void setAccountingTransactionDetailSelected(AccountingTransactionDetail[] accountingTransactionDetailSelected) {
     this.accountingTransactionDetailSelected = accountingTransactionDetailSelected;
   }
- 
 
   /**
    * Return Part.
+   *
    * @return Part.
    */
   public Part getReferenceDocumentCopyPathPart() {
     return referenceDocumentCopyPathPart;
   }
+
   /**
    * Set Part referenceDocumentCopyPathPart.
+   *
    * @param referenceDocumentCopyPathPart.
    */
   public void setReferenceDocumentCopyPathPart(Part referenceDocumentCopyPathPart) {
@@ -270,45 +277,48 @@ public class AccountingTransactionDetailView implements Serializable{
     }
   }
 
- /**
-  * AccountingTransaction autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.accountingTransactionAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.accountingTransactionAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * AccountingTransaction autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.accountingTransactionAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.accountingTransactionAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
 //  public List<AccountingTransaction> accountingTransactionAuto(String filter) {
 //    return ScmLookupView.accountingTransactionAuto(filter);
 //  }
- /**
-  * AccountingLedger autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.accountingLedgerAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.accountingLedgerAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * AccountingLedger autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.accountingLedgerAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.accountingLedgerAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
 //  public List<AccountingLedger> accountingLedgerAuto(String filter) {
 //    return ScmLookupView.accountingLedgerAuto(filter);
 //  }
- /**
-  * AccountingDocType autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.accountingDocTypeAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.accountingDocTypeAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * AccountingDocType autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.accountingDocTypeAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.accountingDocTypeAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<AccountingDocType> accountingDocTypeAuto(String filter) {
     return ScmLookupView.accountingDocTypeAuto(filter);
   }

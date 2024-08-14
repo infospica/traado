@@ -8,7 +8,6 @@
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -35,7 +34,7 @@ public abstract class PlatformDescriptionService {
     sql.count("select count(scm_platform_description.id) as total from scm_platform_description scm_platform_description"); //Count query
     sql.join(""); //Join Query
 
-    sql.string(new String[]{"scm_platform_description.title","scm_platform_description.short_code","scm_platform_description.description", "scm_platform_description.created_by", "scm_platform_description.modified_by","scm_platform_description.display_color"}); //String search or sort fields
+    sql.string(new String[]{"scm_platform_description.title", "scm_platform_description.short_code", "scm_platform_description.description", "scm_platform_description.created_by", "scm_platform_description.modified_by", "scm_platform_description.display_color"}); //String search or sort fields
     sql.number(new String[]{"scm_platform_description.id", "scm_platform_description.sort_order"}); //Numeric search or sort fields
     sql.date(new String[]{"scm_platform_description.created_at", "scm_platform_description.modified_at"});  //Date search or sort fields
     return sql;

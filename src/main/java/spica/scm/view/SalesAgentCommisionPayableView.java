@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,10 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -32,52 +26,56 @@ import spica.scm.domain.SalesAgentCommision;
 
 /**
  * SalesAgentCommisionPayableView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Jun 05 13:13:48 IST 2017 
+ * @version	1.0, Mon Jun 05 13:13:48 IST 2017
  */
-
-@Named(value="scmSalesAgentCommisionPayableView")
+@Named(value = "scmSalesAgentCommisionPayableView")
 @ViewScoped
-public class SalesAgentCommisionPayableView implements Serializable{
+public class SalesAgentCommisionPayableView implements Serializable {
 
   private transient SalesAgentCommisionPayable scmSalesAgentCommisionPayable;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesAgentCommisionPayable> scmSalesAgentCommisionPayableLazyModel; 	//For lazy loading datatable.
   private transient SalesAgentCommisionPayable[] scmSalesAgentCommisionPayableSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public SalesAgentCommisionPayableView() {
     super();
   }
- 
+
   /**
    * Return SalesAgentCommisionPayable.
+   *
    * @return SalesAgentCommisionPayable.
-   */  
+   */
   public SalesAgentCommisionPayable getSalesAgentCommisionPayable() {
-    if(scmSalesAgentCommisionPayable == null) {
+    if (scmSalesAgentCommisionPayable == null) {
       scmSalesAgentCommisionPayable = new SalesAgentCommisionPayable();
     }
     return scmSalesAgentCommisionPayable;
-  }   
-  
+  }
+
   /**
    * Set SalesAgentCommisionPayable.
+   *
    * @param scmSalesAgentCommisionPayable.
-   */   
+   */
   public void setSalesAgentCommisionPayable(SalesAgentCommisionPayable scmSalesAgentCommisionPayable) {
     this.scmSalesAgentCommisionPayable = scmSalesAgentCommisionPayable;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchSalesAgentCommisionPayable(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchSalesAgentCommisionPayable(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewTypes.isNew(viewType) && !main.hasError()) {
@@ -89,40 +87,44 @@ public class SalesAgentCommisionPayableView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create scmSalesAgentCommisionPayableLazyModel.
+   *
    * @param main
    */
   private void loadSalesAgentCommisionPayableList(final MainView main) {
     if (scmSalesAgentCommisionPayableLazyModel == null) {
       scmSalesAgentCommisionPayableLazyModel = new LazyDataModel<SalesAgentCommisionPayable>() {
-      private List<SalesAgentCommisionPayable> list;      
-      @Override
-      public List<SalesAgentCommisionPayable> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SalesAgentCommisionPayableService.listPaged(main);
-          main.commit(scmSalesAgentCommisionPayableLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SalesAgentCommisionPayable> list;
+
+        @Override
+        public List<SalesAgentCommisionPayable> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SalesAgentCommisionPayableService.listPaged(main);
+            main.commit(scmSalesAgentCommisionPayableLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SalesAgentCommisionPayable scmSalesAgentCommisionPayable) {
-        return scmSalesAgentCommisionPayable.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SalesAgentCommisionPayable scmSalesAgentCommisionPayable) {
+          return scmSalesAgentCommisionPayable.getId();
+        }
+
+        @Override
         public SalesAgentCommisionPayable getRowData(String rowKey) {
           if (list != null) {
             for (SalesAgentCommisionPayable obj : list) {
@@ -138,11 +140,12 @@ public class SalesAgentCommisionPayableView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_sales_agent_commision_payable/";	
+    String SUB_FOLDER = "scm_sales_agent_commision_payable/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -158,7 +161,7 @@ public class SalesAgentCommisionPayableView implements Serializable{
    */
   public String cloneSalesAgentCommisionPayable(MainView main) {
     main.setViewType("newform");
-    return saveOrCloneSalesAgentCommisionPayable(main, "clone"); 
+    return saveOrCloneSalesAgentCommisionPayable(main, "clone");
   }
 
   /**
@@ -184,14 +187,13 @@ public class SalesAgentCommisionPayableView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many SalesAgentCommisionPayable.
    *
@@ -207,7 +209,7 @@ public class SalesAgentCommisionPayableView implements Serializable{
       } else {
         SalesAgentCommisionPayableService.deleteByPk(main, getSalesAgentCommisionPayable());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (ViewTypes.isEdit(main.getViewType())){
+        if (ViewTypes.isEdit(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -221,55 +223,59 @@ public class SalesAgentCommisionPayableView implements Serializable{
 
   /**
    * Return LazyDataModel of SalesAgentCommisionPayable.
+   *
    * @return
    */
   public LazyDataModel<SalesAgentCommisionPayable> getSalesAgentCommisionPayableLazyModel() {
     return scmSalesAgentCommisionPayableLazyModel;
   }
 
- /**
-  * Return SalesAgentCommisionPayable[].
-  * @return 
-  */
+  /**
+   * Return SalesAgentCommisionPayable[].
+   *
+   * @return
+   */
   public SalesAgentCommisionPayable[] getSalesAgentCommisionPayableSelected() {
     return scmSalesAgentCommisionPayableSelected;
   }
-  
+
   /**
    * Set SalesAgentCommisionPayable[].
-   * @param scmSalesAgentCommisionPayableSelected 
+   *
+   * @param scmSalesAgentCommisionPayableSelected
    */
   public void setSalesAgentCommisionPayableSelected(SalesAgentCommisionPayable[] scmSalesAgentCommisionPayableSelected) {
     this.scmSalesAgentCommisionPayableSelected = scmSalesAgentCommisionPayableSelected;
   }
- 
 
-
- /**
-  * SalesAgentCommisionClaim autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.scmSalesAgentCommisionClaimAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.scmSalesAgentCommisionClaimAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+  /**
+   * SalesAgentCommisionClaim autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.scmSalesAgentCommisionClaimAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.scmSalesAgentCommisionClaimAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<SalesAgentCommisionClaim> scmSalesAgentCommisionClaimAuto(String filter) {
     return ScmLookupView.scmSalesAgentCommisionClaimAuto(filter);
   }
- /**
-  * SalesAgentCommision autocomplete filter.
-  * <pre>
-  * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
-  * If your list is smaller in size and is cached you can use.
-  * <o:converter list="#{ScmLookupView.scmSalesAgentCommisionAuto(null)}" converterId="omnifaces.ListConverter"  />
-  * Note:- ScmLookupView.scmSalesAgentCommisionAuto(null) Should be implemented to return full values from cache if the filter is null
-  * </pre>
-  * @param filter
-  * @return
-  */
+
+  /**
+   * SalesAgentCommision autocomplete filter.
+   * <pre>
+   * This method fetch based on query condition and on wawo.LookupIntConverter fetch the object for selection.
+   * If your list is smaller in size and is cached you can use.
+   * <o:converter list="#{ScmLookupView.scmSalesAgentCommisionAuto(null)}" converterId="omnifaces.ListConverter"  />
+   * Note:- ScmLookupView.scmSalesAgentCommisionAuto(null) Should be implemented to return full values from cache if the filter is null
+   * </pre>
+   *
+   * @param filter
+   * @return
+   */
   public List<SalesAgentCommision> scmSalesAgentCommisionAuto(String filter) {
     return ScmLookupView.scmSalesAgentCommisionAuto(filter);
   }

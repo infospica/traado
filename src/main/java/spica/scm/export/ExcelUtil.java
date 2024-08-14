@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.export;
 
@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.List;
 import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -53,7 +52,6 @@ import static spica.scm.print.PdfUtil.fontProduct;
 import static spica.scm.print.PdfUtil.fontProductHead;
 import spica.scm.service.CompanyAddressService;
 import wawo.app.faces.Jsf;
-import static wawo.app.faces.Jsf.getServletContext;
 import wawo.app.faces.JsfIo;
 import wawo.app.faces.MainView;
 import static wawo.entity.core.AppIo.getMimetypesFileTypeMap;

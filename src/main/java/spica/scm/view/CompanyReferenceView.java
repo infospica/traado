@@ -13,15 +13,12 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -115,6 +112,7 @@ public class CompanyReferenceView implements Serializable {
     parent = (Company) Jsf.popupParentValue(Company.class);
     getCompanyReference().setId(Jsf.getParameterInt("id"));
   }
+
   /**
    * Create companyReferenceLazyModel.
    *
@@ -338,10 +336,11 @@ public class CompanyReferenceView implements Serializable {
   public void setActiveIndex(int activeIndex) {
     this.activeIndex = activeIndex;
   }
-      /**
+
+  /**
    * Calling back the dialogReturn method. Can pass an object back to the returning method.
    */
   public void companyReferenceDocPopupClose() {
-    Jsf.popupReturn(parent,null);
+    Jsf.popupReturn(parent, null);
   }
 }

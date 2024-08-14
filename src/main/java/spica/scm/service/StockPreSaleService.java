@@ -145,8 +145,8 @@ public abstract class StockPreSaleService {
   public static final void releaseStockFromPreSale(Main main, SalesInvoice salesInvoice) {
     AppService.deleteSql(main, StockPreSale.class, "delete from scm_stock_presale where sales_invoice_id = ?", new Object[]{salesInvoice.getId()});
   }
-  
-  public static final void deleteByProductEntryDetail(Main main,ProductEntryDetail productEntryDetail){
+
+  public static final void deleteByProductEntryDetail(Main main, ProductEntryDetail productEntryDetail) {
     AppService.deleteSql(main, StockPreSale.class, "delete from scm_stock_presale where ref_product_entry_detail_id = ?", new Object[]{productEntryDetail.getId()});
   }
 }

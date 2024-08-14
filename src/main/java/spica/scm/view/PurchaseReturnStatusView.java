@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -13,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.Part;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import wawo.app.config.ViewType;
-import wawo.app.config.ViewTypeAction;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.MainView;
-import wawo.app.faces.JsfIo;
 import wawo.entity.core.AppPage;
 import wawo.entity.util.StringUtil;
 
@@ -30,52 +25,56 @@ import spica.scm.service.PurchaseReturnStatusService;
 
 /**
  * PurchaseReturnStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Wed May 25 13:23:25 IST 2016 
+ * @version	1.0, Wed May 25 13:23:25 IST 2016
  */
-
-@Named(value="purchaseReturnStatusView")
+@Named(value = "purchaseReturnStatusView")
 @ViewScoped
-public class PurchaseReturnStatusView implements Serializable{
+public class PurchaseReturnStatusView implements Serializable {
 
   private transient PurchaseReturnStatus purchaseReturnStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<PurchaseReturnStatus> purchaseReturnStatusLazyModel; 	//For lazy loading datatable.
   private transient PurchaseReturnStatus[] purchaseReturnStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public PurchaseReturnStatusView() {
     super();
   }
- 
+
   /**
    * Return PurchaseReturnStatus.
+   *
    * @return PurchaseReturnStatus.
-   */  
+   */
   public PurchaseReturnStatus getPurchaseReturnStatus() {
-    if(purchaseReturnStatus == null) {
+    if (purchaseReturnStatus == null) {
       purchaseReturnStatus = new PurchaseReturnStatus();
     }
     return purchaseReturnStatus;
-  }   
-  
+  }
+
   /**
    * Set PurchaseReturnStatus.
+   *
    * @param purchaseReturnStatus.
-   */   
+   */
   public void setPurchaseReturnStatus(PurchaseReturnStatus purchaseReturnStatus) {
     this.purchaseReturnStatus = purchaseReturnStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchPurchaseReturnStatus(MainView main, String viewType) {
-   //this.main = main;
-   if (!StringUtil.isEmpty(viewType)) {
+  public String switchPurchaseReturnStatus(MainView main, String viewType) {
+    //this.main = main;
+    if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
         if (ViewType.newform.toString().equals(viewType)) {
@@ -87,40 +86,44 @@ public class PurchaseReturnStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create purchaseReturnStatusLazyModel.
+   *
    * @param main
    */
   private void loadPurchaseReturnStatusList(final MainView main) {
     if (purchaseReturnStatusLazyModel == null) {
       purchaseReturnStatusLazyModel = new LazyDataModel<PurchaseReturnStatus>() {
-      private List<PurchaseReturnStatus> list;      
-      @Override
-      public List<PurchaseReturnStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = PurchaseReturnStatusService.listPaged(main);
-          main.commit(purchaseReturnStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<PurchaseReturnStatus> list;
+
+        @Override
+        public List<PurchaseReturnStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = PurchaseReturnStatusService.listPaged(main);
+            main.commit(purchaseReturnStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(PurchaseReturnStatus purchaseReturnStatus) {
-        return purchaseReturnStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(PurchaseReturnStatus purchaseReturnStatus) {
+          return purchaseReturnStatus.getId();
+        }
+
+        @Override
         public PurchaseReturnStatus getRowData(String rowKey) {
           if (list != null) {
             for (PurchaseReturnStatus obj : list) {
@@ -136,11 +139,12 @@ public class PurchaseReturnStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_purchase_return_status/";	
+    String SUB_FOLDER = "scm_purchase_return_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -156,7 +160,7 @@ public class PurchaseReturnStatusView implements Serializable{
    */
   public String clonePurchaseReturnStatus(MainView main) {
     main.setViewType("newform");
-    return saveOrClonePurchaseReturnStatus(main, "clone"); 
+    return saveOrClonePurchaseReturnStatus(main, "clone");
   }
 
   /**
@@ -182,14 +186,13 @@ public class PurchaseReturnStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many PurchaseReturnStatus.
    *
@@ -205,7 +208,7 @@ public class PurchaseReturnStatusView implements Serializable{
       } else {
         PurchaseReturnStatusService.deleteByPk(main, getPurchaseReturnStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if ("editform".equals(main.getViewType())){
+        if ("editform".equals(main.getViewType())) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -219,28 +222,29 @@ public class PurchaseReturnStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of PurchaseReturnStatus.
+   *
    * @return
    */
   public LazyDataModel<PurchaseReturnStatus> getPurchaseReturnStatusLazyModel() {
     return purchaseReturnStatusLazyModel;
   }
 
- /**
-  * Return PurchaseReturnStatus[].
-  * @return 
-  */
+  /**
+   * Return PurchaseReturnStatus[].
+   *
+   * @return
+   */
   public PurchaseReturnStatus[] getPurchaseReturnStatusSelected() {
     return purchaseReturnStatusSelected;
   }
-  
+
   /**
    * Set PurchaseReturnStatus[].
-   * @param purchaseReturnStatusSelected 
+   *
+   * @param purchaseReturnStatusSelected
    */
   public void setPurchaseReturnStatusSelected(PurchaseReturnStatus[] purchaseReturnStatusSelected) {
     this.purchaseReturnStatusSelected = purchaseReturnStatusSelected;
   }
- 
-
 
 }

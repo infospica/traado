@@ -43,7 +43,6 @@ public class CustomerOutstanding implements Serializable {
 //  public void setRepname(String repname) {
 //    this.repname = repname;
 //  }
-
   public String getName() {
     return this.name;
   }
@@ -121,7 +120,6 @@ public class CustomerOutstanding implements Serializable {
 //  public void setDebitorcredit(int debitorcredit) {
 //    this.debitorcredit = debitorcredit;
 //  }
-
   public String getAgentName() {
     return agentName;
   }
@@ -145,7 +143,6 @@ public class CustomerOutstanding implements Serializable {
 //  public void setDifference(Double difference) {
 //    this.difference = difference;
 //  }
-
 //  public Double getReceivableAmount() {
 //    return receivableAmount;
 //  }
@@ -153,7 +150,6 @@ public class CustomerOutstanding implements Serializable {
 //  public void setReceivableAmount(Double receivableAmount) {
 //    this.receivableAmount = receivableAmount;
 //  }
-
 //  public String getDocumentNumber() {
 //    return documentNumber;
 //  }
@@ -161,7 +157,6 @@ public class CustomerOutstanding implements Serializable {
 //  public void setDocumentNumber(String documentNumber) {
 //    this.documentNumber = documentNumber;
 //  }
-
   public Double getCumulativeAmount() {
     return cumulativeAmount;
   }
@@ -241,7 +236,6 @@ public class CustomerOutstanding implements Serializable {
 //  public void setTerritoryId(Integer territoryId) {
 //    this.territoryId = territoryId;
 //  }
-
   public Integer getEntityId() {
     return entityId;
   }
@@ -281,5 +275,4 @@ public class CustomerOutstanding implements Serializable {
 //  public void setNegativeCumulative(boolean negativeCumulative) {
 //    this.negativeCumulative = negativeCumulative;
 //  }
-
 }

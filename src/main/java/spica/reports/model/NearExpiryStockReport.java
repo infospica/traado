@@ -1,6 +1,9 @@
 package spica.reports.model;
+
 import java.io.Serializable;
-public class NearExpiryStockReport implements Serializable { 
+
+public class NearExpiryStockReport implements Serializable {
+
   private Long productId;
   private Long accountId;
   private Long productDetailId;
@@ -22,130 +25,172 @@ public class NearExpiryStockReport implements Serializable {
   private Long salesRate;
   private String supplierName;
   private String supplierGst;
-  public Long getProductId() { 
+
+  public Long getProductId() {
     return this.productId;
   }
-  public void setProductId(Long productId) { 
-    this.productId=productId;
+
+  public void setProductId(Long productId) {
+    this.productId = productId;
   }
-  public Long getAccountId() { 
+
+  public Long getAccountId() {
     return this.accountId;
   }
-  public void setAccountId(Long accountId) { 
-    this.accountId=accountId;
+
+  public void setAccountId(Long accountId) {
+    this.accountId = accountId;
   }
-  public Long getProductDetailId() { 
+
+  public Long getProductDetailId() {
     return this.productDetailId;
   }
-  public void setProductDetailId(Long productDetailId) { 
-    this.productDetailId=productDetailId;
+
+  public void setProductDetailId(Long productDetailId) {
+    this.productDetailId = productDetailId;
   }
-  public Long getProductEntryDetailId() { 
+
+  public Long getProductEntryDetailId() {
     return this.productEntryDetailId;
   }
-  public void setProductEntryDetailId(Long productEntryDetailId) { 
-    this.productEntryDetailId=productEntryDetailId;
+
+  public void setProductEntryDetailId(Long productEntryDetailId) {
+    this.productEntryDetailId = productEntryDetailId;
   }
-  public Long getStockId() { 
+
+  public Long getStockId() {
     return this.stockId;
   }
-  public void setStockId(Long stockId) { 
-    this.stockId=stockId;
+
+  public void setStockId(Long stockId) {
+    this.stockId = stockId;
   }
-  public String getProductName() { 
+
+  public String getProductName() {
     return this.productName;
   }
-  public void setProductName(String productName) { 
-    this.productName=productName;
+
+  public void setProductName(String productName) {
+    this.productName = productName;
   }
-  public String getHsnCode() { 
+
+  public String getHsnCode() {
     return this.hsnCode;
   }
-  public void setHsnCode(String hsnCode) { 
-    this.hsnCode=hsnCode;
+
+  public void setHsnCode(String hsnCode) {
+    this.hsnCode = hsnCode;
   }
-  public String getPackSize() { 
+
+  public String getPackSize() {
     return this.packSize;
   }
-  public void setPackSize(String packSize) { 
-    this.packSize=packSize;
+
+  public void setPackSize(String packSize) {
+    this.packSize = packSize;
   }
-  public String getBatchNo() { 
+
+  public String getBatchNo() {
     return this.batchNo;
   }
-  public void setBatchNo(String batchNo) { 
-    this.batchNo=batchNo;
+
+  public void setBatchNo(String batchNo) {
+    this.batchNo = batchNo;
   }
-  public Long getMrpValue() { 
+
+  public Long getMrpValue() {
     return this.mrpValue;
   }
-  public void setMrpValue(Long mrpValue) { 
-    this.mrpValue=mrpValue;
+
+  public void setMrpValue(Long mrpValue) {
+    this.mrpValue = mrpValue;
   }
-  public java.util.Date getExpiryDateActual() { 
+
+  public java.util.Date getExpiryDateActual() {
     return this.expiryDateActual;
   }
-  public void setExpiryDateActual(java.util.Date expiryDateActual) { 
-    this.expiryDateActual=expiryDateActual;
+
+  public void setExpiryDateActual(java.util.Date expiryDateActual) {
+    this.expiryDateActual = expiryDateActual;
   }
-  public Long getExpiryDays() { 
+
+  public Long getExpiryDays() {
     return this.expiryDays;
   }
-  public void setExpiryDays(Long expiryDays) { 
-    this.expiryDays=expiryDays;
+
+  public void setExpiryDays(Long expiryDays) {
+    this.expiryDays = expiryDays;
   }
-  public Long getQuantitySaleable() { 
+
+  public Long getQuantitySaleable() {
     return this.quantitySaleable;
   }
-  public void setQuantitySaleable(Long quantitySaleable) { 
-    this.quantitySaleable=quantitySaleable;
+
+  public void setQuantitySaleable(Long quantitySaleable) {
+    this.quantitySaleable = quantitySaleable;
   }
-  public Long getQuantityFreeSaleable() { 
+
+  public Long getQuantityFreeSaleable() {
     return this.quantityFreeSaleable;
   }
-  public void setQuantityFreeSaleable(Long quantityFreeSaleable) { 
-    this.quantityFreeSaleable=quantityFreeSaleable;
+
+  public void setQuantityFreeSaleable(Long quantityFreeSaleable) {
+    this.quantityFreeSaleable = quantityFreeSaleable;
   }
-  public Long getQuantityBlocked() { 
+
+  public Long getQuantityBlocked() {
     return this.quantityBlocked;
   }
-  public void setQuantityBlocked(Long quantityBlocked) { 
-    this.quantityBlocked=quantityBlocked;
+
+  public void setQuantityBlocked(Long quantityBlocked) {
+    this.quantityBlocked = quantityBlocked;
   }
-  public Long getQuantityFreeBlocked() { 
+
+  public Long getQuantityFreeBlocked() {
     return this.quantityFreeBlocked;
   }
-  public void setQuantityFreeBlocked(Long quantityFreeBlocked) { 
-    this.quantityFreeBlocked=quantityFreeBlocked;
+
+  public void setQuantityFreeBlocked(Long quantityFreeBlocked) {
+    this.quantityFreeBlocked = quantityFreeBlocked;
   }
-  public Long getPurchaseRate() { 
+
+  public Long getPurchaseRate() {
     return this.purchaseRate;
   }
-  public void setPurchaseRate(Long purchaseRate) { 
-    this.purchaseRate=purchaseRate;
+
+  public void setPurchaseRate(Long purchaseRate) {
+    this.purchaseRate = purchaseRate;
   }
-  public Long getPtsRate() { 
+
+  public Long getPtsRate() {
     return this.ptsRate;
   }
-  public void setPtsRate(Long ptsRate) { 
-    this.ptsRate=ptsRate;
+
+  public void setPtsRate(Long ptsRate) {
+    this.ptsRate = ptsRate;
   }
-  public Long getSalesRate() { 
+
+  public Long getSalesRate() {
     return this.salesRate;
   }
-  public void setSalesRate(Long salesRate) { 
-    this.salesRate=salesRate;
+
+  public void setSalesRate(Long salesRate) {
+    this.salesRate = salesRate;
   }
-  public String getSupplierName() { 
+
+  public String getSupplierName() {
     return this.supplierName;
   }
-  public void setSupplierName(String supplierName) { 
-    this.supplierName=supplierName;
+
+  public void setSupplierName(String supplierName) {
+    this.supplierName = supplierName;
   }
-  public String getSupplierGst() { 
+
+  public String getSupplierGst() {
     return this.supplierGst;
   }
-  public void setSupplierGst(String supplierGst) { 
-    this.supplierGst=supplierGst;
+
+  public void setSupplierGst(String supplierGst) {
+    this.supplierGst = supplierGst;
   }
 }

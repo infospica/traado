@@ -1,13 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.addon.view;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
@@ -16,16 +14,12 @@ import spica.addon.model.SmsUsages;
 import spica.addon.service.SmsUsageService;
 import spica.fin.domain.SmsLog;
 import spica.reports.model.FilterParameters;
-import spica.scm.domain.Company;
 import spica.scm.domain.CompanySettings;
 import spica.scm.service.CompanySettingsService;
-import spica.sys.FileConstant;
-import spica.sys.UserRuntimeView;
 import spica.sys.domain.SmsProvider;
 import wawo.app.config.ViewType;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
-import wawo.entity.util.DateUtil;
 import wawo.entity.util.StringUtil;
 
 /**
@@ -72,7 +66,7 @@ public class SmsSummaryView implements Serializable {
           }
         }
       } catch (Throwable t) {
-        main.rollback(t,"error.select");
+        main.rollback(t, "error.select");
       } finally {
         main.close();
       }
@@ -86,13 +80,12 @@ public class SmsSummaryView implements Serializable {
         usageList = SmsUsageService.loadCompanySmsUsages(main);
       }
     } catch (Throwable t) {
-      main.rollback(t,"error.select");
+      main.rollback(t, "error.select");
     } finally {
       main.close();
     }
 
   }
- 
 
   public void getCompanySmsLog(MainView main) {
     try {
@@ -100,7 +93,7 @@ public class SmsSummaryView implements Serializable {
         smsLogList = SmsUsageService.loadSmsLogByCompanyAndDate(main, companyId, getFilterParameters().getFromDate(), getFilterParameters().getToDate());
       }
     } catch (Throwable t) {
-      main.rollback(t,"error.select");
+      main.rollback(t, "error.select");
     } finally {
       main.close();
     }
@@ -112,7 +105,7 @@ public class SmsSummaryView implements Serializable {
         smsProviders = SmsUsageService.loadSmsProviders(main);
       }
     } catch (Throwable t) {
-      main.rollback(t,"error.select");
+      main.rollback(t, "error.select");
     } finally {
       main.close();
     }
@@ -160,14 +153,13 @@ public class SmsSummaryView implements Serializable {
   }
 
   public FilterParameters getFilterParameters() {
-    filterParameters = filterParameters == null ? new FilterParameters():filterParameters; 
+    filterParameters = filterParameters == null ? new FilterParameters() : filterParameters;
     return filterParameters;
   }
 
   public void setFilterParameters(FilterParameters filterParameters) {
     this.filterParameters = filterParameters;
   }
-
 
   public String smsBalanceColor(int count) {
     if (count == 0) {
@@ -239,15 +231,15 @@ public class SmsSummaryView implements Serializable {
 
   public void updateCompanySettingSmsQuantity(MainView main, CompanySettings cs) {
     try {
-      if (cs.getUpdatedSmsQuantity() != null && cs.getUpdatedSmsQuantity() > 0 && (selectedProvider.getAvailableQuantity()-cs.getUpdatedSmsQuantity())>=0) {
+      if (cs.getUpdatedSmsQuantity() != null && cs.getUpdatedSmsQuantity() > 0 && (selectedProvider.getAvailableQuantity() - cs.getUpdatedSmsQuantity()) >= 0) {
         cs.setSmsAllowed(cs.getSmsAllowed() + cs.getUpdatedSmsQuantity());
         CompanySettingsService.insertOrUpdate(main, cs);
-        getSelectedProvider().setAvailableQuantity(selectedProvider.getAvailableQuantity()-cs.getUpdatedSmsQuantity());
+        getSelectedProvider().setAvailableQuantity(selectedProvider.getAvailableQuantity() - cs.getUpdatedSmsQuantity());
         SmsUsageService.insertOrUpdate(main, selectedProvider);
         main.commit("success.save");
         usageList = null;
         smsProviders = null;
-        loadSmsUsages(main) ;        
+        loadSmsUsages(main);
         loadProvidersStatus(main);
       } else {
         main.error("amount.not.tally");

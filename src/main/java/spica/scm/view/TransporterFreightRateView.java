@@ -434,14 +434,14 @@ public class TransporterFreightRateView implements Serializable {
         transporterFreightRate.setFreightRateFixedPerBaseuom(null);
       }
       if (getTransporterFreightRate().getSourceStateId() == null && getTransporterFreightRate().getSourceDistrictId() == null) {
-      main.error("select.source");
-      return;
-    }
-    
-    if (getTransporterFreightRate().getDestinationStateId() == null && getTransporterFreightRate().getDestinationDistrictId() == null) {
-      main.error("select.destination");
-      return;
-    }
+        main.error("select.source");
+        return;
+      }
+
+      if (getTransporterFreightRate().getDestinationStateId() == null && getTransporterFreightRate().getDestinationDistrictId() == null) {
+        main.error("select.destination");
+        return;
+      }
       TransporterFreightRateService.insertOrUpdate(main, transporterFreightRate);
       main.commit("success.save");
     } catch (Throwable t) {

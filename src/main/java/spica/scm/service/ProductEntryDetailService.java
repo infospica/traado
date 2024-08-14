@@ -30,7 +30,6 @@ import spica.scm.util.ReferenceInvoice;
 import spica.scm.validate.ProductEntryDetailIs;
 import spica.scm.view.AccountUtil;
 import spica.sys.SystemConstants;
-import spica.sys.SystemRuntimeConfig;
 import wawo.app.faces.MainServlet;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppDb;
@@ -418,6 +417,7 @@ public abstract class ProductEntryDetailService {
       updateByPk(main, ped);
     }
   }
+
   /**
    *
    * @param main

@@ -103,7 +103,7 @@
       <!--status-->
       <p:outputLabel value="#{lang.status}" for="companyBankStatusId"/>
       <h:panelGroup>
-          <p:selectOneMenu value="#{vendorLicenseView.vendorLicense.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+        <p:selectOneMenu value="#{vendorLicenseView.vendorLicense.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
                          id="companyBankStatusId">
           <f:selectItems value="#{vendorLicenseView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
         </p:selectOneMenu>

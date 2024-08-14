@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.util;
 
@@ -19,26 +19,25 @@ public abstract class AccountContractUtil {
   private static final String FIXED_PERCENTAGE = "2";
   private static final String SLAB_AMOUNT = "3";
   private static final String SLAB_PERCENTAGE = "4";
-  
+
   public static final int C_FORM = 1;
   public static final int F_FORM = 2;
-  
+
   public static final int COMMODITY_MOVEMENT_TYPE_STOCK_TRANSFER = 1;
-  public static final int COMMODITY_MOVEMENT_TYPE_PURCHASE = 2; 
-  
+  public static final int COMMODITY_MOVEMENT_TYPE_PURCHASE = 2;
 
   public static final int CONTRACT_STATUS_ACTIVE = 1;
   public static final int CONTRACT_STATUS_DRAFT = 2;
   public static final int CONTRACT_STATUS_RENEW = 3;
   public static final int CONTRACT_STATUS_INACTIVE = 4;
-  
+
   public static final String CONTRACT_STATUS_ACTIVE_LABEL = "Active";
   public static final String CONTRACT_STATUS_INACTIVE_LABEL = "Inactive";
   public static final String CONTRACT_STATUS_DRAFT_LABEL = "Draft";
   public static final String CONTRACT_STATUS_RENEW_LABEL = "Renew";
-  
+
   public static final int ACCOUNT_STATUS_DRAFT = 2;
-  public static final int ACCOUNT_STATUS_ACTIVE = 1;  
+  public static final int ACCOUNT_STATUS_ACTIVE = 1;
 
   public static boolean isFixedCommissionType(String commissionType) {
     if (!StringUtil.isEmpty(commissionType)) {
@@ -85,7 +84,7 @@ public abstract class AccountContractUtil {
     cs.setId(status);
     return cs;
   }
-  
+
   public static AccountStatus getAccountStatusIntance(int status) {
     AccountStatus as = new AccountStatus();
     as.setId(status);
@@ -93,9 +92,9 @@ public abstract class AccountContractUtil {
   }
 
   public static String getContractStatus(ContractStatus status) {
-    if(status != null && status.getId() != null){
-     return status.getId() == 1 ? CONTRACT_STATUS_ACTIVE_LABEL : status.getId() == 3 ? CONTRACT_STATUS_RENEW_LABEL : status.getId() == 4 ?  CONTRACT_STATUS_INACTIVE_LABEL : CONTRACT_STATUS_DRAFT_LABEL;
-    }    
+    if (status != null && status.getId() != null) {
+      return status.getId() == 1 ? CONTRACT_STATUS_ACTIVE_LABEL : status.getId() == 3 ? CONTRACT_STATUS_RENEW_LABEL : status.getId() == 4 ? CONTRACT_STATUS_INACTIVE_LABEL : CONTRACT_STATUS_DRAFT_LABEL;
+    }
     return "";
   }
 }

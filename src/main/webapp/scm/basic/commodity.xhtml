@@ -51,7 +51,7 @@
           <!-- HSN Code-->
           <p:outputLabel value="#{lang.hsnCode} " for="hsnCode" />
           <h:panelGroup>
-              <p:inputText styleClass="fw" value="#{commodityView.commodity.hsnSacCode}" maxlength="10" validator="wawo.WhiteSpaceValidator" required="true"
+            <p:inputText styleClass="fw" value="#{commodityView.commodity.hsnSacCode}" maxlength="10" validator="wawo.WhiteSpaceValidator" required="true"
                          requiredMessage="#{lang.commodity} #{lang.code} #{lang.isRequired}" id="hsnCode" >
               <f:validateLength minimum="2"/>
             </p:inputText>

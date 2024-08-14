@@ -2,7 +2,7 @@
   <ui:include src="/block.xhtml" />
   <h:outputScript target="body">  var originalPrimeFacesCw = PrimeFaces.cw; PrimeFaces.cw = function(name, id, options, resource) { resource = resource || name.toLowerCase(); originalPrimeFacesCw.apply(this, [name, id, options, resource]); }; </h:outputScript>
   <h:outputScript name="jsf.js" library="javax.faces" target="head"/> 
-  
+
   <script src="#{request.contextPath}/theme1/js/bootstrap.min.js" type="text/javascript"></script>
 <!--  <script src="#{request.contextPath}/theme1/js/mcautocomplete.js" type="text/javascript"></script>
   <script src="#{request.contextPath}/theme1/js/tag-it.js" type="text/javascript"></script>
@@ -20,5 +20,5 @@
         console.log(err.message);
       }
     });           //]]></script>
-  
+
 </ui:composition>

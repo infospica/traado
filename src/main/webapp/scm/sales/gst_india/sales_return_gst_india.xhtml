@@ -3,7 +3,7 @@
                 xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
@@ -246,7 +246,7 @@
         </h:panelGroup>
         <!-- Note For Customer -->
         <p:outputLabel value="#{lang.note}" for="remarks" >
-         <i class="fa fa-print"></i>
+          <i class="fa fa-print"></i>
         </p:outputLabel>
         <h:panelGroup>
           <p:inputTextarea disabled="#{salesReturnView.confirmed}" value="#{salesReturnView.salesReturn.noteForCustomerOrSupplier}" placeholder="#{lang.note} (#{lang.print})" 
@@ -944,7 +944,9 @@
         </h:panelGroup>
       </h:panelGroup>
       <style>
-        .vtop{vertical-align: top;}
+        .vtop{
+          vertical-align: top;
+        }
       </style>
 
       <script>
@@ -1110,8 +1112,13 @@
       </script>
 
       <style>
-        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
-        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+        .mDataTable td, .themeTable td, .dataTable td{
+          border-top:none;
+          border-bottom: none;
+        }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{
+          border: none;
+        }
       </style>
 
     </ui:define>

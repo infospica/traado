@@ -22,7 +22,7 @@ import spica.scm.validate.ProductTypeIs;
  * @author	Spirit 1.2
  * @version	1.0, Mon Aug 08 17:59:21 IST 2016
  */
-public abstract class ProductTypeService {  
+public abstract class ProductTypeService {
 
   /**
    * ProductType paginated query.

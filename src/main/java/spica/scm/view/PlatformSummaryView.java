@@ -34,7 +34,6 @@ import spica.sys.FileConstant;
 import spica.sys.SystemConstants;
 import spica.sys.SystemRuntimeConfig;
 import spica.sys.UserRuntimeView;
-import wawo.app.config.AppConfig;
 import wawo.app.config.ViewTypes;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
@@ -588,22 +587,22 @@ public class PlatformSummaryView implements Serializable {
 
   private void addCrDrItem(List<DebitCreditNotePlatform> debitCreditNotePlatformList, Platform platform) {
     if (!getSelectedPlatform().containsKey(platform.getId())) {
-    getSelectedPlatform().put(platform.getId(), platform);
-    double platformValue = 0.0;
-    // String platformDesc = "";
-    DebitCreditNoteItem debitCreditNoteItem = null;
-    platformValue = debitNote ? platform.getDebitAmountRequired() : platform.getCreditAmountRequired();
-    debitCreditNoteItem = new DebitCreditNoteItem(debitCreditNote, platform.getTitle(), getReferenceInvoiceNumber(platform), platformValue);
-    debitCreditNoteItem.setDescription(platform.getPlatformDescId().getTitle());
-    debitCreditNoteItem.setRefInvoiceNo(platform.getDocumentNo());
-    debitCreditNoteItem.setTaxableValue(platformValue);
-    //debitCreditNoteItem.setRefInvoiceDate(getReferenceInvoiceDate(platform));
-    debitCreditNoteItem.setRefInvoiceDate(null);
-    debitCreditNoteItem.setProductId(platform.getProductDetailId().getProductPresetId().getProductId());
-    debitCreditNoteItem.setHsnSacCode(platform.getProductDetailId().getProductPresetId().getProductId().getHsnCode());
-    debitCreditNoteItem.setTitle(debitCreditNoteItem.getProductId().getProductName());
-    debitCreditNotePlatformList.add(new DebitCreditNotePlatform(debitCreditNote, debitCreditNoteItem, platform));
-    getDebitCreditNoteItemList().add(debitCreditNoteItem);
+      getSelectedPlatform().put(platform.getId(), platform);
+      double platformValue = 0.0;
+      // String platformDesc = "";
+      DebitCreditNoteItem debitCreditNoteItem = null;
+      platformValue = debitNote ? platform.getDebitAmountRequired() : platform.getCreditAmountRequired();
+      debitCreditNoteItem = new DebitCreditNoteItem(debitCreditNote, platform.getTitle(), getReferenceInvoiceNumber(platform), platformValue);
+      debitCreditNoteItem.setDescription(platform.getPlatformDescId().getTitle());
+      debitCreditNoteItem.setRefInvoiceNo(platform.getDocumentNo());
+      debitCreditNoteItem.setTaxableValue(platformValue);
+      //debitCreditNoteItem.setRefInvoiceDate(getReferenceInvoiceDate(platform));
+      debitCreditNoteItem.setRefInvoiceDate(null);
+      debitCreditNoteItem.setProductId(platform.getProductDetailId().getProductPresetId().getProductId());
+      debitCreditNoteItem.setHsnSacCode(platform.getProductDetailId().getProductPresetId().getProductId().getHsnCode());
+      debitCreditNoteItem.setTitle(debitCreditNoteItem.getProductId().getProductName());
+      debitCreditNotePlatformList.add(new DebitCreditNotePlatform(debitCreditNote, debitCreditNoteItem, platform));
+      getDebitCreditNoteItemList().add(debitCreditNoteItem);
     }
   }
 
@@ -623,7 +622,7 @@ public class PlatformSummaryView implements Serializable {
         Platform platform = (Platform) treeNode.getData();
         if (platform != null && platform.getId() != null) {
           if (!getSelectedPlatform().containsKey(platform.getId())) {
-            if (platform.getLevel() == SystemConstants.FIRST_LEVEL || platform.getLevel() == SystemConstants.SECOND_LEVEL) {              
+            if (platform.getLevel() == SystemConstants.FIRST_LEVEL || platform.getLevel() == SystemConstants.SECOND_LEVEL) {
               if (treeNode.isExpanded() && treeNode.getChildCount() > 0) {
                 processSelect(debitCreditNotePlatformList, treeNode.getChildren().toArray(new TreeNode[treeNode.getChildCount()]));
               } else {

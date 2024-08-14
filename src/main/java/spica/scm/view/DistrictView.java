@@ -35,7 +35,7 @@ import spica.scm.domain.State;
 @Named(value = "districtView")
 @ViewScoped
 public class DistrictView implements Serializable {
-  
+
   private transient District district;	//Domain object/selected Domain.
   private transient LazyDataModel<District> districtLazyModel; 	//For lazy loading datatable.
   private transient District[] districtSelected;	 //Selected Domain Array
@@ -124,7 +124,7 @@ public class DistrictView implements Serializable {
     if (districtLazyModel == null) {
       districtLazyModel = new LazyDataModel<District>() {
         private List<District> list;
-        
+
         @Override
         public List<District> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
           try {
@@ -139,12 +139,12 @@ public class DistrictView implements Serializable {
           }
           return list;
         }
-        
+
         @Override
         public Object getRowKey(District district) {
           return district.getId();
         }
-        
+
         @Override
         public District getRowData(String rowKey) {
           if (list != null) {
@@ -159,7 +159,7 @@ public class DistrictView implements Serializable {
       };
     }
   }
-  
+
   private void uploadFiles() {
     String SUB_FOLDER = "scm_district/";
   }
@@ -303,7 +303,7 @@ public class DistrictView implements Serializable {
     }
     return null;
   }
-  
+
   public void countrySelectEvent(SelectEvent event) {
     Country countryId = (Country) event.getObject();
     if (countryId != null) {

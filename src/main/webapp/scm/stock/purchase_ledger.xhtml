@@ -2,7 +2,7 @@
   #{purchaseLedgerView.reset()}
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <o:importConstants type="spica.constant.ReportConstant" />
@@ -92,7 +92,7 @@
             </p:autoComplete>
             <p:message for="account" />
           </h:panelGroup>
-            <p:commandButton actionListener="#{purchaseLedgerView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate purchaseLedgerTable"  styleClass="btn" onclick="block();" oncomplete="unblock();"/>
+          <p:commandButton actionListener="#{purchaseLedgerView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate purchaseLedgerTable"  styleClass="btn" onclick="block();" oncomplete="unblock();"/>
           <p:commandButton actionListener="#{purchaseLedgerView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate purchaseLedgerTable" styleClass="btn" onclick="block();" oncomplete="unblock();" />
 
           <p:calendar value="#{purchaseLedgerView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="13" size="10"
@@ -281,7 +281,7 @@
           <h:outputText value="#{appView.display(row.accountInvoiceNo)}" escape="false">
           </h:outputText>
         </p:column>
-          
+
         <p:column sortBy="#{row.referenceNo}" field="reference_no" 
                   rendered="#{purchaseLedgerView.showReference}" >
           <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>

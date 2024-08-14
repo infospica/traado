@@ -8,26 +8,26 @@
                 template="/theme1/layoutDialog.xhtml">
   <ui:define name="content" >
     <h:form id="f1" prependId="false" enctype="multipart/form-data">
-      #{main.setViewPath(param.viewPath eq null ? main.viewPath : param.viewPath, param.viewType eq null ? main.viewType : param.viewType)}
-      #{productPricelistView.switchProductPricelist(main, main.viewType)}
+#{main.setViewPath(param.viewPath eq null ? main.viewPath : param.viewPath, param.viewType eq null ? main.viewType : param.viewType)}
+#{productPricelistView.switchProductPricelist(main, main.viewType)}
 
-      <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
-        <ui:param name="label" value="#{lang.product} #{lang.priceList}" />
-        <ui:param name="ids" value="prodPriceList" />
-        <ui:param name="deleteListMenu" value="false" />
-        
-        <ui:define name="form">
-          <p:tabView  prependId="false" dynamic="true" cache="false" 
-                      value="#{productPricelistView.getProductPriceList(main)}"
-                      var="ppl"
-                      activeIndex="#{productPricelistView.activeIndex}" styleClass="materialTabs">
-            <p:tab title="#{ppl.accountGroupPriceListId.title}">
-              <h:outputText value="Welcome" />              
-            </p:tab>
-          
-          </p:tabView>
-        </ui:define>        
-      </ui:decorate>
-    </h:form>
-  </ui:define>
+<ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+  <ui:param name="label" value="#{lang.product} #{lang.priceList}" />
+  <ui:param name="ids" value="prodPriceList" />
+  <ui:param name="deleteListMenu" value="false" />
+  
+  <ui:define name="form">
+    <p:tabView  prependId="false" dynamic="true" cache="false" 
+                value="#{productPricelistView.getProductPriceList(main)}"
+                var="ppl"
+                activeIndex="#{productPricelistView.activeIndex}" styleClass="materialTabs">
+      <p:tab title="#{ppl.accountGroupPriceListId.title}">
+        <h:outputText value="Welcome" />              
+      </p:tab>
+    
+    </p:tabView>
+  </ui:define>        
+</ui:decorate>
+</h:form>
+</ui:define>
 </ui:composition>-->

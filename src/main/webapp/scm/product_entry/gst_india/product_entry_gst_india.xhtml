@@ -4,7 +4,7 @@
                 xmlns:o="http://omnifaces.org/ui"  >
   <style>
     .ui-datatable table {
-      table-layout: auto; 
+      table-layout: auto;
     }
   </style>
   <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
@@ -480,18 +480,21 @@
 
       <h:panelGroup layout="block" rendered="#{main.isForm() and main.edit}"  id="p21">
         <style>
-          .vtop{vertical-align: top;}
+          .vtop{
+            vertical-align: top;
+          }
           .old{
             background-color: #fca752 !important;
             background-image: none !important;
-            color: #000000 !important;}
-          </style>
+            color: #000000 !important;
+          }
+        </style>
 
 
 
-          <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
+        <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
 
-          <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" pt:data-fast-input="true" >
+        <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" pt:data-fast-input="true" >
           <p:dataTable id="invoiceEntrydt1" var="productEntryDetailVar" widgetVar="productEntryDetailWidget" rowIndexVar="rowIndex"
                        tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{productEntryView.productEntryDetailList}"
                        rows="50"
@@ -1212,7 +1215,7 @@
                       <h:panelGroup layout="block" style="border-bottom:1px solid;" rendered="#{productEntryView.productEntry.companyId.tcsEnabled eq 1}">
                         <h:outputText id="tcsValue" value="#{productEntryView.productEntry.tcsNetValue eq null ? '0.00' : appView.decimal(productEntryView.productEntry.tcsNetValue)}" />
                       </h:panelGroup>
-                       <!-- Invoice Variation -->
+                      <!-- Invoice Variation -->
                       <h:panelGroup>Invoice Difference :</h:panelGroup>
                       <h:panelGroup layout="block" >
                         <h:outputText value="#{productEntryView.productEntry.invoiceAmountVariation eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceAmountVariation)}" />
@@ -1222,7 +1225,7 @@
                       <h:panelGroup layout="block" style="border-bottom:1px solid;">
                         <h:outputText value="#{productEntryView.productEntry.invoiceRoundOff eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceRoundOff)}" />
                       </h:panelGroup>
-                   
+
                       <!-- Net Amount -->
                       <h:panelGroup>Net Amount :</h:panelGroup>
                       <h:panelGroup>

@@ -69,11 +69,9 @@ import spica.scm.service.UserProfileService;
 import spica.sys.SystemConstants;
 
 import spica.sys.UserRuntimeView;
-import wawo.app.Main;
 import wawo.app.common.AppService;
 import wawo.app.faces.AppLookup;
 import wawo.app.faces.MainView;
-import wawo.entity.core.AppDb;
 import wawo.entity.util.StringUtil;
 
 /**

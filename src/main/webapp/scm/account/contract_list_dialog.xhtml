@@ -92,7 +92,7 @@
                 <h:panelGroup>                    
                   <p:inputNumber value="#{contractView.contract.depositAmount}" converterMessage="#{lang.depositAmount} #{lang.invalidNumber}"
                                  decimalPlaces="2" styleClass="fw"
-                                onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15"
                                  id="depositAmount" />                  
                 </h:panelGroup>
 
@@ -160,7 +160,7 @@
                                  decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="stockStatusReportDueDay" />
                   <p:message for="stockStatusReportDueDay" display="text"/>
                 </h:panelGroup>
-                
+
                 <p:outputLabel value="#{lang.nearExpiryDays}" for="nearExpiryDays" />
                 <h:panelGroup>
                   <p:inputNumber value="#{contractView.contract.nearExpiryDays}" converterMessage="#{lang.nearExpiryDays} #{lang.invalidNumber}"
@@ -353,7 +353,7 @@
                 <p:outputLabel value="#{lang.commissionClaimDueDay}" for="commissionClaimDueDay" rendered="#{contractView.isBenefitByCommission()}" />
                 <h:panelGroup rendered="#{contractView.isBenefitByCommission()}">
                   <p:inputNumber value="#{contractView.contract.commissionClaimDueDay}" converterMessage="#{lang.commissionClaimDueDay} #{lang.invalidNumber}"
-                                  decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="commissionClaimDueDay" />
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="commissionClaimDueDay" />
                   <p:message for="commissionClaimDueDay" display="text"/>
                 </h:panelGroup>
 
@@ -400,7 +400,7 @@
                                rendered="#{contractView.isPercentageCommissionByRange()}" />
                 <h:panelGroup rendered="#{contractView.isPercentageCommissionByRange()}">
                   <p:inputNumber value="#{contractView.contract.commissionValuePercent}" converterMessage="#{lang.commissionValuePercent} #{lang.invalidNumber}" decimalPlaces="2"
-                                onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="commissionValuePercent" />
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="commissionValuePercent" />
                   <p:message for="commissionValuePercent" display="text"/>
                 </h:panelGroup>
 
@@ -409,7 +409,7 @@
                 <h:panelGroup rendered="#{contractView.isBenefitByMarginPercentage()}">
                   <p:inputNumber   value="#{contractView.contract.marginPercentage}"
                                    converterMessage="#{lang.marginPercentage} #{lang.invalidNumber}" decimalPlaces="2"
-                                  onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="marginPercentage" />
+                                   onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="marginPercentage" />
                   <p:message for="marginPercentage" display="text"/>
                 </h:panelGroup>
 
@@ -425,8 +425,8 @@
                 <p:outputLabel value="#{lang.totalMargin}" rendered="#{contractView.isBenefitByMarginPercentage()}" />
                 <h:panelGroup id="totalmargin" rendered="#{contractView.isBenefitByMarginPercentage()}">
                   <p:inputNumber value="#{contractView.totalMargin}"
-                                  decimalPlaces="2" readonly="true"
-                                onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" />
+                                 decimalPlaces="2" readonly="true"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" />
                 </h:panelGroup>
 
               </ui:decorate>

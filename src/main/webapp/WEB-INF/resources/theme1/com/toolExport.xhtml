@@ -7,16 +7,16 @@
                 xmlns:pe="http://primefaces.org/ui/extensions"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <!--        <div class="L g" style="#{padding eq null ? 'padding-left: 5%' : padding}">         -->
-          <p:commandButton id="#{ids}expBtn" type="button" icon="fa fa-angle-down" value="#{lang.action}" iconPos="down" styleClass="btn btn-default"/>
-          <p:menu overlay="true" trigger="#{ids}expBtn" my="left top" at="left bottom">
-            <p:submenu label="Current Page">
-              <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad" ><p:dataExporter type="xls" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="true" postProcessor="#{excelExportView.postProcessXLS}"/></p:menuitem>
-              <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="true"  /></p:menuitem>
-            </p:submenu>
-            <p:submenu label="All Pages">
-              <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad"><p:dataExporter type="xls" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="false" postProcessor="#{excelExportView.postProcessXLS}"/></p:menuitem>
-              <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="false"  /></p:menuitem>
-            </p:submenu>
-          </p:menu>
-<!--        </div>-->
+  <p:commandButton id="#{ids}expBtn" type="button" icon="fa fa-angle-down" value="#{lang.action}" iconPos="down" styleClass="btn btn-default"/>
+  <p:menu overlay="true" trigger="#{ids}expBtn" my="left top" at="left bottom">
+    <p:submenu label="Current Page">
+      <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad" ><p:dataExporter type="xls" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="true" postProcessor="#{excelExportView.postProcessXLS}"/></p:menuitem>
+      <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="true"  /></p:menuitem>
+    </p:submenu>
+    <p:submenu label="All Pages">
+      <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad"><p:dataExporter type="xls" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="false" postProcessor="#{excelExportView.postProcessXLS}"/></p:menuitem>
+      <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{fileName eq null ? ids : fileName}" pageOnly="false"  /></p:menuitem>
+    </p:submenu>
+  </p:menu>
+  <!--        </div>-->
 </ui:composition>

@@ -1,13 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.reports.view;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -20,7 +18,6 @@ import spica.reports.model.FilterParameters;
 import spica.reports.model.CompanyCustomerSalesRender;
 
 import spica.reports.service.PurchaseReturnReportService;
-import spica.sys.UserRuntimeService;
 import spica.sys.UserRuntimeView;
 import wawo.app.faces.Jsf;
 import wawo.app.faces.MainView;
@@ -50,7 +47,7 @@ public class PurchaseReturnReportView implements Serializable {
 
   public List<PurchaseReturnReport> getPurchaseReturnReportList(MainView main) {
     if (StringUtil.isEmpty(purchaseReturnReportList)) {
-      try  {
+      try {
         if (filterParameters.getFromDate() == null) {
           filterParameters.setFromDate(UserRuntimeView.instance().getStartFiscalDate());
         }
@@ -77,7 +74,7 @@ public class PurchaseReturnReportView implements Serializable {
         }
       } catch (Throwable t) {
         main.rollback(t, "error.select");
-      }finally{
+      } finally {
         main.close();
       }
     }
@@ -278,8 +275,8 @@ public class PurchaseReturnReportView implements Serializable {
   public Double getQty() {
     return qty;
   }
-  
-  public void openPurchaseReturnPopup(Integer id){
+
+  public void openPurchaseReturnPopup(Integer id) {
     Jsf.popupForm(UserRuntimeView.instance().getTaxCalculator().getPurchaseReturnView(), id, id);
   }
 }

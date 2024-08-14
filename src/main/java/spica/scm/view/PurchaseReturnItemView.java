@@ -121,10 +121,10 @@ public class PurchaseReturnItemView implements Serializable {
   }
 
   public PurchaseReturn getPurchaseReturn() {
-      if (purchaseReturn == null) {
+    if (purchaseReturn == null) {
       purchaseReturn = new PurchaseReturn();
     }
-     if (purchaseReturn.getCompanyId() == null) {
+    if (purchaseReturn.getCompanyId() == null) {
       purchaseReturn.setCompanyId(UserRuntimeView.instance().getCompany());
       purchaseReturn.setFinancialYearId(UserRuntimeView.instance().getCompany().getCurrentFinancialYear());
       purchaseReturn.setAccountId(UserRuntimeView.instance().getAccount());

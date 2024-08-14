@@ -118,7 +118,8 @@
     if (key.match(/A/)) {
       this.stack = [];
       this.num = 0;
-		};
+    }
+    ;
     if (key === 'AC') {
       this.buff = [false, false];
     }
@@ -162,7 +163,8 @@
         keyDown(false, keyBoard['2nd']);
         doKey('2nd', true);
       }
-			if (eval(localStorage['deg'])) doKey('Deg', true);
+      if (eval(localStorage['deg']))
+        doKey('Deg', true);
       if (localStorage['memory']) {
         render(localStorage['memory']);
         doKey('m+', true);
@@ -170,7 +172,8 @@
       render(localStorage['resBuffer']);
       var buffStrX = localStorage['buffStr'].split(',');
       for (var n = 0, m = buffStrX.length; n < m; n++) {
-				if (buffStrX[n]) doKey(buffStrX[n], true);
+        if (buffStrX[n])
+          doKey(buffStrX[n], true);
       }
       render(localStorage['resBuffer']);
       resBuffer = localStorage['resBuffer'];
@@ -191,7 +194,8 @@
             keyMatchHold = ('sin|sinh|cos|cosh|tan|tanh|m-|Rand|Deg|Rand|sin-1|sinh-1|cos-1|cosh-1|tan-1|tanh-1|' +
                     '1|1/x|2|x2|3|x3|x√y|√|ln|log2|ex|2x').split('|');
 
-		if (key === 13) key = 61;
+    if (key === 13)
+      key = 61;
     key = String.fromCharCode(key);
     for (var n = 0, m = keyMatch.length; n < m; n = n + 2)
       if (key === keyMatch[n]) {
@@ -206,9 +210,12 @@
         }
       hold.textContent = '';
     }
-		if ((key === 'h' || key === 'H') && !holdKey) hold.textContent = 'hold';
-		if (key === 'G' && holdKey) switchGrouping(true);
-		if (!keyBoard[key]) return false;
+    if ((key === 'h' || key === 'H') && !holdKey)
+      hold.textContent = 'hold';
+    if (key === 'G' && holdKey)
+      switchGrouping(true);
+    if (!keyBoard[key])
+      return false;
     if ((key.match(/-1$|log2$|2x$/) && !secondActive) || (key.match(/h$|n$|cos$|ex$/) && secondActive)) {
       keyDown(false, keyBoard['2nd']);
       doKey('2nd', true);
@@ -267,7 +274,8 @@
     render(parseFloat(e.clipboardData.getData("Text") + '') + '');
     calculator[brackets].curr = true;
     keyBoard['AC'].children[0].firstChild.data = 'C';
-		if (frozenKey) freezeKey(frozenKey, true);
+    if (frozenKey)
+      freezeKey(frozenKey, true);
     e.preventDefault();
   }, false);
 
@@ -281,7 +289,8 @@
 
   calcSS3.onmousedown = function (e) {
     keyDown(e);
-		if (!pressedKey) return false;
+    if (!pressedKey)
+      return false;
     document.addEventListener('mouseout', keyUp, false);
     document.addEventListener('mouseover', keyDown, false);
     return false;
@@ -359,7 +368,8 @@
 
   function freezeKey(key, del) {
     var obj = (!del || del !== 2) ? frozenKey : key;
-		if (obj) obj.className = obj.className.replace(' calc-active', '');
+    if (obj)
+      obj.className = obj.className.replace(' calc-active', '');
     if (!del) {
       key.className = key.className + ' calc-active';
       frozenKey = key;
@@ -502,9 +512,11 @@
       keyBoard['AC'].children[0].firstChild.data = 'C';
     } else if (text === 'C') {
       key.children[0].firstChild.data = 'AC';
-			if (frozenKey) freezeKey(frozenKey);
+      if (frozenKey)
+        freezeKey(frozenKey);
     } else if (text.match(/AC|=/)) {
-			if (bracketKey) freezeKey(bracketKey, 2);
+      if (bracketKey)
+        freezeKey(bracketKey, 2);
       freezeKey(key, true);
       frozenKey = null
     } else if (text.match(/Deg|Rad/)) {

@@ -1,12 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
+ * Copyright 2015-2024 Infospica. All rights reserved.
+ * Use is subject to license terms.
  */
 package spica.scm.view;
 
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.Serializable;
 import java.util.Date;
@@ -116,7 +115,7 @@ public class SalesInvoicePrintView implements Serializable {
       pdfWriter.setPageEvent(new PageHeaderEvent(salesInvoice.getCompanyId().getCompanyName(), salesInvoice.getInvoiceNo(), salesInvoice.getCustomerId().getCustomerName(),
               date));
     }
-     document.open();
+    document.open();
     ItemTable table = generateItemTable(salesInvoice);
     printSalesInvoice.dataTable(salesInvoice.getPrintMode(), document, pdfWriter, table);
     printSalesInvoice.createFooterBar(document, pdfWriter, salesInvoice.getPrintType(), table.getColumnWidth(), salesInvoice.getCompanyId().getCompanySettings());

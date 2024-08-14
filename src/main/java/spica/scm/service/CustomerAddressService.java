@@ -9,7 +9,6 @@ package spica.scm.service;
 
 import java.util.List;
 import spica.scm.domain.Customer;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -36,9 +35,9 @@ public abstract class CustomerAddressService {
     sql.count("select count(scm_customer_address.id) as total from scm_customer_address scm_customer_address "); //Count query
     sql.join("left outer join scm_customer scm_customer_addresscustomer_id on (scm_customer_addresscustomer_id.id = scm_customer_address.customer_id) left outer join scm_address_type scm_customer_addressaddress_type_id on (scm_customer_addressaddress_type_id.id = scm_customer_address.address_type_id) left outer join scm_country scm_customer_addresscountry_id on (scm_customer_addresscountry_id.id = scm_customer_address.country_id) left outer join scm_state scm_customer_addressstate_id on (scm_customer_addressstate_id.id = scm_customer_address.state_id) left outer join scm_district scm_customer_addressdistrict_id on (scm_customer_addressdistrict_id.id = scm_customer_address.district_id) left outer join scm_territory scm_customer_addressterritory_id on (scm_customer_addressterritory_id.id = scm_customer_address.territory_id) left outer join scm_status scm_customer_addressstatus_id on (scm_customer_addressstatus_id.id = scm_customer_address.status_id)"); //Join Query
 
-    sql.string(new String[]{"scm_customer_addresscustomer_id.customer_name","scm_customer_addressaddress_type_id.title","scm_customer_address.address","scm_customer_addresscountry_id.country_name","scm_customer_addressstate_id.state_name","scm_customer_addressdistrict_id.district_name","scm_customer_address.pin","scm_customer_addressterritory_id.territory_name","scm_customer_address.phone_1","scm_customer_address.phone_2","scm_customer_address.phone_3","scm_customer_address.fax_1","scm_customer_address.fax_2","scm_customer_address.email","scm_customer_addressstatus_id.title","scm_customer_address.created_by","scm_customer_address.modified_by"}); //String search or sort fields
-    sql.number(new String[]{"scm_customer_address.id","scm_customer_address.sort_order"}); //Numeric search or sort fields
-    sql.date(new String[]{"scm_customer_address.created_at","scm_customer_address.modified_at"});  //Date search or sort fields
+    sql.string(new String[]{"scm_customer_addresscustomer_id.customer_name", "scm_customer_addressaddress_type_id.title", "scm_customer_address.address", "scm_customer_addresscountry_id.country_name", "scm_customer_addressstate_id.state_name", "scm_customer_addressdistrict_id.district_name", "scm_customer_address.pin", "scm_customer_addressterritory_id.territory_name", "scm_customer_address.phone_1", "scm_customer_address.phone_2", "scm_customer_address.phone_3", "scm_customer_address.fax_1", "scm_customer_address.fax_2", "scm_customer_address.email", "scm_customer_addressstatus_id.title", "scm_customer_address.created_by", "scm_customer_address.modified_by"}); //String search or sort fields
+    sql.number(new String[]{"scm_customer_address.id", "scm_customer_address.sort_order"}); //Numeric search or sort fields
+    sql.date(new String[]{"scm_customer_address.created_at", "scm_customer_address.modified_at"});  //Date search or sort fields
     return sql;
   }
 
@@ -138,7 +137,7 @@ public abstract class CustomerAddressService {
    * @param customerAddress
    */
   public static void makeDefault(Main main, CustomerAddress customerAddress) {
-    if (customerAddress.getSortOrder()== 0) {
+    if (customerAddress.getSortOrder() == 0) {
       main.param(1);
       main.param(customerAddress.getCustomerId().getId());
       main.param(customerAddress.getId());
@@ -181,7 +180,7 @@ public abstract class CustomerAddressService {
       deleteByPk(main, e);
     }
   }
-  
+
   public static final CustomerAddress selectCustomerRegisteredAddress(Main main, Customer customer) {
     return (CustomerAddress) AppService.single(main, CustomerAddress.class, "select * from scm_customer_address where customer_id = ? and address_type_id = ?", new Object[]{customer.getId(), AddressTypeService.REGISTERED_ADDRESS});
   }

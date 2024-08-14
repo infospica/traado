@@ -102,10 +102,10 @@ public abstract class TransporterService {
   public static void insertOrUpdate(Main main, Transporter transporter) {
     if (transporter.getId() == null) {
       TransporterIs.insertAble(main, transporter);  //Validating
-    AppService.insert(main, transporter);
+      AppService.insert(main, transporter);
     } else {
- TransporterIs.updateAble(main, transporter); //Validating     
-transporter = (Transporter) AppService.update(main, transporter);
+      TransporterIs.updateAble(main, transporter); //Validating     
+      transporter = (Transporter) AppService.update(main, transporter);
     }
     LedgerExternalService.saveLedgerTransporter(main, transporter);
 //    if (transportModeSelected != null) {
@@ -177,9 +177,9 @@ transporter = (Transporter) AppService.update(main, transporter);
     return (TransporterRateCard) AppService.single(main, TransporterRateCard.class, "select * from scm_transporter_rate_card scm_transporter_rate_card where scm_transporter_rate_card.transporter_id=? and scm_transporter_rate_card.transport_mode_id=?", new Object[]{transporter.getId(), id});
 //  and scm_transporter_rate_card.transport_mode_id=?
   }
-  
-  public static Transporter selectTransporterByCustomer(Main main,Customer customer){
-    return (Transporter) AppService.single(main, Transporter.class, "SELECT t1.* FROM scm_transporter t1,scm_customer t2 WHERE t2.transporter_id = t1.id AND t2.id = ? ",new Object[]{customer.getId()});
+
+  public static Transporter selectTransporterByCustomer(Main main, Customer customer) {
+    return (Transporter) AppService.single(main, Transporter.class, "SELECT t1.* FROM scm_transporter t1,scm_customer t2 WHERE t2.transporter_id = t1.id AND t2.id = ? ", new Object[]{customer.getId()});
   }
-  
+
 }

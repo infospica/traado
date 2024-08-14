@@ -2,9 +2,7 @@ package spica.reports.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Calendar;
 import spica.scm.domain.SalesAgent;
-import spica.sys.UserRuntimeView;
 
 public class CompanyCustomerSales implements Serializable {
 

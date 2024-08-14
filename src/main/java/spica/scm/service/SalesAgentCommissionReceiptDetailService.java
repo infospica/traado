@@ -5,11 +5,9 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.service;
 
 import java.util.List;
-import wawo.app.AppSec;
 import wawo.app.common.AppService;
 import wawo.app.Main;
 import wawo.entity.core.SqlPage;
@@ -18,13 +16,13 @@ import spica.scm.validate.SalesAgentCommissionReceiptDetailIs;
 
 /**
  * SalesAgentCommissionReceiptDetailService
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Dec 18 16:22:19 IST 2017 
+ * @version	1.0, Mon Dec 18 16:22:19 IST 2017
  */
+public abstract class SalesAgentCommissionReceiptDetailService {
 
-public abstract class SalesAgentCommissionReceiptDetailService {  
- 
- /**
+  /**
    * SalesAgentCommissionReceiptDetail paginated query.
    *
    * @param main
@@ -37,18 +35,19 @@ public abstract class SalesAgentCommissionReceiptDetailService {
     sql.join("left outer join scm_sales_agent_commission_receipt scm_sales_agent_commission_receipt_detailsales_agent_commission_receipt_id on (scm_sales_agent_commission_receipt_detailsales_agent_commission_receipt_id.id = scm_sales_agent_commission_receipt_detail.sales_agent_commission_receipt_id) left outer join scm_sales_invoice scm_sales_agent_commission_receipt_detailsales_invoice_id on (scm_sales_agent_commission_receipt_detailsales_invoice_id.id = scm_sales_agent_commission_receipt_detail.sales_invoice_id)"); //Join Query
 
     sql.string(new String[]{"scm_sales_agent_commission_receipt_detailsales_invoice_id.invoice_no"}); //String search or sort fields
-    sql.number(new String[]{"scm_sales_agent_commission_receipt_detail.id","scm_sales_agent_commission_receipt_detail.invoice_commission_value","scm_sales_agent_commission_receipt_detail.eligible_commission_value","scm_sales_agent_commission_receipt_detail.approved_commission_value"}); //Numeric search or sort fields
+    sql.number(new String[]{"scm_sales_agent_commission_receipt_detail.id", "scm_sales_agent_commission_receipt_detail.invoice_commission_value", "scm_sales_agent_commission_receipt_detail.eligible_commission_value", "scm_sales_agent_commission_receipt_detail.approved_commission_value"}); //Numeric search or sort fields
     sql.date(new String[]{"scm_sales_agent_commission_receipt_detailsales_agent_commission_receipt_id.entry_date"});  //Date search or sort fields
     return sql;
   }
-	
- /**
-  * Return List of SalesAgentCommissionReceiptDetail.
-  * @param main
-  * @return List of SalesAgentCommissionReceiptDetail
-  */
+
+  /**
+   * Return List of SalesAgentCommissionReceiptDetail.
+   *
+   * @param main
+   * @return List of SalesAgentCommissionReceiptDetail
+   */
   public static final List<SalesAgentCommissionReceiptDetail> listPaged(Main main) {
-     return AppService.listPagedJpa(main, getSalesAgentCommissionReceiptDetailSqlPaged(main));
+    return AppService.listPagedJpa(main, getSalesAgentCommissionReceiptDetailSqlPaged(main));
   }
 
 //  /**
@@ -64,34 +63,36 @@ public abstract class SalesAgentCommissionReceiptDetailService {
 //     return AppService.listPagedJpa(main, sql); // For pagination in view
 //   //  return AppService.listAllJpa(main, sql); // Return the full records
 //  }
-
- /**
-  * Select SalesAgentCommissionReceiptDetail by key.
-  * @param main
-  * @param salesAgentCommissionReceiptDetail
-  * @return SalesAgentCommissionReceiptDetail
-  */
+  /**
+   * Select SalesAgentCommissionReceiptDetail by key.
+   *
+   * @param main
+   * @param salesAgentCommissionReceiptDetail
+   * @return SalesAgentCommissionReceiptDetail
+   */
   public static final SalesAgentCommissionReceiptDetail selectByPk(Main main, SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
     return (SalesAgentCommissionReceiptDetail) AppService.find(main, SalesAgentCommissionReceiptDetail.class, salesAgentCommissionReceiptDetail.getId());
   }
 
- /**
-  * Insert SalesAgentCommissionReceiptDetail.
-  * @param main
-  * @param salesAgentCommissionReceiptDetail
-  */
+  /**
+   * Insert SalesAgentCommissionReceiptDetail.
+   *
+   * @param main
+   * @param salesAgentCommissionReceiptDetail
+   */
   public static final void insert(Main main, SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
     SalesAgentCommissionReceiptDetailIs.insertAble(main, salesAgentCommissionReceiptDetail);  //Validating
     AppService.insert(main, salesAgentCommissionReceiptDetail);
 
   }
 
- /**
-  * Update SalesAgentCommissionReceiptDetail by key.
-  * @param main
-  * @param salesAgentCommissionReceiptDetail
-  * @return SalesAgentCommissionReceiptDetail
-  */
+  /**
+   * Update SalesAgentCommissionReceiptDetail by key.
+   *
+   * @param main
+   * @param salesAgentCommissionReceiptDetail
+   * @return SalesAgentCommissionReceiptDetail
+   */
   public static final SalesAgentCommissionReceiptDetail updateByPk(Main main, SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
     SalesAgentCommissionReceiptDetailIs.updateAble(main, salesAgentCommissionReceiptDetail); //Validating
     return (SalesAgentCommissionReceiptDetail) AppService.update(main, salesAgentCommissionReceiptDetail);
@@ -106,8 +107,7 @@ public abstract class SalesAgentCommissionReceiptDetailService {
   public static void insertOrUpdate(Main main, SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
     if (salesAgentCommissionReceiptDetail.getId() == null) {
       insert(main, salesAgentCommissionReceiptDetail);
-    }
-    else{
+    } else {
       updateByPk(main, salesAgentCommissionReceiptDetail);
     }
   }
@@ -123,21 +123,23 @@ public abstract class SalesAgentCommissionReceiptDetailService {
     insert(main, salesAgentCommissionReceiptDetail);
   }
 
- /**
-  * Delete SalesAgentCommissionReceiptDetail.
-  * @param main
-  * @param salesAgentCommissionReceiptDetail
-  */
+  /**
+   * Delete SalesAgentCommissionReceiptDetail.
+   *
+   * @param main
+   * @param salesAgentCommissionReceiptDetail
+   */
   public static final void deleteByPk(Main main, SalesAgentCommissionReceiptDetail salesAgentCommissionReceiptDetail) {
     SalesAgentCommissionReceiptDetailIs.deleteAble(main, salesAgentCommissionReceiptDetail); //Validation
     AppService.delete(main, SalesAgentCommissionReceiptDetail.class, salesAgentCommissionReceiptDetail.getId());
   }
-	
- /**
-  * Delete Array of SalesAgentCommissionReceiptDetail.
-  * @param main
-  * @param salesAgentCommissionReceiptDetail
-  */
+
+  /**
+   * Delete Array of SalesAgentCommissionReceiptDetail.
+   *
+   * @param main
+   * @param salesAgentCommissionReceiptDetail
+   */
   public static final void deleteByPkArray(Main main, SalesAgentCommissionReceiptDetail[] salesAgentCommissionReceiptDetail) {
     for (SalesAgentCommissionReceiptDetail e : salesAgentCommissionReceiptDetail) {
       deleteByPk(main, e);

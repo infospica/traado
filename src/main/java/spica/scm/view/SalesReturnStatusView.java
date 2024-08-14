@@ -5,7 +5,6 @@
  * Use is subject to license terms.
  *
  */
-
 package spica.scm.view;
 
 import java.io.Serializable;
@@ -25,50 +24,54 @@ import spica.scm.service.SalesReturnStatusService;
 
 /**
  * SalesReturnStatusView
+ *
  * @author	Spirit 1.2
- * @version	1.0, Mon Jan 29 16:45:18 IST 2018 
+ * @version	1.0, Mon Jan 29 16:45:18 IST 2018
  */
-
-@Named(value="salesReturnStatusView")
+@Named(value = "salesReturnStatusView")
 @ViewScoped
-public class SalesReturnStatusView implements Serializable{
+public class SalesReturnStatusView implements Serializable {
 
   private transient SalesReturnStatus salesReturnStatus;	//Domain object/selected Domain.
   private transient LazyDataModel<SalesReturnStatus> salesReturnStatusLazyModel; 	//For lazy loading datatable.
   private transient SalesReturnStatus[] salesReturnStatusSelected;	 //Selected Domain Array
+
   /**
    * Default Constructor.
-   */   
+   */
   public SalesReturnStatusView() {
     super();
   }
- 
+
   /**
    * Return SalesReturnStatus.
+   *
    * @return SalesReturnStatus.
-   */  
+   */
   public SalesReturnStatus getSalesReturnStatus() {
-    if(salesReturnStatus == null) {
+    if (salesReturnStatus == null) {
       salesReturnStatus = new SalesReturnStatus();
     }
     return salesReturnStatus;
-  }   
-  
+  }
+
   /**
    * Set SalesReturnStatus.
+   *
    * @param salesReturnStatus.
-   */   
+   */
   public void setSalesReturnStatus(SalesReturnStatus salesReturnStatus) {
     this.salesReturnStatus = salesReturnStatus;
   }
- 
+
   /**
    * Change view of
+   *
    * @param main
    * @param viewType
-   * @return 
+   * @return
    */
- public String switchSalesReturnStatus(MainView main, String viewType) {
+  public String switchSalesReturnStatus(MainView main, String viewType) {
     if (!StringUtil.isEmpty(viewType)) {
       try {
         main.setViewType(viewType);
@@ -81,40 +84,44 @@ public class SalesReturnStatusView implements Serializable{
         }
       } catch (Throwable t) {
         main.rollback(t);
-      } finally{
+      } finally {
         main.close();
       }
     }
     return null;
-  } 
-  
+  }
+
   /**
    * Create salesReturnStatusLazyModel.
+   *
    * @param main
    */
   private void loadSalesReturnStatusList(final MainView main) {
     if (salesReturnStatusLazyModel == null) {
       salesReturnStatusLazyModel = new LazyDataModel<SalesReturnStatus>() {
-      private List<SalesReturnStatus> list;      
-      @Override
-      public List<SalesReturnStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        try {
-          AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
-          list = SalesReturnStatusService.listPaged(main);
-          main.commit(salesReturnStatusLazyModel, first, pageSize);
-        } catch (Throwable t) {
-          main.rollback(t, "error.list");
-          return null;
-        } finally{
-          main.close();
+        private List<SalesReturnStatus> list;
+
+        @Override
+        public List<SalesReturnStatus> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+          try {
+            AppPage.move(main.getPageData(), first, pageSize, sortField, sortOrder.name());
+            list = SalesReturnStatusService.listPaged(main);
+            main.commit(salesReturnStatusLazyModel, first, pageSize);
+          } catch (Throwable t) {
+            main.rollback(t, "error.list");
+            return null;
+          } finally {
+            main.close();
+          }
+          return list;
         }
-        return list;
-      }
-      @Override
-      public Object getRowKey(SalesReturnStatus salesReturnStatus) {
-        return salesReturnStatus.getId();
-      }
-      @Override
+
+        @Override
+        public Object getRowKey(SalesReturnStatus salesReturnStatus) {
+          return salesReturnStatus.getId();
+        }
+
+        @Override
         public SalesReturnStatus getRowData(String rowKey) {
           if (list != null) {
             for (SalesReturnStatus obj : list) {
@@ -130,11 +137,12 @@ public class SalesReturnStatusView implements Serializable{
   }
 
   private void uploadFiles() {
-    String SUB_FOLDER = "scm_sales_return_status/";	
+    String SUB_FOLDER = "scm_sales_return_status/";
   }
-  
+
   /**
    * Insert or update.
+   *
    * @param main
    * @return the page to display.
    */
@@ -150,7 +158,7 @@ public class SalesReturnStatusView implements Serializable{
    */
   public String cloneSalesReturnStatus(MainView main) {
     main.setViewType(ViewTypes.newform);
-    return saveOrCloneSalesReturnStatus(main, "clone"); 
+    return saveOrCloneSalesReturnStatus(main, "clone");
   }
 
   /**
@@ -176,14 +184,13 @@ public class SalesReturnStatusView implements Serializable{
         main.setViewType(ViewTypes.editform); // Change to ViewTypes.list to navigate to list page
       }
     } catch (Throwable t) {
-      main.rollback(t, "error."+ key);
+      main.rollback(t, "error." + key);
     } finally {
       main.close();
     }
     return null;
   }
 
-  
   /**
    * Delete one or many SalesReturnStatus.
    *
@@ -199,7 +206,7 @@ public class SalesReturnStatusView implements Serializable{
       } else {
         SalesReturnStatusService.deleteByPk(main, getSalesReturnStatus());  //individual record delete from list or edit form
         main.commit("success.delete");
-        if (main.isEdit()){
+        if (main.isEdit()) {
           main.setViewType(ViewTypes.newform);
         }
       }
@@ -213,28 +220,29 @@ public class SalesReturnStatusView implements Serializable{
 
   /**
    * Return LazyDataModel of SalesReturnStatus.
+   *
    * @return
    */
   public LazyDataModel<SalesReturnStatus> getSalesReturnStatusLazyModel() {
     return salesReturnStatusLazyModel;
   }
 
- /**
-  * Return SalesReturnStatus[].
-  * @return 
-  */
+  /**
+   * Return SalesReturnStatus[].
+   *
+   * @return
+   */
   public SalesReturnStatus[] getSalesReturnStatusSelected() {
     return salesReturnStatusSelected;
   }
-  
+
   /**
    * Set SalesReturnStatus[].
-   * @param salesReturnStatusSelected 
+   *
+   * @param salesReturnStatusSelected
    */
   public void setSalesReturnStatusSelected(SalesReturnStatus[] salesReturnStatusSelected) {
     this.salesReturnStatusSelected = salesReturnStatusSelected;
   }
- 
-
 
 }

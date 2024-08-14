@@ -34,14 +34,12 @@ import wawo.app.AppUser;
 import wawo.app.Main;
 import wawo.app.common.AppService;
 import wawo.app.config.AppConfig;
-import wawo.app.faces.AppLookup;
 import wawo.app.faces.MainView;
 import wawo.entity.core.AppDb;
 import wawo.entity.core.AppEm;
 import wawo.entity.core.FileData;
 import wawo.entity.util.Secure;
 import wawo.entity.util.StringUtil;
-import wawo.mail.smtp.SmtpMail;
 
 /**
  * Provide service level run time data of a logged in user.
