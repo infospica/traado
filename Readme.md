@@ -18,7 +18,9 @@ Maven
 ## Code Quality
 
 mvn spotbugs:spotbugs
+
 mvn spotbugs:gui
+
 mvn pmd:pmd
 
 ## Build
