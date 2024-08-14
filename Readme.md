@@ -2,7 +2,7 @@
 
 <div align="center">
     <a href="https://infospica.com">
-        <img src="https://raw.githubusercontent.com/infospica/traado/main/TRAADO_logo.jpg" height="128">
+        <img src="https://raw.githubusercontent.com/infospica/traado/main/TRAADO_logo.jpg" height="100">
     </a>
     <h2>TRAADO</h2>
     <p align="center">
@@ -13,6 +13,7 @@
 ## Environment Requirements
 
 Java 8
+
 Maven
 
 ## Code Quality
@@ -33,7 +34,7 @@ TODO
 
 ## License
 
-GNU/General Public License (see [license.txt](license.txt))
+GNU/General Public License (see [license](LICENSE))
 
 The TRAADO code is licensed as GNU General Public License (v3) and the copyright is owned by Infospica Consultancy Services LLP and Contributors.
 
