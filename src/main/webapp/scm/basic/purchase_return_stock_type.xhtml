@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{purchaseReturnStockTypeView.switchPurchaseReturnStockType(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReturnStockType}" />
+    <ui:param name="ids" value="purchaseReturnStockType" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{purchaseReturnStockTypeView.deletePurchaseReturnStockType(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('purchaseReturnStockTypeWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{purchaseReturnStockTypeView.clonePurchaseReturnStockType(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{purchaseReturnStockTypeView.deletePurchaseReturnStockType(main)}" value="#{lang.delete}" onclick="wdgOff('purchaseReturnStockTypeWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{purchaseReturnStockTypeView.savePurchaseReturnStockType(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"   rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">    
+
+      <!--Title-->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{purchaseReturnStockTypeView.purchaseReturnStockType.title}" maxlength="200" required="true" 
+                     requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <!--Priority-->
+      <p:outputLabel value="#{lang.priority}" for="priority" />
+      <h:panelGroup>
+        <p:inputNumber value="#{purchaseReturnStockTypeView.purchaseReturnStockType.priority}" converterMessage="#{lang.priority} #{lang.invalidNumber}" 
+                       decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="priority" styleClass="fw" />
+        <p:message for="priority" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(purchaseReturnStockTypeView.purchaseReturnStockType.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(purchaseReturnStockTypeView.purchaseReturnStockType.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(purchaseReturnStockTypeView.purchaseReturnStockType.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(purchaseReturnStockTypeView.purchaseReturnStockType.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseReturnStockTypeTable" var="purchaseReturnStockTypeVar" widgetVar="purchaseReturnStockTypeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{purchaseReturnStockTypeView.purchaseReturnStockTypeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseReturnStockTypeVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{purchaseReturnStockTypeView.purchaseReturnStockTypeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.title}" sortBy="#{purchaseReturnStockTypeVar.title}" field="title" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseReturnStockTypeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{purchaseReturnStockTypeView.purchaseReturnStockType}" value="#{purchaseReturnStockTypeVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.priority}" sortBy="#{purchaseReturnStockTypeVar.priority}" field="priority" ><h:outputText value="#{appView.number(purchaseReturnStockTypeVar.priority)}" escape="false" /></p:column>        
+        <p:column headerText="#{lang.log}" exportable="false">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(purchaseReturnStockTypeVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(purchaseReturnStockTypeVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(purchaseReturnStockTypeVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(purchaseReturnStockTypeVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(purchaseReturnStockTypeVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

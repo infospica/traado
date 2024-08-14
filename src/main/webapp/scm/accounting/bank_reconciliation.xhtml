@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <o:importConstants type="spica.constant.AccountingConstant" />
+
+  #{bankReconciliationView.switchBankReconciliation(main, 'newform')}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.bankReconciliation}"/>
+    <ui:param name="labelOnly" value="true"/>
+    <ui:param name="navLabel" value="#{accountingMainView.selectedLedger.title}"/>
+    <ui:param name="ids" value="bankReconciliation"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save">
+      <h:panelGroup styleClass="searchBox m m-r-5"  >
+        <p:inputText styleClass="fw" id="txtLdSearch" value="#{main.pageData.searchKeyWord}" placeholder="#{lang.search}" autocomplete="off"  />
+        <p:commandButton styleClass="btn" onclick="block()" oncomplete="unblock();" process="txtLdSearch,@this" 
+                         update="bankReconciliationTable "  title="#{lang.search}" id="btnLdSearch" partialSubmit="true" icon="fa fa-search" iconPos="left" >
+          <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+          <f:setPropertyActionListener target="#{bankReconciliationView.bankReconciliationList}" value="#{null}" />
+          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+        </p:commandButton>
+        <ui:insert name="defaultCommand" >
+          <p:defaultCommand target="btnLdSearch"/>
+        </ui:insert>
+      </h:panelGroup>
+      <p:commandButton process="bankReconciliationTableDiv @this" value="#{lang.save}" action="#{bankReconciliationView.actionSave(main)}" styleClass="btn btn-primary" update="f1 bankReconciliationTable" ></p:commandButton>
+    </ui:define>
+    <!--
+        <ui:define name="newList">
+          <p:inputText styleClass="fw" id="bankReconciliationST" onkeyup="return callDtFilter(this.value, 'bankReconciliation');"  placeholder="#{lang.search}"/>
+        </ui:define>-->
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="list">
+    </ui:define>
+    <ui:define name="navRight" >
+      <h:inputText id="forFocus" styleClass="sr-only" />
+      <h:panelGroup styleClass="L" >
+        <p:commandButton actionListener="#{bankReconciliationView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="bankReconciliationTable fmess fromDate" styleClass="btn"/>
+        <p:commandButton actionListener="#{bankReconciliationView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="bankReconciliationTable fmess fromDate" styleClass="btn"/>
+        <p:calendar id="fromDate" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" mindate="#{userRuntimeView.company.financialYearStartDate}"
+                    maxlength="10" size="7"  showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}" >
+          <p:ajax event="dateSelect" process="@this" listener="#{bankReconciliationView.onFromDateSelect}" update="bankReconciliationTable fmess"/>
+        </p:calendar> <p:message for="fromDate" display="text" id="fmess"/>
+      </h:panelGroup>      <h:panelGroup styleClass="L" >
+        <p:calendar id="toDate" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{accountingMainView.fromDate}"
+                    maxlength="10" size="7"  showButtonPanel="true" navigator="true" mask="true"  maxdate="#{userRuntimeView.getToday()}">
+          <p:ajax event="dateSelect" process="@this" listener="#{bankReconciliationView.onToDateSelect}" update="bankReconciliationTable tmess"/>
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>
+      </h:panelGroup>
+      <p:commandButton process="@this" immediate="true"
+                       actionListener="#{bankReconciliationView.dialogClose}"
+                       icon="fa fa-times" iconPos="right" styleClass="btn btn-default right" update="f1" />
+    </ui:define>
+    <ui:define name="moreForm">
+      <h:panelGroup styleClass="L m-l-30" >
+        <h:outputLabel value="#{lang.copy} #{lang.date}" for="applyAll"/>
+        <p:calendar  value="#{bankReconciliationView.selectedDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.processed} #{lang.date} #{lang.invalidDate}"
+                     maxlength="10" id="applyAll" size="10" showButtonPanel="true" navigator="true" mask="true"  >
+          <p:ajax event="dateSelect" process="@this" partialSubmit="true" update="applymess"  />
+        </p:calendar>
+        <p:message for="applyAll" display="text" id="applymess"/> </h:panelGroup>  
+      <h:panelGroup styleClass="L" >
+        <p:commandButton process="@this applyAll" 
+                         actionListener="#{bankReconciliationView.applyAllProcessed()}" value=" #{lang.to} #{lang.processed} #{lang.date}" title="#{lang.copy} #{lang.to} #{lang.all} #{lang.processed} #{lang.date}"
+                         icon="fa fa-copy" iconPos="left" styleClass="btn btn-info" update="bankReconciliationTable applymess" />
+      </h:panelGroup>              
+      <ui:decorate template="/WEB-INF/resources/theme1/com/toolExport.xhtml"/> 
+    </ui:define>
+    <ui:define name="formRight">
+
+      <h:panelGroup styleClass="L" layout="block">
+        <p:selectOneButton id="filter" value="#{bankReconciliationView.reconciliationOptions}" styleClass="l-p-10" valueChangeListener="#{bankReconciliationView.filterWithStatus}"  >
+          <f:selectItem itemLabel="#{lang.deposited}" itemValue="#{AccountingConstant.BANK_CHEQUE_ISSUED}" /> 
+          <f:selectItem itemLabel="#{lang.cleared}" itemValue="#{AccountingConstant.BANK_CHEQUE_RECONCILED}" />
+          <f:selectItem itemLabel="#{lang.dishonoured}" itemValue="#{AccountingConstant.BANK_CHEQUE_BOUNCE}" />
+          <f:selectItem itemLabel="#{lang.all}" itemValue="#{null}" />
+          <p:ajax event="change" process="@this" update="bankReconciliationTable @this" onstart="block();" oncomplete="unblock();" />
+        </p:selectOneButton>
+      </h:panelGroup>
+
+
+    </ui:define>
+    <ui:define name="afterForm">
+      <h:panelGroup layout="block"  id="bankReconciliationTableDiv" styleClass="table-responsive">
+        <p:dataTable id="bankReconciliationTable" var="row" widgetVar="bankReconciliationWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{bankReconciliationView.getBankReconciliationList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false"   >
+          <p:ajax event="page" onstart="block();" oncomplete="unblock();" />
+          <f:facet name="header">
+            <p:outputPanel styleClass="hidden" >
+              <p:inputText id="globalFilter"  onkeyup="return PF('bankReconciliationWidget').filter()" />
+            </p:outputPanel>
+          </f:facet>
+          <p:column headerText="#{lang.particulars}"><h:outputText value="#{appView.display(row.particulars)}" title="#{appView.title(row.particulars)}" escape="false" /></p:column>
+          <p:column headerText="" exportable="false" styleClass="w-20" >
+            <p:fragment rendered="#{row.voucherType ne null}">  
+              <p:commandLink rendered="#{(row.processedAt eq null or row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE) and row.voucherTypeId eq 3 }"  title="#{lang.revokeBankTransaction}" oncomplete="updateDialog();" styleClass="ignoreLoad" update="bankReconcDlg" process="@this" >
+                <i class="fa fa-undo"></i> 
+                <f:setPropertyActionListener target="#{bankReconciliationView.bankReconciliationSelected}" value="#{row}"  />
+              </p:commandLink>             
+            </p:fragment>
+          </p:column>
+          <p:column headerText="#{lang.voucherType}" >
+            <p:commandLink rendered="#{row.tranId ne null}" actionListener="#{popUpView.showJournalByAccountingTransactionId(row.tranId)}"  value="#{appView.display(row.voucherType)}" title="#{lang.view} #{row.documentNumber}"
+                           process="@this" immediate="true" onstart="block()" oncomplete="unblock()"  />
+            <h:outputText rendered="#{row.tranId eq null}" value="#{appView.display(row.voucherType)}" title="#{appView.title(row.voucherType)}" escape="false" />
+          </p:column>  
+
+          <p:column headerText="#{lang.transactionType}"><h:outputText value="#{appView.display(row.transactionType)}" title="#{appView.title(row.transactionType)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.documentNo}"><h:outputText value="#{appView.display(row.documentNumber)}" title="#{appView.title(row.documentNumber)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.reference} #{lang.no}"><h:outputText value="#{appView.display(row.referNumber)}" title="#{appView.title(row.referNumber)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.document} #{lang.date}"><h:outputText value="#{appView.date(row.documentDate)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.entry} #{lang.date}" ><h:outputText value="#{appView.date(row.entryDate)}" escape="false" title="#{lang.deposit} #{lang.date}" /></p:column>
+          <p:column headerText="#{lang.processed} #{lang.date}">
+            <p:calendar value="#{row.processedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" maxlength="12" id="processedAt" showButtonPanel="true" navigator="true" mask="true" pages="3" styleClass="test" rendered="#{row.voucherType ne null}" >
+              <p:ajax event="dateSelect" immediate="true" process="@this" />
+            </p:calendar>
+          </p:column>
+          <p:column headerText="#{lang.debit}" style="text-align: right;"><h:outputText  rendered="#{row.isReciept(bankReconciliationView.selectedLedger.id)}" value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.credit}" style="text-align: right;"><h:outputText rendered="#{row.isPayment(bankReconciliationView.selectedLedger.id)}" value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.status} #{row.bankStatus}" style="text-align: right;"><h:outputText value="#{appView.display(row.bankStatus eq AccountingConstant.BANK_CHEQUE_RECIEVED ? lang.received : row.bankStatus eq AccountingConstant.BANK_CHEQUE_ISSUED ? lang.deposited : row.bankStatus eq AccountingConstant.BANK_CHEQUE_RECONCILED ? lang.cleared : row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE ? lang.dishonoured : row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE_RESUBMITTED ? lang.represent : row.bankStatus eq AccountingConstant.BANK_CHEQUE_RETURNED ? lang.returned :  row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE_HIDE ? lang.dishonoured : row.bankStatus eq AccountingConstant.BANK_CHEQUE_CANCELED ? lang.cancelled : row.processedAt eq null ? lang.deposited : 'None' )}" escape="false" /></p:column>
+          <p:columnGroup type="footer">
+            <!--            <p:row>
+                          <p:column colspan="9" style="text-align:right" footerText="#{lang.balanceaspercompany}" />
+                          <p:column style="text-align:right" footerText="#{appView.decimal(bankReconciliationView.bankBalance.totalAmountDebit - bankReconciliationView.bankBalance.totalAmountCredit)}" rendered="#{bankReconciliationView.bankBalance.totalAmountDebit gt bankReconciliationView.bankBalance.totalAmountCredit}"></p:column>
+                          <p:column style="text-align:right" footerText="#{appView.decimal(bankReconciliationView.bankBalance.totalAmountCredit - bankReconciliationView.bankBalance.totalAmountDebit)}" rendered="#{bankReconciliationView.bankBalance.totalAmountDebit lt bankReconciliationView.bankBalance.totalAmountCredit}"></p:column>
+                          <p:column style="text-align:right" footerText="" />
+                        </p:row>-->
+            <p:row rendered="#{bankReconciliationView.reconciliationOptions eq null or bankReconciliationView.reconciliationOptions eq AccountingConstant.BANK_CHEQUE_ISSUED}">
+              <p:column colspan="9" style="text-align:right" footerText="#{lang.amountnotreflected}" />
+              <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(bankReconciliationView.debit)}"></p:column>
+              <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(bankReconciliationView.credit)}"></p:column>
+              <p:column style="text-align:right" footerText="" />   
+            </p:row>
+            <!--            <p:row>
+                          <p:column colspan="9" style="text-align:right" footerText="#{lang.balanceasperbank}" />
+                          <p:column style="text-align:right" footerText="#{appView.decimal(bankReconciliationView.bankBalance.processedAmountDebit - bankReconciliationView.bankBalance.processedAmountCredit)}" rendered="#{bankReconciliationView.bankBalance.processedAmountDebit gt bankReconciliationView.bankBalance.processedAmountCredit}"></p:column>
+                          <p:column style="text-align:right" footerText="#{appView.decimal(bankReconciliationView.bankBalance.processedAmountCredit - bankReconciliationView.bankBalance.processedAmountDebit)}" rendered="#{bankReconciliationView.bankBalance.processedAmountDebit lt bankReconciliationView.bankBalance.processedAmountCredit}"></p:column>
+                          <p:column style="text-align:right" footerText="" />
+                        </p:row>-->
+          </p:columnGroup>
+        </p:dataTable>
+      </h:panelGroup>
+
+      <p:dialog id="bankReconcDlg" widgetVar="bankReconcDlgVar" header="Revoke Bank Transaction" resizable="true" modal="true" dynamic="true" width="600" height="500" 
+                responsive="false" closeOnEscape="true"  >
+        <p:messages id="dialogMessage" />
+        #{bankReconciliationView.loadBankReconciliation(main)}
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+          <ui:param name="styleClass" value="#{sysRuntimeView.getGrid2Medium()}" />
+          <ui:param name="label" value=" " />
+          <ui:param name="id" value="bounce" />
+
+          <ui:define name="menuleft">
+            <h:panelGroup id="menuDlg">
+              <p:commandButton value="#{lang.confirm}" action="#{bankReconciliationView.actionSaveBounce(main)}" styleClass="btn btn-primary" update="menuDlg dialogMessage bankReconciliationTable" rendered="#{bankReconciliationView.chequeBounce.id eq null}" id="saveRevoke" process="bankReconcDlg" />
+              <p:commandButton value="#{lang.delete}" action="#{bankReconciliationView.actionDeleteBounce(main)}" styleClass="btn btn-danger" update="menuDlg dialogMessage bankReconciliationTable" rendered="#{bankReconciliationView.chequeBounce.id ne null}" id="delRevoke" process="bankReconcDlg" oncomplete="PF('bankReconcDlgVar').hide()" />
+            </h:panelGroup>
+          </ui:define>
+          <h:outputLabel value="#{lang.party}" for="particulars"/>
+          <p:outputLabel id="particulars" value="#{bankReconciliationView.bankReconciliationSelected.particulars}" styleClass="fw"/>
+          <p:outputLabel value="#{lang.voucherType}" for="vType"/>
+          <p:outputLabel id="vType" value="#{bankReconciliationView.bankReconciliationSelected.voucherType} (#{bankReconciliationView.bankReconciliationSelected.transactionType})" />
+<!--          <p:outputLabel value="#{lang.transactionType}" for="tType"/>
+          <p:outputLabel id="tType" value="#{bankReconciliationView.bankReconciliationSelected.transactionType}"/>-->
+          <p:outputLabel value="#{lang.documentNo}" for="docNo"/>
+          <p:outputLabel id="docNo" value="#{bankReconciliationView.bankReconciliationSelected.documentNumber}" />
+          <p:outputLabel value="#{lang.document} #{lang.date}" for="docDate"/>
+          <p:outputLabel id="docDate" value="#{appView.date(bankReconciliationView.bankReconciliationSelected.documentDate)}" />
+          <p:outputLabel value="#{lang.deposit} #{lang.date}" for="depDate"/>
+          <p:outputLabel id="depDate" value="#{appView.date(bankReconciliationView.bankReconciliationSelected.entryDate)}" />
+          <p:outputLabel value="#{lang.debit}" for="debit" rendered="#{bankReconciliationView.bankReconciliationSelected.isReciept(bankReconciliationView.selectedLedger.id)}"/>
+          <p:outputLabel id="debit" rendered="#{bankReconciliationView.bankReconciliationSelected.isReciept(bankReconciliationView.selectedLedger.id)}" value="#{appView.decimal(bankReconciliationView.bankReconciliationSelected.netAmount)}"/>
+          <p:outputLabel value="#{lang.credit}" for="credit" rendered="#{bankReconciliationView.bankReconciliationSelected.isPayment(bankReconciliationView.selectedLedger.id)}"/>
+          <p:outputLabel id="credit" rendered="#{bankReconciliationView.bankReconciliationSelected.isPayment(bankReconciliationView.selectedLedger.id)}" value="#{appView.decimal(bankReconciliationView.bankReconciliationSelected.netAmount)}"/>
+          <p:outputLabel value="#{lang.ledger}" for="ledgerId"/>
+          <p:outputLabel id="ledgerId" value="#{bankReconciliationView.chequeBounce.accountingLedgerId.title}"/>
+          <p:outputLabel value="#{lang.bank} #{lang.charges}" for="bankCharge"/>
+          <p:inputNumber id="bankCharge" value="#{bankReconciliationView.chequeBounce.bankCharge}" onclick="this.select()"  inputStyleClass="text-right w-200" required="true" requiredMessage="#{lang.bank} #{lang.charges} #{lang.isRequired}" autocomplete="off" >
+            <p:ajax event="change" listener="#{bankReconciliationView.calculatetax()}" process="bankCharge" update="cgst sgst total penalty" />
+          </p:inputNumber>
+          <p:outputLabel value="#{bankReconciliationView.bankchargeLedger.cgstId.code}" for="cgst" rendered="#{bankReconciliationView.bankchargeLedger.cgstId.code ne null}"/>
+          <p:inputText  id="cgst" styleClass="text-right w-200" value="#{appView.decimal(bankReconciliationView.chequeBounce.cgstAmount)}" rendered="#{bankReconciliationView.bankchargeLedger.cgstId.code ne null}" readonly="true"/>
+          <p:outputLabel value="#{bankReconciliationView.bankchargeLedger.sgstId.code}" for="sgst" rendered="#{bankReconciliationView.bankchargeLedger.sgstId.code ne null}"/>
+          <p:inputText id="sgst" styleClass="text-right w-200" value="#{appView.decimal(bankReconciliationView.chequeBounce.sgstAmount)}" rendered="#{bankReconciliationView.bankchargeLedger.sgstId.code ne null}" readonly="true" />
+          <p:outputLabel value="#{lang.total}" for="total" rendered="#{bankReconciliationView.bankchargeLedger.cgstId.code ne null and bankReconciliationView.bankchargeLedger.sgstId.code ne null}"/>
+          <p:inputText id="total" styleClass="text-right w-200" value="#{appView.decimal(bankReconciliationView.chequeBounce.totalAmount)}" rendered="#{bankReconciliationView.bankchargeLedger.cgstId.code ne null and bankReconciliationView.bankchargeLedger.sgstId.code ne null}" readonly="true"/>
+          <p:outputLabel value="#{lang.penalty} #{lang.amount}" for="penalty"/>
+          <p:inputNumber id="penalty" value="#{bankReconciliationView.chequeBounce.penaltyAmount}" onclick="this.select()" inputStyleClass="text-right w-200" required="true" requiredMessage="#{lang.penalty} #{lang.amount} #{lang.isRequired}" autocomplete="off" >
+          </p:inputNumber>
+          <p:outputLabel value="#{lang.entry} #{lang.date}" for="processedAt2" title="#{lang.processed} #{lang.date}" />
+          <h:panelGroup>
+            <p:calendar value="#{bankReconciliationView.bankReconciliationSelected.processedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" 
+                        maxlength="11" id="processedAt2" showButtonPanel="true" pages="2" navigator="true" mask="true" required="true" requiredMessage="#{lang.processed} #{lang.date} #{lang.isRequired}"/>
+            <p:message for="processedAt2" />
+          </h:panelGroup>
+          <p:outputLabel value="#{lang.note}" for="remarks"/>
+          <p:inputTextarea  value="#{bankReconciliationView.chequeBounce.remarks}" maxlength="1000" id="remarks" styleClass="fw" />
+          <!--            <o:validateOrder type="gte" components="processedAt2 depDate" 
+                                       message="#{lang.processed} #{lang.date} #{lang.gte} #{lang.deposit} #{lang.date}" showMessageFor="processedAt2" />-->
+        </ui:decorate>         
+      </p:dialog>
+      <p:remoteCommand name="updateDialog" update="bankReconcDlg" oncomplete="PF('bankReconcDlgVar').show();"  />
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

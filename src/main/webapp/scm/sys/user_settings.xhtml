@@ -1,0 +1,141 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  #{userProfileView.switchUserProfile(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.user}" />
+    <ui:param name="navLabel" value="#{lang.settings}" />
+    <ui:param name="ids" value="userEdit" />
+
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  
+                       actionListener="#{userRuntimeView.userSettingPopupClose}"
+                       oncomplete="closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+
+
+    <ui:define name="form">
+
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{customerView.activeIndex}" orientation="left">
+        <p:ajax event="tabChange"  oncomplete="unblock()"/>                
+        <p:tab title="#{lang.profile}"  >
+
+          <div data-fast-input="true" >
+            <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+              <ui:param name="ids" value="userEdit" />          
+              <ui:define name="save">
+                <p:commandButton value="#{lang.save}" action="#{userRuntimeView.actionEditProfile(main)}" update="f1" styleClass="btn btn-primary" />
+              </ui:define>    
+
+              <p:outputLabel value="#{lang.name}" for="userName" />
+              <h:panelGroup>
+                <p:inputText styleClass="fw" value="#{userRuntimeView.appUser.userProfileId.name}" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" id="userName" validator="wawo.WhiteSpaceValidator"/>
+                <p:message for="userName" display="text"/>
+              </h:panelGroup>
+              <p:outputLabel value="#{lang.address1}" for="profileaddr1" />
+              <h:panelGroup>
+                <p:inputText  styleClass="fw" id="profileaddr1" value="#{userRuntimeView.appUser.userProfileId.address1}" />
+                <p:message for="profileaddr1" display="text"/>
+              </h:panelGroup>
+              <p:outputLabel value="#{lang.address2}" for="profileaddr2" />
+              <h:panelGroup>
+                <p:inputText  styleClass="fw" id="profileaddr2" value="#{userRuntimeView.appUser.userProfileId.address2}" />
+                <p:message for="profileaddr2" display="text"/>
+              </h:panelGroup>
+              <p:outputLabel value="#{lang.phone1}" for="phn1"/>
+              <h:panelGroup>
+                <p:inputText  styleClass="fw" maxlength="10" value="#{userRuntimeView.appUser.userProfileId.phone1}" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" id="phn1" validator="wawo.WhiteSpaceValidator"/>
+                <p:message for="phn1" display="text"/>
+              </h:panelGroup>
+              <p:outputLabel value="#{lang.phone2}" for="phn2"/>
+              <h:panelGroup>
+                <p:inputText  styleClass="fw" maxlength="10" value="#{userRuntimeView.appUser.userProfileId.phone2}" id="phn2" />
+                <p:message for="phn2" display="text"/>
+              </h:panelGroup>
+              <p:outputLabel value="#{lang.email}" for="profileEmail"/>
+              <h:panelGroup>
+                <p:inputText styleClass="fw" id="profileEmail" value="#{userRuntimeView.appUser.userProfileId.email}"  readonly="true"  required="true" requiredMessage="#{lang.email} #{lang.isRequired}" validator="wawo.WhiteSpaceValidator"/>
+                <p:message for="profileEmail" display="text"/>
+              </h:panelGroup>
+              <p:outputLabel value="#{lang.pan}" for="profilePanNo"/>
+              <h:panelGroup>
+                <p:inputText styleClass="fw" id="profilePanNo" value="#{userRuntimeView.appUser.userProfileId.panNo}" maxlength="20" >
+                  <f:validator validatorId="spica.scm.validators.PanCardValidator" />
+                </p:inputText>
+                <p:message for="profilePanNo" display="text"/>
+              </h:panelGroup>
+            </ui:decorate>
+
+          </div>
+
+
+        </p:tab>
+
+        <!-- Customer Address -->
+        <p:tab  title="#{lang.changePassword}"  >
+          <div data-fast-input="true">
+            <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+              <ui:param name="ids" value="passwordEdit" />
+              <ui:define name="save">
+                <p:commandButton value="#{lang.reset} #{lang.password}" action="#{userRuntimeView.changePassword(main)}" process="@this resetPwd"  styleClass="btn btn-primary" rendered="#{!main.appUser.root}"/>
+              </ui:define>
+
+              <p:outputLabel value="#{lang.newname} #{lang.password}" for="resetPwd" />
+              <h:panelGroup>
+                <p:password styleClass="fw" value="#{userRuntimeView.password}" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" id="resetPwd" validator="wawo.WhiteSpaceValidator" placeholder="#{lang.newname} #{lang.password}" autocomplete="off"/>
+                <p:message for="resetPwd" display="text"/>
+              </h:panelGroup>
+            </ui:decorate>
+          </div>
+
+        </p:tab>
+  
+        <!-- Preference menu list -->
+        <p:tab  title="#{lang.preference}" >
+
+          <h:panelGroup>
+            <p:panel id="preferPanel">
+              <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+                <ui:param name="ids" value="themeSwitcher" />
+                <ui:define name="save">
+                  <p:commandButton value="#{lang.save}" action="#{userRuntimeView.actionEditProfile(main)}" styleClass="btn btn-primary" oncomplete="parent.location.reload();"  />
+                </ui:define>
+                <h:panelGrid columns="2" style="text-align: left;">
+                <p:outputLabel for="console" value="Theme:" style="width:125px" />
+                <p:selectOneMenu id="console" style="width:120px" value="#{userRuntimeView.appUser.userProfileId.theme}">
+                  <f:selectItem itemLabel="current Theme" itemValue="all.min.css" />
+<!--                  <f:selectItem itemLabel="Dark" itemValue="all.min_dark.css" />
+                  <f:selectItem itemLabel="Red" itemValue="all.min_red.css" />
+                  <f:selectItem itemLabel="Purple" itemValue="all.min_purple.css" />-->
+                </p:selectOneMenu>
+                  
+                <h:outputLabel value="Prefered Menu" style="width:125px" />
+                <p:inputSwitch value="#{userRuntimeView.appUser.userProfileId.preferedMenu}" />        
+                  
+                </h:panelGrid>
+              </ui:decorate>
+            </p:panel>
+          </h:panelGroup>
+
+        </p:tab>
+        <p:tab title="#{lang.email} #{lang.configuration}" >
+          <div style="background-color: #FFF;padding:25px;">
+            
+          </div>
+        </p:tab>
+      </p:tabView>
+
+    </ui:define>
+
+  </ui:decorate>
+
+
+</ui:composition>

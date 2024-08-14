@@ -1,0 +1,27 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+  <p:confirmDialog rendered="#{main.isList()}" widgetVar="#{ids}WidgetDelConf" message="#{lang.confirmDeleteMessage}" header="#{lang.confirmDeleteHeader}" severity="alert" closable="false" >
+    <ui:insert name="deleteList" />
+    <p:commandButton value="#{lang.btnNo}" onclick="wdgOff('#{ids}WidgetDelConf')" type="button"  />
+  </p:confirmDialog>
+  <p:dialog rendered="#{main.isList()}" widgetVar="wdgOk" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+    <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+    <p:commandButton value="#{lang.btnOk}" onclick="wdgOff('wdgOk')" type="button" title="#{lang.btnYes}" />
+  </p:dialog>
+
+  <p:dialog widgetVar="#{ids}WidgetDel" header="#{lang.confirmDeleteHeader}" draggable="no" resizable="no" modal="true">
+    <h:outputText value="#{lang.confirmMessage}" /><h:outputText value="#{lang.deleteCap}" style="color:#C62828;font-size: small"/>?
+    <br/> <br/>   
+    <ui:insert name="deleteForm" rendered="#{main.isList() or main.isEdit()}" />
+    <p:commandButton value="#{lang.cancel}" icon="ui-icon-back" onclick="wdgOff('#{ids}WidgetDel')" type="button" title="#{lang.cancel}" />
+  </p:dialog>
+</ui:composition>
+
+

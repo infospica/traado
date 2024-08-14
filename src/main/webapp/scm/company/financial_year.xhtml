@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{financialYearView.switchFinancialYear(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchase}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="financialYear" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+    <ui:param name="search" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" actionListener="#{financialYearView.financialYearPopupClose()}" oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" id="finYearList" >
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="" />
+          <ui:define name="menuright">    
+            <!--Select and Close Button-->
+            <p:commandButton actionListener="#{financialYearView.addNewFinancialYear(main)}" title="#{lang.select}"
+                             onclick="return preSelect('financialYearTableWidget')" oncomplete="unblock();closePopup();" onstart="block();"
+                             styleClass="btn btn-primary" value="#{lang.select}" >
+            </p:commandButton>
+          </ui:define>
+
+          <p:dataTable id="financialYearTable" var="row" widgetVar="financialYearTableWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       lazy="true" value="#{financialYearView.financialYearLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesInvoiceVar.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                       selection="#{financialYearView.financialYearListSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+            <p:column selectionMode="multiple" exportable="false" />
+            <f:facet name="header">
+              <p:outputPanel styleClass="hidden" >
+                <p:inputText id="globalFilter"  onkeyup="return PF('financialYearTableWidget').filter()" />
+              </p:outputPanel>
+            </f:facet>
+            <p:column sortBy="#{row.id}" field="id" filterBy="#{row.id}" filterStyleClass="hidden">
+              <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+              <h:outputText value="#{appView.display(row.id)}" title="#{appView.title(row.id)}" escape="false" /></p:column>
+            <p:column sortBy="#{row.title}" field="id" filterBy="#{row.title}" filterStyleClass="hidden">
+              <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+              <h:outputText value="#{appView.display(row.title)}" title="#{appView.title(row.title)}" escape="false" /></p:column>
+            <p:column sortBy="#{row.startDate}" field="id" filterBy="#{row.id}" filterStyleClass="hidden">
+              <f:facet name="header"><h:outputText value="#{lang.startDate}" title="#{lang.startDate}"/></f:facet>
+              <h:outputText value="#{appView.date(row.startDate)}" title="#{appView.date(row.startDate)}" escape="false" /></p:column>
+            <p:column sortBy="#{row.endDate}" field="id" filterBy="#{row.endDate}" filterStyleClass="hidden">
+              <f:facet name="header"><h:outputText value="#{lang.endDate}" title="#{lang.endDate}"/></f:facet>
+              <h:outputText value="#{appView.date(row.endDate)}" title="#{appView.date(row.endDate)}" escape="false" /></p:column>
+
+          </p:dataTable>
+          <script>
+            //<![CDATA[
+            function preSelect(widget) {
+              var rowcount = PF(widget).getSelectedRowsCount();
+              if (rowcount == 0) {
+                PF('emptyTable').show();
+                return false;
+              }
+              return true;
+            }
+            //]]>
+          </script>
+        </ui:decorate>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</html>

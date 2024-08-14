@@ -1,0 +1,197 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  #{customerLedgerReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="gstrReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="more" />
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="gstrReportST" onkeyup="return callDtFilter(this.value, 'gstrReport');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <table>
+        <tr>
+          <td>
+            <h:panelGroup id="accountGroupDiv" rendered="true">
+              <p:autoComplete id='accountGroup'  value="#{customerLedgerReportView.filterParameters.accountGroup}" completeMethod="#{customerLedgerReportView.accountGroupAuto}" 
+                              converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                              
+                              title="#{lang.accountGroup}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+                <p:column style="width:250px;">
+                  <h:outputText value="#{e.groupName}" />
+                </p:column>
+                <p:column style="width: 40px;">
+                  <h:outputText value="#{e.groupCode}" />
+                </p:column>
+                <p:column style="width: 50px;">
+                  <p:fragment rendered="#{e.isDefault eq 0}">
+                    <i class="fa fa-users" style="color:#000;"></i>
+                  </p:fragment>
+                  <p:fragment rendered="#{e.isDefault eq 1}">
+                    <i class="fa fa-users" style="color:#CCC;" ></i>
+                  </p:fragment>
+                </p:column>
+                <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv " update="f1 salesAgentDiv customerGroup districtDiv" onstart="block()" oncomplete="unblock()"  listener="#{customerLedgerReportView.accountGroupSelectEvent}"/>             
+              </p:autoComplete>                
+            </h:panelGroup>  
+          </td>
+          <td>
+            <h:panelGroup id="salesAgentDiv" rendered="true">
+              <p:autoComplete id='salesAgent'  value="#{customerLedgerReportView.filterParameters.salesAgent}" completeMethod="#{customerLedgerReportView.salesAgentAuto}" 
+                              converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.name}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectSalesAgent}" autocomplete="off" forceSelection="true"                               
+                              title="#{lang.accountGroup}" >
+                <f:attribute name="clazz" value="#{scmLookupView.salesAgentClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.salesAgentById()}"/>        
+                <p:column style="width:250px;">
+                  <h:outputText value="#{e.name}" />
+                </p:column>
+
+                <p:ajax event="itemSelect" immediate="true" process="salesAgentDiv" onstart="block()" oncomplete="unblock()"
+                        update="customerLedgerReportTable accountGroupDiv customerGroup districtDiv" listener="#{customerLedgerReportView.salesAgentSelectEvent}"/>
+              </p:autoComplete>               
+            </h:panelGroup> 
+            <h:panelGroup id ="districtDiv" rendered="true">
+              <p:selectCheckboxMenu id="district" value="#{customerLedgerReportView.filterParameters.district}" label="District" 
+                                    filter="false" panelStyle="width:250px" onHide="districtCommand()" converter="omnifaces.SelectItemsConverter" style="width:200px;">
+                <f:selectItems value="#{customerLedgerReportView.districtAuto(filter)}" var="d" itemLabel="#{d.districtName}" itemValue="#{d}"/>
+                <p:ajax event="change" process="@this" />
+                <p:remoteCommand name="districtCommand" action="#{customerLedgerReportView.reset()}" update="customerLedgerReportTable customerGroup" immediate="true" onstart="block()" oncomplete="unblock()" />
+              </p:selectCheckboxMenu>
+            </h:panelGroup>
+            <h:panelGroup id="customerGroup" >
+              <p:autoComplete id='customerAuto'  value="#{customerLedgerReportView.filterParameters.customer}" completeMethod="#{customerLedgerReportView.customerAuto}" 
+                              converter="wawo.LookupIntConverter" scrollHeight="500" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectCustomerCombo}" autocomplete="off" forceSelection="true"                               
+                              title="#{lang.customer}" >
+                <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>        
+                <p:column style="width:250px;">
+                  <h:outputText value="#{e.customerName}" />
+                </p:column>          
+                <p:ajax event="itemSelect" immediate="true" process="customerGroup" update="customerLedgerReportTable accountGroupDiv salesAgentDiv" listener="#{customerLedgerReportView.customerSelectEvent}"
+                        onstart="block()" oncomplete="unblock()"  />
+              </p:autoComplete>               
+            </h:panelGroup> 
+          </td>
+          <td>
+            <h:panelGroup styleClass="L" >   
+              <p:commandButton actionListener="#{customerLedgerReportView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate f1"  styleClass="btn" 
+                               onstart="block()" oncomplete="unblock()" />
+              <p:commandButton actionListener="#{customerLedgerReportView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate f1" styleClass="btn" 
+                               onstart="block()" oncomplete="unblock()" />
+
+              <!--From Date-->
+              <p:calendar id="fromDate" value="#{customerLedgerReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}" onfocus="this.select()"
+                          required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" autocomplete="off"
+                          converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" 
+                          maxdate="#{customerLedgerReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: customerLedgerReportView.filterParameters.today}"
+                          >
+                <p:ajax event="dateSelect" process="@this" listener="#{customerLedgerReportView.reset()}" update="toDateDiv customerLedgerReportTable" onstart="block();" oncomplete="unblock();" />
+                <p:ajax event="change" process="@this" listener="#{customerLedgerReportView.reset()}" update="toDateDiv customerLedgerReportTable" onstart="block();" oncomplete="unblock();" />
+              </p:calendar>
+              <p:message for="fromDate" display="text" id="fmess"/>
+            </h:panelGroup>
+            <!--To date-->
+            <h:panelGroup styleClass="L" id="toDateDiv" >
+              <p:calendar id="toDate" value="#{customerLedgerReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                          required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" autocomplete="off" onfocus="this.select();"
+                          converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{customerLedgerReportView.filterParameters.fromDate}"
+                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  
+                          maxdate="#{customerLedgerReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: customerLedgerReportView.filterParameters.today}"
+                          >
+                <p:ajax event="dateSelect" process="@this" listener="#{customerLedgerReportView.reset()}"  update="customerLedgerReportTable " onstart="block();" oncomplete="unblock();" />
+
+              </p:calendar>
+              <p:message for="toDate" display="text" id="tmess"/>
+            </h:panelGroup>
+            <p:commandButton value="#{lang.export}" actionListener="#{customerLedgerReportView.export(main)}" immediate="true"  process="@this"  styleClass="btn btn-primary" 
+                             ajax="false" onstart="block()" oncomplete="unblock()" >
+            </p:commandButton>
+          </td>
+        </tr>
+      </table>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="customerLedgerReportTable" var="row" widgetVar="customerLedgerReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{customerLedgerReportView.getCustomerLedgerReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('customerLedgerReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.customerName}" field="customer_name" filterBy="#{row.customerName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.accountGroup}" field="account_group" filterBy="#{row.accountGroup}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.accountGroup}" title="#{lang.accountGroup}"/></f:facet>
+          <h:outputText value="#{appView.display(row.accountGroup)}" title="#{appView.title(row.accountGroup)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.accDate}" field="acc_date" filterBy="#{row.accDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.accDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.transTitle}" field="trans_title" filterBy="#{row.transTitle}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.particulars}" title="#{lang.particulars}"/></f:facet>
+          <h:outputText value="#{appView.display(row.transTitle)}" title="#{appView.title(row.transTitle)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.documentNumber}" field="document_number" filterBy="#{row.documentNumber}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.voucherNo}" title="#{lang.voucherNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.documentNumber)}" title="#{appView.title(row.documentNumber)}" escape="false"  />
+          <!--<p:commandLink value="#{row.documentNumber}" rendered="#{row.documentNumber ne null}" title="#{row.documentNumber}" />-->
+        </p:column>
+
+        <p:column sortBy="#{row.narration}" field="narration" filterBy="#{row.narration}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.narration}" title="#{lang.narration}"/></f:facet>
+          <h:outputText value="#{appView.display(row.narration)}" title="#{appView.title(row.narration)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.debitAmount}" field="debit_amount" style="text-align: right" filterBy="#{row.debitAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.debit}" title="#{lang.debit}"/></f:facet>
+          <h:outputText value="#{appView.number(row.debitAmount)}" escape="false" />
+          <f:facet name="footer">
+            <div style="text-align: right;font-weight: bold;">
+              <h:outputText value="#{appView.decimal(customerLedgerReportView.debit)}" />
+            </div>
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.creditAmount}" field="credit_amount" style="text-align: right" filterBy="#{row.creditAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.credit}" title="#{lang.credit}"/></f:facet>
+          <h:outputText value="#{appView.number(row.creditAmount)}" escape="false" />
+          <f:facet name="footer">
+            <div style="text-align: right;font-weight: bold;">
+              <h:outputText value="#{appView.decimal(customerLedgerReportView.credit)}" />
+            </div>
+          </f:facet>
+        </p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

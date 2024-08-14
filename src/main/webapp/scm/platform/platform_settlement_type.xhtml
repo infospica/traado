@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{platformSettlementTypeView.switchPlatformSettlementType(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.platformSettlementType}" />
+    <ui:param name="ids" value="platformSettlementType" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{platformSettlementTypeView.deletePlatformSettlementType(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('platformSettlementTypeWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{platformSettlementTypeView.clonePlatformSettlementType(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{platformSettlementTypeView.deletePlatformSettlementType(main)}" value="#{lang.delete}" onclick="wdgOff('platformSettlementTypeWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{platformSettlementTypeView.savePlatformSettlementType(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup><p:inputText value="#{platformSettlementTypeView.platformSettlementType.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text" styleClass="fw" /></h:panelGroup>            
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup><p:inputText value="#{platformSettlementTypeView.platformSettlementType.sortOrder}" maxlength="5" id="sortOrder" /><p:message for="sortOrder" display="text" styleClass="fw" /></h:panelGroup>            
+<!--        <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+      <h:panelGroup><p:inputText value="#{platformSettlementTypeView.platformSettlementType.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>            
+      <p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
+      <h:panelGroup><p:inputText value="#{platformSettlementTypeView.platformSettlementType.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+      <h:panelGroup><p:calendar value="#{platformSettlementTypeView.platformSettlementType.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+      <h:panelGroup><p:calendar value="#{platformSettlementTypeView.platformSettlementType.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>-->
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="platformSettlementTypeTable" var="platformSettlementTypeVar" widgetVar="platformSettlementTypeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{platformSettlementTypeView.platformSettlementTypeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{platformSettlementTypeVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{platformSettlementTypeView.platformSettlementTypeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.title}" sortBy="#{platformSettlementTypeVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{platformSettlementTypeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{platformSettlementTypeView.platformSettlementType}" value="#{platformSettlementTypeVar}" />
+          </p:commandLink>
+        </p:column>
+<!--        <p:column headerText="#{lang.title}" sortBy="#{platformSettlementTypeVar.title}" field="title"><h:outputText value="#{appView.display(platformSettlementTypeVar.title)}" title="#{appView.title(platformSettlementTypeVar.title)}" escape="false" /></p:column>-->
+        <p:column headerText="#{lang.sortOrder}" sortBy="#{platformSettlementTypeVar.sortOrder}" field="sort_order">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+
+          <h:outputText value="#{appView.display(platformSettlementTypeVar.sortOrder)}" title="#{appView.title(platformSettlementTypeVar.sortOrder)}" escape="false" />
+        </p:column>
+<!--        <p:column headerText="#{lang.createdBy}" sortBy="#{platformSettlementTypeVar.createdBy}" field="created_by"><h:outputText value="#{appView.display(platformSettlementTypeVar.createdBy)}" title="#{appView.title(platformSettlementTypeVar.createdBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.modifiedBy}" sortBy="#{platformSettlementTypeVar.modifiedBy}" field="modified_by"><h:outputText value="#{appView.display(platformSettlementTypeVar.modifiedBy)}" title="#{appView.title(platformSettlementTypeVar.modifiedBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.createdAt}" sortBy="#{platformSettlementTypeVar.createdAt}" field="created_at" ><h:outputText value="#{appView.dateTime(platformSettlementTypeVar.createdAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.modifiedAt}" sortBy="#{platformSettlementTypeVar.modifiedAt}" field="modified_at" ><h:outputText value="#{appView.dateTime(platformSettlementTypeVar.modifiedAt)}" escape="false" /></p:column>-->
+        <p:column headerText="#{lang.id}" sortBy="#{platformSettlementTypeVar.id}" field="id">
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+
+          <h:outputText value="#{appView.display(platformSettlementTypeVar.id)}" title="#{appView.title(platformSettlementTypeVar.id)}" escape="false" />
+        </p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

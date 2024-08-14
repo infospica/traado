@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  <!-- <div class="card">
+     <div class="bar-T header">
+      <p class="h5 head bold">${label}</p>
+      <ui:insert name="toolbar" />
+    </div>
+    <ui:insert />
+  </div>
+  -->
+<!--  <ui:include src="com/confirmDialog.xhtml"/>-->
+  <h:panelGroup id="#{ids}" styleClass="card"  layout="block" rendered="#{rendered eq null ? true : rendered}">
+    <h:panelGroup layout="block" styleClass="bar-T header" rendered="#{not empty label}">  
+      <div class="L"><p class="h5 head bold L">#{label}</p>
+<!--        <ui:insert name="reset" >
+          <h:commandButton  action="#{main.setViewType(main.viewType)}" rendered="#{(reset eq null ? true : reset) and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}" value="#{lang.reset}" immediate="true" onclick="toTop()" styleClass="btn btn-default" >
+            <f:ajax execute="@this" render="f1" resetValues="true"/>
+          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+        </h:commandButton>
+        </ui:insert>-->
+ 
+        <ui:insert name="menuleft" />
+      </div>
+    </h:panelGroup>
+    <p:panelGrid rendered="#{grid eq null ? true : false}"  columns="#{cols eq null ? 2 : cols}" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{styleClass eq null ? col eq 4 ? sysRuntimeView.getGrid4() : sysRuntimeView.grid2Small : styleClass }">
+      <ui:insert />
+    </p:panelGrid>  
+
+    <ui:insert name="subAfter" />
+  </h:panelGroup> 
+
+</ui:composition>
+
+

@@ -1,0 +1,481 @@
+.lbl,
+label{
+	font-weight:normal;
+	font-family:$prLabelFont;
+	&[for]{ cursor:pointer;}
+}
+
+.mandatory:after{
+	color:#e00;
+	content:' *';
+	line-height: 0;
+	font-size: 18px;
+	font-family:$prFont;
+}
+
+.button{
+	color:#fff;
+	width: auto;
+	font-size:16px;
+	min-width:144px;
+	padding:8px 22px;
+	background: $Clr1;
+	text-align: center;
+	letter-spacing: 1px;
+	display:inline-block;
+	border:transparent 1px solid;
+	@include border-radius(8px);
+	@extend .animate-fast !optional;
+	///*@include box-shadow(2px 2px 3px 0px rgba(0,0,0,0.3));*/
+	&:hover,&:focus,&:active{
+		color: $Clr1;
+		background:#fff;
+		border:$Clr1 1px solid;
+	}
+}
+
+.btn{
+	text-decoration:none;
+	@extend .animate-fast !optional;
+	
+	///*&:hover,&:focus,&:active{
+//		color: $prBtnTxtHover;
+//		background:$prBtnHover;
+//	}*/
+	
+	&.big{
+		height:68px;
+		width: 250px;
+		font-size:23px;
+		border:$prBtnBrdr 1px solid;
+		@include border-radius(40px);
+		&:hover,&:focus,&:active{ border-color:$prBtnTxtHover; }
+	}
+	
+	&.digital{
+		input[type="number"],
+		input[type="text"]{
+			width:40px;
+			border:none;
+			padding-left:5px;
+			text-align: center;
+			background:rgba(255,255,255,0.2);
+			@include border-radius(10px);
+		}
+	}
+	&+&{
+		margin-left:5px;
+	}
+}
+
+.btn,a.btn,a.button{
+	border-radius:0;
+	text-decoration:none;
+	outline:none !important;
+	span{
+		display:inline-block;
+		vertical-align:middle;
+		& + span{
+			margin-left:8px;
+		}
+	}
+	&:hover,&:active,&:focus{ text-decoration:none; }
+}
+
+.error{
+	color: #a94442;
+}
+
+textarea.form-control{
+	width: 100% !important;
+}
+
+.form-control{
+	@include border-radius(0);
+}
+
+[data-toggle="dropdown"]{cursor:pointer;}
+
+.iconText{
+	.btn{
+		color:$Txt;
+		min-width: 100px;
+		background:$Clr3;
+		@each $type in $colorType{
+			&-#{nth($type, 1)}{
+				border-color: nth($type, 2);
+				&>.fa{
+					color:nth($type, 2);
+				}
+				&:focus{
+					color:$Clr3;
+					background:darken(nth($type, 2), 17%);
+				}
+			}
+		}
+	}
+}
+
+input[type=checkbox].custom {
+	border:0;
+	padding:0;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow:hidden;
+	position:absolute;
+	clip:rect(0 0 0 0);
+	& + label {
+		height:20px;
+		font-size:14px;
+		cursor: pointer;
+		line-height:20px;
+		padding-left:25px;
+		margin:0px 0px 8px;
+		display:inline-block;
+		vertical-align: middle;
+		background-position: 0 0;
+		background-repeat:no-repeat;
+		background-image:url(../img/chkbox.png);
+		/*nilSelect*/-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;
+	}
+	&:checked + label {	background-position: 0 -20px;}
+	
+	///*&.Switch{
+//		& + label {
+//			height: 30px;
+//			min-width:30px;
+//			overflow: hidden;
+//			padding-left:30px;
+//			text-indent:-999px;
+//			background-image:url(../img/chkbox-YorN.png);
+//			&:focus{ background-color:#eee; }
+//		}
+//		&:checked + label {	background-position: 0 -30px;}
+//	}*/
+}
+
+.fileUpload{
+	@extend .form-control !optional;
+	///*width:100%;
+//	padding: 5px;
+//	min-height:32px;
+//	border:#ccc 1px solid;*/
+	overflow: hidden;
+	position:relative;
+	background:#fff;///* url(../img/ico-upload.png) 100% center no-repeat;*/
+
+	&:before{
+		top:0;
+		right:0;
+		width:35px;
+		height: 100%;
+		content:"\f093";
+		padding: 9px 0px;
+		text-align:center;
+		position: absolute;
+		font-size: inherit;
+		pointer-events:none;
+		font: normal normal normal 14px/1 FontAwesome;
+		@extend .pseudo !optional;
+	}
+	& > input[type="file"]{
+		top:0px;
+		left:0px;
+		width:100%;
+		height:100%;
+		position:absolute;
+		@include opacity(0);
+	}
+	& > span{
+		position:absolute;
+		color:#CCC;
+		left:5px;
+		top:5px;
+	}
+}
+
+textarea.form-control{
+	height: 5.6em;///*3 Lines*/
+}
+
+.form{
+	@extend .clearfix !optional;
+	label,select,textarea,
+	input[type="tel"],
+	input[type="email"],
+	input[type="password"],
+	input[type="text"]{
+		padding:5px;
+		height: 35px;
+		font-size:14px;
+		margin-bottom:5px;
+		@extend .m !optional;
+	}
+	select,textarea,
+	input[type="tel"],
+	input[type="email"],
+	input[type="password"],
+	input[type="text"]{
+		padding:2px 15px;
+		border:$prBrdr 1px solid;
+	}
+	textarea{
+		height: 210px;
+		max-width:100%;
+		min-width: 100%;
+	}
+	button{  }
+	&.fw{
+		select,label,textarea,
+		input[type="tel"],
+		input[type="email"],
+		input[type="password"],
+		input[type="text"]{ width:100%;}
+	}
+}
+
+.autoCombo{
+	
+}
+
+.ui-autocomplete{
+	max-height:200px;
+	overflow: auto;
+	overflow-x:hidden;
+	overflow-y:scroll;
+	overflow-y:auto;
+}
+
+.ui-menu{
+	.ui-menu-item {
+		border:transparent 1px solid;
+		border-left: none transparent;
+		border-right: none transparent;
+		&.ui-state-focus{
+			margin:0;
+			border-color:$Brdr;
+		}
+	}
+}
+
+.combiPwdBtn{
+	position:relative;
+	input[type="text"],
+	input[type="password"]{
+		width:100%;
+		width: calc(100% - 45px);
+	}
+	.btn,
+	input[type="submit"],
+	.button{
+		top:0;
+		right:0;
+		margin:0;
+		width:45px;
+		height:45px;
+		color: $ClrF;
+		border: none;
+		display:block;
+		font-size:24px;
+		min-width: auto;
+		padding:6px 15px;
+		text-align:center;
+		position: absolute;
+		background: $Clr1;
+		overflow: hidden;
+		@include border-radius(0);
+		&:hover,&:active,&:focus{
+			background: $Clr1;
+		}
+	}
+}
+
+.form-lg{
+	margin:0px;
+	padding:0px;
+	@extend .clearfix !optional;
+	input[type="password"],input[type="text"]{
+		width:100%;
+		height:45px;
+		display:block;
+		padding:5px 10px;
+		margin-bottom:25px;
+		border:#D9D9D9 1px solid;
+		@include border-radius(0px);
+		&:focus,&:active{ border:$Clr1 1px solid; }
+	}
+	&.login{
+		margin-bottom:60px;
+		input[type="password"],input[type="text"]{ margin-bottom:12px;}
+	}
+}
+
+[data-tooltip]{
+	position:relative;
+	&:before{
+		left:0;
+		bottom:-30px;
+		display: none;
+		margin: 0 auto;
+		padding:3px 10px;
+		background:$Clr1;
+		position:absolute;
+		text-align: center;
+		content:attr(title);
+		@extend .pseudo !optional;
+	}
+	&:hover{
+		&:before{
+			display:block;
+		}
+	}
+}
+
+.searchBox{
+	padding: 0;
+	height:32px;
+	min-width:160px;
+	margin-right:3px;
+	position: relative;
+	display:inline-block;
+	vertical-align:middle;
+	button,.btn,.ui-button,
+	input[type="text"]{
+		padding: 6px 12px;
+		position: absolute;
+		border:none transparent;
+	}
+	input[type="text"]{
+		top:0px;
+		left:0px;
+		width:100%;
+		height:100%;
+		padding-right: 32px;
+		background:none;
+		border:$prBrdr 1px solid;
+	}
+	button,.btn,.ui-button{
+		color: inherit;
+		margin:0;
+		top: 0px;
+		right:0px;
+		width:2.4em;
+		height: 100%;
+		padding: 4px 12px;
+	}
+	&.m{
+		input[type="text"]{
+			border-color:transparent;
+			border-bottom-color: $prInputBrdr;
+			&:focus{
+				border-color:transparent;
+				border-bottom-color: $prInputBrdrFocus;
+			}
+		}
+	}
+}
+
+.autoCombo{
+	background:$ClrF url('#{$img}/downArrow.png') 97% center no-repeat;
+}
+
+.form-control{
+	color:$Clr6;
+	border-color: $prInputBrdr;
+	@extend .mtl !optional;
+//	/*&:focus{
+//		border-color: $prInputBrdrFocus;
+//	}*/
+}
+
+.mtl{
+	@include box-shadow(none !important);
+	border-color: transparent;
+	border-bottom-color: $prInputBrdr;
+	&:focus{
+		border-color: transparent;
+		border-bottom-color: $prInputBrdrFocus;
+	}
+}
+.rating {
+	direction:rtl;
+	font-size: 30px;
+	unicode-bidi:bidi-override;
+	span.star {
+		font-style:normal;
+		font-weight: normal;
+		display: inline-block;
+		font-family:FontAwesome;
+		&:hover {
+			cursor: pointer;
+			&:before,
+			&:hover ~ span.star:before {
+				content: "\f005";
+				color: #e3cf7a;
+			}
+		}
+		&:before {
+			color: #777777;
+			content: "\f006";
+			padding-right: 5px;
+		}
+	}
+}
+
+.spotlightSearch{
+	@extend .modalOverlay !optional;
+	.popup{
+		padding:0px;
+		height:50px;
+		border:none;
+		background:none;
+	}
+	
+}
+.ui-menu .ui-menu-item {
+    padding: 5px;
+}
+
+.mcacAnchor,
+.ui-menu .ui-menu-item,
+.ui-menu .link a{
+	display:block;
+}
+
+[data-control="toggle"]{
+	display:none;
+}
+
+.btn-group.optional{
+	.btn{
+		&.btn-default{
+			&.active{
+				color:$ClrF;
+				background:$Clr1;
+			}
+		}
+	}
+}
+
+.affix{
+	left: 0px;
+	width: 100%;
+	z-index: 9999;
+	position: fixed;
+	margin: 0px !important;
+	&.bar,
+	&.page-header{
+		top: 0px;
+	}
+	&.footer{
+		bottom: 0px;
+	}
+}
+
+.affix-top{
+	
+}
+.affix-bottom{
+	
+}

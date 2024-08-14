@@ -1,0 +1,1123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{companyView.switchCompany(main, viewType)}
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.company}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? companyView.company.companyName : null}" />
+    <ui:param name="ids" value="company"/>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{companyView.deleteCompany(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('companyWidgetDelConf')" process="f1" update="f1 f" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{companyView.cloneCompany(main)}" value="#{lang.clone}" process="f1" update="f1 f" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{companyView.deleteCompany(main)}" value="#{lang.delete}" onclick="wdgOff('companyWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:commandButton action="#{companyView.saveCompany(main)}" value="#{lang.save}"  onclick="toTop()" styleClass="btn btn-primary" update="f1 f" process="f1" rendered="#{userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true}"/>
+    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{companyView.activeIndex}" styleClass="materialTabs">
+        <!--Company Tab-->
+        <p:tab title="#{lang.company}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="company" />
+            <!-- Company Name -->
+            <p:outputLabel value="#{lang.name}" for="companyName" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyView.company.companyName}" maxlength="50" required="true" requiredMessage="#{lang.companyName} #{lang.isRequired}"
+                           id="companyName" validator="wawo.WhiteSpaceValidator" style="position: relative" autocomplete="off" />
+              <p:message for="companyName" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.code}" for="companyCode" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyView.company.companyCode}" maxlength="50" 
+                           required="true" requiredMessage="#{lang.code} #{lang.isRequired}"
+                           id="companyCode" validator="wawo.WhiteSpaceValidator" style="position: relative" autocomplete="off" />
+              <p:message for="companyCode" display="text"/>
+            </h:panelGroup>
+
+            <!--Company Type-->
+            <p:outputLabel value="#{lang.companyType}" for="companyCompanyTypeId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{companyView.company.companyTypeId}"  required="true" requiredMessage="#{lang.companyType} #{lang.isRequired}"
+                               id="companyCompanyTypeId" converter="omnifaces.SelectItemsConverter" style="position: relative" styleClass="fw"
+                               disabled="#{main.edit and !userRole.isRoot()}">
+                <f:selectItem itemValue="#{null}" itemLabel="#{lang.select}" />
+                <f:selectItems value="#{companyView.companyTypeAuto(filter)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              </p:selectOneMenu>
+              <p:message for="companyCompanyTypeId" display="text" />
+            </h:panelGroup>
+
+            <!--Country -->
+            <p:commandLink actionListener="#{companyView.countryOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.country}" for="companyCountryId"/>
+            </p:commandLink> 
+            <h:panelGroup>
+              <p:autoComplete  value="#{companyView.company.countryId}" completeMethod="#{companyView.countryAuto}" converter="wawo.LookupIntConverter" required="true"
+                               requiredMessage="#{lang.country} #{lang.isRequired}" id="companyCountryId" var="c" itemValue="#{c}" itemLabel="#{c.countryName}"
+                               emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw" 
+                               disabled="#{companyView.accountExist}" readonly="#{main.edit and !userRole.isRoot()}" >
+                <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+                <p:ajax event="itemSelect" immediate="true" process="@this" 
+                        update="companyStateDiv countryTaxRegimeDiv companyRegAddressDistrictDiv panLbl pinDiv pinLabel phone1 gstRegNumberLabel gstRegNumberValue panDiv currencyId" 
+                        listener="#{companyView.countrySelectEvent}"/>
+              </p:autoComplete>
+              <p:message for="companyCountryId" display="text" />
+            </h:panelGroup>
+
+            <!-- Country Tax Regime -->
+            <p:outputLabel value="#{lang.taxRegime}" for="companyCountryTaxRegimeId" />
+            <h:panelGroup id="countryTaxRegimeDiv">
+              <p:selectOneMenu value="#{companyView.company.countryTaxRegimeId}"  id="companyCountryTaxRegimeId" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{lang.taxRegime} #{lang.isRequired}" styleClass="fw"
+                               disabled="#{main.edit and !userRole.isRoot()}">
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{companyView.selectCountryTaxByCountry()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+                <p:ajax event="itemSelect" process="countryTaxRegimeDiv"
+                        update="gstRegNumberLabel gstRegNumberValue"
+                        listener="#{companyView.countryTaxRegimeSelectEvent}" />
+              </p:selectOneMenu>
+              <p:message for="companyCountryTaxRegimeId" display="text" />
+            </h:panelGroup>
+
+            <!-- GSTIN  -->
+            <h:panelGroup id="gstRegNumberLabel" >
+              <p:commandLink target="_blank"  onclick="window.open('#{SystemConstants.GST_URL}')"  >                
+                <p:outputLabel value="#{lang.gstin} " title="#{lang.gstinabbr} " for="gstRegNumber" rendered="#{userRuntimeView.isGstRegime(companyView.company)}"/>
+              </p:commandLink>
+            </h:panelGroup>
+            <h:panelGroup id="gstRegNumberValue" layout="block">
+              <p:inputText styleClass="fw text-uppercase" value="#{companyView.company.gstNo}" maxlength="15" autocomplete="off"
+                           required="true" requiredMessage="#{lang.gstin} #{lang.isRequired}" rendered="#{userRuntimeView.isGstRegime(companyView.company)}"
+                           id="gstRegNumber" validator="wawo.WhiteSpaceValidator" style="position: relative" readonly="#{main.edit and !userRole.isRoot()}" >
+                <f:validator validatorId="spica.scm.validators.GstinValidator" />
+                <p:ajax event="change" listener="#{companyView.gstinChangeEventHandler}" update="companyStateDiv gstRegNumberValue panDiv companyRegAddressDistrictDiv" process="gstRegNumberValue" />
+              </p:inputText>
+              <p:message for="gstRegNumber" display="text" rendered="#{userRuntimeView.isGstRegime(companyView.company)}"/>
+            </h:panelGroup>
+
+            <!--PAN-->
+            <h:panelGroup id="panLbl" >
+              <p:outputLabel value="#{lang.pan} #{lang.sno}" title="#{lang.panabbr}" for="pan" />
+            </h:panelGroup>
+            <h:panelGroup id="panDiv" >
+              <p:inputText styleClass="fw text-uppercase" value="#{companyView.company.panNo}" maxlength="10" autocomplete="off"
+                           required="#{userRuntimeView.isGstRegime(companyView.company)}" requiredMessage="#{lang.pan} #{lang.isRequired}" 
+                           id="pan" validator="wawo.WhiteSpaceValidator" style="position: relative" readonly="#{userRuntimeView.isGstRegime(companyView.company)}">
+                <f:validator validatorId="spica.scm.validators.PanCardValidator" />
+              </p:inputText>
+              <p:message for="pan" display="text"/>
+            </h:panelGroup>            
+
+            <!-- State -->
+            <p:commandLink actionListener="#{companyView.stateOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.state}" for="companyStateId"/>
+            </p:commandLink>            
+            <h:panelGroup id="companyStateDiv">
+              <p:autoComplete  value="#{companyView.company.stateId}" completeMethod="#{companyView.stateAuto}" converter="wawo.LookupIntConverter"
+                               dropdown="true" required="true" requiredMessage="#{lang.state} #{lang.isRequired}" id="companyStateId" var="s" itemValue="#{s}" 
+                               itemLabel="#{s.stateName ne null ? s.stateName +=' ('+=s.stateCode+=')' : ''}"
+                               emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw" readonly="#{userRuntimeView.isGstRegime(companyView.company)}">
+                <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+                <p:ajax event="itemSelect" immediate="true" process="@this" update="@this" listener="#{companyView.stateSelectEvent}"/>
+                <p:column styleClass="w-20">
+                  <h:outputText value="#{s.stateCode}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{s.stateName}" />
+                </p:column>
+              </p:autoComplete>
+              <p:message for="companyStateId" display="text" />
+            </h:panelGroup>
+
+            <!--district-->
+            <p:commandLink actionListener="#{companyView.districtOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.district}" for="companyRegAddressDistrictId"/>
+            </p:commandLink> 
+            <h:panelGroup id="companyRegAddressDistrictDiv">
+              <p:autoComplete  value="#{companyView.companyRegAddress.districtId}" completeMethod="#{companyView.districtAuto}" converter="wawo.LookupIntConverter"
+                               required="true" requiredMessage="#{lang.district} #{lang.isRequired}" id="companyRegAddressDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}"
+                               dropdown="true" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+              </p:autoComplete>
+              <p:message for="companyRegAddressDistrictId" display="text" />
+            </h:panelGroup>
+
+            <!--Parent Company-->
+            <p:outputLabel value="#{lang.parentCompany}" for="companyParentCompanyId" rendered="#{sysRuntimeView.isBranchAsCompany()}"/>
+            <h:panelGroup rendered="#{sysRuntimeView.isBranchAsCompany()}">
+              <p:autoComplete  value="#{companyView.company.companyId}" completeMethod="#{companyView.companyAuto}" converter="wawo.LookupIntConverter"
+                               id="companyParentCompanyId" var="e" itemValue="#{e}" itemLabel="#{e.companyName}" emptyMessage="#{lang.noResult}"
+                               dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                               forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.companyClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.companyById()}"/>
+              </p:autoComplete>
+              <p:message for="companyParentCompanyId" display="text" />
+            </h:panelGroup>
+
+            <!--pin -->
+            <h:panelGroup id="pinLabel">
+              <p:outputLabel value="#{companyView.pinLength eq 5 ? lang.zip:lang.pincode}" for="pin" />
+            </h:panelGroup>
+            <h:panelGroup id="pinDiv">
+              <p:inputNumber styleClass="fw" value="#{companyView.companyRegAddress.pin}" maxlength="#{companyView.pinLength}" onfocus="this.select()" inputStyleClass="text-left" maxValue="#{companyView.pinValue ne null ? companyView.pinValue : 99999}" decimalPlaces="0"  thousandSeparator="" validatorMessage="#{lang.requiredLength} is #{companyView.pinLength} "
+                             autocomplete="off" id="pin" >
+                <f:validateLength minimum="#{companyView.pinLength}"/>
+              </p:inputNumber>
+              <p:message for="pin" display="text"/>
+            </h:panelGroup>
+
+            <!-- Company Registered Address-->
+            <p:outputLabel value="Registered #{lang.address}" for="address" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{companyView.companyRegAddress.address}" cols="100" rows="2" maxlength="500" required="true"
+                                requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="address" display="text"/>
+            </h:panelGroup>
+            <!-- Warehouse is same -->
+            <p:outputLabel value="Warehouse is same" for="warehouse" rendered="#{companyView.company.id eq null}"/>
+            <h:panelGroup rendered="#{companyView.company.id eq null}">
+              <p:selectBooleanCheckbox value="#{companyView.wareHouse}" id="warehouse" />
+              <p:message for="warehouse" display="text"/>
+            </h:panelGroup>
+            <!-- phone 1 -->
+            <h:panelGroup>                 
+              <p:outputLabel value="#{lang.phone} #{lang.no} " for="phone1" />
+              <p:outputLabel value="(#{companyView.company.countryId.phoneCode})" rendered="#{companyView.company.countryId.phoneCode ne null}" />                      
+            </h:panelGroup>
+            <h:panelGroup>
+              <p:inputText  value="#{companyView.companyRegAddress.phone1}" maxlength="#{companyView.company.countryId.phoneNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                            autocomplete="off" id="phone1" styleClass="fw" title="#{lang.maximum} #{companyView.company.countryId.phoneNumberLength} #{lang.digit}" >                  
+                <f:validateRegex pattern="#{companyView.company.countryId.phoneNoRegex}"  />
+              </p:inputText>
+              <!--<h:outputLabel value="#{lang.maximum} #{companyView.company.countryId.phoneNumberLength} #{lang.digit}" />--> 
+              <p:tooltip id="phone1ToolTip" for="phone1" showEvent="focus" hideEvent="blur" />
+              <p:message for="phone1" display="text"/>
+            </h:panelGroup>    
+
+            <!--Mobile Number-->
+            <h:panelGroup>                 
+              <p:outputLabel value="#{lang.mobile} #{lang.no} " for="phone2" />
+              <p:outputLabel value="(#{companyView.company.countryId.phoneCode})" rendered="#{companyView.company.countryId.phoneCode ne null}" />                      
+            </h:panelGroup>
+            <h:panelGroup>
+              <p:inputText value="#{companyView.companyRegAddress.phone2}" maxlength="#{companyView.company.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                           autocomplete="off" id="phone2" styleClass="fw" title="#{lang.maximum} #{companyView.company.countryId.mobileNumberLength} #{lang.digit}" >
+                <f:validateRegex pattern="#{companyView.company.countryId.phoneNoRegex}"  />
+              </p:inputText>
+              <!--<h:outputLabel value="#{lang.maximum} #{companyView.company.countryId.mobileNumberLength} #{lang.digit}" />-->     
+              <p:tooltip id="phone2ToolTip" for="phone2" showEvent="focus" hideEvent="blur" />
+              <p:message for="phone2" display="text"/>
+            </h:panelGroup> 
+
+            <!-- email -->
+            <p:outputLabel value="#{lang.email}" for="email" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyView.companyRegAddress.email}" maxlength="50" id="email" validator="wawo.EmailValidator" autocomplete="off"/>
+              <p:message for="email" display="text"/>
+            </h:panelGroup>
+
+            <!-- email -->
+            <p:outputLabel value="#{lang.website}" for="website" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyView.companyRegAddress.website}" maxlength="80" id="website"  autocomplete="off"/>
+              <p:message for="website" display="text"/>
+            </h:panelGroup>
+
+            <!-- Financial Year Start Date-->
+            <p:outputLabel value="#{lang.financialYearStartDate}" for="financialYearStartDate"/>
+            <h:panelGroup>
+              <p:calendar value="#{companyView.company.financialYearStartDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.financialYearStartDate} #{lang.invalidDate}"
+                          maxlength="29" required="true" requiredMessage="#{lang.financialYearStartDate} #{lang.isRequired}" id="financialYearStartDate" showButtonPanel="true" navigator="true" mask="true"/>
+              <p:message for="financialYearStartDate" display="text" />
+            </h:panelGroup>
+            <!-- currency -->
+            <p:outputLabel value="#{lang.currency}" for="currency"/>
+            <h:panelGroup id="currencyId">              
+              <p:selectOneMenu styleClass="L" id="currency" value="#{companyView.company.currencyId}" required="true" requiredMessage="#{lang.currency} #{lang.isRequired}" converter="omnifaces.SelectItemsConverter" >
+                <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+                <f:selectItems  value="#{scmLookupView.currency(main)}" var="c" itemLabel="#{c.code}" itemValue="#{c}" />
+                <p:message for="currency" display="text"/>
+              </p:selectOneMenu>
+            </h:panelGroup> 
+
+            <!--Taxable-->
+            <p:outputLabel value="#{lang.taxable}" for="companyTaxable"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{companyView.company.taxable}" id="companyTaxable" style="position: relative" styleClass="fw">
+                <f:selectItem itemValue="1" itemLabel="#{lang.taxableZone}" />
+                <f:selectItem itemValue="2" itemLabel="#{lang.taxableFreeZoneAllExempted}" />
+                <f:selectItem itemValue="3" itemLabel="#{lang.taxableFreeZoneFreeZoneExempted}" />
+              </p:selectOneMenu>
+              <p:message for="companyTaxable" display="text" />
+            </h:panelGroup>
+
+            <!--Special Cess Tax-->
+            <p:outputLabel value="#{lang.specialCessTax}" for="specialCessTax"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{companyView.company.specialCessTax}" id="specialCessTax" style="position: relative" styleClass="fw">
+                <f:selectItem itemValue="#{null}" itemLabel="#{lang.none}" />
+                <f:selectItem itemValue="1" itemLabel="#{lang.cessOnLocalSale}" />
+                <!--<f:selectItem itemValue="3" itemLabel="#{lang.cessOnMainlandSale}" />-->
+                <!--<f:selectItem itemValue="4" itemLabel="#{lang.cessOnAllSales}" />-->
+              </p:selectOneMenu>
+              <p:message for="specialCessTax" display="text" />
+            </h:panelGroup>
+
+            <!--Business Operation-->
+            <p:outputLabel value="#{lang.businessOperation}" for="companyBusinessOperation"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{companyView.company.businessOperation}" id="companyBusinessOperation" style="position: relative" styleClass="fw">
+                <f:selectItem itemValue="1" itemLabel="#{lang.businessOperationMainLand}" />
+                <f:selectItem itemValue="2" itemLabel="#{lang.businessOperationMainLandAndImport}" />
+                <f:selectItem itemValue="3" itemLabel="#{lang.businessOperationMainLandAndExport}" />
+                <f:selectItem itemValue="4" itemLabel="#{lang.businessOperationMainLandAndImportAndExportMain}" />
+              </p:selectOneMenu>
+              <p:message for="companyBusinessOperation" display="text" />
+            </h:panelGroup>
+            <!--TCS enabled-->
+            <p:outputLabel value="#{lang.taxCollectedatSource}" for="tcsEnabled"/>
+            <h:panelGroup>
+              <p:inputSwitch id="tcsEnabled" value="#{companyView.company.tcsEnabledBoolean}" onLabel="#{lang.on}" offLabel="#{lang.off}" />
+            </h:panelGroup>
+            <!--Doc Prefix based on Company-->
+            <p:outputLabel value="#{lang.docPrefix} #{lang.basedOn} #{lang.company}" for="docPrefixbutton"/>
+            <h:panelGroup>
+              <p:inputSwitch id="docPrefixbutton" value="#{companyView.docPrefixBoolean}" onLabel="Yes" offLabel="No" />
+            </h:panelGroup>
+            <!--Description-->
+            <p:outputLabel value="#{lang.description}" for="description" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{companyView.company.description}" cols="100" rows="3" maxlength="500" id="description" autoResize="false" style="position: relative"/>
+              <p:message for="description" display="text"/>
+            </h:panelGroup>
+
+            <h:panelGroup></h:panelGroup>
+            <h:panelGroup></h:panelGroup>
+            <!--            <h:panelGroup id="logoPathPart">
+                          <h:inputFile value="#{companyLicenseView.filePathPart}"  maxlength="200" id="logoPath"/>        
+                          <p:commandButton rendered="#{not empty companyLicenseView.companyLicense.filePath}" icon="fa fa-trash" title="#{lang.delete}" process="@this" 
+                                           oncomplete="hide('filePathLink')" update="logoPathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                            <f:setPropertyActionListener target="#{companyLicenseView.filePathPart}" value="#{appIo.getRemoveFile()}" />    
+                          </p:commandButton>
+                          <p:spacer width="5"/>
+                          <p:commandLink value="#{appIo.fileName(companyLicenseView.companyLicense.filePath)}" ajax="false" id="logoPathLink" class="ignoreLoad" >   
+                            <p:fileDownload value="#{appIo.downloadPrivate(companyLicenseView.companyLicense.filePath)}" />
+                          </p:commandLink>
+                          <p:message for="logoPathPart" display="text"/>
+                        </h:panelGroup>-->
+
+          </ui:decorate>
+
+
+          <!-- Company Branches -->
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{main.isEdit() and sysRuntimeView.isBranchAsCompany()}" />
+
+            <ui:param name="label" value="#{companyView.company.companyName} / #{lang.branches}" />
+
+            <p:dataTable id="companyBranchTable" var="companyBranchVar" widgetVar="companyBranchWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         lazy="true" value="#{companyView.getCompanyBranchList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{companyBranchVar.id}"
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  rendered="#{sysRuntimeView.isBranchAsCompany()}">
+              <p:column headerText="#{lang.name}" sortBy="#{companyBranchVar.companyName}" field="company_name" filterBy="#{companyBranchVar.companyName}" filterStyle="display:none">
+                <p:commandLink action="#{main.setViewType(editform)}" value="#{companyBranchVar.companyName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                  <f:setPropertyActionListener target="#{companyView.company}" value="#{companyBranchVar}" />
+                </p:commandLink>
+              </p:column>
+              <p:column headerText="#{lang.description}" sortBy="#{companyBranchVar.description}" field="description" filterBy="#{companyBranchVar.description}" filterStyle="display:none">
+                <h:outputText value="#{appView.display(companyBranchVar.description)}" title="#{appView.title(companyBranchVar.description)}" escape="false" />
+              </p:column>
+              <p:column headerText="#{lang.pan}" sortBy="#{companyBranchVar.pan}" field="pan" filterBy="#{companyBranchVar.pan}" filterStyle="display:none">
+                <h:outputText value="#{appView.display(companyBranchVar.pan)}" title="#{appView.title(companyBranchVar.pan)}" escape="false" />
+              </p:column>              
+              <p:column headerText="#{lang.log}">
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyBranchVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyBranchVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyBranchVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyBranchVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyBranchVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+
+          <!--Share Holders-->
+
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="ids" value="companyInvestor" />
+            <ui:param name="rendered" value="#{main.isEdit()}" />
+            <ui:param name="label" value="#{lang.shareHolders} / #{companyView.company.companyName}" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.userProfileNewPopup(1)}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+              </p:commandButton>
+              <p:remoteCommand name="userProfilePopupReturned" actionListener="#{companyView.companyInvestorPopupReturned()}" update="companyInvestorTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+
+            <p:dataTable id="companyInvestorTable" var="companyInvestorVar" widgetVar="companyInvestorWidget" value="#{companyView.getCompanyInvestorList(main)}"
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter" onkeyup="PF('companyInvestorWidget').filter()" placeholder="#{lang.search}"/>
+                </p:outputPanel>
+              </f:facet>
+
+              <p:ajax event="rowEdit" update="companyInvestorTable" listener="#{companyView.onRowEditInvestor(main,companyInvestorVar)}"/>
+
+              <p:column headerText="#{lang.name}" sortBy="#{companyInvestorVar.userProfileId.name}" field="name" filterBy="#{companyInvestorVar.userProfileId.name}" filterStyleClass="hidden">
+                <h:outputText value="#{appView.display(companyInvestorVar.userProfileId.name)}" title="#{appView.title(companyInvestorVar.userProfileId.name)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.designation}">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{companyInvestorVar.designationId.title}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:selectOneMenu value="#{companyInvestorVar.designationId}" style="width:100%" converter="omnifaces.SelectItemsConverter">
+                      <f:selectItems value="#{companyInvestorView.selectDesignationByCompanyContextInvestor(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                    </p:selectOneMenu>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.investmentAmount}" sortBy="#{companyInvestorVar.investmentAmount}" field="investment_amount" style="text-align: right">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{appView.decimal(companyInvestorVar.investmentAmount)}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <h:panelGroup>
+                      <p:inputNumber styleClass="fw" id="investmentAmount" value="#{companyInvestorVar.investmentAmount}" autocomplete="off"
+                                     decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="10"
+                                     required="true" requiredMessage="#{lang.investmentAmount} #{lang.isRequired}">
+                        <p:ajax update="totAmt"/>
+                      </p:inputNumber>
+                      <p:message for="investmentAmount" display="text" />
+                    </h:panelGroup>
+                  </f:facet>
+                </p:cellEditor>
+                <f:facet name="footer" >
+                  <h:panelGroup layout="block" id="totAmt">
+                    <h:outputText value="#{companyView.totalAmt}"/>
+                  </h:panelGroup>
+                </f:facet>
+              </p:column>
+
+              <p:column headerText="#{lang.investmentDate}" sortBy="#{companyInvestorVar.investmentDate}" field="investment_date" style="text-align: right">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{appView.date(companyInvestorVar.investmentDate)}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <h:panelGroup>
+                      <p:calendar value="#{companyInvestorVar.investmentDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.investmentDate} #{lang.invalidDate}"
+                                  maxlength="29" required="true" requiredMessage="#{lang.investmentDate} #{lang.isRequired}" id="investmentDate" showButtonPanel="true" navigator="true" mask="true"/>
+                      <p:message for="investmentDate" display="text" />
+                    </h:panelGroup>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.shareValue}" sortBy="#{companyInvestorVar.shareValue}" field="share_value" style="text-align: right" rendered="#{companyView.isShareVal()}">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{companyInvestorVar.shareValue}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:inputText styleClass="fw" id="shareValue" value="#{companyInvestorVar.shareValue}" style="width:100%" autocomplete="off"/>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.shareCount}" sortBy="#{companyInvestorVar.shareCount}" field="share_count" style="text-align: right" rendered="#{companyView.isShareVal()}">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{companyInvestorVar.shareCount}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:inputNumber styleClass="fw" id="shareCount" value="#{companyInvestorVar.shareCount}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="3" autocomplete="off"/>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.profitPercentage}" sortBy="#{companyInvestorVar.profitPercentage}" field="profit_percentage" style="text-align: right" rendered="#{companyView.isProfitShare()}">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{companyInvestorVar.profitPercentage}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:inputNumber styleClass="fw" id="profitPercentage" value="#{companyInvestorVar.profitPercentage}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="3" autocomplete="off"/>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.status}" field="status_id" style="text-align: right">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{appView.display(companyInvestorVar.statusId.title)}" title="#{appView.display(companyInvestorVar.statusId.title)})" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:selectOneMenu value="#{companyInvestorVar.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}"
+                                     id="statusId">
+                      <f:selectItems value="#{companyInvestorView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                    </p:selectOneMenu>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.action}">
+                <div style="float:left;">
+                  <p:rowEditor />
+                </div>
+                <div>
+                  <p:commandButton action="#{companyView.deleteCompanyInvestor(main,companyInvestorVar)}" process="@this"
+                                   value="" update="companyInvestorTable" icon="fa fa-trash">
+                    <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                  </p:commandButton>
+                </div>
+              </p:column>
+
+              <p:column headerText="#{lang.log}">
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyInvestor.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyInvestor.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyInvestor.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyInvestor.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyInvestor.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+
+              <!--              <p:columnGroup type="footer" id="totalAmtValId">
+                              <p:row>
+                                <p:column colspan="3" style="text-align:right" footerText="Totals:" />
+                                <p:column footerText="#{companyView.totalAmt}" />
+                              </p:row>
+                            </p:columnGroup>-->
+
+            </p:dataTable>
+          </ui:decorate>
+
+          <!-- Audit Info -->
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(companyView.company.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(companyView.company.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(companyView.company.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(companyView.company.modifiedAt)}</ui:define>
+          </ui:decorate>
+
+        </p:tab>
+        <!--Company Address Tab-->
+        <p:tab  title="#{lang.address}" disabled="#{main.isNew()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyAddress" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.companyAddressNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="companyAddressPopupReturned" actionListener="#{companyView.companyAddressPopupReturned()}" update="companyAddressTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+
+            <p:dataTable id="companyAddressTable" var="companyAddressVar" widgetVar="companyAddressWidget" value="#{companyView.getCompanyAddressList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyAddressWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{companyAddressVar.address}" field="address_type_id.title" filterBy="#{companyAddressVar.address}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+                <p:commandLink action="#{companyView.companyAddressEditPopup(companyAddressVar.id)}" value="#{appView.display(companyAddressVar.address)}"
+                               process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.addressTypeId.title}" field="address_type_id.title" filterBy="#{companyAddressVar.addressTypeId.title}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.addressType}" title="#{lang.addressType}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.addressTypeId.title)}" title="#{appView.title(companyAddressVar.addressTypeId.title)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.stateId.stateName}" field="state_id.state_name">
+                <f:facet name="header"><h:outputText value="#{lang.state}" title="#{lang.state}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.stateId.stateName)}" title="#{appView.title(companyAddressVar.stateId.stateName)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.districtId.districtName}" field="district_id.district_name">
+                <f:facet name="header"><h:outputText value="#{lang.district}" title="#{lang.district}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.districtId.districtName)}" title="#{appView.title(companyAddressVar.districtId.districtName)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.phone1}" field="phone_1">
+                <f:facet name="header"><h:outputText value="#{lang.phone} #{lang.no}" title="#{lang.fax}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.phone1)}" title="#{appView.title(companyAddressVar.phone1)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.fax1}" field="fax_1">
+                <f:facet name="header"><h:outputText value="#{lang.fax} #{lang.no}" title="#{lang.fax}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.fax1)}" title="#{appView.title(companyAddressVar.fax1)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.email}" field="email">
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.email)}" title="#{appView.title(companyAddressVar.email)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyAddressVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(companyAddressVar.statusId.title)}" title="#{appView.title(companyAddressVar.statusId.title)}" rendered="#{companyAddressVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(companyAddressVar.statusId.title)}" title="#{appView.title(companyAddressVar.statusId.title)}" rendered="#{companyAddressVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyAddressVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyAddressVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyAddressVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyAddressVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyAddressVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+        <!--End of Company Address Tab-->
+
+        <!--Company Contact Tab-->
+
+        <p:tab   title="#{lang.contact}" disabled="#{main.isNew()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyContact" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.userProfileNewPopup(0)}" immediate="true" process="@this" icon="fa fa-plus" title="#{lang.add}"
+                               iconPos="left" styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="userProfilePopupReturned" actionListener="#{companyView.companyContactPopupReturned()}" update="companyContactTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="companyContactTable" var="companyContactVar" widgetVar="companyContactWidget" value="#{companyView.getCompanyContactList(main)}"
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyContactWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:ajax event="rowEdit" update="companyContactTable" listener="#{companyContactView.onRowEdit(companyContactVar)}"/>
+
+              <p:column sortBy="#{companyContactVar.userProfileId.name}" field="name" filterBy="#{companyContactVar.userProfileId.name}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+                <h:outputText value="#{appView.display(companyContactVar.userProfileId.name)}" title="#{appView.title(companyContactVar.userProfileId.name)}" escape="false" />
+              </p:column>              
+
+              <p:column filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.designation}" title="#{lang.designation}"/></f:facet>
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{appView.display(companyContactVar.designationId.title)}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:selectOneMenu value="#{companyContactVar.designationId}" converter="omnifaces.SelectItemsConverter" style="width:100%">
+                      <f:selectItems value="#{companyContactView.selectDesignationByCompanyContext(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                    </p:selectOneMenu>
+                    <!--<h:outputText value="#{appView.display(companyContactVar.designationId.title)}" />-->
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.phone} #{lang.no}" title="#{lang.phone} #{lang.no}"/></f:facet>
+                <h:outputText value="#{appView.display(companyContactVar.userProfileId.phone1)}" />
+              </p:column>
+
+              <p:column sortBy="#{companyContactVar.userProfileId.email}" field="email">
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(companyContactVar.userProfileId.email)}" title="#{appView.title(companyContactVar.userProfileId.email)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.action}" styleClass="w-100">
+                <div style="float: left;">
+                  <p:rowEditor />
+                </div>
+                <div>
+                  <p:commandButton styleClass="text-left;" action="#{companyView.deleteCompanyContact(main,companyContactVar)}" process="@this"
+                                   value="" update="companyContactTable" icon="fa fa-trash">
+                    <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                  </p:commandButton>
+                </div>
+
+              </p:column>
+
+
+              <p:column styleClass="w-80">
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyContactVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyContactVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyContactVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyContactVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyContactVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+        <!--End of Company Contact Tab-->
+
+        <!--Company Bank Tab-->
+        <p:tab title="#{lang.bank}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyBank" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.companyBankNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="companyBankPopupReturned" actionListener="#{companyView.companyBankPopupReturned()}" update="companyBankTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+
+            <p:dataTable id="companyBankTable" var="companyBankVar" widgetVar="companyBankWidget" value="#{companyView.getCompanyBankList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyBankWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{companyBankVar.accountNo}" field="account_number" filterBy="#{companyBankVar.accountNo}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.accountNumber}" title="#{lang.accountNumber}"/></f:facet>
+                <p:commandLink action="#{companyView.companyBankEditPopup(companyBankVar.id)}" value="#{appView.display(companyBankVar.accountNo)}" process="@this" immediate="true" onstart="block()"
+                               oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column sortBy="#{companyBankVar.accountName}" field="account_name" filterBy="#{companyBankVar.accountName}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.accountName}" title="#{lang.accountName}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBankVar.accountName)}" title="#{appView.title(companyBankVar.accountName)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyBankVar.bankAccountTypeId.title}" field="bank_account_type_id.title" filterBy="#{companyBankVar.bankAccountTypeId.title}"
+                        filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.accountType}" title="#{lang.accountType}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBankVar.bankAccountTypeId.title)}" title="#{appView.title(companyBankVar.bankAccountTypeId.title)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyBankVar.bankId.name}" field="bank_id.name" filterBy="#{companyBankVar.bankId.name}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.bank}" title="#{lang.bank}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBankVar.bankId.name)}" title="#{appView.title(companyBankVar.bankId.name)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyBankVar.branchName}" field="branch_name" filterBy="#{companyBankVar.branchName}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.branchName}" title="#{lang.branchName}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBankVar.branchName)}" title="#{appView.title(companyBankVar.branchName)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyBankVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBankVar.statusId.title)}" title="#{appView.title(companyBankVar.statusId.title)}" rendered="#{companyBankVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(companyBankVar.statusId.title)}" title="#{appView.title(companyBankVar.statusId.title)}" rendered="#{companyBankVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.contact}" title="#{lang.contact}"/></f:facet>
+                <p:commandButton action="#{companyView.bankContactPopup(companyBankVar)}" process="@this" immediate="true"  icon="fa fa-eye"
+                                 onstart="block()" oncomplete="unblock()" title="View">
+                </p:commandButton>
+                <p:commandButton action="#{companyView.bankContactPopupNewForm(companyBankVar)}" icon="fa fa-plus" process="@this" immediate="true"
+                                 onstart="block()" oncomplete="unblock()" title="New">
+                </p:commandButton>
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyBankVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyBankVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyBankVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyBankVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyBankVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+        <!--End of Company Bank Tab-->
+
+        <!--Company Brach Tab-->
+        <p:tab title="#{lang.branches}" disabled="#{main.isNew()}" rendered="#{sysRuntimeView.isBranchAsInfoTab()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyBranches" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.companyBranchNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="companyBranchPopupReturned" actionListener="#{companyView.companyBranchPopupReturned()}" update="companyBranchesTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="companyBranchesTable" var="companyBranchesVar" widgetVar="companyBranchesWidget" value="#{companyView.getCompanyBranchesList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyBranchesWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{companyBranchesVar.branchName}" field="branch_name" filterBy="#{companyBranchesVar.branchName}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+                <p:commandLink action="#{companyView.companyBranchEditPopup(companyBranchesVar.id)}" value="#{appView.display(companyBranchesVar.branchName)}" process="@this"
+                               immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.address}" field="address">
+                <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.address)}" title="#{appView.title(companyBranchesVar.address)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.stateId.stateName}" field="state_id.state_name">
+                <f:facet name="header"><h:outputText value="#{lang.state}" title="#{lang.state}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.stateId.stateName)}" title="#{appView.title(companyBranchesVar.stateId.stateName)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.districtId.districtName}" field="district_id.district_name">
+                <f:facet name="header"><h:outputText value="#{lang.district}" title="#{lang.district}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.districtId.districtName)}" title="#{appView.title(companyBranchesVar.districtId.districtName)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.phone1}" field="phone_1">
+                <f:facet name="header"><h:outputText value="#{lang.phone} #{lang.no}" title="#{lang.phone} #{lang.no}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.phone1)}" title="#{appView.title(companyBranchesVar.phone1)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.fax1}" field="fax_1">
+                <f:facet name="header"><h:outputText value="#{lang.fax} #{lang.no}" title="#{lang.fax} #{lang.no}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.fax1)}" title="#{appView.title(companyBranchesVar.fax1)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.email}" field="email">
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.email)}" title="#{appView.title(companyBranchesVar.email)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyBranchesVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(companyBranchesVar.statusId.title)}" title="#{appView.title(companyBranchesVar.statusId.title)}" rendered="#{companyBranchesVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(companyBranchesVar.statusId.title)}" title="#{appView.title(companyBranchesVar.statusId.title)}" rendered="#{companyBranchesVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyBranchesVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyBranchesVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyBranchesVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyBranchesVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyBranchesVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+        <!--End of Company Branch Tab-->
+
+        <!--Company Warehouse Tab-->
+        <p:tab title="#{lang.warehouse}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyWarehouse" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.companyWarehouseNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="companyWarehousePopupReturned" actionListener="#{companyView.companyWarehousePopupReturned()}" update="companyWarehouseTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="companyWarehouseTable" var="companyWarehouseVar" widgetVar="companyWarehouseWidget" value="#{companyView.getCompanyWarehouseList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyWarehouseWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{companyWarehouseVar.warehouseName}" field="warehouse_name" filterBy="#{companyWarehouseVar.warehouseName}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+                <p:commandLink action="#{companyView.companyWarehouseEditPopup(companyWarehouseVar.id)}" value="#{appView.display(companyWarehouseVar.warehouseName)}" process="@this"
+                               immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+
+              <p:column sortBy="#{companyWarehouseVar.address}" field="address" filterBy="#{companyWarehouseVar.address}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.address)}" title="#{appView.title(companyWarehouseVar.address)}" escape="false" />
+              </p:column>
+
+<!--              <p:column headerText="#{lang.country}" sortBy="#{companyWarehouseVar.countryId.countryName}" field="country_id.country_name">
+                <h:outputText value="#{appView.display(companyWarehouseVar.countryId.countryName)}" title="#{appView.title(companyWarehouseVar.countryId.countryName)}" escape="false" />
+              </p:column>-->
+
+              <p:column sortBy="#{companyWarehouseVar.stateId.stateName}" field="state_id.state_name">
+                <f:facet name="header"><h:outputText value="#{lang.state}" title="#{lang.state}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.stateId.stateName)}" title="#{appView.title(companyWarehouseVar.stateId.stateName)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyWarehouseVar.districtId.districtName}" field="district_id.district_name">
+                <f:facet name="header"><h:outputText value="#{lang.district}" title="#{lang.district}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.districtId.districtName)}" title="#{appView.title(companyWarehouseVar.districtId.districtName)}" escape="false" />
+              </p:column>
+
+<!--              <p:column headerText="#{lang.pincode}" sortBy="#{companyWarehouseVar.pin}" field="pin">
+                <h:outputText value="#{appView.display(companyWarehouseVar.pin)}" title="#{appView.title(companyWarehouseVar.pin)}" escape="false" />
+              </p:column>-->
+
+              <p:column sortBy="#{companyWarehouseVar.phone1}" field="phone_1">
+                <f:facet name="header"><h:outputText value="#{lang.phone} #{lang.no}" title="#{lang.phone} #{lang.no}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.phone1)}" title="#{appView.title(companyWarehouseVar.phone1)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyWarehouseVar.fax1}" field="fax_1">
+                <f:facet name="header"><h:outputText value="#{lang.fax} #{lang.no}" title="#{lang.log}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.fax1)}" title="#{appView.title(companyWarehouseVar.fax1)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyWarehouseVar.email}" field="email">
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.email)}" title="#{appView.title(companyWarehouseVar.email)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyWarehouseVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(companyWarehouseVar.statusId.title)}" title="#{appView.title(companyWarehouseVar.statusId.title)}" rendered="#{companyWarehouseVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(companyWarehouseVar.statusId.title)}" title="#{appView.title(companyWarehouseVar.statusId.title)}" rendered="#{companyWarehouseVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyWarehouseVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyWarehouseVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyWarehouseVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyWarehouseVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyWarehouseVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+        <!--End of Company Warehouse Tab-->
+
+        <!--Company Reference Tab-->
+        <p:tab title="#{lang.reference}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyReference" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.companyReferenceNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+                <p:remoteCommand name="companyReferencePopupReturned" actionListener="#{companyView.companyReferencePopupReturned()}" update="companyReferenceTable"
+                                 process="@this" immediate="true" />
+              </p:commandButton>
+              <p:remoteCommand name="companyReferencePopupReturned" actionListener="#{companyView.companyReferencePopupReturned()}" update="companyReferenceTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="companyReferenceTable" var="companyReferenceVar" widgetVar="companyReferenceWidget" value="#{companyView.getCompanyReferenceList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyReferenceWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{companyReferenceVar.referenceTitle}" field="reference_title" filterBy="#{companyReferenceVar.referenceTitle}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.referenceTitle}" title="#{lang.referenceTitle}"/></f:facet>
+                <p:commandLink action="#{companyView.companyReferenceEditPopup(companyReferenceVar.id)}" value="#{appView.display(companyReferenceVar.referenceTitle)}" process="@this" immediate="true"
+                               onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column sortBy="#{companyReferenceVar.referenceDescription}" field="reference_description">
+                <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+                <h:outputText value="#{appView.display(companyReferenceVar.referenceDescription)}" title="#{appView.title(companyReferenceVar.referenceDescription)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyReferenceVar.referenceNote}" field="reference_note">
+                <f:facet name="header"><h:outputText value="#{lang.note}" title="#{lang.note}"/></f:facet>
+                <h:outputText value="#{appView.display(companyReferenceVar.referenceNote)}" title="#{appView.title(companyReferenceVar.referenceNote)}" escape="false" />
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.documents}" title="#{lang.documents}"/></f:facet>
+                <p:commandButton action="#{companyView.companyReferenceDocPopup(companyReferenceVar)}" process="@this" immediate="true"  icon="fa fa-eye"
+                                 onstart="block()" oncomplete="unblock()" title="View">
+                </p:commandButton>
+                <p:commandButton action="#{companyView.companyReferenceDocPopupNewForm(companyReferenceVar)}" icon="fa fa-plus" process="@this" immediate="true"
+                                 onstart="block()" oncomplete="unblock()" title="New">
+                </p:commandButton>
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyReferenceVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyReferenceVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyReferenceVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyReferenceVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyReferenceVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+        <!--End of Company Reference Tab-->
+
+        <!--Company License Tab-->
+        <p:tab title="#{lang.license}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="companyLicense" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{companyView.companyLicenseNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="companyLicensePopupReturned" actionListener="#{companyView.companyLicensePopupReturned()}" update="companyLicenseTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="companyLicenseTable" var="companyLicenseVar" widgetVar="companyLicenseWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{companyView.getCompanyLicenseList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{companyLicenseVar.id}"
+                         rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                         rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('companyLicenseWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{companyLicenseVar.licenseKey}" field="license_key">
+                <f:facet name="header"><h:outputText value="#{lang.licenseKey}" title="#{lang.licenseKey}"/></f:facet>
+                <p:commandLink action="#{companyView.companyLicenseEditPopup(companyLicenseVar.id)}" value="#{appView.display(companyLicenseVar.licenseKey)}"
+                               process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column sortBy="#{companyLicenseVar.licenseTypeId.title}" field="license_type_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.licenseType}" title="#{lang.licenseType}"/></f:facet>
+                <h:outputText value="#{appView.display(companyLicenseVar.licenseTypeId.title)}" title="#{appView.title(companyLicenseVar.licenseTypeId.title)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyLicenseVar.description}" field="description">
+                <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+                <h:outputText value="#{appView.display(companyLicenseVar.description)}" title="#{appView.title(companyLicenseVar.description)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyLicenseVar.issuedAt}" field="issued_at" >
+                <f:facet name="header"><h:outputText value="#{lang.issuedAt}" title="#{lang.issuedAt}"/></f:facet>
+                <h:outputText value="#{appView.display(companyLicenseVar.issuedAt)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyLicenseVar.validFrom}" field="valid_from" >
+                <f:facet name="header"><h:outputText value="#{lang.validFrom}" title="#{lang.validFrom}"/></f:facet>
+                <h:outputText value="#{appView.date(companyLicenseVar.validFrom)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyLicenseVar.validTo}" field="valid_to" >
+                <f:facet name="header"><h:outputText value="#{lang.validTo}" title="#{lang.validTo}"/></f:facet>
+                <h:outputText value="#{appView.date(companyLicenseVar.validTo)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyLicenseVar.filePath}" field="file_path">
+                <f:facet name="header"><h:outputText value="#{lang.filePath}" title="#{lang.filePath}"/></f:facet>
+                <h:outputText value="#{appView.display(companyLicenseVar.filePath)}" title="#{appView.title(companyLicenseVar.filePath)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{companyLicenseVar.sortOrder}" field="sort_order" style="text-align: right">
+                <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+                <h:outputText value="#{appView.number(companyLicenseVar.sortOrder)}" escape="false" />
+              </p:column>
+
+              <p:column sortBy="#{companyLicenseVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(companyLicenseVar.statusId.title)}" title="#{appView.title(companyLicenseVar.statusId.title)}" rendered="#{companyLicenseVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(companyLicenseVar.statusId.title)}" title="#{appView.title(companyLicenseVar.statusId.title)}" rendered="#{companyLicenseVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(companyLicenseVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(companyLicenseVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(companyLicenseVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(companyLicenseVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(companyLicenseVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+        <!--End of Company License Tab-->
+
+        <!--SALES AGENT-->
+
+
+
+      </p:tabView>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="companyTable" var="companyVar" widgetVar="companyWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{companyView.companyLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{companyVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{companyView.companySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Company Name -->
+        <p:column sortBy="#{companyVar.companyName}" field="company_name" filterBy="#{companyVar.companyName}" filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.companyName}" title="#{lang.companyName}"/></f:facet>
+          <p:commandLink action="#{companyView.editCompany(main)}" value="#{companyVar.companyName}" process="@this" update="f f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{companyView.company}" value="#{companyVar}" />
+            <f:setPropertyActionListener target="#{userRuntimeView.company}" value="#{companyVar}" />
+          </p:commandLink>
+        </p:column>        
+
+        <!-- Company Type -->
+        <p:column  sortBy="#{companyVar.companyTypeId.title}" field="company_type_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.companyType}" title="#{lang.companyType}"/></f:facet>
+          <h:outputText value="#{appView.display(companyVar.companyTypeId.title)}" title="#{appView.title(companyVar.companyTypeId.title)}" escape="false" />
+        </p:column>
+
+        <!-- Tin/GSTIN -->
+        <p:column sortBy="#{companyVar.gstNo}" field="gst_no" filterBy="#{companyVar.gstNo}" filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.gstin} / #{lang.tin}" title="#{lang.tinabbr} / #{lang.gstinabbr}"/></f:facet>
+          <h:outputText value="#{companyVar.gstNo eq null ? appView.display(companyVar.tinNo) : appView.display(companyVar.gstNo)}" escape="false" styleClass="text-uppercase" />
+        </p:column>
+
+        <!-- Description -->
+        <p:column  sortBy="#{companyVar.description}" field="description" filterBy="#{companyVar.description}" filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+          <h:outputText value="#{appView.display(companyVar.description)}" title="#{appView.title(companyVar.description)}" escape="false" />
+        </p:column>
+
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(companyVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(companyVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(companyVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(companyVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(companyVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

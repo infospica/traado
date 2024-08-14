@@ -1,0 +1,292 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+  #{productPopupView.switchProduct(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{main.isEdit() ? productPopupView.product.productName : lang.product}"/>
+    <ui:param name="newLink" value="false" />
+    <ui:param name="ids" value="product" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="columnClasses" value="col-md-1 col-sm-4 control-label,col-md-1 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7" />
+    <ui:param name="cols" value="4" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:define name="moreForm" />
+    <ui:define name="deleteList" >
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+    </ui:define>
+
+    <ui:define name="menu1" >
+    </ui:define>
+
+    <ui:define name="more" >
+    </ui:define>
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" 
+                       actionListener="#{productPopupView.productPopupClose}"
+                       oncomplete="parent.productPopupReturned(); closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:commandButton action="#{productPopupView.saveProductDetail(main)}" value="#{lang.save}" onclick="toTop()"
+                       rendered="#{productPopupView.productEntryDraft}" id="saveBtnProd"
+                       styleClass="btn btn-primary" process="f1" update="f1" oncomplete="productDetailSaved(xhr, status, args);"  />
+
+      <p:commandButton actionListener="#{productPopupView.addNewProductDetail}" title="#{lang.add}" icon="fa fa-plus" iconPos="left" 
+                       process="@this" update="f1" rendered="#{productPopupView.productEntryDraft}"
+                       styleClass="btn btn-info" oncomplete="page.refresh();" >
+      </p:commandButton>
+      <script>
+        //<![CDATA[
+        function productDetailSaved(xhr, status, args) {
+          if (!args.validationFailed && args.saved) {
+            parent.productPopupReturned();
+            closePopup();
+          }
+        }
+        //]]>
+      </script>
+    </ui:define>
+    <ui:define name="afterForm">
+      <div data-fast-input="true">        
+        <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                      columnClasses="col-md-1 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+
+          <p:outputLabel value="#{lang.batchNumber}" for="batchNo" />
+          <h:panelGroup>
+            <p:inputText styleClass="text-uppercase w-260" value="#{productPopupView.productBatch.batchNo}" autocomplete="off"
+                         required="true" requiredMessage="#{lang.batchNumber} #{lang.isRequired}" id="batchNo"
+                         readonly="#{productPopupView.productBatchTraded}" />
+            <p:message for="batchNo" display="text"/>
+          </h:panelGroup>
+
+          <p:outputLabel value="#{lang.expiryDateActual}" for="expiryDateActual" />
+          <h:panelGroup>
+            <p:calendar styleClass="w-260" inputStyleClass="w-260" value="#{productPopupView.productBatch.expiryDateActual}" pattern="MM/yyyy" showOn="off"
+                        converterMessage="#{lang.expiryDateActual} #{lang.invalidDate}" maskSlotChar="mm/yyyy" autocomplete="off"
+                        required="true" requiredMessage="#{lang.expiryDateActual} #{lang.isRequired}" disabled="#{productPopupView.productBatchTraded}"
+                        maxlength="29" id="expiryDateActual" showButtonPanel="true" navigator="true" mask="true" pages="3">              
+            </p:calendar>
+            <p:message for="expiryDateActual" display="text"/>
+          </h:panelGroup>
+
+          <p:outputLabel value="#{lang.value} #{lang.mrp}" for="valueMrp" />
+          <h:panelGroup>
+            <p:inputNumber styleClass="w-260" value="#{productPopupView.productBatch.valueMrp}" converterMessage="#{lang.value} #{lang.mrp} #{lang.invalidNumber}" decimalPlaces="2"
+                          onfocus="this.select()" inputStyleClass="text-right w-260" maxValue="99999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" autocomplete="off"
+                           readonly="#{productPopupView.productBatchTraded}"
+                           requiredMessage="#{lang.value} #{lang.mrp} #{lang.isRequired}" id="valueMrp" />
+            <p:message for="valueMrp" display="text"/>
+          </h:panelGroup>
+
+          <p:outputLabel value="#{lang.expiryDateSale}" for="expiryDateSales"/>
+          <h:panelGroup id="expiryDateSales" layout="block">
+            <p:calendar styleClass="w-260" inputStyleClass="w-260" value="#{productPopupView.productBatch.expiryDateSales}" converterMessage="#{lang.expiryDateSale} #{lang.invalidDate}"
+                        disabled="true" pattern="MM/yyyy" mask="true" />
+          </h:panelGroup>
+
+          <!-- Product Packing -->
+          <p:outputLabel value="#{lang.productPacking}" for="productBatchProductPackingDetailId" />
+          <h:panelGroup>
+            <p:selectOneMenu value="#{productPopupView.productBatch.productPackingDetailId}" 
+                             required="true" requiredMessage="#{lang.productPacking} #{lang.isRequired}" id="productBatchProductPackingDetailId" 
+                             converter="omnifaces.SelectItemsConverter" styleClass="w-260" disabled="#{productPopupView.productBatchTraded}">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{productPopupView.lookupProductPackingDetail()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              <p:ajax event="itemSelect" process="@this" update="productDefaultPackDiv" listener="#{productPopupView.productPackingSelectEvent}" />
+            </p:selectOneMenu>
+            <p:message for="productBatchProductPackingDetailId" display="text" />
+          </h:panelGroup>
+
+          <!-- Default Packing -->
+          <p:outputLabel value="#{lang.defaultPacking}" for="productBatchDefaultProductPackingDetailId" />
+          <h:panelGroup id="productDefaultPackDiv">
+            <p:selectOneMenu value="#{productPopupView.productBatch.defaultProductPackingId}"  id="productBatchDefaultProductPackingDetailId"
+                             disabled="#{productPopupView.productBatchTraded}"
+                             converter="omnifaces.SelectItemsConverter" styleClass="w-260" required="true" requiredMessage="#{lang.defaultPacking} #{lang.isRequired}">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{productPopupView.productPackingAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            </p:selectOneMenu><p:message for="productBatchDefaultProductPackingDetailId" display="text" />
+          </h:panelGroup>
+
+          <!-- Manufacturer -->
+          <p:outputLabel value="#{lang.manufacturer}" for="manufactureId"/>
+          <h:panelGroup>
+            <p:selectOneMenu value="#{productPopupView.productBatch.manufactureId}"  id="manufactureId" styleClass="fw"  
+                             required="true" requiredMessage="#{lang.manufacture} #{lang.isRequired}"
+                             converter="omnifaces.SelectItemsConverter" disabled="#{productPopupView.productBatchTraded}" >
+              <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+              <f:selectItems value="#{productPopupView.lookupManufacturer()}" var="m" itemValue="#{m}" itemLabel="#{m.name}" />              
+            </p:selectOneMenu>
+          </h:panelGroup>
+        </p:panelGrid>
+      </div>
+    </ui:define>
+
+    <ui:define name="after">     
+
+      <!-- Product Basic Details-->
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="ids" value="prod" />
+        <ui:param name="label" value="#{lang.product}" />
+        <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                      columnClasses="col-md-1 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+          <!-- Product Name -->
+          <p:outputLabel value="#{lang.productName}" for="productName" />
+          <h:panelGroup>
+            <p:inputText  styleClass="w-260" value="#{productPopupView.product.productName}" maxlength="50" required="true" requiredMessage="#{lang.productName} #{lang.isRequired}"
+                          id="productName" readonly="true"/>
+            <p:message for="productName" display="text"/>
+          </h:panelGroup>
+
+          <!-- Commodity -->
+          <p:outputLabel value="#{lang.commodity}" for="productCommodityId"/>
+          <h:panelGroup>
+            <p:autoComplete styleClass="w-260" inputStyleClass="w-260" value="#{productPopupView.product.commodityId}" completeMethod="#{productPopupView.lookupCommodityByCompany}"
+                            converter="wawo.LookupIntConverter" id="productCommodityId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                            cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                            required="true" requiredMessage="#{lang.commodity} #{lang.isRequired}" readonly="true">
+              <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+            </p:autoComplete>
+            <p:outputLabel value="#{productPopupView.commodityTaxes}" id="commodityRealatedInfo" rendered="false"/>
+            <p:message for="productCommodityId" display="text" />
+          </h:panelGroup>          
+
+          <!-- Product Type -->
+          <p:outputLabel value="#{lang.productType}" for="productProductTypeId"/>
+          <h:panelGroup id="productTypeDiv">
+            <p:autoComplete styleClass="w-260" inputStyleClass="w-260" value="#{productPopupView.product.productTypeId}" completeMethod="#{productPopupView.lookupProductType}"
+                            converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.productType} #{lang.isRequired}" id="productProductTypeId"
+                            var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                            converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" readonly="true">
+              <f:attribute name="clazz" value="#{scmLookupView.productTypeClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.productTypeById()}"/>
+            </p:autoComplete>
+            <p:message for="productProductTypeId" display="text" />
+          </h:panelGroup>
+
+          <!-- Product Category -->
+          <p:outputLabel value="#{lang.productCategory}" for="productProductCategoryId"/>
+          <h:panelGroup id="productCategoryDiv">
+            <p:autoComplete styleClass="w-260" inputStyleClass="w-260" value="#{productPopupView.product.productCategoryId}" completeMethod="#{productPopupView.lookupProductCategoryByCompany}"
+                            converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.productCategory} #{lang.isRequired}" id="productProductCategoryId"
+                            var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                            converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  readonly="true">
+              <f:attribute name="clazz" value="#{scmLookupView.productCategoryClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.productCategoryById()}"/>
+            </p:autoComplete>
+            <p:outputLabel value="#{productPopupView.productCategoryTaxes}" id="categoryExDuty"/>
+            <p:message for="productProductCategoryId" display="text" />
+          </h:panelGroup>
+
+          <!-- PTR Margin Percentage -->
+          <p:outputLabel value="#{lang.ptrMargin} (#{contractUtilView.contractPtrMarginPercentageAsString(productPopupView.contract)})" />
+          <h:panelGroup layout="block" styleClass="row">
+            <div class="col-md-3 p-r-0">
+              <p:inputNumber styleClass="fw" value="#{productPopupView.productPreset.ptrMarginPercentage}" 
+                             converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}" readonly="#{!productPopupView.productPresetEditable}"
+                             decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.000" minValue="0.0" symbol="#{appView.percentageSymbol} " 
+                             symbolPosition="s" maxlength="5" id="ptrMarginPercentage"/>              
+            </div>
+            <div class="col-md-3 p-l-0" >
+              <p:selectOneMenu disabled="#{!productPopupView.productPresetEditable}" value="#{productPopupView.productPreset.mrpltePtrRateDerivationCriterion}" id="mrpltePtrRateDerivationCriterion" >
+                <f:selectItem itemValue="2" itemLabel="#{lang.markDown}" />
+                <f:selectItem itemValue="1" itemLabel="#{lang.markUp}" />
+              </p:selectOneMenu>              
+            </div>
+            <div class="col-md-6" >
+              <!--<h:outputText value="#{contractUtilView.contractPtrMarginPercentageAsString(productPopupView.contract)}" />-->
+            </div>
+
+          </h:panelGroup>
+
+          <!-- Product Classification -->
+          <p:outputLabel value="#{lang.productClassification}" for="productProductClassificationId"/>
+          <h:panelGroup id="productClassificationDiv">
+            <p:autoComplete styleClass="w-260" inputStyleClass="w-260" value="#{productPopupView.product.productClassificationId}" 
+                            completeMethod="#{productPopupView.productClassificationAuto}" converter="wawo.LookupIntConverter" id="productProductClassificationId" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" 
+                            queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" readonly="true">
+              <f:attribute name="clazz" value="#{scmLookupView.productClassificationClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.productClassificationById()}"/>
+            </p:autoComplete>
+            <p:message for="productProductClassificationId" display="text" />
+          </h:panelGroup>
+
+          <!-- PTS Margin Percentage -->
+          <p:outputLabel value="#{lang.ptsMargin} (#{contractUtilView.contractPtsMarginPercentageAsString(productPopupView.contract)})" />
+          <h:panelGroup layout="block" styleClass="row">
+            <div class="col-md-3 p-r-0">
+              <p:inputNumber styleClass="fw" value="#{productPopupView.productPreset.ptsMarginPercentage}" 
+                             converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}" readonly="#{!productPopupView.productPresetEditable}"
+                             decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.000" minValue="0.0" symbol="#{appView.percentageSymbol} " 
+                             symbolPosition="s" maxlength="5" id="ptsMarginPercentage"/>
+            </div>
+            <div class="col-md-3 p-l-0" >
+              <p:selectOneMenu disabled="#{!productPopupView.productPresetEditable}" value="#{productPopupView.productPreset.ptrPtsRateDerivationCriterion}" id="ptrPtsRateDerivationCriterion" >
+                <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+              </p:selectOneMenu>              
+            </div>
+            <div class="col-md-6" >
+              <!--<h:outputText value="#{contractUtilView.contractPtsMarginPercentageAsString(productPopupView.contract)}" />-->
+            </div>
+          </h:panelGroup>
+
+          <!-- Sales Expiry Days -->
+          <p:outputLabel value="#{lang.sales} #{lang.expiryDay}" for="expiryDay"/>
+          <h:panelGroup>
+            <p:inputNumber styleClass="w-260" onfocus="this.select()" inputStyleClass="text-right w-260" value="#{productPopupView.product.expirySalesDays}" converterMessage="#{lang.expiryDay} #{lang.invalidNumber}" id="expiryDay"
+                           decimalPlaces="0" readonly="true">
+            </p:inputNumber>
+            <p:message for="expiryDay" display="text"/>
+          </h:panelGroup>
+
+          <!-- SS Margin Percentage -->
+          <p:outputLabel value="#{lang.ss} #{lang.margin} (#{contractUtilView.contractMarginPercentageAsString(productPopupView.contract)})" rendered="#{accountUtilView.isSuperStockiest(productPopupView.account)}" />
+          <h:panelGroup layout="block" styleClass="row" rendered="#{accountUtilView.isSuperStockiest(productPopupView.account)}">
+            <div class="col-md-3 p-r-0">
+              <p:inputNumber styleClass="fw" value="#{productPopupView.productPreset.marginPercentage}" 
+                             converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}" readonly="#{!productPopupView.productPresetEditable}"
+                             decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.000" minValue="0.0" symbol="#{appView.percentageSymbol} " 
+                             symbolPosition="s" maxlength="5" id="marginPercentage"/>              
+            </div>
+            <div class="col-md-3 p-l-0" >
+              <p:selectOneMenu disabled="#{!productPopupView.productPresetEditable}" value="#{productPopupView.productPreset.ptsSsRateDerivationCriterion}" id="ptsSsRateDerivationCriterion">
+                <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+              </p:selectOneMenu>              
+            </div>
+            <div class="col-md-6" >              
+              <!--<h:outputText value="#{contractUtilView.contractMarginPercentageAsString(productPopupView.contract)}" />-->
+            </div>
+          </h:panelGroup>
+
+          <h:panelGroup rendered="#{!accountUtilView.isSuperStockiest(productPopupView.account)}"></h:panelGroup>
+          <h:panelGroup rendered="#{!accountUtilView.isSuperStockiest(productPopupView.account)}"></h:panelGroup>
+
+          <!-- Pack Size -->
+          <p:outputLabel value="#{lang.packSize}" for="packSize"/>
+          <h:panelGroup>
+            <p:inputText styleClass="w-260" value="#{productPopupView.product.packSize} #{appView.display(productPopupView.product.productUnitId.title)}" maxlength="6" id="packSize" readonly="true" required="true"
+                         requiredMessage="#{lang.packSize} #{lang.isRequired}" >
+
+            </p:inputText>
+            <p:message for="packSize" display="text"/>
+          </h:panelGroup>
+
+        </p:panelGrid>
+      </ui:decorate>      
+    </ui:define>
+  </ui:decorate>
+
+</ui:composition>

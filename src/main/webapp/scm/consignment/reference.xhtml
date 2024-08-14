@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+  #{consignmentReferenceView.switchConsignmentReference(main, main.viewType)}
+
+  <!--PURCHASE ORDER-->
+  <c:if test="#{consignmentReferenceView.consignmentReference.consignmentId.consignmentTypeId.id eq 1}" >
+    <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+      <ui:param name="label" value="#{lang.reference}" />
+      <ui:param name="ids" value="consignmentReference" />
+      <ui:param name="newList" value="false" />
+      <ui:param name="search" value="false" />
+
+      <ui:define name="more" >
+      </ui:define>
+
+      <ui:define name="navRight" >
+        <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{consignmentReferenceView.consignmentPODialogClose}" oncomplete="parent.referencePoPopupReturned(); closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+      </ui:define>
+
+      <ui:define name="leftRightList" >
+        <p:commandButton  actionListener="#{consignmentReferenceView.insertConsignmentPO(main)}" onclick="return preListSelect('purchaseOrderWidget', 'wdgOk', null);" 
+                          title="#{lang.select}"
+                          oncomplete="parent.referencePoPopupReturned();closePopup()" rendered="#{main.isList()}" 
+                          icon="fa fa-check"  iconPos="left" styleClass="btn btn-default" value="#{lang.select}">
+        </p:commandButton>
+      </ui:define>
+
+      <ui:define name="list">
+        <p:dataTable id="purchaseOrderTable" var="purchaseOrderVar" widgetVar="purchaseOrderWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     lazy="true" value="#{consignmentReferenceView.getPO(main)}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseOrderVar.id}"
+                     selection="#{consignmentReferenceView.purchaseOrderSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" >
+          <p:column selectionMode="multiple" exportable="false" />              
+          <p:column headerText="#{lang.purchaseOrderNo}" sortBy="#{purchaseOrderVar.purchaseOrderNo}" field="purchase_order_no">
+            <h:outputText value="#{appView.display(purchaseOrderVar.purchaseOrderNo)}" title="#{appView.title(purchaseOrderVar.purchaseOrderNo)}" escape="false" />
+
+          </p:column>  
+          <p:column headerText="#{lang.purchaseOrder} #{lang.date}" sortBy="#{purchaseOrderVar.purchaseOrderDate}" field="purchase_order_date">
+            <h:outputText value="#{appView.date(purchaseOrderVar.purchaseOrderDate)}" title="#{appView.date(purchaseOrderVar.purchaseOrderDate)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.createdBy}" field="created_by">
+            <h:outputText value="#{appView.display(purchaseOrderVar.createdBy)}" title="#{appView.title(purchaseOrderVar.createdBy)}" escape="false" />
+          </p:column>
+        </p:dataTable> 	
+      </ui:define>
+    </ui:decorate>
+  </c:if>
+</html>

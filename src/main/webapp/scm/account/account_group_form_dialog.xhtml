@@ -1,0 +1,200 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+  #{accountGroupView.switchAccountGroup(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{accountGroupView.popupTitle}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="accountGroup" />
+    <ui:param name="more" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{accountGroupView.accountGroupReturn}"
+                       oncomplete="parent.accountGroupListReturned();closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountGroupView.deleteAccountGroup(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountGroupWidgetDelConf')"
+                       process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountGroupView.cloneAccountGroup(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()"
+                  icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountGroupView.deleteAccountGroup(main)}" value="#{lang.delete}" onclick="wdgOff('accountGroupWidgetDel')"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{accountGroupView.saveAccountGroup(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="leftLeftList" >
+      <h:commandButton action="#{accountGroupView.insertAccountGroupDetails(main)}" value="#{lang.select}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <!-- Group Name -->
+      <p:outputLabel value="#{lang.groupName}" for="groupName" rendered="#{accountGroupView.salesInvoiceGroup}"/>
+      <h:panelGroup rendered="#{accountGroupView.salesInvoiceGroup}">
+        <p:inputText value="#{accountGroupView.accountGroup.groupName}" maxlength="500" required="true" requiredMessage="#{lang.groupName} #{lang.isRequired}" id="groupName" />
+        <p:message for="groupName" display="text"/>
+      </h:panelGroup>
+
+      <!-- Invoice Prefix -->
+      <p:outputLabel value="#{accountGroupView.popupTitle} #{lang.prefix}" for="invoicePrefix" rendered="#{!accountGroupView.salesInvoiceGroup}" />
+      <p:outputLabel value="#{lang.invoicePrefix}" for="invoicePrefixes" rendered="#{accountGroupView.salesInvoiceGroup}" />
+      <h:panelGroup>
+        <p:inputText value="#{accountGroupView.accountGroup.invoicePrefix}" required="true" requiredMessage="#{lang.invoicePrefix} #{lang.isRequired}" 
+                     id="invoicePrefix" rendered="#{!accountGroupView.salesInvoiceGroup}" />
+        <p:inputText value="#{accountGroupView.accountGroup.invoicePrefix}" maxlength="3" required="true" 
+                     requiredMessage="#{lang.invoicePrefix} #{lang.isRequired}" rendered="#{accountGroupView.salesInvoiceGroup}"
+                     id="invoicePrefixes" />
+        <p:message for="invoicePrefix" display="text" rendered="#{!accountGroupView.salesInvoiceGroup}"/>
+        <p:message for="invoicePrefixes" display="text" rendered="#{accountGroupView.salesInvoiceGroup}"/>
+      </h:panelGroup>
+
+      <!-- Invoice Number Counter -->
+      <p:outputLabel value="#{lang.sequence}" for="invoiceNoCounter" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountGroupView.accountGroup.invoiceNoCounter}" converterMessage="#{lang.invoiceNoCounter} #{lang.invalidNumber}" decimalPlaces="0"
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="invoiceNoCounter" />
+        <p:message for="invoiceNoCounter" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.padding}" for="padding" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountGroupView.accountGroup.padding}" converterMessage="#{lang.padding} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="padding" />
+        <p:message for="padding" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.yearSequence}" for="yearSequence" />
+      <h:panelGroup id="yearSequenceDiv">
+        <p:selectOneRadio id="yearSequence" value="#{accountGroupView.accountGroup.yearSequence}">
+          <f:selectItem itemLabel="#{lang.none}" itemValue="#{0}" />
+          <f:selectItem itemLabel="#{lang.currentYear}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.financialYear}" itemValue="#{2}" />
+          <p:ajax process="yearSequenceDiv" update="yearPaddingLabel yearPaddingDiv" listener="#{accountGroupView.yearSequenceChangeHandler}"  />
+        </p:selectOneRadio>
+        <p:message for="yearSequence" display="text"/>
+      </h:panelGroup>
+
+      <h:panelGroup id="yearPaddingLabel">
+        <p:outputLabel value="#{lang.yearPadding}" for="yearPadding" rendered="#{accountGroupView.yearSequence}" />
+      </h:panelGroup>
+      <h:panelGroup id="yearPaddingDiv">
+        <p:selectOneRadio id="yearPadding" value="#{accountGroupView.accountGroup.yearPadding}" rendered="#{accountGroupView.yearSequence}" >
+          <f:selectItem itemLabel="#{lang.twoDigits}" itemValue="#{2}" />
+          <f:selectItem itemLabel="#{lang.fourDigits}" itemValue="#{4}" />
+          <p:ajax update="yearPaddingLabel yearPaddingDiv"  />
+        </p:selectOneRadio>
+
+        <p:message for="yearPadding" display="text" />
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="accountGroupStatusId" rendered="#{accountGroupView.salesInvoiceGroup}"/>
+      <h:panelGroup rendered="#{accountGroupView.salesInvoiceGroup}">
+        <p:autoComplete value="#{accountGroupView.accountGroup.statusId}" completeMethod="#{accountGroupView.statusAuto}" converter="wawo.LookupIntConverter"
+                        required="true" requiredMessage="#{lang.status} #{lang.isRequired}" id="accountGroupStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}"
+                        emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                        forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
+        </p:autoComplete><p:message for="accountGroupStatusId" display="text" />
+      </h:panelGroup>
+
+      <!-- Sort Order -->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" rendered="false" />
+      <h:panelGroup rendered="false">
+        <p:inputNumber value="#{accountGroupView.accountGroup.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder"  thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!-- Note -->
+      <p:outputLabel value="#{lang.note}" for="note" />
+      <h:panelGroup>
+        <p:inputTextarea value="#{accountGroupView.accountGroup.note}" cols="100" rows="3" maxlength="1000" id="note" autoResize="false" />
+        <p:message for="note" display="text"/>
+      </h:panelGroup>
+      <h:panelGroup></h:panelGroup>
+      <h:panelGroup></h:panelGroup>
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml" >
+        <ui:param name="label" value="#{lang.priceList}" />
+        <ui:param name="rendered" value="#{accountGroupView.priceListApplicable}" />
+        <ui:define name="menuleft">
+          <p:commandButton title="#{lang.add}" icon="fa fa-plus" update="f1" style="float: left;" process="@this"
+                           iconPos="left" styleClass="btn btn-info" id="btnPriceListAdd">
+            <f:setPropertyActionListener target="#{accountGroupView.newPriceList}" value="#{true}" />
+            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+          </p:commandButton>
+          <p:spacer width="10" style="float: left;" />
+          <h:panelGroup  layout="block" id="priceListFormPanel" style="float: left;" rendered="#{accountGroupView.isNewPriceList()}">
+            <p:outputLabel value="#{lang.name}" for="groupPriceListName" />
+            <h:panelGroup >
+              <p:inputText value="#{accountGroupView.priceListName}" required="true" requiredMessage=""
+                           maxlength="100" id="groupPriceListName" />
+            </h:panelGroup>
+            <p:spacer width="10" />
+            <h:commandButton  action="#{accountGroupView.actionNewAccoutPriceList(main)}" value="#{lang.save}" styleClass="btn btn-default" >
+              <f:setPropertyActionListener target="#{accountGroupView.newPriceList}" value="#{false}" />
+              <f:ajax execute="priceListFormPanel" render="f1"/>
+            </h:commandButton>
+            <p:spacer width="10" />
+            <h:commandButton  action="#{accountGroupView.actionReturnNull}" value="#{lang.cancel}" immediate="true" styleClass="btn btn-default" >
+              <f:setPropertyActionListener target="#{accountGroupView.newPriceList}" value="#{false}" />
+              <f:ajax execute="@this" render="f1" />
+            </h:commandButton>
+          </h:panelGroup>
+        </ui:define>
+        <p:dataTable id="accountGrpPriceListTable" var="accountGrpPriceVar" widgetVar="accountGrpPriceWidget"
+                     value="#{accountGroupView.getAccountGroupPriceList(main)}" editable="true"
+                     rowHover="false" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+          <p:ajax event="rowEdit" listener="#{accountGroupView.onAccountGroupPriceListRowEdit}" update="@this" />
+
+          
+          <p:column headerText="#{lang.name}" sortBy="#{accountGrpPriceVar.title}" field="title">
+            <p:cellEditor>
+              <f:facet name="output"><h:outputText value="#{appView.display(accountGrpPriceVar.title)}" title="#{appView.title(accountGrpPriceVar.title)}" escape="false" /></f:facet>
+              <f:facet name="input"><p:inputText value="#{accountGrpPriceVar.title}" required="true" requiredMessage="" style="width:100%" label="Year"/></f:facet>
+            </p:cellEditor>
+          </p:column>
+          <p:column headerText="#{lang.remove}">
+            <p:commandButton action="#{accountGroupView.deleteAccountGroupPriceList(main, accountGrpPriceVar)}"  value=""
+                             rendered="#{accountGrpPriceVar.isDefault ne 1}"
+                             partialSubmit="true" process="@this"
+                             update="f1" title="#{lang.delete}" icon="fa fa-times" />
+            <!--<p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />-->
+          </p:column>
+          <p:column style="width:50px;">
+            <p:rowEditor />
+          </p:column>
+          
+        </p:dataTable>
+      </ui:decorate>
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(accountGroupView.accountGroup.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(accountGroupView.accountGroup.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(accountGroupView.accountGroup.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(accountGroupView.accountGroup.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

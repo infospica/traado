@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{accountingTransactionView.switchAccountingTransaction(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.accountingTransaction}" />
+    <ui:param name="ids" value="accountingTransaction" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountingTransactionView.deleteAccountingTransaction(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountingTransactionWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountingTransactionView.cloneAccountingTransaction(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountingTransactionView.deleteAccountingTransaction(main)}" value="#{lang.delete}" onclick="wdgOff('accountingTransactionWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{accountingTransactionView.saveAccountingTransaction(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.accountingHead}" for="accountingLedgerAccountingHeadId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{accountingTransactionView.accountingHeadId}" completeMethod="#{accountingTransactionView.accountingHeadAuto}" converter="wawo.LookupIntConverter"   
+                         id="accountingLedgerAccountingHeadId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                        emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
+                        style="position: relative" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingHeadClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingHeadById()}"/>
+        </p:autoComplete>
+        <p:message for="accountingLedgerAccountingHeadId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.ledgerMaster}" for="accountingTransactionAccountingLedgerId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{accountingTransactionView.accountingTransaction.accountingLedgerId}" completeMethod="#{accountingTransactionView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"   
+                        required="true" requiredMessage="#{lang.accountingTransactionAccountingLedgerId} #{lang.isRequired}" id="accountingTransactionAccountingLedgerId" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+        </p:autoComplete>
+        <p:message for="accountingTransactionAccountingLedgerId" display="text" />
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

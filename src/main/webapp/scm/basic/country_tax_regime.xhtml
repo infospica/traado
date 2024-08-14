@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{countryTaxRegimeView.switchCountryTax(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.countryTaxRegime}" />
+    <ui:param name="ids" value="countryTaxRegime" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{countryTaxRegimeView.deleteCountryTax(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('countryTaxRegimeWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{countryTaxRegimeView.cloneCountryTax(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{countryTaxRegimeView.deleteCountryTax(main)}" value="#{lang.delete}" onclick="wdgOff('countryTaxRegimeWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{countryTaxRegimeView.saveCountryTax(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">      
+
+      <!-- Title -->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{countryTaxRegimeView.countryTaxRegime.title}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <!-- Country -->
+      <p:outputLabel value="#{lang.country}" for="countryTaxCountryId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{countryTaxRegimeView.countryTaxRegime.countryId}" completeMethod="#{countryTaxRegimeView.countryAuto}" converter="wawo.LookupIntConverter" 
+                        required="true" requiredMessage="#{lang.country} #{lang.isRequired}"
+                        id="countryTaxCountryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" 
+                        queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+        </p:autoComplete>
+        <p:message for="countryTaxCountryId" display="text" />
+      </h:panelGroup>
+
+      <!-- Regime -->
+      <p:outputLabel value="#{lang.regime}" for="regime" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{countryTaxRegimeView.countryTaxRegime.regime}"  required="true" requiredMessage="#{lang.regime} #{lang.isRequired}"
+                         id="regime" converter="omnifaces.SelectItemsConverter" style="position: relative" styleClass="fw">
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.select}" />
+          <f:selectItems value="#{countryTaxRegimeView.selectRegime()}" var="r" itemValue="#{r.intValue}" itemLabel="#{r.itemLabel}" />
+        </p:selectOneMenu>
+        <p:message for="regime" display="text" styleClass="fw" />
+      </h:panelGroup>
+      
+      <p:outputLabel value="#{lang.taxProcessor}" for="taxProcessorId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{countryTaxRegimeView.countryTaxRegime.taxProcessorId}" completeMethod="#{countryTaxRegimeView.taxProcessorAuto}" converter="wawo.LookupIntConverter" 
+                        required="true" requiredMessage="#{lang.taxProcessor} #{lang.isRequired}"
+                        id="taxProcessorId" var="t" itemValue="#{t}" itemLabel="#{t.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true"
+                        queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.taxProcessorClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.taxProcessorById()}"/>
+        </p:autoComplete>
+        <p:message for="taxProcessorId" display="text"/>
+      </h:panelGroup>
+
+      <!-- Valid From --> 
+      <p:outputLabel value="#{lang.validFrom}" for="validFrom" />
+      <h:panelGroup>
+        <p:calendar value="#{countryTaxRegimeView.countryTaxRegime.validFrom}" pattern="#{lang.datePattern}" converterMessage="#{lang.validFrom} #{lang.invalidDate}" maxlength="29" 
+                    id="validFrom" showButtonPanel="true" navigator="true" mask="true"/>
+        <p:message for="validFrom" display="text"/>
+      </h:panelGroup>
+
+      <!-- Valid Upto -->
+      <p:outputLabel value="#{lang.validUpto}" for="validUpto" />
+      <h:panelGroup>
+        <p:calendar value="#{countryTaxRegimeView.countryTaxRegime.validUpto}" pattern="#{lang.datePattern}" converterMessage="#{lang.validUpto} #{lang.invalidDate}" maxlength="29" id="validUpto" showButtonPanel="true" navigator="true" mask="true"/>
+        <p:message for="validUpto" display="text"/>
+      </h:panelGroup>
+
+      <!-- Sort Order -->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{countryTaxRegimeView.countryTaxRegime.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(countryTaxRegimeView.countryTaxRegime.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(countryTaxRegimeView.countryTaxRegime.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(countryTaxRegimeView.countryTaxRegime.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(countryTaxRegimeView.countryTaxRegime.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(countryTaxRegimeView.countryTaxRegime.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="countryTaxRegimeTable" var="countryTaxRegimeVar" widgetVar="countryTaxRegimeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{countryTaxRegimeView.countryTaxRegimeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{countryTaxRegimeVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{countryTaxRegimeView.countryTaxRegimeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />        
+
+
+        <!-- Title -->
+        <p:column  sortBy="#{countryTaxRegimeVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>          
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{countryTaxRegimeVar.title}" process="@this" update="f1" immediate="true" onstart="block()" 
+                         oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{countryTaxRegimeView.countryTaxRegime}" value="#{countryTaxRegimeVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Regime -->
+        <p:column sortBy="#{countryTaxRegimeVar.regime}" field="scm_country_tax_regime.regime">
+          <f:facet name="header"><h:outputText value="#{lang.regime}" title="#{lang.regime}"/></f:facet>          
+          <h:outputText value="#{countryTaxRegimeView.displayRegime(countryTaxRegimeVar.regime)}" escape="false" />          
+        </p:column>        
+
+<!--         Country 
+        <p:column sortBy="#{countryTaxRegimeVar.countryId.countryName}" field="country_id.country_name">
+          <f:facet name="header"><h:outputText value="#{lang.country}" title="#{lang.country}"/></f:facet>
+          <h:outputText value="#{appView.display(countryTaxRegimeVar.countryId.countryName)}" title="#{appView.title(countryTaxRegimeVar.countryId.countryName)}" escape="false" />
+        </p:column>-->
+
+        <!-- Sort Order -->
+        <p:column sortBy="#{countryTaxRegimeVar.sortOrder}" field="scm_country_tax_regime.sort_order" styleClass="text-right">
+          <f:facet name="header">
+            <h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/>
+          </f:facet>
+          <h:outputText value="#{appView.number(countryTaxRegimeVar.sortOrder)}" escape="false" />
+        </p:column>
+
+        <!-- Log -->
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(countryTaxRegimeVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(countryTaxRegimeVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(countryTaxRegimeVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(countryTaxRegimeVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(countryTaxRegimeVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

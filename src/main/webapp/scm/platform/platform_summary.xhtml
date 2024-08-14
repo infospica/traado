@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{platformSummaryView.switchPlatform(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.platform}" />
+    <ui:param name="ids" value="platform" />
+    <ui:param name="search" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{platformSummaryView.platformPopupClose}" 
+                       oncomplete="closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="leftLeftList" >      
+      <p:commandButton action="#{platformSummaryView.selectPlatform}" value="#{lang.select}" 
+                       process="@this" immediate="true" onclick="return preSelect();"
+                       oncomplete="parent.platformPopupReturn();closePopup();" styleClass="btn btn-primary">        
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="rightList" >
+
+      <p:selectCheckboxMenu styleClass="L" id="selectSource" value="#{platformSummaryView.selectSource}" converter="omnifaces.SelectItemsConverter"
+                            filter="true" filterMatchMode="startsWith" panelStyle="width:250px" label="#{lang.all} #{lang.source}" >
+        <f:selectItems value="#{scmLookupView.platformSource(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        <p:ajax event="change" process="@this" immediate="true" listener="#{platformSummaryView.sourceFilter}" 
+                update="debitTreeTableId creditTreeTableId tables"/>
+      </p:selectCheckboxMenu>
+
+      <p:selectOneMenu styleClass="L" label="#{lang.status}" title="#{lang.status}" value="#{platformSummaryView.selectedStatus}"  id="selectStatus" converter="omnifaces.SelectItemsConverter">
+        <f:selectItem itemLabel="#{lang.newform}" itemValue="1" />
+        <f:selectItem itemLabel="#{lang.processed}" itemValue="2" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{platformSummaryView.statusFilter}" update="debitTreeTableId creditTreeTableId tables"/>
+      </p:selectOneMenu>
+    </ui:define>
+
+    <ui:define name="more" >      
+    </ui:define>
+    <ui:define name="newList" />
+
+    <ui:define name="deleteList" >
+    </ui:define>
+
+    <ui:define name="deleteForm" >      
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{platformSummaryView.savePlatform(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="false">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">s
+    </ui:define>
+
+    <ui:define name="list">      
+      <style>
+        .vtop{vertical-align: top;}
+        .ui-treetable-toggler.ui-icon.ui-icon-triangle-1-e.ui-c {
+          visibility: visible !important;
+        }
+        .ui-treetable-toggler.ui-icon.ui-c.ui-icon-triangle-1-s{
+          visibility: visible !important;
+        }
+      </style>
+      <script>
+        //<![CDATA[
+        function preSelect() {
+//          var rowcount = parseInt($('#selectedRowCount').val());
+//          if (rowcount === 0) {
+//            PF('emptyTable').show();
+//            return false;
+//          }
+          return true;
+        }
+
+        function onSelect() {
+          var selectedRowCount = parseInt($('#selectedRowCount').val());
+          selectedRowCount += 1;
+          $('#selectedRowCount').val(selectedRowCount);
+        }
+
+        function onUnSelect() {
+          var selectedRowCount = parseInt($('#selectedRowCount').val());
+          selectedRowCount -= 1;
+          $('#selectedRowCount').val(selectedRowCount);
+        }
+        //]]>
+      </script>
+
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:remoteCommand name="platformPopupReturned" actionListener="#{platformSummaryView.platformPopupReturned()}"
+                       process="@this" immediate="true" />
+      <p:panelGrid columns="2" columnClasses="vtop #{sysRuntimeView.getGrid2()} vtop" id="tables" >
+
+        <!-- Debit Summary List -->
+        <h:panelGroup layout="block" id="debitSummaryDiv" rendered="#{platformSummaryView.debitNote}">
+          <p:selectCheckboxMenu styleClass="R" value="#{platformSummaryView.selectedDebitDescription}" converter="omnifaces.SelectItemsConverter"
+                                rendered="#{platformSummaryView.selectedSummary le 3}"
+                                filter="true" filterMatchMode="startsWith" panelStyle="width:250px" label="#{lang.all} #{lang.type}" >
+            <f:selectItems value="#{platformSummaryView.lookupPlatformDescription()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            <p:ajax event="change" process="@this" immediate="true" listener="#{platformSummaryView.debitDescriotionFilterEvent}" 
+                    update="debitTreeTableId"/>
+          </p:selectCheckboxMenu>
+
+          <p:treeTable rendered="#{platformSummaryView.selectedSummary == 1}" selectionMode="checkbox" selection="#{platformSummaryView.platformDebitTreeSelected}" 
+                       id="debitTreeTableId" widgetVar="debitTreeTableWidgetVar"
+                       expandMode="self" value="#{platformSummaryView.getRootDebit(main)}" var="debitVar" tableStyleClass="mDataTable mDataTable-center fw editLinks">            
+            <p:ajax event="expand" listener="#{platformSummaryView.onNodeExpandDebit}" update="debitTreeTableId" />
+<!--            <p:ajax event="select" update="debitTreeTableId"  process="debitTreeTableId"  oncomplete="onSelect();"/>
+            <p:ajax event="unselect" update="debitTreeTableId" process="debitTreeTableId" oncomplete="onUnSelect();"  />-->
+
+            <p:column headerText="#{lang.description}" >
+              <h:outputText value="#{appView.title(debitVar.title)}" rendered="#{debitVar.level ne 2}" style="font-weight: bold;"/>              
+              <p:commandLink action="#{platformSummaryView.showItems(debitVar)}" rendered="#{debitVar.level eq 2}" style="font-weight: bold;padding-left: 73px;margin-top: -28px;"
+                             value="#{appView.title(debitVar.title)}"
+                             process="@this" immediate="true" onstart="block();" oncomplete="unblock();">
+              </p:commandLink>
+            </p:column>
+
+            <p:column headerText="#{lang.debit}" style="text-align:right;" >
+              <h:outputText value="#{appView.decimal(debitVar.debitAmountRequired)}" style="#{debitVar.level == 1 ? 'font-weight: bold;':debitVar.level == 2? 'font-weight: bold;':''}"/>
+            </p:column>
+
+            <p:column styleClass="w-100">
+              <f:facet name="header"><h:outputText value="#{lang.source}" title="#{lang.source}"/></f:facet>
+              <h:outputText styleClass="label" style="background-color: ##{debitVar.sourceId.displayColor}" value="#{debitVar.sourceId.shortCode}" title="#{debitVar.level == 1 ? appView.title(debitVar.sourceId.title):debitVar.level == 2 ? appView.title(debitVar.sourceId.title) +=  ' '+=lang.invoiceNo :debitVar.level == 3 ? lang.product :''}" escape="false" />
+            </p:column>
+          </p:treeTable>
+        </h:panelGroup>
+
+        <!-- Credit Summary List -->
+        <h:panelGroup layout="bock" id="creditSummaryDiv" rendered="#{platformSummaryView.creditNote}">
+          <p:selectCheckboxMenu styleClass="R" value="#{platformSummaryView.selectedCreditDescription}" converter="omnifaces.SelectItemsConverter"
+                                rendered="#{platformSummaryView.selectedSummary le 2}"
+                                filter="true" filterMatchMode="startsWith" panelStyle="width:250px" label="#{lang.all} #{lang.type}" >
+            <f:selectItems value="#{platformSummaryView.lookupPlatformDescription()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            <p:ajax event="change" process="@this" immediate="true" listener="#{platformSummaryView.creditDescriotionFilterEvent}" 
+                    update="creditTreeTableId"/>
+          </p:selectCheckboxMenu>
+
+          <p:treeTable rendered="#{platformSummaryView.selectedSummary == 1}" selectionMode="checkbox" 
+                       selection="#{platformSummaryView.platformDebitTreeSelected}" id="creditTreeTableId"
+                       value="#{platformSummaryView.getRootCredit(main)}" var="creditVar" 
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks">
+            <p:ajax event="expand" listener="#{platformSummaryView.onNodeExpandCredit}" update="creditTreeTableId" />
+            <p:ajax event="select" update="creditTreeTableId"  process="creditTreeTableId"  oncomplete="onSelect();"/>
+            <p:ajax event="unselect" update="creditTreeTableId" process="creditTreeTableId" oncomplete="onUnSelect();"  />
+
+            <p:column headerText="#{lang.description}">
+              <h:outputText value="#{appView.title(creditVar.title)}" rendered="#{creditVar.level ne 2}" style="font-weight: bold;"/>              
+              <p:commandLink action="#{platformSummaryView.showItems(creditVar)}" rendered="#{creditVar.level eq 2}" style="font-weight: bold;padding-left: 73px;margin-top: -28px;"
+                             value="#{appView.title(creditVar.title)}"
+                             process="@this" immediate="true" onstart="block();" oncomplete="unblock();">
+              </p:commandLink>
+            </p:column>
+
+            <p:column headerText="#{lang.credit}" style="text-align:right;">
+              <h:outputText value="#{appView.decimal(creditVar.creditAmountRequired)}" style="#{creditVar.level == 1 ? 'font-weight: bold;':creditVar.level == 2? 'font-weight: bold;':''}"/>
+            </p:column>
+
+            <p:column styleClass="w-100">
+              <f:facet name="header"><h:outputText value="#{lang.source}" title="#{lang.source}"/></f:facet>
+              <h:outputText styleClass="label" style="background-color: ##{creditVar.sourceId.displayColor}"
+                            value="#{creditVar.sourceId.shortCode}" title="#{creditVar.level == 1 ? appView.title(creditVar.sourceId.title):creditVar.level == 2 ? appView.title(creditVar.sourceId.title) += ' '+=lang.invoiceNo :creditVar.level == 3 ? lang.product :''}" escape="false" />
+            </p:column>
+          </p:treeTable>
+        </h:panelGroup>       
+
+      </p:panelGrid>
+      <h:inputHidden id="selectedRowCount" value="0" />
+      <p:dialog widgetVar="emptyTable" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+        <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+        <p:commandButton value="#{lang.btnOk}" onclick="wdgOff('emptyTable')" type="button" title="#{lang.btnYes}" />
+      </p:dialog>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

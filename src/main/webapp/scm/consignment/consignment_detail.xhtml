@@ -1,0 +1,288 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{consignmentDetailView.switchConsignmentDetail(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.consignmentDetail}" />
+    <ui:param name="ids" value="consignmentDetail" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{consignmentDetailView.deleteConsignmentDetail(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('consignmentDetailWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{consignmentDetailView.cloneConsignmentDetail(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{consignmentDetailView.deleteConsignmentDetail(main)}" value="#{lang.delete}" onclick="wdgOff('consignmentDetailWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{consignmentDetailView.saveConsignmentDetail(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+
+        <p:outputLabel value="#{lang.consignmentDetailConsignmentId}" for="consignmentDetailConsignmentId"/>
+        <h:panelGroup>
+          <p:autoComplete  value="#{consignmentDetailView.consignmentDetail.consignmentId}" completeMethod="#{consignmentDetailView.consignmentAuto}" 
+                          converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.consignmentDetailConsignmentId} #{lang.isRequired}" id="consignmentDetailConsignmentId" var="e" itemValue="#{e}" itemLabel="#{e.consignmentNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookup.consignmentClass()}"/>
+          <f:attribute name="byid" value="#{scmLookup.consignmentById()}"/>
+        </p:autoComplete>
+          <p:message for="consignmentDetailConsignmentId" display="text" />
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.exitDocumentNo}" for="exitDocumentNo" />
+        <h:panelGroup><p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.exitDocumentNo}" maxlength="100" id="exitDocumentNo" />
+          <p:message for="exitDocumentNo" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.exitDocumentFilePath}" for="exitDocumentFilePath" />
+        <h:panelGroup id="exitDocumentFilePathPart">
+        <h:inputFile value="#{consignmentDetailView.exitDocumentFilePathPart}"  maxlength="200" id="exitDocumentFilePath"/>        
+        <p:commandButton rendered="#{not empty consignmentDetailView.consignmentDetail.exitDocumentFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" 
+                         process="@this" oncomplete="hide('exitDocumentFilePathLink')" update="exitDocumentFilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{consignmentDetailView.exitDocumentFilePathPart}" value="#{appIo.getRemoveFile()}" />    
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentDetailView.consignmentDetail.exitDocumentFilePath)}" ajax="false" id="exitDocumentFilePathLink" class="ignoreLoad" >   
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentDetailView.consignmentDetail.exitDocumentFilePath)}" />
+        </p:commandLink>
+        <p:message for="exitDocumentFilePath" display="text"/>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.consignmentDetailExitDocumentTypeId}" for="consignmentDetailExitDocumentTypeId"/>
+        <h:panelGroup>
+          <p:autoComplete  value="#{consignmentDetailView.consignmentDetail.exitDocumentTypeId}" completeMethod="#{consignmentDetailView.consignmentDocTypeAuto}" 
+                          converter="wawo.LookupIntConverter"   id="consignmentDetailExitDocumentTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                          emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                          autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookup.consignmentDocTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookup.consignmentDocTypeById()}"/>
+        </p:autoComplete>
+          <p:message for="consignmentDetailExitDocumentTypeId" display="text" />
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.exitDocument2No}" for="exitDocument2No" />
+        <h:panelGroup><p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.exitDocument2No}" maxlength="100" id="exitDocument2No" />
+          <p:message for="exitDocument2No" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.exitDocument2FilePath}" for="exitDocument2FilePath" />
+        <h:panelGroup id="exitDocument2FilePathPart">
+        <h:inputFile value="#{consignmentDetailView.exitDocument2FilePathPart}"  maxlength="200" id="exitDocument2FilePath"/>        
+        <p:commandButton rendered="#{not empty consignmentDetailView.consignmentDetail.exitDocument2FilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" 
+                         process="@this" oncomplete="hide('exitDocument2FilePathLink')" update="exitDocument2FilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{consignmentDetailView.exitDocument2FilePathPart}" value="#{appIo.getRemoveFile()}" />    
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentDetailView.consignmentDetail.exitDocument2FilePath)}" ajax="false" id="exitDocument2FilePathLink" class="ignoreLoad" >   
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentDetailView.consignmentDetail.exitDocument2FilePath)}" />
+        </p:commandLink>
+        <p:message for="exitDocument2FilePath" display="text"/>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.consignmentDetailExitDocument2TypeId}" for="consignmentDetailExitDocument2TypeId"/>
+        <h:panelGroup>
+          <p:autoComplete  value="#{consignmentDetailView.consignmentDetail.exitDocument2TypeId}" completeMethod="#{consignmentDetailView.consignmentDocTypeAuto}" 
+                          converter="wawo.LookupIntConverter"   id="consignmentDetailExitDocument2TypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                          emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                          autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookup.consignmentDocTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookup.consignmentDocTypeById()}"/>
+        </p:autoComplete>
+          <p:message for="consignmentDetailExitDocument2TypeId" display="text" />
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.entryDocumentNo}" for="entryDocumentNo" />
+        <h:panelGroup><p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.entryDocumentNo}" maxlength="100" id="entryDocumentNo" />
+          <p:message for="entryDocumentNo" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.entryDocumentFilePath}" for="entryDocumentFilePath" />
+        <h:panelGroup id="entryDocumentFilePathPart">
+        <h:inputFile value="#{consignmentDetailView.entryDocumentFilePathPart}"  maxlength="200" id="entryDocumentFilePath"/>        
+        <p:commandButton rendered="#{not empty consignmentDetailView.consignmentDetail.entryDocumentFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" 
+                         process="@this" oncomplete="hide('entryDocumentFilePathLink')" update="entryDocumentFilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{consignmentDetailView.entryDocumentFilePathPart}" value="#{appIo.getRemoveFile()}" />    
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentDetailView.consignmentDetail.entryDocumentFilePath)}" ajax="false" id="entryDocumentFilePathLink" class="ignoreLoad" >   
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentDetailView.consignmentDetail.entryDocumentFilePath)}" />
+        </p:commandLink><p:message for="entryDocumentFilePath" display="text"/>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.consignmentDetailEntryDocumentTypeId}" for="consignmentDetailEntryDocumentTypeId"/>
+        <h:panelGroup>
+          <p:autoComplete  value="#{consignmentDetailView.consignmentDetail.entryDocumentTypeId}" completeMethod="#{consignmentDetailView.consignmentDocTypeAuto}" 
+                          converter="wawo.LookupIntConverter"   id="consignmentDetailEntryDocumentTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                          emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                          autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookup.consignmentDocTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookup.consignmentDocTypeById()}"/>
+        </p:autoComplete>
+          <p:message for="consignmentDetailEntryDocumentTypeId" display="text" />
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.exitCheckpostName}" for="exitCheckpostName" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.exitCheckpostName}" maxlength="200" id="exitCheckpostName" />
+          <p:message for="exitCheckpostName" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.exitCheckpostArrivalAt}" for="exitCheckpostArrivalAt" />
+        <h:panelGroup>
+          <p:calendar value="#{consignmentDetailView.consignmentDetail.exitCheckpostArrivalAt}" pattern="#{lang.datePattern}" 
+                      converterMessage="#{lang.exitCheckpostArrivalAt} #{lang.invalidDate}" maxlength="29" id="exitCheckpostArrivalAt" 
+                      mindate="#{userRuntimeView.minDate}"
+                      showButtonPanel="true" navigator="true" mask="true"/>
+          <p:message for="exitCheckpostArrivalAt" display="text"/>
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.entryCheckpostName}" for="entryCheckpostName" />
+        <h:panelGroup><p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.entryCheckpostName}" maxlength="20" id="entryCheckpostName" />
+          <p:message for="entryCheckpostName" display="text"/>
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.entryCheckpostArrivalAt}" for="entryCheckpostArrivalAt" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.entryCheckpostArrivalAt}" maxlength="20" id="entryCheckpostArrivalAt" />
+          <p:message for="entryCheckpostArrivalAt" display="text"/></h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.receiptNo}" for="receiptNo" />
+        <h:panelGroup><p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.receiptNo}" maxlength="100" id="receiptNo" />
+          <p:message for="receiptNo" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.receiptFilePath}" for="receiptFilePath" />
+        <h:panelGroup id="receiptFilePathPart">
+        <h:inputFile value="#{consignmentDetailView.receiptFilePathPart}"  maxlength="200" id="receiptFilePath"/>        
+        <p:commandButton rendered="#{not empty consignmentDetailView.consignmentDetail.receiptFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" 
+                         process="@this" oncomplete="hide('receiptFilePathLink')" update="receiptFilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{consignmentDetailView.receiptFilePathPart}" value="#{appIo.getRemoveFile()}" />    
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentDetailView.consignmentDetail.receiptFilePath)}" ajax="false" id="receiptFilePathLink" class="ignoreLoad" >   
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentDetailView.consignmentDetail.receiptFilePath)}" />
+        </p:commandLink>
+        <p:message for="receiptFilePath" display="text"/>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.consignmentDetailConsignmentReceiptTypeId}" for="consignmentDetailConsignmentReceiptTypeId"/>
+        <h:panelGroup>
+          <p:autoComplete  value="#{consignmentDetailView.consignmentDetail.consignmentReceiptTypeId}" completeMethod="#{consignmentDetailView.consignmentReceiptTypeAuto}" 
+                          converter="wawo.LookupIntConverter"   id="consignmentDetailConsignmentReceiptTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                          emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                          autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookup.consignmentReceiptTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookup.consignmentReceiptTypeById()}"/>
+        </p:autoComplete>
+          <p:message for="consignmentDetailConsignmentReceiptTypeId" display="text" />
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.receiptReturnFilePath}" for="receiptReturnFilePath" />
+        <h:panelGroup id="receiptReturnFilePathPart">
+        <h:inputFile value="#{consignmentDetailView.receiptReturnFilePathPart}"  maxlength="200" id="receiptReturnFilePath"/>        
+        <p:commandButton rendered="#{not empty consignmentDetailView.consignmentDetail.receiptReturnFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" 
+                         process="@this" oncomplete="hide('receiptReturnFilePathLink')" update="receiptReturnFilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{consignmentDetailView.receiptReturnFilePathPart}" value="#{appIo.getRemoveFile()}" />    
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentDetailView.consignmentDetail.receiptReturnFilePath)}" ajax="false" id="receiptReturnFilePathLink" class="ignoreLoad" >   
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentDetailView.consignmentDetail.receiptReturnFilePath)}" />
+        </p:commandLink>
+        <p:message for="receiptReturnFilePath" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.note}" for="note" />
+        <h:panelGroup><p:inputTextarea  styleClass="fw" value="#{consignmentDetailView.consignmentDetail.note}" cols="100" rows="3" maxlength="500" id="note" autoResize="false" />
+          <p:message for="note" display="text"/></h:panelGroup>
+
+        <p:outputLabel value="#{lang.consignmentDetailTransporterId}" for="consignmentDetailTransporterId"/>
+        <h:panelGroup>
+          <p:autoComplete  value="#{consignmentDetailView.consignmentDetail.transporterId}" completeMethod="#{consignmentDetailView.transporterAuto}" 
+                          converter="wawo.LookupIntConverter"   id="consignmentDetailTransporterId" var="e" itemValue="#{e}" itemLabel="#{e.transporterName}" 
+                          emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                          autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookup.transporterClass()}"/>
+          <f:attribute name="byid" value="#{scmLookup.transporterById()}"/>
+        </p:autoComplete>
+          <p:message for="consignmentDetailTransporterId" display="text" />
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.transporterName}" for="transporterName" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.transporterName}" maxlength="20" id="transporterName" />
+          <p:message for="transporterName" display="text"/>
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.vehicheNo}" for="vehicheNo" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.vehicheNo}" maxlength="100" id="vehicheNo" />
+          <p:message for="vehicheNo" display="text"/>
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.vehicleType}" for="vehicleType" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.vehicleType}" maxlength="200" id="vehicleType" />
+          <p:message for="vehicleType" display="text"/>
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.driverName}" for="driverName" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.driverName}" maxlength="200" id="driverName" />
+          <p:message for="driverName" display="text"/>
+        </h:panelGroup>            
+        
+        <p:outputLabel value="#{lang.driverLicenseNo}" for="driverLicenseNo" />
+        <h:panelGroup>
+          <p:inputText styleClass="fw" value="#{consignmentDetailView.consignmentDetail.driverLicenseNo}" maxlength="100" id="driverLicenseNo" />
+          <p:message for="driverLicenseNo" display="text"/>
+        </h:panelGroup>
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="consignmentDetailTable" var="consignmentDetailVar" widgetVar="consignmentDetailWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+        lazy="true" value="#{consignmentDetailView.consignmentDetailLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{consignmentDetailVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+        selection="#{consignmentDetailView.consignmentDetailSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{consignmentDetailVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentDetailVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{consignmentDetailView.consignmentDetail}" value="#{consignmentDetailVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.consignmentNo}" sortBy="#{consignmentDetailVar.consignmentId.consignmentNo}" field="consignment_id.consignment_no"><h:outputText value="#{appView.display(consignmentDetailVar.consignmentId.consignmentNo)}" title="#{appView.title(consignmentDetailVar.consignmentId.consignmentNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.exitDocumentNo}" sortBy="#{consignmentDetailVar.exitDocumentNo}" field="exit_document_no"><h:outputText value="#{appView.display(consignmentDetailVar.exitDocumentNo)}" title="#{appView.title(consignmentDetailVar.exitDocumentNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.exitDocumentFilePath}" sortBy="#{consignmentDetailVar.exitDocumentFilePath}" field="exit_document_file_path"><h:outputText value="#{appView.display(consignmentDetailVar.exitDocumentFilePath)}" title="#{appView.title(consignmentDetailVar.exitDocumentFilePath)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{consignmentDetailVar.exitDocumentTypeId.title}" field="exit_document_type_id.title"><h:outputText value="#{appView.display(consignmentDetailVar.exitDocumentTypeId.title)}" title="#{appView.title(consignmentDetailVar.exitDocumentTypeId.title)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.exitDocument2No}" sortBy="#{consignmentDetailVar.exitDocument2No}" field="exit_document_2_no"><h:outputText value="#{appView.display(consignmentDetailVar.exitDocument2No)}" title="#{appView.title(consignmentDetailVar.exitDocument2No)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.exitDocument2FilePath}" sortBy="#{consignmentDetailVar.exitDocument2FilePath}" field="exit_document_2_file_path"><h:outputText value="#{appView.display(consignmentDetailVar.exitDocument2FilePath)}" title="#{appView.title(consignmentDetailVar.exitDocument2FilePath)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{consignmentDetailVar.exitDocument2TypeId.title}" field="exit_document_2_type_id.title"><h:outputText value="#{appView.display(consignmentDetailVar.exitDocument2TypeId.title)}" title="#{appView.title(consignmentDetailVar.exitDocument2TypeId.title)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.entryDocumentNo}" sortBy="#{consignmentDetailVar.entryDocumentNo}" field="entry_document_no"><h:outputText value="#{appView.display(consignmentDetailVar.entryDocumentNo)}" title="#{appView.title(consignmentDetailVar.entryDocumentNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.entryDocumentFilePath}" sortBy="#{consignmentDetailVar.entryDocumentFilePath}" field="entry_document_file_path"><h:outputText value="#{appView.display(consignmentDetailVar.entryDocumentFilePath)}" title="#{appView.title(consignmentDetailVar.entryDocumentFilePath)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{consignmentDetailVar.entryDocumentTypeId.title}" field="entry_document_type_id.title"><h:outputText value="#{appView.display(consignmentDetailVar.entryDocumentTypeId.title)}" title="#{appView.title(consignmentDetailVar.entryDocumentTypeId.title)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.exitCheckpostName}" sortBy="#{consignmentDetailVar.exitCheckpostName}" field="exit_checkpost_name"><h:outputText value="#{appView.display(consignmentDetailVar.exitCheckpostName)}" title="#{appView.title(consignmentDetailVar.exitCheckpostName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.exitCheckpostArrivalAt}" sortBy="#{consignmentDetailVar.exitCheckpostArrivalAt}" field="exit_checkpost_arrival_at" ><h:outputText value="#{appView.dateTime(consignmentDetailVar.exitCheckpostArrivalAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.entryCheckpostName}" sortBy="#{consignmentDetailVar.entryCheckpostName}" field="entry_checkpost_name"><h:outputText value="#{appView.display(consignmentDetailVar.entryCheckpostName)}" title="#{appView.title(consignmentDetailVar.entryCheckpostName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.entryCheckpostArrivalAt}" sortBy="#{consignmentDetailVar.entryCheckpostArrivalAt}" field="entry_checkpost_arrival_at"><h:outputText value="#{appView.display(consignmentDetailVar.entryCheckpostArrivalAt)}" title="#{appView.title(consignmentDetailVar.entryCheckpostArrivalAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.receiptNo}" sortBy="#{consignmentDetailVar.receiptNo}" field="receipt_no"><h:outputText value="#{appView.display(consignmentDetailVar.receiptNo)}" title="#{appView.title(consignmentDetailVar.receiptNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.receiptFilePath}" sortBy="#{consignmentDetailVar.receiptFilePath}" field="receipt_file_path"><h:outputText value="#{appView.display(consignmentDetailVar.receiptFilePath)}" title="#{appView.title(consignmentDetailVar.receiptFilePath)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{consignmentDetailVar.consignmentReceiptTypeId.title}" field="consignment_receipt_type_id.title"><h:outputText value="#{appView.display(consignmentDetailVar.consignmentReceiptTypeId.title)}" title="#{appView.title(consignmentDetailVar.consignmentReceiptTypeId.title)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.receiptReturnFilePath}" sortBy="#{consignmentDetailVar.receiptReturnFilePath}" field="receipt_return_file_path"><h:outputText value="#{appView.display(consignmentDetailVar.receiptReturnFilePath)}" title="#{appView.title(consignmentDetailVar.receiptReturnFilePath)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.note}" sortBy="#{consignmentDetailVar.note}" field="note"><h:outputText value="#{appView.display(consignmentDetailVar.note)}" title="#{appView.title(consignmentDetailVar.note)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.transporterName}" sortBy="#{consignmentDetailVar.transporterId.transporterName}" field="transporter_id.transporter_name"><h:outputText value="#{appView.display(consignmentDetailVar.transporterId.transporterName)}" title="#{appView.title(consignmentDetailVar.transporterId.transporterName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.transporterName}" sortBy="#{consignmentDetailVar.transporterName}" field="transporter_name"><h:outputText value="#{appView.display(consignmentDetailVar.transporterName)}" title="#{appView.title(consignmentDetailVar.transporterName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.vehicheNo}" sortBy="#{consignmentDetailVar.vehicheNo}" field="vehiche_no"><h:outputText value="#{appView.display(consignmentDetailVar.vehicheNo)}" title="#{appView.title(consignmentDetailVar.vehicheNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.vehicleType}" sortBy="#{consignmentDetailVar.vehicleType}" field="vehicle_type"><h:outputText value="#{appView.display(consignmentDetailVar.vehicleType)}" title="#{appView.title(consignmentDetailVar.vehicleType)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.driverName}" sortBy="#{consignmentDetailVar.driverName}" field="driver_name"><h:outputText value="#{appView.display(consignmentDetailVar.driverName)}" title="#{appView.title(consignmentDetailVar.driverName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.driverLicenseNo}" sortBy="#{consignmentDetailVar.driverLicenseNo}" field="driver_license_no"><h:outputText value="#{appView.display(consignmentDetailVar.driverLicenseNo)}" title="#{appView.title(consignmentDetailVar.driverLicenseNo)}" escape="false" /></p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

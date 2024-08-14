@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+  #{gstReportDetailView.setGstReportDetailList(null)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{gstReportDetailView.reportSummary.ledgerCode}" />    
+    <ui:param name="ids" value="gstReportDetail" />
+    <ui:param name="search" value="false" rendered="false" />
+
+
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  
+                       oncomplete="closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="gstReportDetailST" onkeyup="return callDtFilter(this.value, 'gstReportDetail');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="gstReportDetailTable" var="row" widgetVar="gstReportDetailWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gstReportDetailView.getGstReportDetailList(main)}" 
+                   rows="#{main.pageData.pageSize}" rowKey="#{row.id}" rowIndexVar="index"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gstReportDetailWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column style="width: 100px;" exportable="false" >
+          &#160;
+        </p:column>
+        <p:column headerText="#{lang.slno}" style="width:100px;" >
+          <h:outputText value="#{index+1}" />
+        </p:column>
+        <p:column sortBy="#{row.document}" field="document" filterBy="#{row.document}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.document}" title="#{lang.document}"/></f:facet>
+          <!--<p:commandLink actionListener="#{gstReportDetailView.showDetails(main,row.transactionid,row.detailid)}">-->
+            <h:outputText value="#{appView.display(row.document)}" title="#{appView.title(row.document)}" escape="false" />
+          <!--</p:commandLink>-->
+        </p:column>
+<!--        <p:column sortBy="#{row.ledgercode}" field="ledgercode" filterBy="#{row.ledgercode}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+          <h:outputText value="#{appView.display(row.ledgercode)}" title="#{appView.title(row.ledgercode)}" escape="false" />
+        </p:column>-->
+        <p:column sortBy="#{row.title}" field="title" filterBy="#{row.title}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <h:outputText value="#{appView.display(row.title)}" title="#{appView.title(row.title)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{row.taxtype}" field="taxtype" filterBy="#{row.taxtype}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.tax}" title="#{lang.tax}"/></f:facet>
+          <h:outputText value="#{appView.display(row.taxtype)}" title="#{appView.title(row.taxtype)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.amount}" sortBy="#{gstReportDetailView.actualAmount(row.credit,row.debit)}" field="amount" 
+                  styleClass="text-right" style="text-align: right;width:200px;">           
+          <h:outputText value="#{appView.decimal(gstReportDetailView.actualAmount(row.credit,row.debit))}" escape="false" />
+        </p:column>
+
+        <p:column style="width: 250px;" exportable="false" >
+          &#160;<script>unblock();</script>
+        </p:column>
+
+
+      </p:dataTable>
+    </ui:define>
+
+
+
+    <ui:define name="after">
+
+    </ui:define>
+  </ui:decorate>
+</html>

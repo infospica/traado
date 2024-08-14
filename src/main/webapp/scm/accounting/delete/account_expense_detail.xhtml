@@ -1,0 +1,232 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{accountExpenseDetailView.switchAccountExpenseDetail(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.accountExpenseDetail}" />
+    <ui:param name="ids" value="accountExpenseDetail" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountExpenseDetailView.deleteAccountExpenseDetail(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountExpenseDetailWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountExpenseDetailView.cloneAccountExpenseDetail(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountExpenseDetailView.deleteAccountExpenseDetail(main)}" value="#{lang.delete}" onclick="wdgOff('accountExpenseDetailWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{accountExpenseDetailView.saveAccountExpenseDetail(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-success"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.accountExpenseDetailAccountExpenseId}" for="accountExpenseDetailAccountExpenseId" /><h:panelGroup>
+         <p:selectOneMenu value="#{accountExpenseDetailView.accountExpenseDetail.accountExpenseId}"  id="accountExpenseDetailAccountExpenseId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.accountExpense(main)}" var="e" itemValue="#{e}" itemLabel="#{e.status}" />
+        </p:selectOneMenu><p:message for="accountExpenseDetailAccountExpenseId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.accountExpenseDetailAccountExpenseId}" for="accountExpenseDetailAccountExpenseId" /><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.accountExpenseId}" completeMethod="#{scmLookupView.accountExpenseAuto}"  id="accountExpenseDetailAccountExpenseId" var="e" itemValue="#{e}" itemLabel="#{e.status}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.accountExpense(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="accountExpenseDetailAccountExpenseId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.accountExpenseDetailAccountExpenseId}" for="accountExpenseDetailAccountExpenseId"/><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.accountExpenseId}" completeMethod="#{accountExpenseDetailView.accountExpenseAuto}" converter="wawo.LookupIntConverter"   id="accountExpenseDetailAccountExpenseId" var="e" itemValue="#{e}" itemLabel="#{e.status}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.accountExpenseClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountExpenseById()}"/>
+        </p:autoComplete><p:message for="accountExpenseDetailAccountExpenseId" display="text" /></h:panelGroup>
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.accountExpenseDetailVendorLedgerId}" for="accountExpenseDetailVendorLedgerId" /><h:panelGroup>
+         <p:selectOneMenu value="#{accountExpenseDetailView.accountExpenseDetail.vendorLedgerId}"  id="accountExpenseDetailVendorLedgerId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.finAccountingLedger(main)}" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" />
+        </p:selectOneMenu><p:message for="accountExpenseDetailVendorLedgerId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.accountExpenseDetailVendorLedgerId}" for="accountExpenseDetailVendorLedgerId" /><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.vendorLedgerId}" completeMethod="#{scmLookupView.finAccountingLedgerAuto}"  id="accountExpenseDetailVendorLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.finAccountingLedger(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="accountExpenseDetailVendorLedgerId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.accountExpenseDetailVendorLedgerId}" for="accountExpenseDetailVendorLedgerId"/><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.vendorLedgerId}" completeMethod="#{accountExpenseDetailView.finAccountingLedgerAuto}" converter="wawo.LookupIntConverter"   id="accountExpenseDetailVendorLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.finAccountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.finAccountingLedgerById()}"/>
+        </p:autoComplete><p:message for="accountExpenseDetailVendorLedgerId" display="text" /></h:panelGroup>
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.accountExpenseDetailExpenseLedgerId}" for="accountExpenseDetailExpenseLedgerId" /><h:panelGroup>
+         <p:selectOneMenu value="#{accountExpenseDetailView.accountExpenseDetail.expenseLedgerId}"  id="accountExpenseDetailExpenseLedgerId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.finAccountingLedger(main)}" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" />
+        </p:selectOneMenu><p:message for="accountExpenseDetailExpenseLedgerId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.accountExpenseDetailExpenseLedgerId}" for="accountExpenseDetailExpenseLedgerId" /><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.expenseLedgerId}" completeMethod="#{scmLookupView.finAccountingLedgerAuto}"  id="accountExpenseDetailExpenseLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.finAccountingLedger(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="accountExpenseDetailExpenseLedgerId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.accountExpenseDetailExpenseLedgerId}" for="accountExpenseDetailExpenseLedgerId"/><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.expenseLedgerId}" completeMethod="#{accountExpenseDetailView.finAccountingLedgerAuto}" converter="wawo.LookupIntConverter"   id="accountExpenseDetailExpenseLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.finAccountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.finAccountingLedgerById()}"/>
+        </p:autoComplete><p:message for="accountExpenseDetailExpenseLedgerId" display="text" /></h:panelGroup>
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.accountExpenseDetailBankCashLedgerId}" for="accountExpenseDetailBankCashLedgerId" /><h:panelGroup>
+         <p:selectOneMenu value="#{accountExpenseDetailView.accountExpenseDetail.bankCashLedgerId}"  id="accountExpenseDetailBankCashLedgerId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.finAccountingLedger(main)}" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" />
+        </p:selectOneMenu><p:message for="accountExpenseDetailBankCashLedgerId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.accountExpenseDetailBankCashLedgerId}" for="accountExpenseDetailBankCashLedgerId" /><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.bankCashLedgerId}" completeMethod="#{scmLookupView.finAccountingLedgerAuto}"  id="accountExpenseDetailBankCashLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.finAccountingLedger(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="accountExpenseDetailBankCashLedgerId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.accountExpenseDetailBankCashLedgerId}" for="accountExpenseDetailBankCashLedgerId"/><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.bankCashLedgerId}" completeMethod="#{accountExpenseDetailView.finAccountingLedgerAuto}" converter="wawo.LookupIntConverter"   id="accountExpenseDetailBankCashLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.entityId}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.finAccountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.finAccountingLedgerById()}"/>
+        </p:autoComplete><p:message for="accountExpenseDetailBankCashLedgerId" display="text" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.consignmentReceiptNo}" for="consignmentReceiptNo" />
+        <h:panelGroup><p:inputText value="#{accountExpenseDetailView.accountExpenseDetail.consignmentReceiptNo}" maxlength="200" id="consignmentReceiptNo" /><p:message for="consignmentReceiptNo" display="text" styleClass="fw" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.consignmentDeliveryNo}" for="consignmentDeliveryNo" />
+        <h:panelGroup><p:inputText value="#{accountExpenseDetailView.accountExpenseDetail.consignmentDeliveryNo}" maxlength="200" id="consignmentDeliveryNo" /><p:message for="consignmentDeliveryNo" display="text" styleClass="fw" /></h:panelGroup>
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.accountExpenseDetailPaymentType}" for="accountExpenseDetailPaymentType" /><h:panelGroup>
+         <p:selectOneMenu value="#{accountExpenseDetailView.accountExpenseDetail.paymentType}"  id="accountExpenseDetailPaymentType" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.finAccountingDocType(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu><p:message for="accountExpenseDetailPaymentType" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.accountExpenseDetailPaymentType}" for="accountExpenseDetailPaymentType" /><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.paymentType}" completeMethod="#{scmLookupView.finAccountingDocTypeAuto}"  id="accountExpenseDetailPaymentType" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.finAccountingDocType(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="accountExpenseDetailPaymentType" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.accountExpenseDetailPaymentType}" for="accountExpenseDetailPaymentType"/><h:panelGroup>
+          <p:autoComplete value="#{accountExpenseDetailView.accountExpenseDetail.paymentType}" completeMethod="#{accountExpenseDetailView.finAccountingDocTypeAuto}" converter="wawo.LookupIntConverter"   id="accountExpenseDetailPaymentType" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.finAccountingDocTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.finAccountingDocTypeById()}"/>
+        </p:autoComplete><p:message for="accountExpenseDetailPaymentType" display="text" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.paymentDocumentNo}" for="paymentDocumentNo" />
+        <h:panelGroup><p:inputText value="#{accountExpenseDetailView.accountExpenseDetail.paymentDocumentNo}" maxlength="200" id="paymentDocumentNo" /><p:message for="paymentDocumentNo" display="text" styleClass="fw" /></h:panelGroup>
+        <p:outputLabel value="#{lang.paymentDate}" for="paymentDate" />
+        <h:panelGroup><p:calendar value="#{accountExpenseDetailView.accountExpenseDetail.paymentDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.paymentDate} #{lang.invalidDate}" maxlength="29" id="paymentDate" showButtonPanel="true" navigator="true" mask="true"/><p:message for="paymentDate" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.paymentValue}" for="paymentValue" />
+        <h:panelGroup><p:inputNumber value="#{accountExpenseDetailView.accountExpenseDetail.paymentValue}" converterMessage="#{lang.paymentValue} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="paymentValue" /><p:message for="paymentValue" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.paymentDocValue}" for="paymentDocValue" />
+        <h:panelGroup><p:inputNumber value="#{accountExpenseDetailView.accountExpenseDetail.paymentDocValue}" converterMessage="#{lang.paymentDocValue} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="paymentDocValue" /><p:message for="paymentDocValue" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.note}" for="note" />
+        <h:panelGroup><p:inputTextarea value="#{accountExpenseDetailView.accountExpenseDetail.note}" cols="100" rows="3" maxlength="4000" id="note" autoResize="false" styleClass="fw" /><p:message for="note" display="text"/></h:panelGroup>
+<!--             
+        <p:outputLabel value="#{lang.note}" for="note" />
+        <h:panelGroup><p:inputText value="#{accountExpenseDetailView.accountExpenseDetail.note}" maxlength="4000" id="note" /><p:message for="note" display="text" styleClass="fw" /></h:panelGroup> -->            
+        <p:outputLabel value="#{lang.isReimbursable}" for="isReimbursable" />
+        <h:panelGroup><p:inputText value="#{accountExpenseDetailView.accountExpenseDetail.isReimbursable}" maxlength="1" id="isReimbursable" /><p:message for="isReimbursable" display="text" styleClass="fw" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.isTax}" for="isTax" />
+        <h:panelGroup><p:inputText value="#{accountExpenseDetailView.accountExpenseDetail.isTax}" maxlength="1" id="isTax" /><p:message for="isTax" display="text" styleClass="fw" /></h:panelGroup>
+        <p:outputLabel value="#{lang.taxAmount}" for="taxAmount" />
+        <h:panelGroup><p:inputNumber value="#{accountExpenseDetailView.accountExpenseDetail.taxAmount}" converterMessage="#{lang.taxAmount} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="taxAmount" /><p:message for="taxAmount" display="text"/></h:panelGroup>
+<!--
+        <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+        <h:panelGroup><p:calendar value="#{accountExpenseDetailView.accountExpenseDetail.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+-->
+<!--
+        <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+        <h:panelGroup><p:calendar value="#{accountExpenseDetailView.accountExpenseDetail.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>
+-->
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="accountExpenseDetailTable" var="accountExpenseDetailVar" widgetVar="accountExpenseDetailWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+        lazy="true" value="#{accountExpenseDetailView.accountExpenseDetailLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountExpenseDetailVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+        selection="#{accountExpenseDetailView.accountExpenseDetailSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{accountExpenseDetailVar.id}" field="scm_account_expense_detail.id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{accountExpenseDetailVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{accountExpenseDetailView.accountExpenseDetail}" value="#{accountExpenseDetailVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.accountExpenseId.status}" field="account_expense_id.status">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.accountExpenseId.status)}" title="#{appView.title(accountExpenseDetailVar.accountExpenseId.status)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.vendorLedgerId.entityId}" field="vendor_ledger_id.entity_id">
+          <f:facet name="header"><h:outputText value="#{lang.entityId}" title="#{lang.entityId}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.vendorLedgerId.entityId)}" title="#{appView.title(accountExpenseDetailVar.vendorLedgerId.entityId)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.expenseLedgerId.entityId}" field="expense_ledger_id.entity_id">
+          <f:facet name="header"><h:outputText value="#{lang.entityId}" title="#{lang.entityId}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.expenseLedgerId.entityId)}" title="#{appView.title(accountExpenseDetailVar.expenseLedgerId.entityId)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.bankCashLedgerId.entityId}" field="bank_cash_ledger_id.entity_id">
+          <f:facet name="header"><h:outputText value="#{lang.entityId}" title="#{lang.entityId}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.bankCashLedgerId.entityId)}" title="#{appView.title(accountExpenseDetailVar.bankCashLedgerId.entityId)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.consignmentReceiptNo}" field="scm_account_expense_detail.consignment_receipt_no">
+          <f:facet name="header"><h:outputText value="#{lang.consignmentReceiptNo}" title="#{lang.consignmentReceiptNo}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.consignmentReceiptNo)}" title="#{appView.title(accountExpenseDetailVar.consignmentReceiptNo)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.consignmentDeliveryNo}" field="scm_account_expense_detail.consignment_delivery_no">
+          <f:facet name="header"><h:outputText value="#{lang.consignmentDeliveryNo}" title="#{lang.consignmentDeliveryNo}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.consignmentDeliveryNo)}" title="#{appView.title(accountExpenseDetailVar.consignmentDeliveryNo)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.paymentType.title}" field="payment_type.title">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.paymentType.title)}" title="#{appView.title(accountExpenseDetailVar.paymentType.title)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.paymentDocumentNo}" field="scm_account_expense_detail.payment_document_no">
+          <f:facet name="header"><h:outputText value="#{lang.paymentDocumentNo}" title="#{lang.paymentDocumentNo}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.paymentDocumentNo)}" title="#{appView.title(accountExpenseDetailVar.paymentDocumentNo)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.paymentDate}" field="scm_account_expense_detail.payment_date" >
+          <f:facet name="header"><h:outputText value="#{lang.paymentDate}" title="#{lang.paymentDate}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(accountExpenseDetailVar.paymentDate)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.paymentValue}" field="scm_account_expense_detail.payment_value" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.paymentValue}" title="#{lang.paymentValue}"/></f:facet>
+          <h:outputText value="#{appView.decimal(accountExpenseDetailVar.paymentValue)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.paymentDocValue}" field="scm_account_expense_detail.payment_doc_value" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.paymentDocValue}" title="#{lang.paymentDocValue}"/></f:facet>
+          <h:outputText value="#{appView.decimal(accountExpenseDetailVar.paymentDocValue)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.note}" field="scm_account_expense_detail.note">
+          <f:facet name="header"><h:outputText value="#{lang.note}" title="#{lang.note}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.note)}" title="#{appView.title(accountExpenseDetailVar.note)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.isReimbursable}" field="scm_account_expense_detail.is_reimbursable">
+          <f:facet name="header"><h:outputText value="#{lang.isReimbursable}" title="#{lang.isReimbursable}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.isReimbursable)}" title="#{appView.title(accountExpenseDetailVar.isReimbursable)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.isTax}" field="scm_account_expense_detail.is_tax">
+          <f:facet name="header"><h:outputText value="#{lang.isTax}" title="#{lang.isTax}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseDetailVar.isTax)}" title="#{appView.title(accountExpenseDetailVar.isTax)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseDetailVar.taxAmount}" field="scm_account_expense_detail.tax_amount" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.taxAmount}" title="#{lang.taxAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(accountExpenseDetailVar.taxAmount)}" escape="false" />
+        </p:column>
+<!-- 
+        <p:column sortBy="#{accountExpenseDetailVar.createdAt}" field="scm_account_expense_detail.created_at" >
+          <f:facet name="header"><h:outputText value="#{lang.createdAt}" title="#{lang.createdAt}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(accountExpenseDetailVar.createdAt)}" escape="false" />
+        </p:column> -->
+
+<!-- 
+        <p:column sortBy="#{accountExpenseDetailVar.modifiedAt}" field="scm_account_expense_detail.modified_at" >
+          <f:facet name="header"><h:outputText value="#{lang.modifiedAt}" title="#{lang.modifiedAt}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(accountExpenseDetailVar.modifiedAt)}" escape="false" />
+        </p:column> -->
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

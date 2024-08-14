@@ -1,0 +1,213 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  #{creditNoteReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+  <p:importConstants type="spica.constant.ReportConstant" />
+  <p:importConstants type="spica.constant.AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="creditNoteReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <h:panelGroup styleClass="L">
+        <p:selectOneMenu id="reportType" value="#{creditNoteReportView.type}"  styleClass="l-p-10" valueChangeListener="#{creditNoteReportView.reset()}" required="true" >
+          <f:selectItem itemLabel="#{lang.sales}" itemValue="#{ReportConstant.SALES}" />
+          <f:selectItem itemLabel="#{lang.salesReturn}" itemValue="#{ReportConstant.SALES_RETURN}" />
+          <p:ajax event="itemSelect" process="reportType " update="f1" onstart="block()" oncomplete="unblock()" immediate="false"
+                  listener="#{creditNoteReportView.reset()}"/>
+        </p:selectOneMenu>
+      </h:panelGroup>
+      <h:panelGroup styleClass="L">
+        Based On: 
+        <p:selectOneButton value="#{creditNoteReportView.filterParameters.filterOption}"  >
+          <f:selectItem itemLabel="Landing Rate" itemValue="0"  />
+          <f:selectItem itemLabel="Purchase Rate" itemValue="1" />
+          <f:selectItem itemLabel="PTS" itemValue="2" />
+          <p:ajax event="change" listener="#{creditNoteReportView.reset()}" immediate="true" process="@this" update="creditNoteReportTable creditNoteReturnReportTable" onstart="block()" oncomplete="unblock()"/>
+        </p:selectOneButton>
+      </h:panelGroup>
+
+      <h:panelGroup id="accountGroupDiv" styleClass="L"  >
+        <p:autoComplete id='accountGroup'  value="#{creditNoteReportView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" scrollHeight="500"
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" 
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv creditNoteReportTable creditNoteReturnReportTable" onstart="block()" oncomplete="unblock()"
+                  listener="#{creditNoteReportView.accountGroupSelectEvent}"/>
+        </p:autoComplete>
+        <p:message for="accountGroup" />
+      </h:panelGroup> 
+      <h:panelGroup id="accountDiv" styleClass="L" >
+        <p:autoComplete id='account'  value="#{creditNoteReportView.filterParameters.account}" completeMethod="#{creditNoteReportView.accountAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.accountTitle}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxlength="400" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                        scrollHeight="500">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.accountTitle}" />
+          </p:column>
+          <p:ajax event="itemSelect" process="account" update="creditNoteReportTable creditNoteReturnReportTable" onstart="block()" oncomplete="unblock()"
+                  listener="#{creditNoteReportView.reset()}"/>
+        </p:autoComplete>
+      </h:panelGroup>
+
+      <h:panelGroup styleClass="L" >   
+        <p:commandButton actionListener="#{creditNoteReportView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate creditNoteReportTable creditNoteReturnReportTable"  styleClass="btn" 
+                         onstart="block()" oncomplete="unblock()" />
+        <p:commandButton actionListener="#{creditNoteReportView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate creditNoteReportTable creditNoteReturnReportTable" styleClass="btn" 
+                         onstart="block()" oncomplete="unblock()" />
+        <!--From Date-->
+        <p:calendar id="fromDate" value="#{creditNoteReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onfocus="this.select();"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" onclick="this.select();" 
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                    maxdate="#{creditNoteReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: creditNoteReportView.filterParameters.today}">
+          <p:ajax event="dateSelect" listener="#{creditNoteReportView.reset()}" process="@this" onstart="block();" oncomplete="unblock();"  update="toDateDIV creditNoteReportTable creditNoteReturnReportTable"/>          
+          <p:ajax event="change" listener="#{creditNoteReportView.reset()}" process="@this" onstart="block();" oncomplete="unblock();"  update="toDateDIV creditNoteReportTable creditNoteReturnReportTable"/>          
+        </p:calendar>
+        <p:message for="fromDate" display="text" id="fmess"/>
+      </h:panelGroup>
+      <!--To Date-->
+      <h:panelGroup styleClass="L" id="toDateDIV" >
+        <p:calendar id="toDate" value="#{creditNoteReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{creditNoteReportView.filterParameters.fromDate}"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  
+                    maxdate="#{creditNoteReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: creditNoteReportView.filterParameters.today}" >
+          <p:ajax event="dateSelect" listener="#{creditNoteReportView.reset()}" immediate="true" onstart="block();" oncomplete="unblock();" update="creditNoteReportTable creditNoteReturnReportTable"/>          
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>
+      </h:panelGroup>
+      <p:commandButton value="#{lang.export}" actionListener="#{creditNoteReportView.export(main)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false"  />
+    </ui:define>
+    <ui:define name="list">
+
+      <p:dataTable id="creditNoteReportTable" var="row" widgetVar="creditReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{creditNoteReportView.creditNoteSalesReportList}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{creditNoteReportView.type.equals(ReportConstant.SALES)}">
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('creditReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column headerText="S.D Name" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden">
+          <h:outputText value="#{row.customerName}" escape="false" /></p:column>
+        <p:column headerText="#{lang.invoice}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <p:commandLink actionListener="#{popUpView.showSalesInvoice(row.id)}" immediate="true"  >
+            <h:outputText value="#{appView.title(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.gstPerc}" sortBy="#{row.ratePercentage}"  filterBy="#{row.ratePercentage}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.ratePercentage)}" escape="false"/></p:column>
+        <p:column headerText="#{lang.product}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden">
+          <h:outputText value="#{row.productName}" escape="false" /></p:column>
+        <p:column headerText="#{lang.qty}" sortBy="#{row.qty}"  style="text-align: right" filterBy="#{row.qty}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.qty)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.qtyFree}"  sortBy="#{row.qtyFree}" style="text-align: right" filterBy="#{row.qtyFree}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.qtyFree)}" escape="false"/>
+        </p:column>
+        <p:column headerText="#{lang.rate}"  sortBy="#{row.rate}"  style="text-align: right" filterBy="#{row.rate}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.rate)}" escape="false" />
+        </p:column>
+        <p:column headerText="Gross #{lang.value}" sortBy="#{row.grossValue}"  style="text-align: right" filterBy="#{row.grossValue}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.grossValue)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.discountValue}" sortBy="#{row.discAmount}"  style="text-align: right" filterBy="#{row.discAmount}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.discAmount)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.netAmount}" sortBy="#{row.netValue}"  style="text-align: right" filterBy="#{row.netValue}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.netValue)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.commission}" sortBy="#{row.marginPercentage}"  style="text-align: right" filterBy="#{row.marginPercentage}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.marginPercentage)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{creditNoteReportView.filterParameters.filterOption eq 0?'Landing Rate':
+                                (creditNoteReportView.filterParameters.filterOption eq 1?'Purchase Rate':'PTS')}" sortBy="#{row.billingSd}"  style="text-align: right" 
+                  filterBy="#{row.billingSd}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.billingSd)}" escape="false" />
+        </p:column>
+      </p:dataTable>
+      <p:dataTable id="creditNoteReturnReportTable" var="row" widgetVar="creditNoteReturnReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{creditNoteReportView.creditNoteReturnReportList}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" 
+                   rendered="#{creditNoteReportView.type.equals(ReportConstant.SALES_RETURN)}">
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('creditNoteReturnReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column headerText="S.D Name" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden">
+          <h:outputText value="#{row.customerName}" escape="false" /></p:column>
+        <p:column headerText="#{lang.invoice}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <p:commandLink actionListener="#{popUpView.showSalesInvoice(row.id)}" immediate="true"  >
+            <h:outputText value="#{appView.title(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.gstPerc}" sortBy="#{row.ratePercentage}"  filterBy="#{row.ratePercentage}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.ratePercentage)}" escape="false"/></p:column>
+        <p:column headerText="#{lang.product}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden">
+          <h:outputText value="#{row.productName}" escape="false" /></p:column>
+        <p:column headerText="#{lang.qty}" sortBy="#{row.qty}"  style="text-align: right" filterBy="#{row.qty}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.qty)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.qtyFree}"  sortBy="#{row.qtyFree}" style="text-align: right" filterBy="#{row.qtyFree}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.qtyFree)}" escape="false"/>
+        </p:column>
+        <p:column headerText="#{lang.rate}"  sortBy="#{row.rate}"  style="text-align: right" filterBy="#{row.rate}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.rate)}" escape="false" />
+        </p:column>
+        <p:column headerText="Gross #{lang.value}" sortBy="#{row.grossValue}"  style="text-align: right" filterBy="#{row.grossValue}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.grossValue)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.discountValue}" sortBy="#{row.discAmount}"  style="text-align: right" filterBy="#{row.discAmount}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.discAmount)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.netAmount}" sortBy="#{row.netValue}"  style="text-align: right" filterBy="#{row.netValue}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.netValue)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.commission}" sortBy="#{row.marginPercentage}"  style="text-align: right" filterBy="#{row.marginPercentage}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.marginPercentage)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{creditNoteReportView.filterParameters.filterOption eq 0?'Landing Rate':
+                                (creditNoteReportView.filterParameters.filterOption eq 1?'Purchase Rate':'PTS')}" sortBy="#{row.billingSd}"
+                  style="text-align: right" filterBy="#{row.billingSd}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.billingSd)}" escape="false" />
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

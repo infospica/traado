@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{nearExpiryStockReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="nearExpiryStockReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="nearExpiryStockReportST" onkeyup="return callDtFilter(this.value, 'nearExpiryStockReport');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <h:panelGroup id="typeDIV">
+        <p:selectOneMenu value="#{nearExpiryStockReportView.reportType}" style="width:100px;">
+          <f:selectItem itemLabel="#{lang.summary}" itemValue="1" />
+          <f:selectItem itemLabel="#{lang.detail}" itemValue="2" />
+          <p:ajax event="change" process="typeDIV" update="nearExpiryStockReportTable" listener="#{nearExpiryStockReportView.setNearExpiryStockReportList(null)}" />
+        </p:selectOneMenu>
+      </h:panelGroup>
+      <h:panelGroup id="accountGroupDiv" rendered="true">
+        <p:autoComplete id='accountGroup'  value="#{nearExpiryStockReportView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" 
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-users" style="color:#000;"></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <i class="fa fa-users" style="color:#CCC;" ></i>
+            </p:fragment>
+          </p:column>
+          <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" immediate="true" process="accountGroupDiv" update="accountDiv nearExpiryStockReportTable" listener="#{nearExpiryStockReportView.accountGroupSelectEvent}"/>
+        </p:autoComplete>    
+      </h:panelGroup>
+      <h:panelGroup id="accountDiv" >
+        <p:autoComplete id='account'  value="#{nearExpiryStockReportView.filterParameters.account}" completeMethod="#{nearExpiryStockReportView.accountAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                        title="#{lang.accountNumber}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.vendorId.vendorName}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountCode}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.companyTradeProfileId.title}" />
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="@this accountGroupDiv" update="nearExpiryStockReportTable" onstart="block()" oncomplete="unblock()"
+                  listener ="#{nearExpiryStockReportView.reset()}" />
+        </p:autoComplete>
+      </h:panelGroup>
+      <h:panelGroup >
+        <h:outputLabel for="expiryDays" value="Expiry Days" />
+        <p:inputNumber id="expiryDays" value="#{nearExpiryStockReportView.filterParameters.filterOption}"  minValue="0" decimalPlaces="0" maxlength="5" size="5" />
+        <p:commandButton value="#{lang.ok}" actionListener="#{nearExpiryStockReportView.reset()}" styleClass="btn btn-info" process="expiryDays" update="f1" onstart="block()" oncomplete="unblock()"  style="margin-left: 3px; margin-bottom: 4px;"  >
+        </p:commandButton>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+      <p:dataTable id="nearExpiryStockReportTable" var="row" widgetVar="nearExpiryStockReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{nearExpiryStockReportView.getNearExpiryStockReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('nearExpiryStockReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.batchNo}" field="batch_no" filterBy="#{row.batchNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.packSize}" field="pack_size" filterBy="#{row.packSize}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.pack}" title="#{lang.pack}"/></f:facet>
+          <h:outputText value="#{appView.display(row.packSize)}" title="#{appView.title(row.packSize)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.batchNo}" field="batch_no" filterBy="#{row.batchNo}" filterStyleClass="hidden" 
+                  rendered="#{nearExpiryStockReportView.reportType eq SystemConstants.DETAIL}" >
+          <f:facet name="header"><h:outputText value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+          <h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.expiryDays}" field="expiry_days"  filterBy="#{row.expiryDays}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.days}" title="#{lang.days}"/></f:facet>
+          <h:outputText value="#{appView.number(row.expiryDays)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.expiryDateActual}" field="expiry_date_actual" filterBy="#{row.expiryDateActual}" filterStyleClass="hidden" 
+                  >
+          <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.expiryDateActual)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.quantitySaleable}" field="qty" style="text-align: right" filterBy="#{row.quantitySaleable}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.qty}"/></f:facet>
+          <h:outputText value="#{appView.number(row.quantitySaleable +row.quantityFreeSaleable)}" escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.number(nearExpiryStockReportView.qty)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{(row.quantitySaleable +row.quantityFreeSaleable)*(row.purchaseRate)}" field="stock_value" style="text-align: right" 
+                  filterBy="#{(row.quantitySaleable +row.quantityFreeSaleable)*(row.purchaseRate)}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.stockValue}" title="#{lang.stockValue}"/></f:facet>
+          <h:outputText value="#{appView.number((row.quantitySaleable +row.quantityFreeSaleable)*(row.purchaseRate))}" escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.number(nearExpiryStockReportView.stockValue)}" />
+          </f:facet>
+        </p:column>
+
+<!--        <p:column sortBy="#{row.stockId}" field="batch_id" style="text-align: right" filterBy="#{row.stockId}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.batchId}" title="#{lang.batchId}"/></f:facet>
+          <h:outputText value="#{appView.display(row.stockId)}" escape="false" /></p:column>-->
+
+        <p:column sortBy="#{row.mrpValue}" field="mrp_value" style="text-align: right" filterBy="#{row.mrpValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.mrpValue}" title="#{lang.mrpValue}"/></f:facet>
+          <h:outputText value="#{appView.number(row.mrpValue)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.ptsRate}" field="net_rate" style="text-align: right" filterBy="#{row.ptsRate}" filterStyleClass="hidden"
+                  rendered="#{nearExpiryStockReportView.reportType eq SystemConstants.DETAIL}">
+          <f:facet name="header"><h:outputText value="#{lang.netRate}" title="#{lang.netRate}"/></f:facet>
+          <h:outputText value="#{appView.number(row.ptsRate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.supplierName}" field="supplier_name" filterBy="#{row.supplierName}" filterStyleClass="hidden"
+                  rendered="#{nearExpiryStockReportView.reportType eq SystemConstants.DETAIL}">
+          <f:facet name="header"><h:outputText value="#{lang.supplierName}" title="#{lang.supplierName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.salesRate}" field="sales_rate" style="text-align: right" filterBy="#{row.salesRate}" filterStyleClass="hidden"
+                  rendered="#{nearExpiryStockReportView.reportType eq SystemConstants.DETAIL}">
+          <f:facet name="header"><h:outputText value="#{lang.salesRate}" title="#{lang.salesRate}"/></f:facet>
+          <h:outputText value="#{appView.number(row.salesRate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.purchaseRate}" field="purchase_rate" style="text-align: right" filterBy="#{row.purchaseRate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseRate}" title="#{lang.purchaseRate}"/></f:facet>
+          <h:outputText value="#{appView.number(row.purchaseRate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.supplierGst}" field="supplier_gst" filterBy="#{row.supplierGst}" filterStyleClass="hidden"
+                  rendered="#{nearExpiryStockReportView.reportType eq SystemConstants.DETAIL}">
+          <f:facet name="header"><h:outputText value="#{lang.supplierGst}" title="#{lang.supplierGst}"/></f:facet>
+          <h:outputText value="#{appView.display(row.supplierGst)}" title="#{appView.title(row.supplierGst)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.hsnCode}" field="hsn_code" filterBy="#{row.hsnCode}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.hsnCode}" title="#{lang.hsnCode}"/></f:facet>
+          <h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

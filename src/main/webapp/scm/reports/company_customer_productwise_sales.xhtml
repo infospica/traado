@@ -1,0 +1,150 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{companyCustomerProductwiseSalesView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.companyCustomerProductwiseSales}"/>
+    <ui:param name="ids" value="companyCustomerProductwiseSales"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList">
+      <p:panelGrid columns="5">
+        <h:panelGroup  id="accountGroupDiv" >
+          <p:autoComplete id='accountGroup'  value="#{companyCustomerProductwiseSalesView.filterParameters.accountGroup}" completeMethod="#{companyCustomerProductwiseSalesView.accountGroupAuto}"
+                          converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                          
+                          title="#{lang.accountGroup}">
+            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+            <p:column style="width:250px;">
+              <h:outputText value="#{e.groupName}" />
+            </p:column>
+            <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="companyCustomerProductwiseSalesTable accountDiv customerDiv productListDiv"  listener="#{companyCustomerProductwiseSalesView.accountGroupSelectEvent()}"
+                    onstart="block()" oncomplete="unblock()" />
+          </p:autoComplete>    
+        </h:panelGroup>
+        <h:panelGroup id="accountDiv" >
+          <p:autoComplete id='account'  value="#{companyCustomerProductwiseSalesView.filterParameters.account}" completeMethod="#{companyCustomerProductwiseSalesView.accountAuto}" converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                          title="#{lang.accountNumber}" disabled="#{companyCustomerSalesView.filterParameters.brand ne null}">
+            <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>  
+            <p:ajax event="itemSelect" immediate="true" process="accountDiv" update="companyCustomerProductwiseSalesTable productListDiv"  
+                    listener="#{companyCustomerProductwiseSalesView.accountSelectEvent()}"  onstart="block()" oncomplete="unblock()" />
+            <p:column style="width: 300px;">
+              <h:outputText value="#{e.vendorId.vendorName}" />
+            </p:column>
+          </p:autoComplete>
+        </h:panelGroup>
+        <h:panelGroup id="customerDiv" >
+          <p:autoComplete id="customer" value="#{companyCustomerProductwiseSalesView.filterParameters.customer}" 
+                          completeMethod="#{companyCustomerProductwiseSalesView.customerAuto}" converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectCustomerCombo}" autocomplete="off" 
+                          forceSelection ="true" required="false" title="#{lang.customerName}" >
+            <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>  
+            <p:ajax event="itemSelect" immediate="true" process="customerDiv" update="companyCustomerProductwiseSalesTable"  
+                    listener="#{companyCustomerProductwiseSalesView.setCompanyCustomerProductwiseSalesList(null)}"  onstart="block()" oncomplete="unblock()" />
+          </p:autoComplete> 
+        </h:panelGroup>
+        <h:panelGroup id="productListDiv" >
+          <p:autoComplete  multiple="true" value="#{companyCustomerProductwiseSalesView.selectedProductList}" completeMethod="#{companyCustomerProductwiseSalesView.getProductList}" 
+                           converter="wawo.LookupIntConverter" cache="true" id="product" var="prod" itemValue="#{prod}" itemLabel="#{prod.productName}" placeholder="#{lang.select} #{lang.product}" 
+                           emptyMessage="#{lang.noResult}" queryDelay="500"  converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" 
+                           dropdown="true" scrollHeight="600" >
+            <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+            <p:column >
+              <h:outputText value="#{prod.productName}" />
+            </p:column>
+            <p:ajax event="itemSelect" listener="#{companyCustomerProductwiseSalesView.onProductSelect}" update="@this companyCustomerProductwiseSalesTable" />
+            <p:ajax event="itemUnselect" process="productListDiv" immediate="true" listener="#{companyCustomerProductwiseSalesView.onProductUnSelect}" update="@this companyCustomerProductwiseSalesTable"/>
+          </p:autoComplete>
+        </h:panelGroup>
+        <h:panelGroup id="calendar" >
+          <p:commandButton actionListener="#{companyCustomerProductwiseSalesView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate f1"  styleClass="btn" />
+          <p:commandButton actionListener="#{companyCustomerProductwiseSalesView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate f1" styleClass="btn" />
+
+          <p:calendar id="fromDate" value="#{companyCustomerProductwiseSalesView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                      required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                      converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" 
+                      maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" 
+                      maxdate="#{companyCustomerProductwiseSalesView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: companyCustomerProductwiseSalesView.filterParameters.today}"
+                      mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" >
+            <p:ajax event="dateSelect" process="@this" listener="#{companyCustomerProductwiseSalesView.setCompanyCustomerProductwiseSalesList(null)}" onstart="block();" oncomplete="unblock();"  update="toDate companyCustomerProductwiseSalesTable"/>
+            <p:ajax event="change" process="@this" listener="#{companyCustomerProductwiseSalesView.setCompanyCustomerProductwiseSalesList(null)}" onstart="block();" oncomplete="unblock();"  update="toDate companyCustomerProductwiseSalesTable"/>
+          </p:calendar>
+          <p:calendar id="toDate" value="#{companyCustomerProductwiseSalesView.filterParameters.toDate}" pattern="#{lang.datePattern}"
+                      required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"  onclick="this.select();" onfocus="this.select();"
+                      converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1"
+                      maxdate="#{companyCustomerProductwiseSalesView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: companyCustomerProductwiseSalesView.filterParameters.today}"
+                      mindate="#{companyCustomerProductwiseSalesView.filterParameters.fromDate}"
+                      maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" >
+            <p:ajax event="dateSelect" process="@this" listener="#{companyCustomerProductwiseSalesView.setCompanyCustomerProductwiseSalesList(null)}" onstart="block();" oncomplete="unblock();" update="companyCustomerProductwiseSalesTable"/>
+          </p:calendar>
+          <p:message for="fromDate" display="text" id="fmess"/>
+        </h:panelGroup>
+      </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="companyCustomerProductwiseSalesTable" var="row" widgetVar="companyCustomerProductwiseSalesWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{companyCustomerProductwiseSalesView.getCompanyCustomerProductwiseSalesList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" expandableRowGroups="true" sortBy="#{row.customerName}">
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('companyCustomerProductwiseSalesWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:headerRow>     
+          <p:column headerText="#{lang.customerName}"   colspan="8">
+            <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" styleClass="p-r-15"/> 
+            <h:outputText value="#{lang.gstNo} : "  escape="false" styleClass="p-l-15" /> 
+            <h:outputText value="#{row.gstNo}" escape="false"/>
+          </p:column>
+        </p:headerRow>
+        <p:column headerText="#{lang.customerName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden" style="display: none" exportable="true">
+          <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden" style="display: none" exportable="true">
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+        
+        <!--<p:column headerText="#{lang.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>-->
+        <p:column headerText="#{lang.productName}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.hsnCode}" sortBy="#{row.hsnCode}"  filterBy="#{row.hsnCode}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.packing}" sortBy="#{row.packing}"  filterBy="#{row.packing}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.packing)}" title="#{appView.title(row.packing)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.mfr}" sortBy="#{row.mfrCode}"  filterBy="#{row.mfrCode}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.mfrCode)}" title="#{appView.title(row.mfrCode)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.qty}" sortBy="#{row.qty}"  style="text-align: right" filterBy="#{row.qty}" filterStyleClass="hidden"><h:outputText value="#{appView.number(row.qty)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.qtyFree}" sortBy="#{row.qtyFree}"  style="text-align: right" filterBy="#{row.qtyFree}" filterStyleClass="hidden"><h:outputText value="#{appView.number(row.qtyFree)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.goodsValue}" sortBy="#{row.goodsValue}"  style="text-align: right" filterBy="#{row.goodsValue}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.goodsValue)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.tax}" sortBy="#{row.tax}"  style="text-align: right" filterBy="#{row.tax}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.tax)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.netAmount}" sortBy="#{row.netAmount}"  style="text-align: right" filterBy="#{row.netAmount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+        <p:summaryRow>
+          <p:column colspan="4" style="text-align: right">Total</p:column>
+          <p:column style="text-align: right">#{appView.decimal(companyCustomerProductwiseSalesView.getQtyByCustomer(row.customerName))}</p:column>
+          <p:column style="text-align: right">#{appView.decimal(companyCustomerProductwiseSalesView.getFreeQtyByCustomer(row.customerName))}</p:column>
+          <p:column style="text-align: right">#{appView.decimal(companyCustomerProductwiseSalesView.getGoodsValueByCustomer(row.customerName))}</p:column>
+          <p:column style="text-align: right">#{appView.decimal(companyCustomerProductwiseSalesView.getTaxByCustomer(row.customerName))}</p:column>
+          <p:column style="text-align: right">#{appView.decimal(companyCustomerProductwiseSalesView.getAmountByCustomer(row.customerName))}</p:column>
+        </p:summaryRow>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

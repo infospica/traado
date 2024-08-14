@@ -1,0 +1,163 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"  >
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  #{salesAreaWiseReportView.reset()}
+  <p:importConstants type="spica.constant.ReportConstant" var="REPORTCONSTANT" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="salesreceiptReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="true"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="newList">      
+      <!--<p:inputText styleClass="fw" id="customerOutstandingST" onkeyup="return callDtFilter(this.value, 'customerOutstanding');"  placeholder="#{lang.search}"/>-->
+    </ui:define>
+
+    <ui:define name="form"/>
+    <ui:define name="rightList" >
+      <p:panelGrid columns="5" >
+        <h:panelGroup>
+          <p:panelGrid columns="4">
+            <p:outputLabel value="#{lang.salesReturn}" for="srSwitch" />
+            <p:inputSwitch  value="#{salesAreaWiseReportView.salesReturn}" onLabel="#{lang.on}" offLabel="#{lang.off}" id="srSwitch" >
+              <p:ajax listener="#{salesAreaWiseReportView.reset()}" process="@this" update="damgeExpiryDiv salesAreaWiseReportId" onstart="block();" oncomplete="unblock();" />
+            </p:inputSwitch >
+            <h:panelGroup id="damgeExpiryDiv" >
+              <p:panelGrid columns="2" rendered="#{salesAreaWiseReportView.salesReturn}">
+                <p:outputLabel value="#{lang.damaged}/#{lang.expiry}" for="deSwitch" />
+                <p:inputSwitch  value="#{salesAreaWiseReportView.damageExpiry}" onLabel="#{lang.on}" offLabel="#{lang.off}" id="deSwitch" >
+                  <p:ajax listener="#{salesAreaWiseReportView.reset()}" process="@this" update="salesAreaWiseReportId" onstart="block();" oncomplete="unblock();" />
+                </p:inputSwitch >
+              </p:panelGrid>
+            </h:panelGroup>
+          </p:panelGrid>
+        </h:panelGroup>
+
+        <h:panelGroup>
+          <p:selectOneMenu var="e" value="#{salesAreaWiseReportView.filterParameters.accountGroup}" 
+                           converter="omnifaces.SelectItemsConverter" height="450">
+            <f:selectItem itemLabel="#{lang.selectAccountGroupCombo}" itemValue="#{null}" />
+            <f:selectItems  var="accGroup" value="#{userRuntimeView.accountGroupList}" itemLabel="#{accGroup.groupName}" itemValue="#{accGroup}" />
+            <p:ajax event="itemSelect" update="salesAreaWiseReportId" process="@this" onstart="block()" oncomplete="unblock()" listener="#{salesAreaWiseReportView.reset()}" />
+            <p:column style="width: 350px;">
+              <h:outputText value="#{e.groupName}"  />
+            </p:column>
+            <p:column style="width: 50px;">
+              <h:outputText value="#{e.groupCode}"  />                          
+            </p:column>
+            <p:column style="width: 50px;">
+              <p:fragment rendered="#{e.isDefault eq 0}">
+                <i class="fa fa-th" title="#{lang.custom} #{lang.accountGroup}" ></i>
+              </p:fragment>
+              <p:fragment rendered="#{e.isDefault eq 1}">
+                <!--<i class="fa fa-square-o" style="color:#CCC;" ></i>-->
+              </p:fragment>
+            </p:column>
+          </p:selectOneMenu>
+        </h:panelGroup>
+
+        <h:panelGroup>
+          <p:outputLabel value="#{lang.validFrom}" for="validFrom" />
+          <h:panelGroup id="fromDateDiv">
+            <p:calendar value="#{salesAreaWiseReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.validFrom} #{lang.invalidDate}" maxlength="29"
+                        required="true" requiredMessage="#{lang.validFrom} #{lang.isRequired}" id="validFrom" showButtonPanel="true" navigator="true" mask="true"
+                        mindate="#{userRuntimeView.minDate}" autocomplete="off"
+                        maxdate="#{salesAreaWiseReportView.filterParameters.toDate}"
+                        disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+              <p:ajax event="dateSelect" process="@this" listener="#{salesAreaWiseReportView.reset()}" update="toDateDiv salesAreaWiseReportId" onstart="block();" oncomplete="unblock();" />
+            </p:calendar>
+            <p:message for="validFrom" display="text"/>
+          </h:panelGroup>
+        </h:panelGroup>
+
+        <!-- Valid To -->
+        <h:panelGroup>
+          <p:outputLabel value="#{lang.validTo}" for="validTo" />
+          <h:panelGroup id="toDateDiv">
+            <p:calendar value="#{salesAreaWiseReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.validTo} #{lang.invalidDate}" maxlength="29"
+                        required="true" requiredMessage="#{lang.validTo} #{lang.isRequired}" id="validTo" showButtonPanel="true" navigator="true" mask="true"
+                        mindate="#{salesAreaWiseReportView.filterParameters.fromDate}" autocomplete="off"
+                        maxdate="#{salesAreaWiseReportView.filterParameters.today}"
+                        disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}" >
+              <p:ajax event="dateSelect" process="@this" listener="#{salesAreaWiseReportView.reset()}" update="fromDateDiv salesAreaWiseReportId" onstart="block();" oncomplete="unblock();" />
+            </p:calendar>
+            <p:message for="validTo" display="text"/>
+          </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup>
+          <p:commandButton value="#{lang.export}" icon="fa fa-file-excel-o" iconPos="left" styleClass="btn btn-info" ajax="false" actionListener="#{salesAreaWiseReportView.export(main)}" /> 
+        </h:panelGroup>
+      </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="reportList" >
+        <h:panelGroup id="salesAreaWiseReportId">
+          <p:dataTable value="#{salesAreaWiseReportView.getSalesAreaWiseReportList(main)}" var="sa" rowKey="#{sa.id}" rowIndexVar="index" id="salesreceiptReportTable" widgetVar="salesreceiptReportWidget"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       rows="#{main.pageData.pageSize}" 
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                       rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" >
+            <p:column sortBy="#{index+1}">
+              <f:facet name="header"><h:outputText value="#{lang.slno}" /></f:facet>
+              <h:outputText value="#{index+1}" />
+            </p:column>
+            <p:column sortBy="#{sa.productName}">
+              <f:facet name="header" ><h:outputText value="#{lang.product}" /></f:facet>
+              <h:outputText value="#{sa.productName}" />
+            </p:column> 
+            <p:column sortBy="#{sa.packSize} #{sa.unit}">
+              <f:facet name="header"><h:outputText value="#{lang.packing}" /></f:facet>
+              <h:outputText value="#{sa.packSize} #{sa.unit}" />
+            </p:column>
+            <p:column sortBy="#{sa.quantity}" style="text-align: right;" >
+              <f:facet name="header"><h:outputText value="#{lang.quantity}" /></f:facet>
+              <h:outputText value="#{sa.quantity}" style="color: #{sa.invoiceType eq 'SR'? REPORTCONSTANT.COLOR_RED:''}" />
+            </p:column>
+            <p:column sortBy="#{sa.rate}" style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.rate}" /></f:facet>
+              <h:outputText value="#{sa.rate}" style="color: #{sa.invoiceType eq 'SR'? REPORTCONSTANT.COLOR_RED:''}" />
+            </p:column> 
+            <p:column sortBy="#{sa.valueGoods}" style="text-align: right;padding-right: 5px;">
+              <f:facet name="header"><h:outputText value="#{lang.goodsValue}" /></f:facet>
+              <h:outputText value="#{sa.valueGoods}" style="color: #{sa.invoiceType eq 'SR'? REPORTCONSTANT.COLOR_RED:''}" />
+            </p:column>
+            <p:column sortBy="#{sa.invoiceNumber}">
+              <f:facet name="header"><h:outputText value="#{lang.invoice} #{lang.number}" /></f:facet>
+              <p:commandLink value="#{sa.invoiceNumber}" actionListener="#{popUpView.showSalesInvoice(sa.id)}" rendered="#{sa.invoiceType eq 'SI'}" />
+              <p:commandLink value="#{sa.invoiceNumber}" actionListener="#{popUpView.showSalesReturn(sa.id)}" rendered="#{sa.invoiceType eq 'SR'}" />
+            </p:column>
+            <p:column sortBy="#{sa.customerName}">
+              <f:facet name="header"><h:outputText value="#{lang.customerName}" /></f:facet>
+              <h:outputText value="#{sa.customerName}" />
+            </p:column>
+            <p:column sortBy="#{sa.invoiceDate}">
+              <f:facet name="header" ><h:outputText value="#{lang.invoiceDate}" /></f:facet>
+              <h:outputText value="#{appView.date(sa.invoiceDate)}" />
+            </p:column>
+            <p:column sortBy="#{sa.mrp}" >
+              <f:facet name="header" ><h:outputText value="#{lang.mrp}" /></f:facet>
+              <h:outputText value="#{sa.mrp}" />
+            </p:column>
+            <p:column sortBy="#{sa.netAmount}" style="text-align: right;padding-right:10px;" >
+              <f:facet name="header"><h:outputText value="#{lang.amount}" /></f:facet>
+              <h:outputText value="#{appView.decimal(sa.creditSales)}" style="color: #{sa.invoiceType eq 'SR'? REPORTCONSTANT.COLOR_RED:''}" />
+            </p:column>
+            <p:column sortBy="#{sa.salesReturnType}" style="padding-left: 10px;" rendered="#{salesAreaWiseReportView.salesReturn}">
+              <f:facet name="header"><h:outputText value="#{lang.salesReturn} #{lang.type}" /></f:facet>
+              <h:outputText value="#{lang.saleable}" rendered="#{sa.salesReturnType eq 1}" />
+              <h:outputText value="#{lang.damaged}/#{lang.expiry}" rendered="#{sa.salesReturnType eq 2}" />
+            </p:column>
+          </p:dataTable> 
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

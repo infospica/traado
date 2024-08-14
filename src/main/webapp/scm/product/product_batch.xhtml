@@ -1,0 +1,188 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{productBatchView.switchProductBatch(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productBatch}" />
+    <ui:param name="ids" value="productBatch" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? productBatchView.productBatch.batchNo : null}" />
+    <ui:param name="labelOnly" value="true" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{productBatchView.productBatchPopupClose}"
+                       oncomplete="parent.productBatchPopupReturned();closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productBatchView.deleteProductBatch(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productBatchWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productBatchView.cloneProductBatch(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productBatchView.deleteProductBatch(main)}" value="#{lang.delete}" onclick="wdgOff('productBatchWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productBatchView.saveProductBatch(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-success"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:panelGrid columns="2">
+        <!-- Batch No -->
+        <p:outputLabel value="#{lang.batchNo}" for="batchNo" />
+        <h:panelGroup>
+          <p:inputText value="#{productBatchView.productBatch.batchNo}" maxlength="100" required="true" 
+                       readonly="#{productBatchView.productBatchSalesDone or !userRuntimeView.privilege.editField}"
+                       requiredMessage="#{lang.batchNo} #{lang.isRequired}" id="batchNo" styleClass="text-uppercase w-260" />
+          <p:message for="batchNo" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Expiry Date -->
+        <p:outputLabel value="#{lang.expiryDateActual}" for="expiryDateActual" />
+        <h:panelGroup>
+          <p:calendar styleClass="w-260" inputStyleClass="w-260" value="#{productBatchView.productBatch.expiryDateActual}" pattern="MM/yyyy" showOn="off"
+                      converterMessage="#{lang.expiryDateActual} #{lang.invalidDate}" maskSlotChar="mm/yyyy" autocomplete="off"
+                      required="true" requiredMessage="#{lang.expiryDateActual} #{lang.isRequired}" 
+                      readonly="#{productBatchView.productBatchSalesDone or !userRuntimeView.privilege.editField}"
+                      maxlength="29" id="expiryDateActual" showButtonPanel="true" navigator="true" mask="true" pages="3">              
+          </p:calendar>        
+          <p:message for="expiryDateActual" display="text"/>
+        </h:panelGroup>     
+
+        <!-- Value MRP -->
+        <p:outputLabel value="#{lang.valueMrp}" for="valueMrp" />
+        <h:panelGroup>
+          <p:inputNumber value="#{productBatchView.productBatch.valueMrp}" converterMessage="#{lang.valueMrp} #{lang.invalidNumber}" 
+                         decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right w-260" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="12" 
+                         readonly="#{productBatchView.productBatchTraded or !(main.isNew() or (productBatchView.productBatch.valueMrp ne null and (userRuntimeView.privilege.editField or userRole.isRoot())))}"
+                         required="true" requiredMessage="#{lang.valueMrp} #{lang.isRequired}" id="valueMrp" styleClass="w-260"  />
+          <p:message for="valueMrp" display="text"/>
+        </h:panelGroup>
+
+        <!-- Product Packing -->
+        <p:commandLink actionListener="#{productBatchView.productPackingOpen()}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();">
+          <p:outputLabel value="#{lang.productPacking}" for="productBatchProductPackingDetailId" />
+        </p:commandLink>
+        <h:panelGroup>
+          <p:remoteCommand name="productPackingPopupReturn" actionListener="#{productBatchView.productPackingReturned()}" update="productBatchProductPackingDetailId" process="@this" />
+          <p:selectOneMenu value="#{productBatchView.productBatch.productPackingDetailId}" disabled="#{productBatchView.productBatchTraded}"
+                           required="true" requiredMessage="#{lang.productPacking} #{lang.isRequired}" id="productBatchProductPackingDetailId" 
+                           converter="omnifaces.SelectItemsConverter" styleClass="w-260">
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+            <f:selectItems value="#{productBatchView.lookupProductPackingDetail()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            <p:ajax event="itemSelect" process="@this" update="productDefaultPackDiv" listener="#{productBatchView.productPackingSelectEvent}" />
+          </p:selectOneMenu>
+          <p:message for="productBatchProductPackingDetailId" display="text" />
+        </h:panelGroup>
+
+        <!-- Default Packing -->
+        <p:outputLabel value="#{lang.defaultPacking}" for="productBatchDefaultProductPackingDetailId" />
+        <h:panelGroup id="productDefaultPackDiv">
+          <p:selectOneMenu value="#{productBatchView.productBatch.defaultProductPackingId}"  id="productBatchDefaultProductPackingDetailId" 
+                           disabled="#{productBatchView.productBatchTraded}"
+                           converter="omnifaces.SelectItemsConverter" styleClass="w-260" required="true" requiredMessage="#{lang.defaultPacking} #{lang.isRequired}">
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+            <f:selectItems value="#{productBatchView.productPackingAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          </p:selectOneMenu><p:message for="productBatchDefaultProductPackingDetailId" display="text" />
+        </h:panelGroup>
+
+        <!-- Manufacturer -->
+        <p:outputLabel value="#{lang.manufacturer}" for="manufactureId"/>
+        <h:panelGroup>
+            <p:selectOneMenu value="#{productBatchView.productBatch.manufactureId}"  id="manufactureId" styleClass="fw"    required="true"                         
+                           converter="omnifaces.SelectItemsConverter" >
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+            <f:selectItems value="#{productBatchView.lookupManufacturer()}" var="m" itemValue="#{m}" itemLabel="#{m.name}" />              
+          </p:selectOneMenu>
+        </h:panelGroup>
+
+        <!-- Sales expiry Date -->
+        <p:outputLabel value="#{lang.expiryDateSale}" for="expiryDateSales" />
+        <h:panelGroup>        
+          <p:calendar styleClass="w-260" inputStyleClass="w-260" value="#{productBatchView.productBatch.expiryDateSales}" converterMessage="#{lang.expiryDateSale} #{lang.invalidDate}"
+                      disabled="true" pattern="MM/yyyy" mask="true" id="expiryDateSales"/>
+          <p:message for="expiryDateSales" display="text"/>
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.saleable} #{lang.batch}" for="isSaleable" />
+        <h:panelGroup>
+          <p:selectOneRadio value="#{productBatchView.productBatch.isSaleable}"  id="isSaleable" style="display: inline-table;vertical-align: bottom;">
+            <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />          
+          </p:selectOneRadio>
+        </h:panelGroup>
+      </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productBatchTable" var="productBatchVar" widgetVar="productBatchWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{productBatchView.productBatchLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productBatchVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productBatchView.productBatchSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="true" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{productBatchVar.id}" field="scm_product_batch.id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productBatchVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{productBatchView.productBatch}">
+            <f:setPropertyActionListener target="#{productBatchView.productBatch}" value="#{productBatchVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{productBatchVar.productId.productName}" field="product_id.product_name">
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <h:outputText value="#{appView.display(productBatchVar.productId.productName)}" title="#{appView.title(productBatchVar.productId.productName)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{productBatchVar.productPackingDetailId.packTertiarySecondaryQty}" field="product_packing_detail_id.pack_tertiary_secondary_qty">
+          <f:facet name="header"><h:outputText value="#{lang.packTertiarySecondaryQty}" title="#{lang.packTertiarySecondaryQty}"/></f:facet>
+          <h:outputText value="#{appView.display(productBatchVar.productPackingDetailId.packTertiarySecondaryQty)}" title="#{appView.title(productBatchVar.productPackingDetailId.packTertiarySecondaryQty)}" escape="false" />
+        </p:column>        
+        <p:column sortBy="#{productBatchVar.batchNo}" field="scm_product_batch.batch_no">
+          <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+          <h:outputText value="#{appView.display(productBatchVar.batchNo)}" title="#{appView.title(productBatchVar.batchNo)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{productBatchVar.expiryDateActual}" field="scm_product_batch.expiry_date_actual" >
+          <f:facet name="header"><h:outputText value="#{lang.expiryDateActual}" title="#{lang.expiryDateActual}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(productBatchVar.expiryDateActual)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{productBatchVar.expiryDateSales}" field="scm_product_batch.expiry_date_sales" >
+          <f:facet name="header"><h:outputText value="#{lang.expiryDateSales}" title="#{lang.expiryDateSales}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(productBatchVar.expiryDateSales)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{productBatchVar.valueMrp}" field="scm_product_batch.value_mrp" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.valueMrp}" title="#{lang.valueMrp}"/></f:facet>
+          <h:outputText value="#{appView.decimal(productBatchVar.valueMrp)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{productBatchVar.isSaleable}" field="scm_product_batch.is_saleable" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.isSaleable}" title="#{lang.isSaleable}"/></f:facet>
+          <h:outputText value="#{appView.number(productBatchVar.isSaleable)}" escape="false" />
+        </p:column>
+        <!-- 
+                <p:column sortBy="#{productBatchVar.createdBy}" field="scm_product_batch.created_by">
+                  <f:facet name="header"><h:outputText value="#{lang.createdBy}" title="#{lang.createdBy}"/></f:facet>
+                  <h:outputText value="#{appView.display(productBatchVar.createdBy)}" title="#{appView.title(productBatchVar.createdBy)}" escape="false" />
+                </p:column> -->
+
+        <!-- 
+                <p:column sortBy="#{productBatchVar.modifiedBy}" field="scm_product_batch.modified_by">
+                  <f:facet name="header"><h:outputText value="#{lang.modifiedBy}" title="#{lang.modifiedBy}"/></f:facet>
+                  <h:outputText value="#{appView.display(productBatchVar.modifiedBy)}" title="#{appView.title(productBatchVar.modifiedBy)}" escape="false" />
+                </p:column> -->
+
+        <!-- 
+                <p:column sortBy="#{productBatchVar.createdAt}" field="scm_product_batch.created_at" >
+                  <f:facet name="header"><h:outputText value="#{lang.createdAt}" title="#{lang.createdAt}"/></f:facet>
+                  <h:outputText value="#{appView.dateTime(productBatchVar.createdAt)}" escape="false" />
+                </p:column> -->
+
+        <!-- 
+                <p:column sortBy="#{productBatchVar.modifiedAt}" field="scm_product_batch.modified_at" >
+                  <f:facet name="header"><h:outputText value="#{lang.modifiedAt}" title="#{lang.modifiedAt}"/></f:facet>
+                  <h:outputText value="#{appView.dateTime(productBatchVar.modifiedAt)}" escape="false" />
+                </p:column> -->
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{transporterAddressView.switchTransporterAddress(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{transporterAddressView.parent.transporterName} / #{main.isEdit() ? appView.display(transporterAddressView.transporterAddress.address) : lang.address}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="transporterAddress" />
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{transporterAddressView.transporterAddressPopupClose}"
+                       oncomplete="parent.transporterAddressPopupReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{transporterAddressView.deleteTransporterAddress(main)}" value="#{lang.delete}" onclick="wdgOff('transporterAddressWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{transporterAddressView.cloneTransporterAddress(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{transporterAddressView.saveTransporterAddress(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.addressType}" for="transporterAddressAddressTypeId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{transporterAddressView.transporterAddress.addressTypeId}" completeMethod="#{transporterAddressView.addressTypeAuto}" 
+                         converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.addressType} #{lang.isRequired}" id="transporterAddressAddressTypeId" 
+                         var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" 
+                         converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.addressTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.addressTypeById()}"/>
+        </p:autoComplete>
+        <p:message for="transporterAddressAddressTypeId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.address}" for="address" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{transporterAddressView.transporterAddress.address}" cols="100" rows="3" maxlength="500" required="true" 
+                          requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" />
+        <p:message for="address" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.country}" for="transporterAddressCountryId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{transporterAddressView.transporterAddress.countryId}" completeMethod="#{transporterAddressView.countryAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.country} #{lang.isRequired}" id="transporterAddressCountryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}" 
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" update="transporterAddressStateDiv transporterAddressDistrictDiv transporterAddressTerritoryDiv phone1 phone2 phone3" listener="#{transporterAddressView.clearStateDistrict}"/>
+        </p:autoComplete>
+        <p:message for="transporterAddressCountryId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.state}" for="transporterAddressStateId"/>
+      <h:panelGroup id="transporterAddressStateDiv">
+        <p:autoComplete  value="#{transporterAddressView.transporterAddress.stateId}" completeMethod="#{transporterAddressView.stateAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.state} #{lang.isRequired}" id="transporterAddressStateId" var="e" itemValue="#{e}" itemLabel="#{e.stateName}" 
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+          <p:ajax event="itemSelect" update="transporterAddressDistrictDiv transporterAddressTerritoryDiv" listener="#{transporterAddressView.clearDistrict}"/>
+        </p:autoComplete>
+        <p:message for="transporterAddressStateId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.district}" for="transporterAddressDistrictId"/>
+      <h:panelGroup id="transporterAddressDistrictDiv">
+        <p:autoComplete  value="#{transporterAddressView.transporterAddress.districtId}" completeMethod="#{transporterAddressView.districtAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.district} #{lang.isRequired}" id="transporterAddressDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" 
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+          <p:ajax event="itemSelect" update="transporterAddressTerritoryDiv" listener="#{transporterAddressView.clearTerritory}"/>
+        </p:autoComplete>
+        <p:message for="transporterAddressDistrictId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.territory}" for="transporterAddressTerritoryId"/>
+      <h:panelGroup id="transporterAddressTerritoryDiv">
+        <p:autoComplete  value="#{transporterAddressView.transporterAddress.territoryId}" completeMethod="#{transporterAddressView.territoryAuto}" converter="wawo.LookupIntConverter"  
+                         required="true" requiredMessage="#{lang.territory} #{lang.isRequired}" id="transporterAddressTerritoryId" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}"
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.territoryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.territoryById()}"/>
+        </p:autoComplete>
+        <p:message for="transporterAddressTerritoryId" display="text" />
+      </h:panelGroup> 
+
+      <p:outputLabel value="#{lang.pincode}" for="pin" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.pin}" maxlength="6" id="pin" required="true" requiredMessage="#{lang.pincode} #{lang.isRequired}"/>
+        <p:message for="pin" display="text"/>
+      </h:panelGroup>   
+
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.phone1}" maxlength="13" 
+                       required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone1" validator="wawo.WhiteSpaceValidator">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup> 
+      
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.phone2}" maxlength="13" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone2">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone2" display="text"/>
+      </h:panelGroup> 
+      
+      <p:outputLabel value="#{lang.phone3}" for="phone3" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.phone3}" maxlength="13" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone3">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone3" display="text"/>
+      </h:panelGroup> 
+      
+      <p:outputLabel value="#{lang.fax1}" for="fax1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.fax1}" maxlength="13" id="fax1" >
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax1" display="text"/>
+      </h:panelGroup> 
+      
+      <p:outputLabel value="#{lang.fax2}" for="fax2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.fax2}" maxlength="13" id="fax2">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax2" display="text"/>
+      </h:panelGroup>    
+      
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.email}" maxlength="50" id="email" validator="wawo.EmailValidator"/>
+        <p:message for="email" display="text"/>
+      </h:panelGroup>            
+      <p:outputLabel value="#{lang.website}" for="website" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{transporterAddressView.transporterAddress.website}" maxlength="50" id="website" />
+        <p:message for="website" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{transporterAddressView.transporterAddress.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.status}" for="transporterStatusId"/>
+      <h:panelGroup>
+          <p:selectOneMenu value="#{transporterAddressView.transporterAddress.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+                         id="transporterStatusId">
+          <f:selectItems value="#{transporterAddressView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="transporterStatusId" display="text" />
+      </h:panelGroup> 
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(transporterAddressView.transporterAddress.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(transporterAddressView.transporterAddress.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(transporterAddressView.transporterAddress.lastModifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(transporterAddressView.transporterAddress.lastModifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+</html>

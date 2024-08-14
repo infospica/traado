@@ -1,0 +1,167 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  #{tradingDifferenceView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+    .ui-datepicker-calendar {
+      display: none;
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="tradingDifference"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="more" />
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="tradingDifferenceST" onkeyup="return callDtFilter(this.value, 'tradingDifference');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <h:panelGroup styleClass="L" >   
+        <p:panelGrid columns="5">
+          <p:selectOneMenu styleClass="L" id="year" value="#{tradingDifferenceView.productEntry}" rendered="true" style="width: 250px;"
+                           converter="spica.scm.converter.ProductEntryConverter" placeholder="Select Purchase Invoice">
+            <f:selectItem value="#{null}"/>
+            <f:selectItems  value="#{tradingDifferenceView.getProductEntryList(main)}" var="item" itemLabel="#{item.accountInvoiceNo}" itemValue="#{item}" >
+              <p:column >
+                #{item.accountInvoiceNo}
+              </p:column>
+            </f:selectItems>
+            <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{tradingDifferenceView.reset()}" update="tradingDifferenceTable" onstart="block()" oncomplete="unblock()" />
+          </p:selectOneMenu>
+
+          <p:commandButton actionListener="#{tradingDifferenceView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate tradingDifferenceTable"  styleClass="btn" 
+                           onstart="block()" oncomplete="unblock()" />
+          <p:commandButton actionListener="#{tradingDifferenceView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate tradingDifferenceTable" styleClass="btn" 
+                           onstart="block()" oncomplete="unblock()" />
+          <p:datePicker id="fromDate" value="#{tradingDifferenceView.filterParameters.fromDate}" view="month" pattern="MMM/yyyy" yearNavigator="true"  >
+            <p:ajax event="dateSelect" listener="#{tradingDifferenceView.reset()}" process="@this" onstart="block();" oncomplete="unblock();"  update="tradingDifferenceTable"/>          
+            <p:ajax event="change" listener="#{tradingDifferenceView.reset()}" process="@this" onstart="block();" oncomplete="unblock();"  update="tradingDifferenceTable"/>          
+          </p:datePicker>
+          <p:message for="fromDate" display="text" id="fmess"/>
+        </p:panelGrid>
+      </h:panelGroup>
+      <!--To Date-->
+      <!--      <h:panelGroup styleClass="L" id="toDateDIV" style="padding-right: 20px;">
+              <p:calendar id="toDate" value="#{tradingDifferenceView.filterParameters.toDate}" pattern="MM/yyyy" validator="#{sysRuntimeView.dateLteToday}"
+                          required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                          converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{tradingDifferenceView.filterParameters.fromDate}"
+                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  
+                          maxdate="#{tradingDifferenceView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: tradingDifferenceView.filterParameters.today}" >
+                <p:ajax event="dateSelect" listener="#{tradingDifferenceView.reset()}" immediate="true" onstart="block();" oncomplete="unblock();" update="tradingDifferenceTable"/>          
+              </p:calendar>
+              <p:message for="toDate" display="text" id="tmess"/>
+            </h:panelGroup>-->
+      <p:commandButton value="#{lang.export} #{lang.detail}" actionListener="#{tradingDifferenceView.export(main)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false"/>
+    </ui:define>
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+
+      <!--Trading Difference Table-->
+
+      <p:dataTable id="tradingDifferenceTable" var="row" widgetVar="tradingDifferenceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{tradingDifferenceView.getPlatformSummaryList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false"  >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('tradingDifferenceWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.accountInvoiceNo}" field="account_invoice_no" filterBy="#{row.accountInvoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.purchase} #{lang.invoiceNo}" title="#{lang.purchase} #{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showPurchase(row.productEntryId)}" immediate="true" >
+            <h:outputText value="#{row.accountInvoiceNo}" title="#{row.accountInvoiceNo}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.tradeEvent}" field="trade_event" filterBy="#{row.tradeEvent}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.tradeEvent}" title="#{lang.tradeEvent}"/></f:facet>
+          <h:outputText value="#{row.tradeEvent}" title="#{row.tradeEvent}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showSalesInvoice(row.invoiceId)}" immediate="true" rendered="#{row.invoiceType eq 2}" >
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showPurchaseReturn(row.invoiceId)}" immediate="true" rendered="#{row.invoiceType eq 3}" >
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showSalesReturn(row.invoiceId)}" immediate="true" rendered="#{row.invoiceType eq 4}" >
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{row.invoiceDate eq null?'' : appView.date(row.invoiceDate)}" title="#{row.invoiceDate eq null?'' : appView.date(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.parentInvoiceNo}" field="parent_invoice_no"  filterBy="#{row.parentInvoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.parent} #{lang.invoiceNo}" title="#{lang.parent} #{lang.invoiceNo}"/></f:facet>
+          <h:outputText value="#{row.parentInvoiceNo}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <h:outputText value="#{row.productName}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.batchNo}" field="batch_no"  filterBy="#{row.batchNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+          <h:outputText value="#{row.batchNo}" escape="false" /></p:column>
+          
+        <p:column sortBy="#{row.taxRate}" field="tax_rate" style="text-align: right" filterBy="#{row.taxRate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxRate)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{row.landingPrice}" field="landing_price" style="text-align: right" filterBy="#{row.landingPrice}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.landingPrice}" title="#{lang.taxAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.landingPrice)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.sellingPrice}" field="selling_price" style="text-align: right" filterBy="#{row.sellingPrice}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.sellingPrice}" title="#{lang.sellingPrice}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.sellingPrice)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.soldPrice}" field="sold_price" style="text-align: right" filterBy="#{row.soldPrice}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.soldPrice}" title="#{lang.soldPrice}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.soldPrice)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.margin}" field="margin" style="text-align: right" filterBy="#{row.margin}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.margin}" title="#{lang.margin}"/></f:facet>
+          <h:outputText value="#{row.margin}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.marginDifferencePerUnit}" field="margin_difference_per_unit" style="text-align: right" filterBy="#{row.marginDifferencePerUnit}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.marginDifferencePerUnit}" title="#{lang.marginDifferencePerUnit}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.marginDifferencePerUnit)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.totalQty}" field="total_qty" style="text-align: right" filterBy="#{row.totalQty}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.total} #{lang.qty}" title="#{lang.total} #{lang.qty}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.totalQty)}" escape="false" />
+          <f:facet name="footer"><h:outputText value="#{lang.total}: " title="#{lang.total} "/></f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.totalMarginDifference}" field="total_margin_difference" style="text-align: right" filterBy="#{row.totalMarginDifference}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.total} #{lang.margin} #{lang.difference}" title="#{lang.total} #{lang.margin} #{lang.difference}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.totalMarginDifference)}" escape="false" />
+          <f:facet name="footer"><h:outputText value="#{appView.decimal(tradingDifferenceView.totalMarginDifference)}" title="#{lang.total} "/></f:facet>
+        </p:column>
+      </p:dataTable>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

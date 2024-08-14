@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="trialBalance" />
+    <ui:param name="labelOnly" value="true" />
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="trialBalanceST" onkeyup="return callDtFilter(this.value, 'trialBalance');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" oncomplete="closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="form">
+
+
+    </ui:define>
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
+        <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+      <p:dataTable id="trialBalanceTable" widgetVar="trialBalanceWidget" var="trialBalanceVar" value="#{trialBalanceReportView.trialBalanceList}"                   
+                   rows="#{main.pageData.pageSize}" rowKey="#{trialBalanceReportVar.id}" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom">
+        <p:ajax event="page" oncomplete="unblock();" />
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('trialBalanceWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column headerText="#{lang.ledger} " sortBy="#{trialBalanceVar.ledger}" filterBy="#{trialBalanceVar.ledger}" >
+            <p:commandLink  actionListener="#{popUpView.showLedgerBalance(trialBalanceVar.ledgerId)}" onclick="block();" oncomplete="unblock()">
+            <h:outputText value="#{trialBalanceVar.ledger}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.ledger} #{lang.group}" sortBy="#{trialBalanceVar.ledgerGroup}" filterBy="#{trialBalanceVar.ledgerGroup}" >
+          <h:outputText value="#{trialBalanceVar.ledgerGroup}" />
+        </p:column>
+        <p:column headerText="#{lang.opening} #{lang.balance}" sortBy="#{trialBalanceVar.openingBalance}" style="text-align: right;" filterBy="#{trialBalanceVar.openingBalance}" >
+          <h:outputText value="#{appView.decimal(trialBalanceVar.openingBalance)}" />
+          <f:facet name="footer">            
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.opBalance)}" />           
+          </f:facet>
+        </p:column>
+        <p:column  headerText="#{lang.debit}" sortBy="#{trialBalanceVar.debit}" style="text-align: right;" filterBy="#{trialBalanceVar.debit}" >
+          <h:outputText value="#{appView.decimal(trialBalanceVar.debit)}" />
+          <f:facet name="footer">            
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.debit)}" />            
+          </f:facet>
+        </p:column>
+        <p:column headerText="#{lang.credit}" sortBy="#{trialBalanceVar.credit}" style="text-align: right;" filterBy="#{trialBalanceVar.credit}" >
+          <h:outputText value="#{appView.decimal(trialBalanceVar.credit)}" />
+          <f:facet name="footer">            
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.credit)}" />            
+          </f:facet>
+        </p:column>
+        <p:column headerText="#{lang.closing} #{lang.balance}" sortBy="#{appView.decimal(trialBalanceVar.balance)}"  style="text-align: right;" filterBy="#{appView.decimal(trialBalanceVar.balance)}">
+          <h:outputText value="#{appView.decimal(trialBalanceVar.balance)}" styleClass="label" style="background-color: #{trialBalanceVar.balance gt -1 ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}" escape="false" />
+          <f:facet name="footer">            
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.totBalance)}" />            
+          </f:facet>
+        </p:column>
+        <p:column headerText="#{lang.status}" style="text-align: center;" >
+          <h:outputText value=" #{trialBalanceVar.balance gt -1 ? lang.dr: lang.cr}" />       
+        </p:column>
+      </p:dataTable>
+
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

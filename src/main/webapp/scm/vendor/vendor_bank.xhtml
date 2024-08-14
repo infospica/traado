@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:h="http://xmlns.jcp.org/jsf/html"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{vendorBankView.switchVendorBank(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{vendorBankView.vendorBank.vendorId.vendorName}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? appView.display(vendorBankView.vendorBank.bankId.name) : lang.bank}" />   
+    <ui:param name="ids" value="vendorBank" />
+    <ui:param name="labelOnly" value="#{true}" />
+    
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{vendorBankView.vendorBankContactDialogClose}"
+                       oncomplete="parent.vendorBankNewDialogReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{vendorBankView.cloneVendorBank(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>    
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{vendorBankView.deleteVendorBank(main)}" value="#{lang.delete}" onclick="wdgOff('vendorBankWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    <ui:define name="save" >
+      <h:commandButton action="#{vendorBankView.saveVendorBank(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <!--account Name-->
+      <p:outputLabel value="#{lang.accountName}" for="accountName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankView.vendorBank.accountName}" maxlength="50" required="true" requiredMessage="#{lang.accountName} #{lang.isRequired}" 
+                     id="accountName" validator="wawo.WhiteSpaceValidator"/>
+        <p:message for="accountName" display="text"/>
+      </h:panelGroup>
+
+      <!--account Number-->
+      <p:outputLabel value="#{lang.accountNumber}" for="accountNumber" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankView.vendorBank.accountNo}" maxlength="18" required="true" requiredMessage="#{lang.accountNumber} #{lang.isRequired}" 
+                     id="accountNumber" validator="wawo.WhiteSpaceValidator">
+          
+          <f:validateRegex pattern="^[0-9 ]+$" />
+        </p:inputText>
+          <p:message for="accountNumber" display="text"/>
+      </h:panelGroup>
+
+      <!--account Type-->
+      <p:outputLabel value="#{lang.accountType}" for="vendorBankBankAccountTypeId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{vendorBankView.vendorBank.bankAccountTypeId}" completeMethod="#{vendorBankView.bankAccountTypeAuto}" converter="wawo.LookupIntConverter" 
+                         id="vendorBankBankAccountTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" 
+                         queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.bankAccountTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.bankAccountTypeById()}"/>
+        </p:autoComplete><p:message for="vendorBankBankAccountTypeId" display="text" />
+      </h:panelGroup>
+
+      <!--bank-->
+      <p:outputLabel value="#{lang.bank}" for="vendorBankBankId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{vendorBankView.vendorBank.bankId}" completeMethod="#{vendorBankView.bankAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.vendorBank} #{lang.isRequired}" id="vendorBankBankId" var="e" itemValue="#{e}" itemLabel="#{e.name}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.bankClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.bankById()}"/>
+        </p:autoComplete><p:message for="vendorBankBankId" display="text" />
+      </h:panelGroup>
+
+      <!--branch Name-->
+      <p:outputLabel value="#{lang.branchName}" for="branchName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankView.vendorBank.branchName}" maxlength="50" required="true" requiredMessage="#{lang.branchName} #{lang.isRequired}" 
+                     id="branchName" validator="wawo.WhiteSpaceValidator" autocomplete="off"/>
+        <p:message for="branchName" display="text"/>
+      </h:panelGroup>
+
+      <!--branch Code-->
+      <p:outputLabel value="#{lang.branchCode}" for="branchCode" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankView.vendorBank.branchCode}" maxlength="20"  id="branchCode" autocomplete="off" />                    
+        <p:message for="branchCode" display="text"/>
+      </h:panelGroup>
+
+      <!--ifsc Code-->
+      <p:outputLabel value="#{lang.ifscCode}" for="ifscCode" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankView.vendorBank.ifscCode}" maxlength="11" required="true" requiredMessage="#{lang.ifscCode} #{lang.isRequired}" 
+                     id="ifscCode" validator="wawo.WhiteSpaceValidator" autocomplete="off">
+          <f:validator validatorId="spica.scm.validators.IfscValidator" />
+        </p:inputText>
+        <p:outputLabel value="(Eg:HDFC0000123)"/>
+        <p:message for="ifscCode" display="text"/>
+      </h:panelGroup>
+
+      <!--branch Address-->
+      <p:outputLabel value="#{lang.branchAddress}" for="branchAddress" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{vendorBankView.vendorBank.branchAddress}" cols="100" rows="2" maxlength="500" id="branchAddress" autoResize="false"/>
+        <p:message for="branchAddress" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{vendorBankView.vendorBank.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" autocomplete="off"/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.status}" for="statusId"/>
+      <h:panelGroup>
+          <p:selectOneMenu value="#{vendorBankView.vendorBank.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+                         id="statusId">
+          <f:selectItems value="#{vendorBankView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="statusId" display="text" />
+      </h:panelGroup> 
+      <h:panelGroup></h:panelGroup>
+      <h:panelGroup></h:panelGroup>
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(vendorBankView.vendorBank.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(vendorBankView.vendorBank.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(vendorBankView.vendorBank.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(vendorBankView.vendorBank.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>
+

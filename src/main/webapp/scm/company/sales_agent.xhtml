@@ -1,0 +1,647 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  #{salesAgentView.switchSalesAgent(main, main.viewType)}
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesAgent}" />
+    <ui:param name="ids" value="salesAgent" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"       oncomplete="closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesAgentView.deleteSalesAgent(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesAgentWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesAgentView.cloneSalesAgent(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesAgentView.deleteSalesAgent(main)}" value="#{lang.delete}" onclick="wdgOff('salesAgentWidgetDel')"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesAgentView.saveSalesAgent(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+
+    <ui:define name="leftLeftList" >
+      <p:commandButton actionListener="#{salesAgentView.insertSalesAgentContact(main)}" onclick="return preListSelect('salesAgentWidget', 'wdgOk', null);"
+                       title="#{lang.select}"
+                       oncomplete="closePopup()" rendered="#{main.popup and main.isList()}"
+                       icon="fa fa-check"  iconPos="left" styleClass="btn btn-default" value="#{lang.select}">
+      </p:commandButton>
+    </ui:define>
+
+
+
+    <ui:define name="afterForm">
+
+      <p:panelGrid columns="4" rendered="#{main.isForm()}" layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid4}">
+
+
+        <!-- Name -->
+        <p:outputLabel value="#{lang.name}" for="name" />
+        <h:panelGroup>
+          <p:inputText value="#{salesAgentView.salesAgent.name}" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" id="name" 
+                       style="position: relative" styleClass="fw" autocomplete="off"/>
+          <p:message for="name" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Department -->
+        <p:commandLink immediate="true" actionListener="#{popUpView.showDepartment(null)}">
+          <p:outputLabel value="#{lang.department}" for="salesAgentDepartmentIdCompany"/>
+        </p:commandLink>
+        <h:panelGroup>
+          <p:selectOneMenu  value="#{salesAgentView.salesAgent.departmentId}" required="true" requiredMessage="#{lang.department} #{lang.isRequired}"
+                            id="salesAgentDepartmentIdCompany" converter="omnifaces.SelectItemsConverter" 
+                            styleClass="fw">
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}" />
+            <f:selectItems value="#{salesAgentView.selectCompanyDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+            <p:ajax event="itemSelect"  listener="#{salesAgentView.departmentSelectEvent}"/>
+          </p:selectOneMenu>
+          <!--
+                    <p:selectOneMenu value="#{salesAgentView.salesAgent.departmentId}" converter="omnifaces.SelectItemsConverter"
+                                     required="true" requiredMessage="#{lang.department} #{lang.isRequired}" id="salesAgentDepartmentIdVendor" rendered="#{salesAgentView.isVendorsalesAgent()}"
+                                     style="position: relative" styleClass="fw" >
+                      <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}" />
+                      <f:selectItems value="#{salesAgentView.selectVendorDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                      <p:ajax event="itemSelect" update="salesAgentDesignationId" listener="#{salesAgentView.departmentSelectEvent}"/>
+                    </p:selectOneMenu>
+          
+                    <p:selectOneMenu value="#{salesAgentView.salesAgent.departmentId}" converter="omnifaces.SelectItemsConverter"
+                                     required="true" requiredMessage="#{lang.department} #{lang.isRequired}" id="salesAgentDepartmentIdCustomer" rendered="#{salesAgentView.isCustomersalesAgent()}"
+                                     style="position: relative" styleClass="fw">
+                      <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}"/>
+                      <f:selectItems value="#{salesAgentView.selectCustomerDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                      <p:ajax event="itemSelect" update="salesAgentDesignationId" listener="#{salesAgentView.departmentSelectEvent}"/>
+                    </p:selectOneMenu>
+          
+                    <p:selectOneMenu value="#{salesAgentView.salesAgent.departmentId}" converter="omnifaces.SelectItemsConverter"
+                                     required="true" requiredMessage="#{lang.department} #{lang.isRequired}" id="salesAgentDepartmentIdTransporter" rendered="#{salesAgentView.isTransportersalesAgent()}"
+                                     style="position: relative" styleClass="fw">
+                      <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}"/>
+                      <f:selectItems value="#{salesAgentView.selectTransporterDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                      <p:ajax event="itemSelect" update="salesAgentDesignationId" listener="#{salesAgentView.departmentSelectEvent}"/>
+                    </p:selectOneMenu>-->
+        </h:panelGroup>
+
+        <!--Sales Agent Type--> 
+<!--        <p:outputLabel value="#{lang.type}" for="salesAgentType"/>
+        <h:panelGroup>
+          <p:selectOneMenu value="#{salesAgentView.salesAgent.salesAgentType}" required="true" requiredMessage="#{lang.type} #{lang.isRequired}"  styleClass="fw" id="salesAgentType">
+            <f:selectItem itemLabel="Individual" itemValue="1"/>
+            <f:selectItem itemLabel="Company" itemValue="2" />
+            <p:ajax event="itemSelect" immediate="true" process="salesAgentType" update="gstRegNumberLabel gstRegNumberValue panDiv panLabel" />
+          </p:selectOneMenu>
+          <p:message for="salesAgentType" display="text" />
+        </h:panelGroup>-->
+
+        <!-- Pan No -->
+        <p:outputLabel value="#{lang.pan} #{lang.no} " for="pan" title="#{lang.panabbr}" id="panLabel"/>
+        <h:panelGroup id="panDiv">
+          <p:inputText value="#{salesAgentView.salesAgent.panNo}" maxlength="10" id="pan"
+                       readonly="#{salesAgentView.salesAgent.salesAgentType eq 2}" autocomplete="off"                      
+                       validator="spica.scm.validators.PanCardValidator"
+                       styleClass="fw text-uppercase" style="position: relative" validatorMessage="Invalid PAN or PAN is missing.">
+          </p:inputText>
+          <p:message for="pan" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Currency -->
+        <p:outputLabel value="#{lang.currency}" for="currency"/>
+        <h:panelGroup>
+          <p:selectOneMenu styleClass="L" id="currency" value="#{salesAgentView.salesAgent.currencyId}" required="true" requiredMessage="#{lang.currency} #{lang.isRequired}" converter="omnifaces.SelectItemsConverter" >
+            <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+            <f:selectItems  value="#{scmLookupView.currency(main)}" var="c" itemLabel="#{c.code}" itemValue="#{c}" />
+            <p:message for="currency" display="text"/>
+          </p:selectOneMenu>
+        </h:panelGroup>         
+
+        <!-- User Code -->
+<!--        <p:outputLabel value="#{lang.userCode}" for="userCode" />
+        <h:panelGroup >
+          <p:inputText value="#{salesAgentView.salesAgent.userCode}" maxlength="20" required="true" requiredMessage="#{lang.userCode} #{lang.isRequired}" id="userCode"
+                       autocomplete="off" style="position: relative" styleClass="fw" />
+          <p:message for="userCode" display="text" styleClass="fw" />
+        </h:panelGroup> -->
+
+        <!-- Email -->
+        <p:outputLabel value="#{lang.email}" for="email" />
+        <h:panelGroup>
+          <p:inputText value="#{salesAgentView.salesAgent.email}" maxlength="50" required="true" requiredMessage="#{lang.email} #{lang.isRequired}"
+                       id="email" validator="wawo.EmailValidator" styleClass="fw" style="position: relative" autocomplete="off"/>
+          <p:message for="email" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Address 1 -->
+        <p:outputLabel value="#{lang.address}" for="address1" />
+        <h:panelGroup>
+          <p:inputTextarea value="#{salesAgentView.salesAgent.address1}" cols="100" rows="3" maxlength="500"
+                           id="address1" autoResize="false" styleClass="fw" style="position: relative"/>
+          <p:message for="address1" display="text"/>
+        </h:panelGroup>
+
+        <!-- phone 1 -->
+        <h:panelGroup>                 
+          <p:outputLabel value="#{lang.mobile} #{lang.no} 1 " for="phone1" />
+          <p:outputLabel value="(#{userRuntimeView.company.countryId.phoneCode})" rendered="#{userRuntimeView.company.countryId.phoneCode ne null}" />                      
+        </h:panelGroup> 
+        <h:panelGroup id="mobileDiv">
+          <p:inputText readonly="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 1}"  value="#{salesAgentView.salesAgent.phone1}" maxlength="#{userRuntimeView.company.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                       autocomplete="off" id="phone1" styleClass="fw" title="#{lang.maximum} #{userRuntimeView.company.countryId.mobileNumberLength} #{lang.digit}">                  
+            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+            <p:ajax event="change" update="phoneVerifyDivBtn phoneVerifyDiv" />
+          </p:inputText>
+          <!--<h:outputLabel value="#{lang.maximum} #{userRuntimeView.company.countryId.phoneNumberLength} #{lang.digit}" />--> 
+          <p:tooltip id="phone1ToolTip" for="phone1" showEvent="focus" hideEvent="blur" />
+
+          <p:message for="phone1" display="text"/>
+        </h:panelGroup>
+
+
+
+        <h:panelGroup layout="block" style="text-align: left;" id="phoneVerifyDivBtn">
+          <p:commandButton value="#{lang.verifyPhone}" styleClass="btn btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv"
+                           actionListener="#{salesAgentView.verifyPhone(main)}"
+                           rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp eq null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
+          <p:commandButton value="#{lang.disableSMS}" styleClass="btn btn-primary" 
+                           actionListener="#{salesAgentView.disableSMS(main)}" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
+                           rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 1 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
+          <p:inputText value="#{salesAgentView.verifyOtp}" styleClass="fw" placeholder="#{lang.placeholderOtp}"                      
+                       rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
+
+        </h:panelGroup>
+        <h:panelGroup id="phoneVerifyDiv">  
+             
+          
+          <p:commandButton value="#{lang.verifyOtp}" styleClass="btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
+                           actionListener="#{salesAgentView.verifyOtp(main)}"
+                           rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
+          <h:outputLabel value=" Or " style="padding-left:3px;padding-right:3px;"
+                         rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
+          <p:commandButton value="#{lang.resendOtp}" styleClass="btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
+                           actionListener="#{salesAgentView.resendOtp(main)}"
+                           rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and salesAgentView.salesAgent.phoneVerified eq 0 and salesAgentView.salesAgent.otp ne null and (salesAgentView.salesAgent.phone1 ne null and salesAgentView.salesAgent.phone1.length() eq 10)}" />
+          
+        </h:panelGroup>
+        
+        <!-- Mobile Number -->
+        <h:panelGroup>                 
+          <p:outputLabel value="#{lang.mobile} #{lang.no} 2" for="phone2" />
+          <p:outputLabel value="(#{userRuntimeView.company.countryId.phoneCode})" rendered="#{userRuntimeView.company.countryId.phoneCode ne null}" />                      
+        </h:panelGroup> 
+        <h:panelGroup>
+          <p:inputText  value="#{salesAgentView.salesAgent.phone2}" maxlength="#{userRuntimeView.company.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                        autocomplete="off" id="phone2" styleClass="fw" title="#{lang.maximum} #{userRuntimeView.company.countryId.mobileNumberLength} #{lang.digit}">                  
+            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+          </p:inputText>
+          <p:tooltip id="phone2ToolTip" for="phone2" showEvent="focus" hideEvent="blur" />
+          <p:message for="phone2" display="text"/>
+        </h:panelGroup>
+
+        <!-- Status -->
+        <p:outputLabel value="#{lang.status}" for="salesAgentStatusId"/>
+        <h:panelGroup>
+          <p:selectOneMenu value="#{salesAgentView.salesAgent.statusId}" converter="omnifaces.SelectItemsConverter" required="true"
+                           requiredMessage="#{lang.status} #{lang.isRequired}"  styleClass="fw"
+                           id="salesAgentStatusId">
+            <f:selectItems value="#{salesAgentView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+          </p:selectOneMenu>
+          <p:message for="salesAgentStatusId" display="text" />
+        </h:panelGroup>
+
+        <h:panelGroup></h:panelGroup><h:panelGroup></h:panelGroup>
+
+<!--        <h:panelGroup id="gstRegNumberLabel" rendered="#{salesAgentView.salesAgent.salesAgentType eq 2}" >
+          <p:commandLink target="_blank"  onclick="window.open('#{SystemConstants.GST_URL}')"  rendered="#{salesAgentView.salesAgent.salesAgentType eq 2}" > 
+            <p:outputLabel value="#{lang.gstin}" title="#{lang.gstinabbr} " for="gstRegNumber" rendered="#{salesAgentView.salesAgent.salesAgentType eq 2}"/>
+          </p:commandLink>
+        </h:panelGroup>-->
+<!--        <h:panelGroup id="gstRegNumberValue" layout="block" rendered="#{salesAgentView.salesAgent.salesAgentType eq 2}">
+          <p:inputText styleClass="fw text-uppercase" value="#{salesAgentView.salesAgent.gstNo}" maxlength="15" autocomplete="off"
+                       required="true" requiredMessage="#{lang.gstin} #{lang.isRequired}" rendered="#{salesAgentView.salesAgent.salesAgentType eq 2}"
+                       id="gstRegNumber" validator="wawo.WhiteSpaceValidator" style="position: relative" readonly="#{main.edit and !userRole.isRoot()}" >
+            <f:validator validatorId="spica.scm.validators.GstinValidator" />
+            <p:ajax event="change" update="gstRegNumberValue pan" process="gstRegNumberValue" listener="#{salesAgentView.gstinChangeEventHandler()}" />
+          </p:inputText>
+          <p:message for="gstRegNumber" display="text" rendered="#{userRuntimeView.isGstRegime(companyView.company)}"/>
+        </h:panelGroup>-->
+
+
+        <!-- Create Login -->
+        <!--        <p:outputLabel for="createLogin" value="Create Login" rendered="false" />
+                <h:panelGroup rendered="false">
+                  <p:selectOneRadio id="createLogin" value="#{salesAgentView.loginVal}">
+                    <f:selectItem itemLabel="YES" itemValue="1" />
+                    <f:selectItem itemLabel="NO" itemValue="0" />
+                    <p:ajax listener="#{salesAgentView.createLoginSelectEventHandler}" update="userRole lbl" />
+                  </p:selectOneRadio>
+                </h:panelGroup>      -->
+
+
+
+
+        <!-- Role -->
+        <!--        <h:panelGroup id="lbl">
+                  <p:outputLabel value="#{lang.role}" for="roles" rendered="#{salesAgentView.isLoginCreated() and salesAgentView.isCompanyLogin()}"/>
+                </h:panelGroup>
+                <h:panelGroup id="userRole" >
+                  <p:selectManyCheckbox id="roles" rendered="#{salesAgentView.isLoginCreated() and salesAgentView.isCompanyLogin()}" value="#{salesAgentView.roleSelected}"
+                                        converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.role} #{lang.isRequired}">
+                    <f:selectItems value="#{sysLookupView.roleCompany(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                  </p:selectManyCheckbox>
+                  <p:message for="roles" />
+                </h:panelGroup>-->
+
+      </p:panelGrid>
+    </ui:define>
+    <ui:define name="after">
+      <h:panelGroup styleClass="row">
+        <h:panelGroup layout="block" id="benefitTypeDiv" styleClass="col-md-6" rendered="#{main.isForm()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+            <ui:param name="label" value="#{lang.contractRemunerationTerms}" />
+            <ui:param name="ids" value="contractBenefit" />
+            <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+            <!--commision on-->
+            <p:outputLabel value="#{lang.commission} #{lang.on}" for="commission" />
+            <h:panelGroup>
+              <p:selectOneMenu value="#{salesAgentView.salesAgentContract.commissionOn}" 
+                               id="commission" 
+                               style="position: relative" styleClass="fw">
+                <f:selectItem itemValue="#{1}" itemLabel="#{lang.goodsValue}"/>
+                <f:selectItem itemValue="#{2}" itemLabel="#{lang.bill} #{lang.amount}"/>
+              </p:selectOneMenu>
+              <p:message for="commission" display="text" styleClass="fw" />
+            </h:panelGroup>  
+
+            <!-- Commission Applicable On -->
+            <p:outputLabel value="#{lang.commissionApplicableOn}" for="commissionApplicableOn" />
+            <h:panelGroup >
+              <p:selectOneMenu value="#{salesAgentView.salesAgentContract.commissionApplicableOn}"  id="commissionApplicableOn" styleClass="fw"
+                               required="true" requiredMessage="#{lang.commissionApplicableOn} #{lang.isRequired}"
+                               >
+                <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                <f:selectItems value="#{salesAgentView.listCommissionOn}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax listener="#{accountView.ajaxBehaviorEventHandler}"/>
+              </p:selectOneMenu>
+              <p:message for="commissionApplicableOn" display="text"/>
+            </h:panelGroup>
+
+            <!-- Commission By Range -->
+            <p:outputLabel value="#{lang.commissionByRange}"/>
+            <h:panelGroup >
+              <p:selectOneRadio value="#{salesAgentView.salesAgentContract.commissionByRange}" immediate="true">
+                <f:selectItems value="#{salesAgentView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax listener="#{salesAgentView.ajaxBehaviorEventHandler}"
+                        oncomplete="refreshDatatable();"
+                        update="commissionValuePercentDiv commissionValuePercentLabel commissionValueFixedDiv commissionValueFixedLabel rangeDiv scmSalesAgentContractCommTable"/>
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Commission Value -->
+            <p:outputLabel value=""/>
+            <h:panelGroup id="commissionValueId">
+              <p:selectOneRadio value="#{salesAgentView.salesAgentContract.commissionType}">
+                <f:selectItems value="#{salesAgentView.listCommissionValueType}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax listener="#{salesAgentView.commissionValueSelectEventHandler}"
+                        update="commissionValuePercentDiv commissionValuePercentLabel commissionValueFixedDiv commissionValueFixedLabel rangeDiv"/>
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Commission Value Fixed -->
+            <h:panelGroup id="commissionValueFixedLabel">
+              <p:outputLabel styleClass="perc" value="#{lang.commissionValueFixed}" for="commissionValueFixed"
+                             rendered="#{salesAgentView.isFixedCommissionByRange()}"  />
+            </h:panelGroup>
+            <h:panelGroup id="commissionValueFixedDiv" >
+              <p:inputNumber converterMessage="#{lang.commissionValueFixed} #{lang.invalidNumber}"
+                             decimalPlaces="2" styleClass="fw" required="true" requiredMessage="#{lang.commissionValueFixed} #{lang.isRequired}"
+                             rendered="#{salesAgentView.isFixedCommissionByRange()}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commissionValueFixed"
+                             value="#{salesAgentView.salesAgentContract.commissionValueFixed}"
+                             />
+              <p:message for="commissionValueFixed" display="text"/>
+            </h:panelGroup>
+
+            <!-- Commission Value Percent -->
+            <h:panelGroup id="commissionValuePercentLabel">
+              <p:outputLabel value="#{lang.commissionValuePercent}" for="commissionValuePercent"
+                             rendered="#{salesAgentView.isPercentageCommissionByRange()}" />
+            </h:panelGroup>
+
+            <h:panelGroup id="commissionValuePercentDiv">
+              <p:inputNumber converterMessage="#{lang.commissionValuePercent} #{lang.invalidNumber}"
+                             rendered="#{salesAgentView.isPercentageCommissionByRange()}"
+                             decimalPlaces="2" styleClass="fw" required="true" requiredMessage="#{lang.commissionValuePercent} #{lang.isRequired}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="commissionValuePercent"
+                             value="#{salesAgentView.salesAgentContract.commissionValuePercentage}"
+                             />
+              <p:message for="commissionValuePercent" display="text"/>
+            </h:panelGroup>
+
+          </ui:decorate>
+        </h:panelGroup>
+        <h:panelGroup layout="block" id="salesDetails" styleClass="col-md-6" rendered="#{main.isForm()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+            <ui:param name="label" value="#{lang.account} #{lang.details}" />
+            <ui:param name="ids" value="contractBenefit1" />
+            <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+            <p:commandLink actionListener="#{popUpView.showAccountGroup(null)}" immediate="true" onstart="unblock();" oncomplete="unblock();" >
+              <p:outputLabel value="#{lang.accountGroup}(s)" for="accountGroupId"/>
+            </p:commandLink>
+            <h:panelGroup id="accountGroupListDiv">
+              <p:autoComplete  multiple="true" value="#{salesAgentView.accountGroupList}" completeMethod="#{salesAgentView.accountGroupBySalesAgentAuto}"
+                               converter="wawo.LookupIntConverter" cache="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"
+                               validator="#{salesAgentView.salesAgentValidation}"
+                               id="accountGroupId" var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true"
+                               queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                               style="position: relative" styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>
+                <p:ajax event="itemSelect" listener="#{salesAgentView.onAccountGroupSelect}" update="@this" />
+                <p:ajax event="itemUnselect" process="accountGroupListDiv" immediate="true" listener="#{salesAgentView.onAccountGroupUnSelect}" />
+              </p:autoComplete><p:message for="accountGroupId" display="text" />
+            </h:panelGroup>
+
+            <p:commandLink actionListener="#{popUpView.showTerritory(null)}" immediate="true" onstart="unblock();" oncomplete="unblock();" >
+              <p:outputLabel value="#{lang.territory}(s)" for="territoryId"/>
+            </p:commandLink>
+            <h:panelGroup id="territoryDiv">
+              <p:autoComplete  multiple="true" value="#{salesAgentView.territoryList}" completeMethod="#{salesAgentView.territoryBySalesAgentAuto}"
+                               converter="wawo.LookupIntConverter" cache="true" required="true" requiredMessage="#{lang.territory} #{lang.isRequired}"
+                               validator="#{salesAgentView.territoryValidation}"
+                               id="territoryId" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}" emptyMessage="#{lang.noResult}" dropdown="true"
+                               queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                               style="position: relative" styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.territoryClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.territoryById()}"/>
+                <p:ajax event="itemSelect" listener="#{salesAgentView.onTerritorySelect}" update="@this" />
+                <p:ajax event="itemUnselect" process="territoryDiv" immediate="true" listener="#{salesAgentView.onTerritoryUnSelect}" />
+              </p:autoComplete><p:message for="territoryId" display="text" />
+            </h:panelGroup>
+
+          </ui:decorate>
+        </h:panelGroup>
+        <h:panelGroup id="rangeDiv" rendered="#{main.isForm()}">
+          <h:panelGroup layout="block" styleClass="row" rendered="#{salesAgentView.isCommisionByRange()}">
+            <h:panelGroup layout="block" id="TypeDiv" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="label" value="#{lang.commissionByRange}" />
+                <ui:param name="cols" value="1" />
+                <ui:define name="menuleft">
+                  <p:commandButton id="addNewSalesAgentCommision" action="#{salesAgentView.addNewSalesAgentCommision}" oncomplete="refreshDatatable();"
+                                   update="salesAgentCommisionRangeDiv" process="TypeDiv" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info">
+                  </p:commandButton>
+                </ui:define>
+
+                <p:importConstants type="spica.sys.SystemConstants"/>
+                <h:panelGroup layout="block" id="salesAgentCommisionRangeDiv">
+                  <h:inputHidden value="#{salesAgentView.currentRow}" id='rownum' />
+                  <p:remoteCommand actionListener="#{salesAgentView.actionInsertOrUpdateSalesAgentCommissionRange(main)}" process="salesAgentCommisionRangeDiv"
+                                   update="salesAgentCommisionRangeDiv"  name="saveSalesAgentCommisionRange" oncomplete="refreshDatatable();" />
+                  <h:panelGroup layout="block" pt:data-fast-input="true" id="commissionTable" styleClass="table-responsive">
+                    <p:dataTable id="scmSalesAgentContractCommTable" var="scmSalesAgentContractCommVar" widgetVar="scmSalesAgentContractCommWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                                 value="#{salesAgentView.salesAgentContract.salesAgentContractComm}" 
+                                 rowIndexVar="rowIndex" rows="#{main.pageData.pageSize}" rowKey="#{scmSalesAgentContractCommVar.id}"
+                                 rowHover="true" reflow="false">
+
+                      <!-- Range From -->
+                      <p:column headerText="#{lang.rangeFrom}">
+                        <h:panelGroup id="rangeFromDiv">
+                          <p:inputNumber id="rangeFrom" value="#{scmSalesAgentContractCommVar.rangeFrom}"  minValue="0"
+                                         required="true" requiredMessage="#{lang.rangeFrom} #{lang.isRequired}"
+                                         validator="#{salesAgentView.validateRangeFrom}" decimalPlaces="0"
+                                         onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+                            <p:ajax event="change" update="rangeTo" process="rangeFromDiv" />
+                          </p:inputNumber>
+                          <p:focus for="rangeFrom"/>
+
+                          <h:inputHidden value="#{rowIndex}" id="serialNo" />
+
+                          <p:message for="rangeFrom" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Range To -->
+                      <p:column headerText="#{lang.rangeTo}">
+                        <h:panelGroup id="rangeToDiv">
+                          <p:inputNumber id="rangeTo" value="#{scmSalesAgentContractCommVar.rangeTo}"  minValue="0"
+                                         required="true" requiredMessage="#{lang.rangeTo} #{lang.isRequired}"
+                                         validator="#{salesAgentView.validateRangeTo}" decimalPlaces="0"
+                                         onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+
+                            <p:ajax event="change" update="rangeTo" process="rangeToDiv"  />
+                          </p:inputNumber>
+                          <p:message for="rangeTo" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!--Value Type-->
+                      <p:column headerText="#{lang.type}">
+                        <h:panelGroup id="valueTypeDiv">
+                          <p:selectOneMenu id="valueType" value="#{scmSalesAgentContractCommVar.commissionType}" style="width:125px" >
+                            <f:selectItem itemLabel="#{lang.percentage}" itemValue="#{SystemConstants.COMMISSION_AMOUNT_AS_PERCENTAGE}"  />
+                            <f:selectItem itemLabel="#{lang.fixed}" itemValue="#{SystemConstants.COMMISSION_AMOUNT_AS_FIXED}" />
+                            <p:ajax event="change" update="valueDiv" process="@this"/>
+                          </p:selectOneMenu>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!--value-->
+                      <p:column headerText="#{lang.value}" >
+                        <h:panelGroup id="valueDiv">
+                          <p:inputNumber id="valueFixed" value="#{scmSalesAgentContractCommVar.valueFixed}"  minValue="0.0"
+                                         required="true" requiredMessage="#{lang.valueFixed} #{lang.isRequired}" 
+                                         styleClass="submit_item fw" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="9999999" maxlength="7" autocomplete="off"
+                                         rendered="#{scmSalesAgentContractCommVar.commissionType eq SystemConstants.COMMISSION_AMOUNT_AS_FIXED}" >
+                          </p:inputNumber>
+                          <p:message for="valueFixed" display="text"/>
+                          <p:inputNumber id="valuePercentage" value="#{scmSalesAgentContractCommVar.valuePercentage}" minValue="0.0"
+                                         required="true" requiredMessage="#{lang.valuePercentage} #{lang.isRequired}"
+                                         styleClass="submit_item fw" 
+                                         inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="100.00" maxlength="5" autocomplete="off"
+                                         rendered="#{scmSalesAgentContractCommVar.commissionType eq SystemConstants.COMMISSION_AMOUNT_AS_PERCENTAGE or scmSalesAgentContractCommVar.commissionType eq null}" >
+                          </p:inputNumber>
+                          <p:message for="valuePercentage" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Action Column -->
+                      <p:column style="width:40px" >
+                        <p:commandButton  process="@this" update="scmSalesAgentContractCommTable" partialSubmit="true"
+                                          tabindex="-1"
+                                          actionListener="#{salesAgentView.deleteContractCommissionRange(main, scmSalesAgentContractCommVar)}"   title="Delete" iconPos="left" icon="fa fa-trash" >
+                          <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                        </p:commandButton>
+                      </p:column>
+
+                    </p:dataTable>
+                  </h:panelGroup>
+
+                </h:panelGroup>
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <script>
+            //<![CDATA[
+            function refreshDatatable() {
+              page.refresh();
+            }
+
+            function submitForm(params) {
+              saveSalesAgentCommisionRange([{name: 'rownumber', value: params[2]}]);
+              return false;
+            }
+
+            function setFocus() {
+              var r = $('#rownum').val();
+              if (!isNaN(r)) {
+                var nextRow = parseInt(r) + 1;
+                console.log('NextRow :' + nextRow);
+                $('#scmSalesAgentContractCommTable\\:' + nextRow + '\\:rangeFrom_input').focus();
+              }
+
+            }
+
+            $(document).ready(function (e) {
+              refreshDatatable();
+            });
+            //]]>
+          </script>
+        </h:panelGroup>
+      </h:panelGroup>
+
+
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(salesAgentView.salesAgent.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(salesAgentView.salesAgent.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(salesAgentView.salesAgent.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(salesAgentView.salesAgent.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >  
+      <h:panelGroup id="accountGrouId">
+        <p:selectOneMenu value="#{salesAgentView.accountGroup}" converter="omnifaces.SelectItemsConverter" style="width:200px;" >
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.all} #{lang.accountGroup}" />
+          <f:selectItems value="#{salesAgentView.getSalesAgentAccountGroup(main)}" var="ag" itemValue="#{ag}" itemLabel="#{ag.groupName}" />          
+          <p:ajax event="itemSelect" process="accountGrouId" update="salesAgentTable" />
+        </p:selectOneMenu>
+      </h:panelGroup>
+      <h:panelGroup id="territoryDIV">
+        <p:selectOneMenu value="#{salesAgentView.territory}" converter="omnifaces.SelectItemsConverter" >
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.all} #{lang.territory}" />
+          <f:selectItems value="#{salesAgentView.getSalesAgentTerritory(main)}" var="t" itemValue="#{t}" itemLabel="#{t.territoryName}" />
+          <p:column><h:outputText value="#{t.territoryName}" /></p:column>
+          <p:ajax event="itemSelect" process="territoryDIV" update="salesAgentTable" />
+        </p:selectOneMenu>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="salesAgentTable" var="salesAgentVar" widgetVar="salesAgentWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesAgentView.salesAgentLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesAgentVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesAgentView.salesAgentSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column headerText="#{lang.name}" sortBy="#{salesAgentVar.name}" field="user_code" >
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{salesAgentVar.name}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesAgentView.salesAgent}" value="#{salesAgentVar}" />
+          </p:commandLink>
+        </p:column>
+
+<!--        <p:column headerText="#{lang.vendorName}" sortBy="#{salesAgentVar.vendorId.vendorName}" field="vendor_id.vendor_name" 
+                  rendered="#{salesAgentView.isVendorSalesAgent()}">
+          <f:facet name="header"><h:outputText value="#{lang.vendorName}" title="#{lang.vendorName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(salesAgentVar.vendorId.vendorName)}" title="#{appView.title(salesAgentVar.vendorId.vendorName)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.customerName}" sortBy="#{salesAgentVar.customerId.customerName}" field="customer_id.customer_name" 
+                  rendered="#{salesAgentView.isCustomerSalesAgent()}">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(salesAgentVar.customerId.customerName)}" title="#{appView.title(salesAgentVar.customerId.customerName)}" escape="false" />
+        </p:column>-->
+<!--        <p:column headerText="#{lang.transporterName}" sortBy="#{salesAgentVar.transporterId.transporterName}" field="transporter_id.transporter_name" 
+                  rendered="#{salesAgentView.isTransporterSalesAgent()}">
+          <f:facet name="header"><h:outputText value="#{lang.transporterName}" title="#{lang.transporterName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(salesAgentVar.transporterId.transporterName)}" title="#{appView.title(salesAgentVar.transporterId.transporterName)}" escape="false" />
+        </p:column>-->
+
+        <p:column headerText="#{lang.companyName}" sortBy="#{salesAgentVar.companyId.companyName}" field="company_id.company_name" rendered="false" >
+          <f:facet name="header"><h:outputText value="#{lang.companyName}" title="#{lang.companyName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(salesAgentVar.companyId.companyName)}" title="#{appView.title(salesAgentVar.companyId.companyName)}" escape="false" />
+        </p:column>
+<!--              <p:column headerText="#{lang.userCode}" sortBy="#{salesAgentVar.userCode}" field="user_code">
+          <h:outputText value="#{appView.display(salesAgentVar.userCode)}" title="#{appView.title(salesAgentVar.userCode)}" escape="false" />
+        </p:column>-->
+        <p:column headerText="#{lang.userCode}" sortBy="#{salesAgentVar.userCode}" field="name">
+          <f:facet name="header"><h:outputText value="#{lang.userCode}" title="#{lang.userCode}"/></f:facet>
+          <h:outputText value="#{appView.display(salesAgentVar.userCode)}" title="#{appView.title(salesAgentVar.userCode)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.phone} #{lang.sno}" sortBy="#{salesAgentVar.phone1}" field="phone_1">
+          <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+
+          <h:outputText value="#{appView.display(salesAgentVar.phone1)}" title="#{appView.title(salesAgentVar.phone1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.email}" sortBy="#{salesAgentVar.email}" field="email">
+          <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+
+          <h:outputText value="#{appView.display(salesAgentVar.email)}" title="#{appView.title(salesAgentVar.email)}" escape="false" />
+        </p:column>
+
+<!--        <p:column headerText="#{lang.phone}" sortBy="#{salesAgentVar.phone1}" field="phone2">
+  <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+  <h:outputText value="#{appView.display(salesAgentVar.phone1)}" title="#{appView.title(salesAgentVar.phone1)}" escape="false" />
+</p:column>-->
+
+        <p:column headerText="#{lang.address}" sortBy="#{salesAgentVar.address1}" field="address1" styleClass="wrap">
+          <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+          <h:outputText value="#{salesAgentVar.address1}" title="#{appView.title(salesAgentVar.address1)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.status}" sortBy="#{salesAgentVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>       
+          <h:outputText value="#{appView.display(salesAgentVar.statusId.title)}" title="#{appView.title(salesAgentVar.statusId.title)}" 
+                        escape="false" styleClass="label" 
+                        style="background-color: #{sysRuntimeView.statusColorYesNo(salesAgentVar.statusId.id)}"/>          
+        </p:column>
+<!--        <p:column headerText="#{lang.action}" >
+          <p:commandButton value="#{lang.reset} #{lang.password}" action="#{salesAgentView.resetPassword()}"/>
+        </p:column>-->
+        <p:column styleClass="w-60">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.status}"/></f:facet>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesAgentVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesAgentVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesAgentVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesAgentVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesAgentVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>
+

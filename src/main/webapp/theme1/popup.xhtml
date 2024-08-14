@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  <f:metadata>
+    <f:viewAction action="#{userRuntimeView.actionValidateSession()}" />
+  </f:metadata>
+  <ui:composition template="layoutDialog.xhtml" >
+    <ui:define name="content" >
+      <h:form id="timeout" prependId="false">
+        <ui:include src="timeout.xhtml" />
+      </h:form>
+      <h:form id="f1" prependId="false" enctype="multipart/form-data">
+        #{main.setViewPath(param.viewPath eq null ? main.viewPath : param.viewPath, param.viewType eq null ? main.viewType : param.viewType)}
+        #{main.setPopup(true)}
+        <ui:include src="/scm/#{param.viewPath eq null ? main.viewPath : param.viewPath}" >
+          <ui:param name="viewType" value="#{param.viewType eq null ? main.viewType : param.viewType}" />
+          <ui:param name="close" value="#{param.close}" />
+        </ui:include>
+        <script>
+          //<![CDATA[               
+          function startAppTimeout() {
+            trackTimeout();
+            keepAlive();
+            parent.restartTimeout();
+          }
+          function restartTimeout() {
+            resetPageTimer();
+            startAppTimeout();
+          }
+          function closePopup() {
+            resetPageTimer();
+            parent.restartTimeout();
+            parent.popup.close('.popup');
+          }
+          startAppTimeout();
+          //]]>
+        </script>   
+        #{main.close()}
+      </h:form>  
+    </ui:define>
+  </ui:composition>
+</html>

@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:o="http://omnifaces.org/ui">
+  #{purchaseOrderView.switchPurchaseOrder(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseOrder}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? purchaseOrderView.purchaseOrder.purchaseOrderNo : null}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? purchaseOrderView.purchaseOrder.purchaseOrderStatusId.title : null}" />
+    <ui:param name="ids" value="purchaseOrder" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="showForm" value="false" />        
+
+    <ui:define name="navRight" >
+            <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <p:selectOneMenu value="#{purchaseOrderView.filterValue}" converter="omnifaces.SelectItemsConverter">
+        <f:selectItem itemLabel="#{lang.all} #{lang.status}" itemValue="#{null}" />
+        <f:selectItems value="#{scmLookupView.purchaseOrderStatus(main)}" var="e" itemValue="#{e.id}" itemLabel="#{e.title}" />
+        <f:attribute name="filterKey" value="scm_purchase_order.purchase_order_status_id" />
+        <p:ajax event="itemSelect" listener="#{purchaseOrderView.filterEventHandler}" process="@this" update="purchaseOrderTable" />
+      </p:selectOneMenu>
+    </ui:define>
+
+    <ui:define name="deleteList" rendered="#{main.isList()}"  >
+      <p:commandButton action="#{purchaseOrderView.deletePurchaseOrder(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('purchaseOrderWidgetDelConf')"
+                       process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="newList" >
+      <h:commandButton  id="accountBtn" value="#{lang.newform}" immediate="true" rendered="#{purchaseOrderView.purchaseReqAvailable}"
+                        styleClass="btn btn-info" >
+        <f:ajax render="@this" execute="accountPanel" />
+      </h:commandButton>
+      <h:commandButton action="#{purchaseOrderView.newPurchaseOrder(main)}" value="#{lang.newform}" styleClass="btn btn-info" 
+                       rendered="#{!purchaseOrderView.purchaseReqAvailable}">
+        <f:ajax render="f1" execute="f1" />
+      </h:commandButton>
+      <p:overlayPanel  id="accountPanel" for="accountBtn" widgetVar="pqPanel" modal="true" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true"
+                       dynamic="false" style="width: 500px;" >
+        <h:panelGroup layout="block">
+          <p:dataTable id="pq" var="purReq" value="#{purchaseOrderView.getPurchaseReqList(main)}" rowKey="#{purReq.id}"
+                       selection="#{purchaseOrderView.purchaseReqSelectedArray}" 
+                       tableStyleClass="mDataTable mDataTable-center editLinks">
+            <p:column selectionMode="multiple" style="text-align:center"/>
+            <p:column headerText="#{lang.purchaseReq} #{lang.no}">
+              <h:outputText value="#{purReq.requisitionNo}" />
+            </p:column>
+
+            <p:column headerText="#{lang.purchaseReq} #{lang.date}">
+              <h:outputText value="#{appView.dateTime(purReq.requisitionDate)}" />
+            </p:column>
+          </p:dataTable>
+          <h:commandButton action="#{purchaseOrderView.newPurchaseOrder(main)}" onclick="PF('pqPanel').hide();" value="#{lang.create}" styleClass="btn btn-info m-t-15">
+            <f:ajax render="f1" execute="accountPanel" />
+          </h:commandButton>
+        </h:panelGroup>
+      </p:overlayPanel>
+      <style>
+        .ui-datatable-tablewrapper{
+          overflow: hidden;
+        }
+      </style>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseOrderTable" var="purchaseOrderVar" widgetVar="purchaseOrderWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{purchaseOrderView.purchaseOrderLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseOrderVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{purchaseOrderView.purchaseOrderSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{purchaseOrderVar.purchaseOrderNo}" field="purchase_order_no">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseOrder}" title="#{lang.purchaseOrderNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(purchaseOrderVar.purchaseOrderNo)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{purchaseOrderView.purchaseOrder}" value="#{purchaseOrderVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{purchaseOrderVar.purchaseOrderDate}" field="created_at" >
+          <f:facet name="header"><h:outputText value="#{lang.purchaseOrderDate}" title="#{lang.purchaseOrderDate}"/></f:facet>
+          <h:outputText value="#{appView.date(purchaseOrderVar.purchaseOrderDate)}" escape="false" />
+        </p:column>        
+        <p:column  sortBy="#{purchaseOrderVar.purchaseOrderStatusId.title}" field="purchase_order_status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseStatus}" title="#{lang.purchaseStatus}"/></f:facet>          
+          <h:outputText value="#{appView.display(purchaseOrderVar.purchaseOrderStatusId.title)}" title="#{appView.title(purchaseOrderVar.purchaseOrderStatusId.title)}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(purchaseOrderVar.purchaseOrderStatusId.id)}" style="background-color: #{sysRuntimeView.statusColor(purchaseOrderVar.purchaseOrderStatusId.id)}"/>          
+        </p:column>
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(purchaseOrderVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(purchaseOrderVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(purchaseOrderVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(purchaseOrderVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(purchaseOrderVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>   
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+
+  <ui:fragment rendered="#{main.isForm() and purchaseOrderView.taxCalculator.purchaseOrderForm eq '/scm/purchase/gst_india/purchase_order_gst_india.xhtml'}">    
+    <ui:include src="/scm/purchase/gst_india/purchase_order_gst_india.xhtml" />
+  </ui:fragment>
+</ui:composition>

@@ -1,0 +1,147 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{productRateSummaryView.switchProductRateSummaryView(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productRateSummary}"/>
+    <ui:param name="ids" value="productRateSummary"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="productRateSummaryST" onkeyup="return callDtFilter(this.value, 'productRateSummary');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="rightList" >
+      <h:panelGroup layout="block" styleClass="L" id="productCategoryId" >
+        <p:selectOneMenu value="#{productRateSummaryView.productCategory}"  converter="omnifaces.SelectItemsConverter" filter="true" var="pc"
+                         required="true" title="#{lang.productCategory}">
+          <f:selectItem itemLabel="#{lang.select} #{lang.productCategory}" itemValue="#{null}" />
+          <f:selectItems value="#{productRateSummaryView.lookupProductCategory()}" var="p" itemValue="#{p}" itemLabel="#{p.title}" />
+          <p:column styleClass="w-180">
+            <f:facet name="header">Product Category</f:facet>
+            <h:outputText value="#{pc.title}" />
+          </p:column>
+          <p:column>
+            <f:facet name="header">Tax %</f:facet>
+            <h:outputText value="#{pc.purchaseTaxCodeId.ratePercentage} %" />
+          </p:column>
+          <p:ajax event="itemSelect" process="@this" update="productCategoryId productRateSummaryTable" listener="#{productRateSummaryView.productCategorySelectEvent}" />
+        </p:selectOneMenu>
+
+        <p:inputText value="#{productRateSummaryView.prevTaxCodeId.code}" id="prevTax" readonly="true" title="#{lang.taxCode}" />
+
+        <p:selectOneMenu value="#{productRateSummaryView.taxCodeId}" required="true" converter="omnifaces.SelectItemsConverter" id="txCod" title="#{lang.taxCode}" >
+          <f:selectItem itemLabel="#{lang.select} #{lang.taxCode}" itemValue="#{null}" />
+          <f:selectItems  value="#{productRateSummaryView.lookupTaxCode()}" var="tx" itemLabel="#{tx.code}" itemValue="#{tx}" />        
+          <p:ajax event="itemSelect" process="@this" update="productCategoryId productRateSummaryTable" listener="#{productRateSummaryView.taxCodeSelectEvent}" />
+        </p:selectOneMenu>
+
+        <p:commandButton action="#{productRateSummaryView.actionModifyProductCategoryTaxCode(main)}" value="Modify Tax Code" styleClass="btn btn-primary" 
+                         rendered="#{productRateSummaryView.renderModifyButton and (userRuntimeView.privilege.modify==true)}"                         
+                         process="productCategoryId" update="productCategoryId productRateSummaryTable" >        
+        </p:commandButton>
+
+        <p:commandButton id="confirmBtn" action="#{productRateSummaryView.actionConfirmProductCategoryTaxCode(main)}" value="#{lang.confirm}" 
+                         styleClass="btn btn-primary"  oncomplete="handleComplete(xhr, status, args)"
+                         rendered="#{productRateSummaryView.renderConfirmButton and (userRuntimeView.privilege.modify==true)}">        
+          <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+        </p:commandButton>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="list">      
+      <p:dataTable id="productRateSummaryTable" var="row" widgetVar="productRateSummaryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{productRateSummaryView.productRateSummaryList}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('productRateSummaryWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+
+        <p:column sortBy="#{row.productName}" filterBy="#{row.productName}" >
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" />
+        </p:column>        
+
+        <p:column sortBy="#{row.batchNo}" filterBy="#{row.batchNo}">
+          <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.expiryDateActual}" filterBy="#{row.expiryDateActual}" >
+          <f:facet name="header"><h:outputText value="#{lang.expiryDateActual}" title="#{lang.expiryDateActual}"/></f:facet>
+          <h:outputText value="#{appView.date(row.expiryDateActual)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.valueMrp}" filterBy="#{row.valueMrp}" >
+          <f:facet name="header"><h:outputText value="#{lang.valueMrp}" title="#{lang.valueMrp}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueMrp)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.actualPtr}" filterBy="#{row.actualPtr}">
+          <f:facet name="header"><h:outputText value="#{lang.actualPtr}" title="#{lang.actualPtr}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.actualPtr)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.actualPts}" filterBy="#{row.actualPts}" >
+          <f:facet name="header"><h:outputText value="#{lang.actualPts}" title="#{lang.actualPts}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.actualPts)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.newPtr}" filterBy="#{row.newPtr}" >
+          <f:facet name="header"><h:outputText value="#{lang.newform} #{lang.ptr}" title="#{lang.ptr}"/></f:facet>
+          <h:outputText value="#{row.newPtr eq 0 ? 'N/A' : appView.decimal(row.newPtr)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{row.newPts}" filterBy="#{row.newPts}" >
+          <f:facet name="header"><h:outputText value="#{lang.newform} #{lang.pts}" title="#{lang.pts}"/></f:facet>
+          <h:outputText value="#{row.newPts eq 0 ? 'N/A' : appView.decimal(row.newPts)}" escape="false" />
+        </p:column>
+      </p:dataTable>
+
+      <p:dialog id="dlgProductCat" widgetVar="dlgProductCatVar" header="Warning" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="#{lang.productCatAlterMsg}"  escape="false" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">          
+          <p:commandButton type="button" value="#{lang.cancel}" styleClass="btn btn-info" onclick="PF('dlgProductCatVar').hide();" />
+          <p:commandButton id="confirmBtn1" action="#{productRateSummaryView.updateProductCategoryTaxCode(main)}" value="#{lang.confirm}" 
+                           styleClass="btn btn-primary" oncomplete="PF('dlgProductCatVar').hide();" >            
+          </p:commandButton>
+        </div>
+      </p:dialog>
+
+      <p:dialog id="dlgProductCatModify" widgetVar="dlgProductCatModifyVar" header="Warning" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="#{lang.confirmMessage}"  escape="false" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">          
+          <p:commandButton type="button" value="#{lang.cancel}" styleClass="btn btn-info" onclick="PF('dlgProductCatModifyVar').hide();" />
+          <p:commandButton id="confirmBtn2" action="#{productRateSummaryView.updateProductCategoryTaxCode(main)}" value="#{lang.confirm}" 
+                           styleClass="btn btn-primary" >
+          </p:commandButton>
+        </div>
+      </p:dialog>
+
+      <script>
+        //<![CDATA[
+        function handleComplete(xhr, status, args) {
+          if (args.productCount > 0) {
+            PF('dlgProductCatVar').show();
+          }
+        }
+
+        //]]>
+      </script>
+
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

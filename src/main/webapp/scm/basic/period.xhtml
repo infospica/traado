@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{periodView.switchPeriod(main, viewType)}
+ 
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.period}" />
+    <ui:param name="ids" value="period" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{periodView.deletePeriod(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('periodWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{periodView.clonePeriod(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{periodView.deletePeriod(main)}" value="#{lang.delete}" onclick="wdgOff('periodWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{periodView.savePeriod(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{periodView.period.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.days}" for="days" />
+      <h:panelGroup>
+        <p:inputNumber value="#{periodView.period.days}" converterMessage="#{lang.days} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" 
+                       minValue="0" maxlength="10" required="true" requiredMessage="#{lang.days} #{lang.isRequired}" id="days" />
+        <p:message for="days" display="text"/>
+      </h:panelGroup>        
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(periodView.period.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(periodView.period.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(periodView.period.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(periodView.period.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>    
+
+    <ui:define name="list">
+      <p:dataTable id="periodTable" var="periodVar" widgetVar="periodWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{periodView.periodLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{periodVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{periodView.periodSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />        
+        <p:column  sortBy="#{periodVar.title}" field="title">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+            <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(periodVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{periodView.period}" value="#{periodVar}" />
+          </p:commandLink>          
+        </p:column>
+        <p:column  sortBy="#{periodVar.days}" field="days">
+          <f:facet name="header"><h:outputText value="#{lang.days}" title="#{lang.days}"/></f:facet>
+          <h:outputText value="#{appView.number(periodVar.days)}" escape="false" />
+        </p:column>        
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(periodVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(periodVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(periodVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(periodVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(periodVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

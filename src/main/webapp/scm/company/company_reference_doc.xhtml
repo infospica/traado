@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{companyReferenceDocView.switchCompanyReferenceDoc(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{companyReferenceDocView.companyReferenceDoc.companyReferenceId.companyId.companyName} / #{companyReferenceDocView.parent.referenceTitle} / #{main.isEdit() ? companyReferenceDocView.companyReferenceDoc.documentTitle :lang.documents} " />
+   <!--<ui:param name="labelOnly" value="#{true}" />-->
+    <ui:param name="ids" value="companyReferenceDoc" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{companyReferenceDocView.deleteCompanyReferenceDoc(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('companyReferenceDocWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{companyReferenceDocView.cloneCompanyReferenceDoc(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{companyReferenceDocView.deleteCompanyReferenceDoc(main)}" value="#{lang.delete}" onclick="wdgOff('companyReferenceDocWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{companyReferenceDocView.saveCompanyReferenceDoc(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+    
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{companyReferenceDocView.companyReferenceDocPopupClose}"                       
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="form">
+      <p:outputLabel value="#{lang.title}" for="documentTitle" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyReferenceDocView.companyReferenceDoc.documentTitle}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="documentTitle" />
+        <p:message for="documentTitle" display="text"/>
+      </h:panelGroup>            
+
+      <p:outputLabel value="#{lang.documentPath}" for="documentPath" />
+      <h:panelGroup id="documentPathPart">
+        <h:inputFile value="#{companyReferenceDocView.documentPathPart}"  maxlength="200" id="documentPath"/>
+        <p:commandButton rendered="#{not empty companyReferenceDocView.companyReferenceDoc.documentFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this" oncomplete="hide('documentPathLink')" update="documentPathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{companyReferenceDocView.documentPathPart}" value="#{appIo.getRemoveFile()}" />
+        </p:commandButton><p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(companyReferenceDocView.companyReferenceDoc.documentFilePath)}" ajax="false" id="documentPathLink" class="ignoreLoad" >
+          <p:fileDownload value="#{appIo.downloadPrivate(companyReferenceDocView.companyReferenceDoc.documentFilePath)}" />
+        </p:commandLink><p:message for="documentPath" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="companyReferenceDocTable" var="companyReferenceDocVar" widgetVar="companyReferenceDocWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{companyReferenceDocView.companyReferenceDocLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{companyReferenceDocVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{companyReferenceDocView.companyReferenceDocSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.referenceTitle}" sortBy="#{companyReferenceDocVar.companyReferenceId.referenceTitle}" field="company_reference_id.reference_title">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(companyReferenceDocVar.companyReferenceId.referenceTitle)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{companyReferenceDocView.companyReferenceDoc}" value="#{companyReferenceDocVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.documents} #{lang.title}" sortBy="#{companyReferenceDocVar.documentTitle}" field="document_title">
+          <h:outputText value="#{appView.display(companyReferenceDocVar.documentTitle)}" title="#{appView.title(companyReferenceDocVar.documentTitle)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.documentPath}" sortBy="#{companyReferenceDocVar.documentFilePath}" field="document_path">
+          <h:outputText value="#{appView.display(companyReferenceDocVar.documentFilePath)}" title="#{appView.title(companyReferenceDocVar.documentFilePath)}" escape="false" />
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</html>

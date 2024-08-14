@@ -1,0 +1,451 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"  >
+  #{accountGroupView.switchAccountGroup(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{main.isEdit() ? accountGroupView.accountGroup.groupName : lang.accountGroup}" />
+    <ui:param name="ids" value="accountGroup" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" oncomplete="closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountGroupView.deleteAccountGroup(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountGroupWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountGroupView.cloneAccountGroup(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountGroupView.deleteAccountGroup(main)}" value="#{lang.delete}" onclick="wdgOff('accountGroupWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{accountGroupView.saveAccountGroup(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:param name="validateAccounts" value="1" />
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+    <p:remoteCommand name="updateAccount" update="accountListDiv"/>
+    <p:remoteCommand name="updateBrand" update="accountListDiv"/>
+    <ui:define name="form">
+
+      <!-- Group Name -->
+      <p:outputLabel value="#{lang.groupName}" for="groupName" />
+      <h:panelGroup>
+        <p:inputText value="#{accountGroupView.accountGroup.groupName}" maxlength="500" required="true" requiredMessage="#{lang.groupName} #{lang.isRequired}"
+                     id="groupName" styleClass="fw" />
+        <p:message for="groupName" display="text"/>
+      </h:panelGroup>
+
+      <!-- Account -->
+      <p:commandLink actionListener="#{accountGroupView.openAccount()}" process="@this" immediate="true" id="cl1" oncomplete="updateAccount();">
+        <p:outputLabel value="#{lang.account}(s)" for="accountId"/>
+      </p:commandLink>
+      <h:panelGroup id="accountListDiv">
+        <p:autoComplete  multiple="true" value="#{accountGroupView.accountList}" completeMethod="#{accountGroupView.accountByCompanyTradeProfileAuto}"
+                         converter="wawo.LookupIntConverter" cache="true" required="true" requiredMessage="#{lang.account} #{lang.isRequired}"                         
+                         id="accountId" var="e" itemValue="#{e}" itemLabel="#{e.accountCode}" emptyMessage="#{lang.noResult}" dropdown="true"
+                         queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                         style="position: relative" styleClass="fw" unique="true" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>          
+          <p:column>#{e.accountCode} </p:column>
+          <p:column>#{e.accountTitle} </p:column>
+          <p:ajax event="itemSelect" process="accountListDiv" update="brandDiv accountListDiv" />
+          <p:ajax event="itemUnselect" process="accountListDiv" listener="#{accountGroupView.onAccountUnSelect}" update="brandDiv accountListDiv" />
+        </p:autoComplete><p:message for="accountId" display="text" />
+      </h:panelGroup>
+
+      <!-- Invoice Prefix -->
+      <p:outputLabel value="#{lang.groupCode}" for="invoicePrefix" title="Group Code" />
+      <h:panelGroup>
+        <p:inputText value="#{accountGroupView.accountGroup.groupCode}" maxlength="3" required="true" requiredMessage="#{lang.groupCode} #{lang.isRequired}"
+                     id="invoicePrefix" styleClass="fw text-uppercase">
+          <f:validateLength minimum="3"/>
+        </p:inputText>
+        <p:message for="invoicePrefix" display="text"/>
+      </h:panelGroup>
+
+      <!-- Invoice Number Counter -->
+      <p:outputLabel value="#{lang.invoiceNoCounter}" for="docNumberCounter" rendered="#{main.edit}" />
+      <h:panelGroup rendered="#{main.edit}">
+        <p:inputNumber value="#{accountGroupView.accountGroup.accountGroupDocPrefix.docNumberCounter}" converterMessage="#{lang.invoiceNoCounter} #{lang.invalidNumber}"
+                       decimalPlaces="0" required="true" requiredMessage="#{lang.invoiceNoCounter} #{lang.isRequired}"
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="8" id="docNumberCounter" thousandSeparator="" styleClass="fw" placeholder="1" />
+        <p:message for="docNumberCounter" display="text"/>
+      </h:panelGroup>
+
+      <!--padding-->
+      <p:outputLabel value="#{lang.padding}" for="padding" rendered="#{main.edit}" />
+      <h:panelGroup rendered="#{main.edit}">
+        <p:inputNumber value="#{accountGroupView.accountGroup.accountGroupDocPrefix.padding}" converterMessage="#{lang.padding} #{lang.invalidNumber}"
+                       decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" required="true" requiredMessage="#{lang.padding} #{lang.isRequired}"
+                       minValue="0" maxlength="10" id="padding" styleClass="fw" placeholder="4" />
+        <p:message for="padding" display="text"/>
+      </h:panelGroup>
+
+      <!--year Sequence-->
+      <p:outputLabel value="#{lang.yearSequence}" for="yearSequence" rendered="#{main.edit}" />
+      <h:panelGroup id="yearSequenceDiv" rendered="#{main.edit}">
+        <p:selectOneRadio id="yearSequence" value="#{accountGroupView.accountGroup.accountGroupDocPrefix.yearSequence}">
+          <f:selectItem itemLabel="#{lang.none}" itemValue="#{0}" />
+          <f:selectItem itemLabel="#{lang.currentYear}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.financialYear}" itemValue="#{2}" />
+          <p:ajax process="yearSequenceDiv" update="yearPaddingLabel yearPaddingDiv" listener="#{accountGroupView.yearSequenceChangeHandler}"  />
+        </p:selectOneRadio>
+        <p:message for="yearSequence" display="text"/>
+      </h:panelGroup>
+
+      <!-- year Padding -->
+      <h:panelGroup id="yearPaddingLabel" rendered="#{main.edit}">
+        <p:outputLabel value="#{lang.yearPadding}" for="yearPadding" rendered="#{accountGroupView.yearSequence}" />
+      </h:panelGroup>
+      <h:panelGroup id="yearPaddingDiv" rendered="#{main.edit}">
+        <p:selectOneRadio id="yearPadding" value="#{accountGroupView.accountGroup.accountGroupDocPrefix.yearPadding}" rendered="#{accountGroupView.yearSequence}" >
+          <f:selectItem itemLabel="#{lang.twoDigits}" itemValue="#{2}" />
+          <f:selectItem itemLabel="#{lang.fourDigits}" itemValue="#{4}" />
+          <p:ajax update="yearPaddingLabel yearPaddingDiv"  />
+        </p:selectOneRadio>
+        <p:message for="yearPadding" display="text" />
+      </h:panelGroup>
+
+      <!-- Vendor Brands -->
+      <h:panelGroup>
+        <p:commandLink actionListener="#{accountGroupView.openBrand()}" process="@this" immediate="true" oncomplete="updateBrand();">
+          <p:outputLabel value="#{lang.brand}(s)" for="brands"/>
+        </p:commandLink>
+      </h:panelGroup>
+      <h:panelGroup layout="block" id="brandDiv">
+        <p:selectManyCheckbox id="brands" value="#{accountGroupView.brandList}" converter="omnifaces.SelectItemsConverter"
+                              layout="responsive" columns="2"
+                              required="true" requiredMessage="#{lang.brand} #{lang.isRequired}" >
+          <f:selectItems value="#{accountGroupView.lookupVendorBrands(main)}" var="b" itemLabel="#{b.code}" itemValue="#{b}"  />
+        </p:selectManyCheckbox>
+        <p:message for="brands" display="text"/>
+      </h:panelGroup>
+
+      <!-- Service as expense -->
+
+
+
+      <p:outputLabel value="#{lang.sales} #{lang.expense} 1" for="serviceExpense"  />
+      <h:panelGroup layout="block" id="serviceExpenseDiv">
+        <p:selectOneRadio id="serviceExpense" value="#{accountGroupView.accountGroup.serviceAsExpense}" required="true" 
+                          requiredMessage="#{lang.sales} #{lang.expense} 1 #{lang.isRequired}" layout="grid" columns="2"  >
+          <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+          <f:selectItem itemLabel="#{lang.no}" itemValue="0" />  
+          <p:ajax event="valueChange" listener="#{accountGroupView.updateExpenseLedger()}" update="expenseLedgerLabelDiv expenseLedgerDIV"  />
+        </p:selectOneRadio>
+      </h:panelGroup>
+
+      <!-- Expense Ledger -->
+      <h:panelGroup id="expenseLedgerLabelDiv">
+        <p:commandLink id="cl2" actionListener="#{popUpView.openSalesExpenseLedger()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+          <p:outputLabel value="#{lang.sales} #{lang.expense} 1 #{lang.ledger}"  for="selectLedgerId" rendered="#{accountGroupView.accountGroup.serviceAsExpense eq 1}" />
+        </p:commandLink>
+      </h:panelGroup>
+      <h:panelGroup layout="block" id="expenseLedgerDIV"  >                
+        <p:autoComplete  value="#{accountGroupView.accountGroup.expenseLedgerId}" tabindex="1" completeMethod="#{accountGroupView.salesExpenseLedgerAuto}"
+                         rendered="#{accountGroupView.accountGroup.serviceAsExpense eq 1}" converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.sales} #{lang.expense} #{lang.ledger} #{lang.isRequired}" 
+                         id="selectLedgerId" var="sel" itemValue="#{sel}" itemLabel="#{sel.title}" autocomplete="off" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="99"
+                         converterMessage="#{lang.invalidSelection}" forceSelection="false" styleClass="fw" dynamic="true" dropdownMode="true" dropdown="true">
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}" />
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}" />
+
+        </p:autoComplete>
+        <p:message for="selectLedgerId" display="text" />
+      </h:panelGroup>
+
+      <!-- Service 2 as expense -->
+
+      <p:outputLabel value="#{lang.sales} #{lang.expense} 2" for="serviceExpense2"  />
+      <h:panelGroup layout="block" id="serviceExpense2Div">
+        <p:selectOneRadio id="serviceExpense2" value="#{accountGroupView.accountGroup.service2Enabled}" required="true" 
+                          requiredMessage="#{lang.sales} #{lang.expense} 2 #{lang.isRequired}" layout="grid" columns="2"  >
+          <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+          <f:selectItem itemLabel="#{lang.no}" itemValue="0" />  
+          <p:ajax event="valueChange" listener="#{accountGroupView.updateExpenseLedger2()}" update="expenseLedger2LabelDiv expenseLedger2DIV"  />
+        </p:selectOneRadio>
+      </h:panelGroup>
+
+      <!-- Expense Ledger -->
+      <h:panelGroup id="expenseLedger2LabelDiv">
+        <p:commandLink id="cl2service" actionListener="#{popUpView.openSalesExpenseLedger2()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+          <p:outputLabel value="#{lang.sales} #{lang.expense} 2 #{lang.ledger}"  for="selectLedger2Id" rendered="#{accountGroupView.accountGroup.service2Enabled eq 1}" />
+        </p:commandLink>
+      </h:panelGroup>
+      <h:panelGroup layout="block" id="expenseLedger2DIV"  >                
+        <p:autoComplete  value="#{accountGroupView.accountGroup.service2LedgerId}" tabindex="1" completeMethod="#{accountGroupView.salesExpenseLedgerAuto}"
+                         rendered="#{accountGroupView.accountGroup.service2Enabled eq 1}" converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.sales} #{lang.expense} #{lang.ledger} #{lang.isRequired}" 
+                         id="selectLedger2Id" var="sel" itemValue="#{sel}" itemLabel="#{sel.title}" autocomplete="off" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="99"
+                         converterMessage="#{lang.invalidSelection}" forceSelection="false" styleClass="fw" dynamic="true" dropdownMode="true" dropdown="true">
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}" />
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}" />
+
+        </p:autoComplete>
+        <p:message for="selectLedger2Id" display="text" />
+      </h:panelGroup>
+
+      <!-- Note -->
+      <p:outputLabel value="#{lang.note}" for="note" />
+      <h:panelGroup>
+        <p:inputTextarea value="#{accountGroupView.accountGroup.note}" cols="100" rows="2" styleClass="fw" maxlength="1000" id="note" autoResize="false" />
+        <p:message for="note" display="text"/>
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="accountGroupStatusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{accountGroupView.accountGroup.statusId}"  required="true" requiredMessage="#{lang.accountGroupStatusId} #{lang.isRequired}"
+                         id="accountGroupStatusId" converter="omnifaces.SelectItemsConverter" styleClass="fw">
+          <f:selectItems value="#{scmLookupView.status(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu>
+        <p:message for="accountGroupStatusId" display="text" />
+      </h:panelGroup>
+
+      <!--       Sort Order
+            <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+            <h:panelGroup>
+              <p:inputNumber value="#{accountGroupView.accountGroup.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
+                            onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" />
+              <p:message for="sortOrder" display="text"/>
+            </h:panelGroup>      -->
+
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+
+      <h:panelGroup layout="block" styleClass="row">
+
+        <!-- Sale Prefix -->
+        <h:panelGroup layout="block" styleClass="col-md-6">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{main.isEdit()}" />
+            <ui:param name="label" value="#{lang.sales} #{lang.prefix} / #{lang.group}" />
+            <ui:define name="menuleft">
+              <p:remoteCommand name="accountGroupListReturned" actionListener="#{accountView.accountGroupDocPrefixReturned()}"
+                               update=""
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="accountGrpTable" var="accountGrpDocPrefixVar" widgetVar="accountGrpWidget" value="#{accountGroupView.getSalesAccountGroupDocPrefix(main)}"
+                         rowHover="true" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+
+              <p:column headerText="#{lang.prefix}" sortBy="#{accountGrpDocPrefixVar.docPrefix}" field="name">
+                <p:commandLink action="#{accountView.accountGroupDocPrefixEditDialog(accountGrpDocPrefixVar.id)}"
+                               value="#{appView.display(accountGrpDocPrefixVar.docPrefix)}" process="@this" immediate="true"
+                               title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column headerText="#{lang.prefixType}">
+                <h:outputText value="#{accountGrpDocPrefixVar.prefixTypeId.title}" escape="false" />
+              </p:column>
+              <p:column headerText="#{lang.sequence}" style="text-align: right">
+                <h:outputText value="#{appView.number(accountGrpDocPrefixVar.docNumberCounter)}" escape="false" />
+              </p:column>
+            </p:dataTable>
+            <p:remoteCommand name="accountGroupPriceListReturned" actionListener="#{accountView.accountGroupDocPrefixDialogReturn}"
+                             update="accountGrpPriceListTable"  process="@this" immediate="true" />
+          </ui:decorate>
+        </h:panelGroup>
+
+        <!-- Purchase Prefix -->
+        <h:panelGroup layout="block" styleClass="col-md-6">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{main.isEdit()}" />
+            <ui:param name="label" value="#{lang.purchase} #{lang.prefix} / #{lang.group}" />
+            <ui:define name="menuleft">
+              <p:remoteCommand name="accountGroupListReturned" actionListener="#{accountView.accountGroupDocPrefixReturned()}"
+                               update=""
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="accountGrpPurchaseTable" var="accountGrpDocPrefixVar" widgetVar="accountGrpWidget" value="#{accountGroupView.getPurchaseAccountGroupDocPrefix(main)}"
+                         rowHover="true" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+
+              <p:column headerText="#{lang.prefix}" sortBy="#{accountGrpDocPrefixVar.docPrefix}" field="name">
+                <p:commandLink action="#{accountView.accountGroupDocPrefixEditDialog(accountGrpDocPrefixVar.id)}"
+                               value="#{appView.display(accountGrpDocPrefixVar.docPrefix)}" process="@this" immediate="true"
+                               title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column headerText="#{lang.prefixType}">
+                <h:outputText value="#{accountGrpDocPrefixVar.prefixTypeId.title}" escape="false" />
+              </p:column>
+              <p:column headerText="#{lang.sequence}" style="text-align: right">
+                <h:outputText value="#{appView.number(accountGrpDocPrefixVar.docNumberCounter)}" escape="false" />
+              </p:column>
+            </p:dataTable>
+            <p:remoteCommand name="accountGroupPriceListReturned" actionListener="#{accountView.accountGroupDocPrefixDialogReturn}"
+                             update="accountGrpPriceListTable"  process="@this" immediate="true" />
+          </ui:decorate>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" styleClass="col-md-6">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{main.isEdit()}" />
+            <ui:param name="label" value="#{lang.debit} / #{lang.credit}" />
+
+            <p:dataTable id="debitCreditTable" var="debitCreditVar" widgetVar="purchasePrefixDebitCreditWidget" value="#{accountGroupView.getAccountGroupDocDebitCreditList(main)}"
+                         rowHover="true" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+
+              <p:column headerText="#{lang.prefix}" sortBy="#{purchasePrefixDebitCreditVar.docPrefix}" field="debitCredit">
+                <p:commandLink action="#{accountView.accountDebitCreditEditDialog(debitCreditVar.id)}"
+                               value="#{appView.display(debitCreditVar.docPrefix)}" process="@this" immediate="true"
+                               title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column headerText="#{lang.prefixType}">
+                <h:outputText value="#{appView.display(debitCreditVar.prefixTypeId.title)}" escape="false" />
+
+              </p:column>
+              <p:column headerText="#{lang.sequence}"  style="text-align: right">
+                <h:outputText value="#{appView.number(debitCreditVar.docNumberCounter)}" escape="false" />
+              </p:column>
+            </p:dataTable>
+
+            <p:remoteCommand name="debitCreditReturned" actionListener="#{accountView.accountGroupDocDebitCreditListReturned()}"
+                             update="debitCreditTable"  process="@this" immediate="true" />
+          </ui:decorate>
+        </h:panelGroup>
+
+        <!-- price list -->
+        <h:panelGroup layout="block" styleClass="col-md-6">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{main.isEdit()}" />
+            <ui:param name="label" value="#{lang.priceList}" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{accountGroupView.addNewAccountGroup()}" title="#{lang.add}" process="@this" immediate="true"
+                               icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"
+                               rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}" update="accountGrpPriceListTable"
+                               oncomplete="jQuery('.ui-datatable-data tr').first().find('span.ui-icon-pencil').each(function(){jQuery(this).click()});">
+              </p:commandButton>
+            </ui:define>
+            <p:dataTable id="accountGrpPriceListTable" var="accountGrpPriceVar" widgetVar="accountGrpPriceWidget"
+                         value="#{accountGroupView.getAccountGroupPriceList(main)}" editable="true"
+                         rowHover="false" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+              <p:ajax event="rowEdit" listener="#{accountGroupView.onAccountGroupPriceListRowEdit}" update="@this" />
+
+
+              <p:column headerText="#{lang.name}" sortBy="#{accountGrpPriceVar.title}" field="name">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{appView.display(accountGrpPriceVar.title)}" title="#{appView.title(accountGrpPriceVar.title)}" escape="false" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:inputText value="#{accountGrpPriceVar.title}" required="true" requiredMessage="" style="width:100%" />
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="#{lang.variation} #{lang.percentageSymbol}" sortBy="#{accountGrpPriceVar.variationPercentage}" field="name">
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{accountGrpPriceVar.variationPercentage} #{lang.percentageSymbol}" escape="false" />
+                  </f:facet>r
+                  <f:facet name="input">
+                    <h:outputText value="NA" title="Not Applicable" escape="false" rendered="#{accountGrpPriceVar.isDefault eq 1}" />
+                    <p:inputNumber value="#{accountGrpPriceVar.variationPercentage}" converterMessage="#{lang.variationPercentage} #{lang.invalidNumber}"
+                                   decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="p"
+                                   rendered="#{accountGrpPriceVar.isDefault ne 1}" maxlength="5" id="variationPercentage" styleClass="fw"/>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <p:column headerText="" styleClass="C" style="width:150px;">
+                <p:rowEditor id="editRow"/>
+              </p:column>
+
+              <p:column headerText="#{lang.action}">
+                <p:commandButton value="" icon="fa fa-eye"  action="#{accountGroupView.defaultProductPriceListFormDialog(accountGrpPriceVar)}" process="@this"
+                                 immediate="true" title="#{lang.priceList}" rendered="#{accountGrpPriceVar.id ne null}">
+                </p:commandButton>
+                <p:commandButton process="@this" value="" tabindex="-1" icon="fa fa-trash" update="accountGrpPriceListTable"
+                                 rendered="#{accountGrpPriceVar.isDefault ne 1}"
+                                 actionListener="#{accountGroupView.actionDeletePriceList(main, accountGrpPriceVar)}">
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </h:panelGroup>
+
+      </h:panelGroup>
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(accountGroupView.accountGroup.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(accountGroupView.accountGroup.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(accountGroupView.accountGroup.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(accountGroupView.accountGroup.modifiedAt)}</ui:define>
+      </ui:decorate>
+
+      <h:panelGroup layout="block" styleClass="row">
+        <h:panelGroup layout="block" styleClass="col-md-6">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{main.isEdit()}" />
+            <ui:param name="label" value="#{lang.decimalPrecision}" />
+            <ui:param name="ids" value="decimalPrecision" />
+            <p:fragment id ="decimalPrecisionDiv">    
+              <div style="padding-left: 20px;padding-bottom: 20px;">
+                <h:panelGrid columns="2">
+                  <h:panelGroup>
+                    <h:outputText value="#{lang.decimalPrecisionSales}" />
+                  </h:panelGroup>
+                  <h:panelGroup>
+                    <p:selectOneMenu value="#{accountGroupView.accountGroup.customerDecimalPrecision}"  id="customerDecimalPrecision" styleClass="fw">
+                      <f:selectItem itemLabel="2" itemValue="#{2}" />
+                      <f:selectItem itemValue="#{3}" itemLabel="3" />
+                      <f:selectItem itemValue="#{4}" itemLabel="4" />
+                      <p:ajax process="@this" immediate="true" />
+                    </p:selectOneMenu>
+                  </h:panelGroup>  
+
+                </h:panelGrid>
+              </div>
+            </p:fragment>
+          </ui:decorate>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="accountGroupTable" var="accountGroupVar" widgetVar="accountGroupWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{accountGroupView.accountGroupLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountGroupVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{accountGroupView.accountGroupSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column  sortBy="#{accountGroupVar.groupName}" field="group_name">
+          <f:facet name="header"><h:outputText value="#{lang.groupName}" title="#{lang.groupName}"/></f:facet>          
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(accountGroupVar.groupName)}" process="@this" update="f1" immediate="true"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{accountGroupView.accountGroup}" value="#{accountGroupVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column  sortBy="#{accountGroupVar.groupCode}" field="group_code">
+          <f:facet name="header"><h:outputText value="#{lang.groupCode}" title="#{lang.groupCode}"/></f:facet>
+          <h:outputText  value="#{appView.display(accountGroupVar.groupCode)}" title="#{appView.title(accountGroupVar.groupCode)}" escape="false" />          
+        </p:column>
+
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(accountGroupVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountGroupVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountGroupVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountGroupVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(accountGroupVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>      
+    </ui:define>
+  </ui:decorate>
+  <script>
+    function setEdit(id) {
+      $('#' + id + '\\:0\\:editRow > .ui-icon-pencil').trigger('click');
+    }
+  </script>
+</ui:composition>

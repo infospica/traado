@@ -1,0 +1,205 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  #{stockExcessView.switchStockExcess(main, viewType)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.stock} #{lang.excess}"/>
+    <ui:param name="ids" value="stockExcess"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="testST" onkeyup="return callDtFilter(this.value, 'stockExcess');"  placeholder="#{lang.search}"/>
+
+
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <h:panelGroup id="panelGroup">
+        <table>
+          <tr>
+            <td>
+              <p:commandButton oncomplete="return stockSaleableConfirmPopup(xhr, status, args);" process="entryDate" update="panelGroup" iconPos="left" 
+                               styleClass="btn btn-primary" value="#{lang.moveToSaleable}">
+              </p:commandButton>
+
+              <p:commandButton oncomplete="return stockFlushoutConfirmPopup(xhr, status, args);" process="entryDate" update="panelGroup" iconPos="left" 
+                               styleClass="btn btn-primary" value="#{lang.flushOut}" >        
+              </p:commandButton></td>
+            <td>
+              <p:outputLabel value="#{lang.entryDate}" for="entryDate" style="padding-left: 15px;" /></td>
+            <td>
+              <p:calendar value="#{stockExcessView.stockAdjustment.entryDate}" pattern="#{lang.datePattern}" inputStyleClass="w-100"
+                          required="true" validator="#{sysRuntimeView.dateLteToday}" id="entryDate" disabled="true"
+                          converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}" requiredMessage="#{lang.entryDate} #{lang.isRequired}" 
+                          maxlength="29" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}">
+              </p:calendar></td>
+            <tr>
+              <td></td>
+              <td></td>
+              <td><p:message for="entryDate" display="text" /></td>
+            </tr>
+          </tr>
+        </table>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+
+      <h:panelGroup layout="block" id="excessTableDiv">
+        <p:dataTable id="stockExcessTable" var="row" widgetVar="stockExcessWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{stockExcessView.stockExcessList}" rows="50" rowKey="#{row.productDetailId}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" selection="#{stockExcessView.selectedStockExcess}"
+                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+          <f:facet name="header">
+            <p:outputPanel styleClass="hidden" >
+              <p:inputText id="globalFilter"  onkeyup="return PF('stockExcessWidget').filter()" />
+            </p:outputPanel>
+          </f:facet>
+
+          <p:column selectionMode="multiple" exportable="false" />
+
+          <p:column sortBy="#{row.productName}" filterBy="#{row.productName}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+            <h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.batchNo}" filterBy="#{row.batchNo}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+            <h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.expiryDateActual}" filterBy="#{row.expiryDateActual}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.expiryDateActual}" title="#{lang.expiryDateActual}"/></f:facet>
+            <h:outputText value="#{appView.date(row.expiryDateActual)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.packSize}" filterBy="#{row.packSize}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.packSize}" title="#{lang.packSize}"/></f:facet>
+            <h:outputText value="#{appView.display(row.packSize)}" title="#{appView.title(row.packSize)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.mrpValue}" filterBy="#{row.mrpValue}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.mrpValue}" title="#{lang.mrpValue}"/></f:facet>
+            <h:outputText value="#{appView.decimal(row.mrpValue)}" title="#{appView.title(row.mrpValue)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.valuePts}" filterBy="#{row.valuePts}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+            <h:outputText value="#{appView.decimal(row.valuePts)}" title="#{appView.title(row.valuePts)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.purchaseInvoiceNo}" filterBy="#{row.purchaseInvoiceNo}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.purchaseInvoiceNo}" title="#{lang.purchaseInvoiceNo}"/></f:facet>
+            <h:outputText value="#{appView.display(row.purchaseInvoiceNo)}" title="#{appView.title(row.purchaseInvoiceNo)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.purchaseInvoiceDate}" filterBy="#{row.purchaseInvoiceDate}" filterStyleClass="hidden" >
+            <f:facet name="header"><h:outputText value="#{lang.purchaseInvoiceDate}" title="#{lang.purchaseInvoiceDate}"/></f:facet>
+            <h:outputText value="#{appView.date(row.purchaseInvoiceDate)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{row.quantityExcess}" filterBy="#{row.quantityExcess}" filterStyleClass="hidden" style="text-align: right" >
+            <f:facet name="header"><h:outputText value="#{lang.excess} #{lang.qty}" title="#{lang.excess} #{lang.qty}"/></f:facet>
+            <h:outputText value="#{appView.number(row.quantityExcess)}" escape="false" />
+          </p:column>
+
+          <p:column filterStyleClass="hidden" style="text-align: right" id="saleableQty" >
+            <f:facet name="header"><h:outputText value="#{lang.saleableQty}" title="#{lang.saleableQuantity}"/></f:facet>
+            <p:inputNumber value="#{row.saleableQty}" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{row.quantityExcess eq null ? 0: row.quantityExcess}" minValue="0" decimalPlaces="0"  >
+              <p:ajax event="blur" update="saleableQty" process="@this" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--          <p:column>
+                      <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+                      <p:calendar value="#{row.entryDate}" pattern="#{lang.datePattern}" inputStyleClass="w-100"
+                                  required="true" validator="#{sysRuntimeView.dateLteToday}" placeholder="Entry Date"
+                                  converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                                  maxlength="29" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}"/>
+                    </p:column>-->
+
+        </p:dataTable>
+
+
+
+        <p:dialog widgetVar="emptyTable" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+          <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+          <p:commandButton value="#{lang.btnOk}" onclick="wdgOff('emptyTable')" type="button" title="#{lang.btnYes}" />
+        </p:dialog>
+
+        <p:dialog id="stkConfirmDlg" widgetVar="stkConfirmDlgVar" header="#{lang.confirm} #{lang.stockMovement}" resizable="false" showEffect="clip"
+                  hideEffect="clip" closeOnEscape="true" modal="true">
+          <h:outputText value="#{lang.productEntryConfirm}" />
+          <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+            <p:commandButton action="#{stockExcessView.actionAdjustExcessStock(main)}" process="excessTableDiv" update="f1" value="#{lang.yes}" styleClass="btn btn-info" 
+                             oncomplete="PF('stkConfirmDlgVar').hide();"/>
+            <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('stkConfirmDlgVar').hide();" />
+          </div>
+        </p:dialog>
+
+      </h:panelGroup>
+
+      <p:dialog id="stkfoutConfirmDlg" widgetVar="stkfoutConfirmDlgVar" header="#{lang.confirm} #{lang.flushOut}" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="#{lang.productEntryConfirm}"  />
+        <h:panelGrid columns="2" id="noteDiv">
+
+          <p:outputLabel for="enote" value="#{lang.note}" />
+          <h:panelGroup>
+            <p:inputTextarea required="true" requiredMessage="#{lang.note} #{lang.isRequired}"
+                             value="#{stockExcessView.note}" cols="50" rows="3" maxlength="2000" id="enote"
+                             autoResize="false" styleClass="fw" />
+          </h:panelGroup>
+        </h:panelGrid>
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <p:commandButton action="#{stockExcessView.actionFlushOutExcessStock(main)}" process="f1" update="f1" 
+                           value="#{lang.yes}" styleClass="btn btn-info" />
+          <p:commandButton type="button" immediate="true" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('stkfoutConfirmDlgVar').hide();" />
+        </div>
+      </p:dialog>
+
+
+
+      <script>
+        //<![CDATA[
+        function stockSaleableConfirmPopup(xhr, status, args) {
+          if (!args.validationFailed) {
+            console.log('Validation success');
+            var rowcount = PF('stockExcessWidget').getSelectedRowsCount();
+            if (rowcount === '' || rowcount === 0) {
+              PF('emptyTable').show();
+              return false;
+            }
+            PF('stkConfirmDlgVar').show();
+          }
+        }
+
+        function stockFlushoutConfirmPopup(xhr, status, args) {
+          if (!args.validationFailed) {
+            var rowcount = PF('stockExcessWidget').getSelectedRowsCount();
+            if (rowcount === '' || rowcount === 0) {
+              PF('emptyTable').show();
+              return false;
+            }
+            PF('stkfoutConfirmDlgVar').show();
+          }
+        }
+        //]]>
+      </script>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,574 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:f="http://xmlns.jcp.org/jsf/core" 
+                xmlns:h="http://xmlns.jcp.org/jsf/html" 
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions" >
+  #{companyDashboardView.init(main)}
+
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSTEMCONSTANT"/>    
+  <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />    
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.dashboard}" />
+    <!--<ui:param name="navLabel" value="#{userRuntimeView.account.accountTitle}" />-->
+    <ui:define name="toolList"></ui:define>
+    <ui:define name="navRight">      
+      <table>
+        <tr>
+          <td>
+            <h:panelGroup>
+              <p:selectCheckboxMenu id="multiple" value="#{companyDashboardView.selectedChartItems}" label="Bar Chart"
+                                    filter="false" panelStyle="width:250px"  >
+                <f:selectItems value="#{companyDashboardView.chartItems}" />
+                <p:ajax event="toggleSelect"  process="@this" partialSubmit="true" update="barChartFragment" />
+                <p:ajax event="change" update="barChartFragment"  />
+              </p:selectCheckboxMenu>
+            </h:panelGroup>
+          </td>
+          <td>
+            <h:panelGroup id="accountGroupDiv" rendered="true">
+              <p:autoComplete id='accountGroup'  value="#{companyDashboardView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" 
+                              converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                              
+                              title="#{lang.accountGroup}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+                <p:column style="width:250px;">
+                  <h:outputText value="#{e.groupName}" />
+                </p:column>
+                <p:column style="width: 40px;">
+                  <h:outputText value="#{e.groupCode}" />
+                </p:column>
+                <p:column style="width: 50px;">
+                  <p:fragment rendered="#{e.isDefault eq 0}">
+                    <i class="fa fa-users" style="color:#000;"></i>
+                  </p:fragment>
+                  <p:fragment rendered="#{e.isDefault eq 1}">
+                    <i class="fa fa-users" style="color:#CCC;" ></i>
+                  </p:fragment>
+                </p:column>
+                <p:ajax event="itemSelect" process="accountGroupDiv" update="accountDiv barChartFragment" listener="#{companyDashboardView.accountGroupSelectEvent}"/>
+              </p:autoComplete>                
+            </h:panelGroup>  
+          </td>
+          <td>
+            <h:panelGroup id="accountDiv" >
+              <p:autoComplete id='account'  value="#{companyDashboardView.filterParameters.account}" completeMethod="#{companyDashboardView.accountAuto}" converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                              title="#{lang.accountNumber}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+                <p:column style="width: 200px;">
+                  <h:outputText value="#{e.vendorId.vendorName}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountCode}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.companyTradeProfileId.title}" />
+                </p:column>
+                <p:ajax event="itemSelect" immediate="true" process=" @this accountGroupDiv" update="barChartFragment" />
+              </p:autoComplete>
+            </h:panelGroup>
+          </td>
+          <td>
+            <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times" iconPos="right"/>
+          </td>
+        </tr>
+      </table>
+    </ui:define>
+    <div style="height:100%;width:100%">
+      <ui:define name="after">  
+        <p:importConstants type="spica.sys.SystemConstants" var="SYSTEMCONSTANT"/>  
+        <p:importConstants type="spica.sys.FileConstant" var="FILE_CONSTANT"/>
+
+        <table style="width:100%;" >
+          <tr>
+
+            <td style="width:100%;" valign="top" align="left" >
+
+              <div class="popupMegaMenu" id="popupMegaMenu" style="background:transparent;">
+                <div class="popContent">
+                  <ul class="menu m-t-20 grid-2">
+                    <h:panelGroup  layout="block" styleClass="card"  >                  
+                      <table style="width:100%;" >
+                        <tr>
+                          <td colspan="2" align="left" >                            
+                            <h:panelGroup id="select" styleClass="L" >                              
+                              <p:fragment id="buttonGroup">         
+                                <p:selectOneMenu value="#{companyDashboardView.filterParameters.filterType}">
+                                  <f:selectItem itemLabel="Today" itemValue="#{SYSTEMCONSTANT.TODAY}" />
+                                  <f:selectItem itemLabel="Yesterday" itemValue="#{SYSTEMCONSTANT.YESTERDAY}"  />
+                                  <f:selectItem itemLabel="Last 7 days" itemValue="#{SYSTEMCONSTANT.LAST_7DAYS}" />
+                                  <f:selectItem itemLabel="Last Month" itemValue="#{SYSTEMCONSTANT.LAST_MONTH}" />
+                                  <f:selectItem itemLabel="Current Month" itemValue="#{SYSTEMCONSTANT.CURRENT_MONTH}" />
+                                  <f:selectItem itemLabel="Current Year" itemValue="#{SYSTEMCONSTANT.CURRENT_YEAR}" />
+                                  <f:selectItem itemLabel="Previous Year" itemValue="#{SYSTEMCONSTANT.PREVIOUS_YEAR}" />
+                                  <f:selectItem itemLabel="Current Financial Year" itemValue="#{SYSTEMCONSTANT.CURRENT_FINANCIAL_YEAR}" />
+                                  <f:selectItem itemLabel="Previous Financial Year" itemValue="#{SYSTEMCONSTANT.PREVIOUS_FINANCIAL_YEAR}" />
+                                  <f:selectItem itemLabel="Custom" itemValue="#{SYSTEMCONSTANT.CUSTOM_DATE}" />
+                                  <p:ajax event="itemSelect" process="@this" listener="#{companyDashboardView.setFilterDate()}" update="navbtn calendarToGroup calendarFromGroup barChartFragment" />
+                                </p:selectOneMenu>
+                              </p:fragment>
+                            </h:panelGroup>
+
+                            <h:panelGroup id="calendarToGroup" styleClass="R" >
+                              <p:calendar id="toDate" value="#{companyDashboardView.filterParameters.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                                          required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"
+                                          converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="3" mindate="#{companyDashboardView.filterParameters.fromDate}"
+                                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  maxdate="#{userRuntimeView.getToday()}" readonly="#{companyDashboardView.calendar}" >
+                                <p:ajax event="dateSelect" process="@this fromDate" update="f1"/>
+                              </p:calendar>
+                              <p:message for="toDate" display="text" id="tmess"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup id="calendarFromGroup" styleClass="R" rendered="#{main.isList()}">                               
+
+                              <p:calendar id="fromDate" value="#{companyDashboardView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                                          required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
+                                          converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="3" 
+                                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}" 
+                                          readonly="#{companyDashboardView.calendar}" >
+                                <p:ajax event="dateSelect" process="@this toDate"  update="f1 "/>
+                              </p:calendar>
+                              <p:message for="fromDate" display="text" id="fmess"/>
+                            </h:panelGroup>
+                            <h:panelGroup id="navbtn" styleClass="R">
+                              <p:commandButton id="backButton" actionListener="#{companyDashboardView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" 
+                                               process="@this" update="fmess calendarFromGroup fromDate toDate barChartFragment" styleClass="btn" rendered="#{companyDashboardView.navbtn}"  />
+                              <p:commandButton id="forwardButton" actionListener="#{companyDashboardView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true"
+                                               process="@this" update="fmess fromDate toDate barChartFragment" styleClass="btn" renderDisabledClick="true" rendered="#{companyDashboardView.navbtn}"  />
+                            </h:panelGroup>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="width:60%;">
+                            <p:fragment id="barChartFragment">
+                              <p:barChart model="#{companyDashboardView.getSalesChartJsBar(main)}" style="width: 90%;" transient="false"  >
+                              </p:barChart>    
+                            </p:fragment>
+                          </td>                      
+                        </tr>
+                      </table>
+                    </h:panelGroup>
+
+                    <h:panelGroup>               
+                      <ul class="menu m-t-20 grid-2">
+                        <h:panelGroup layout="block" >
+                          <li>
+                            <div>
+                              <p:panel class="dashBox" style='border-radius:10px;background-color: #ab47bc;' >
+                                <table style="width:100%;">
+                                  <tr>
+                                    <td><div class="dashHead">  <span >Stock</span> </div></td>
+                                    <td valign="top" align="right">   
+                                      <div class="dashIcon" style="color:#FFECB3;">
+                                        <span><i class="fas fa-boxes" ></i></span>  
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2" style="padding-top:10px;">                              
+                                      <h:panelGrid columns="1" class="fw">
+                                        <h:panelGroup >                                  
+                                          <div class="dashSummary">                                                                 
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Today</td>
+                                                <td align="right">--</td>
+                                              </tr>
+                                            </table>                                                              
+                                          </div>                                 
+                                        </h:panelGroup>
+                                        <!--                                        <h:panelGroup>
+                                                                                  <div class="dashSummary">                               
+                                                                                    <table style="width:100%;">
+                                                                                      <tr>
+                                                                                        <td>Week</td>
+                                                                                        <td align="right">#{appView.decimal(companyDashboardView.outstandingBox.weeklyAmount)}</td>
+                                                                                      </tr>
+                                                                                    </table>
+                                                                                  </div>                                  
+                                                                                </h:panelGroup>
+                                                                                <h:panelGroup>
+                                                                                  <div class="dashSummary">                               
+                                                                                    <table style="width:100%;">
+                                                                                      <tr>
+                                                                                        <td>Month</td>
+                                                                                        <td align="right">#{appView.decimal(companyDashboardView.outstandingBox.monthlyAmount)}</td>
+                                                                                      </tr>
+                                                                                    </table>
+                                                                                  </div>                                  
+                                                                                </h:panelGroup>                                -->
+                                      </h:panelGrid>
+                                    </td>                           
+                                  </tr>
+                                </table>               
+                              </p:panel>
+                            </div>
+                          </li>
+                        </h:panelGroup>
+
+                        <h:panelGroup layout="block" >
+                          <li>
+                            <div>
+                              <p:panel class="dashBox" style='border-radius:10px;background-color: #42A5F5;' >
+                                <table style="width:100%;">
+                                  <tr>
+                                    <td>
+                                      <p:commandLink id="xm"  action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.SALES_INVOICE),list)}" process="@this" update="f1" immediate="true" style="color:#ffffff;margin-left: -10px;" >
+                                        <div class="dashHead">                                         
+                                          <span >#{lang.sales}</span>                                        
+                                        </div>
+                                      </p:commandLink>
+                                    </td>
+                                    <td valign="top" align="right">   
+                                      <div class="dashIcon">
+                                        <span><i class="fa fa-balance-scale" ></i></span>  
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2" style="padding-top:10px;">                              
+                                      <h:panelGrid columns="1" class="fw">
+                                        <h:panelGroup >                                  
+                                          <div class="dashSummary">                                                                 
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Today</td>
+                                                <td align="right">#{appView.decimal(companyDashboardView.salesBox.todaysAmount)}</td>
+                                              </tr>
+                                            </table>                                                              
+                                          </div>                                 
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                          <div class="dashSummary">                               
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Week</td>
+                                                <td align="right">#{appView.decimal(companyDashboardView.salesBox.weeklyAmount)} </td></tr>
+                                            </table>
+                                          </div>                                  
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                          <div class="dashSummary">                               
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Month</td>
+                                                <td align="right">#{appView.decimal(companyDashboardView.salesBox.monthlyAmount)}</td>
+                                              </tr>
+                                            </table>
+                                          </div>                                  
+                                        </h:panelGroup>                                
+                                      </h:panelGrid>
+                                    </td>                           
+                                  </tr>
+                                </table>
+                              </p:panel>
+                            </div>
+                          </li>
+                        </h:panelGroup>
+
+                        <h:panelGroup layout="block" >
+                          <li>
+                            <div>
+                              <p:panel class="dashBox" style='border-radius:10px;' >
+                                <table style="width:100%;">
+                                  <tr>
+                                    <td>
+                                      <p:commandLink  action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.SUPPLIER_OUTSTANDING),list)}" process="@this" update="f1" immediate="true" style="color:#ffffff;margin-left: -10px;" >
+                                        <div class="dashHeadNormal">  <span >#{lang.supplier} #{lang.outstanding}</span>      </div>
+                                      </p:commandLink>
+                                      <div>
+                                        <table style="width:100%;color:#666;">                                      
+                                          <p:repeat value="#{companyDashboardView.topSupplierOutstandingList}" var="so" varStatus="status" >
+                                            <tr class="row">                                            
+                                              <td align="left" style="height:30px;padding-left: 0px;">                                              
+                                                <p:commandLink actionListener="#{popUpView.showLedgerBalance(so.id)}" oncomplete="unblock();" ><h:outputText value="#{so.name.length() gt 35 ? (fn:substring(so.name,0,35)):so.name } #{so.name.length() gt 35 ?'...':''}" title="#{so.name}" /></p:commandLink>
+                                              </td>                                              
+                                              <td align="right" style="padding-right:0px;">#{appView.decimal(so.outstandingAmount)}</td>
+                                            </tr>
+                                          </p:repeat>
+                                        </table>
+                                      </div>
+                                    </td>
+                                    <td valign="top" align="right">   
+                                      <div class="dashIcon" style="color:#FFF8E1;">
+                                        <span></span>  
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </p:panel>
+                            </div>
+                          </li>
+                        </h:panelGroup>                                              
+
+                        <h:panelGroup layout="block" >
+                          <li>
+                            <div>
+                              <p:panel class="dashBox" style='border-radius:10px;background-color: #7caf42;' >
+                                <table style="width:100%;">
+                                  <tr>
+                                    <td><div class="dashHead">  <span >Receipts</span> </div></td>
+                                    <td valign="top" align="right">   
+                                      <div class="dashIcon" style="color:#FFECB3;">
+                                        <span>#{companyDashboardView.getCurrency()}</span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2" style="padding-top:10px;">                              
+                                      <h:panelGrid columns="1" class="fw">
+                                        <h:panelGroup >                                  
+                                          <div class="dashSummary">                                                                 
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Today</td>
+                                                <td align="right">--</td>
+                                              </tr>
+                                            </table>                                                              
+                                          </div>                                 
+                                        </h:panelGroup>
+                                        <!--                                        <h:panelGroup>
+                                                                                  <div class="dashSummary">                               
+                                                                                    <table style="width:100%;">
+                                                                                      <tr>
+                                                                                        <td>Week</td>
+                                                                                        <td align="right">#{appView.decimal(companyDashboardView.outstandingBox.weeklyAmount)}</td>
+                                                                                      </tr>
+                                                                                    </table>
+                                                                                  </div>                                  
+                                                                                </h:panelGroup>
+                                                                                <h:panelGroup>
+                                                                                  <div class="dashSummary">                               
+                                                                                    <table style="width:100%;">
+                                                                                      <tr>
+                                                                                        <td>Month</td>
+                                                                                        <td align="right">#{appView.decimal(companyDashboardView.outstandingBox.monthlyAmount)}</td>
+                                                                                      </tr>
+                                                                                    </table>
+                                                                                  </div>                                  
+                                                                                </h:panelGroup>                                -->
+                                      </h:panelGrid>
+                                    </td>                           
+                                  </tr>
+                                </table> 
+                              </p:panel>
+                            </div>
+                          </li>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" >
+                          <li>
+                            <div>
+                              <p:panel class="dashBox" style='border-radius:10px;background-color: #7E57C2;' >
+                                <table style="width:100%;">
+                                  <tr>
+                                    <td>
+                                      <p:commandLink  action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.PRODUCT_ENTRY_GST_INDIA),list)}" process="@this" update="f1" immediate="true" style="color:#ffffff;margin-left: -10px;" >
+                                        <div class="dashHead">  <span >#{lang.purchase}</span> </div>
+                                      </p:commandLink>
+                                    </td>
+
+                                    <td valign="top" align="right">   
+                                      <div class="dashIcon" style="color:#D1C4E9;">
+                                        <span><i class="fa fa-shopping-cart" ></i></span>  
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2" style="padding-top:10px;">                              
+                                      <h:panelGrid columns="1" class="fw">
+                                        <h:panelGroup >                                  
+                                          <div class="dashSummary">                                                                 
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Today</td>
+                                                <td align="right">#{appView.decimal(companyDashboardView.purchaseBox.todaysAmount)}</td>
+                                              </tr>
+                                            </table>                                                              
+                                          </div>                                 
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                          <div class="dashSummary">                               
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Week</td>
+                                                <td align="right">#{appView.decimal(companyDashboardView.purchaseBox.weeklyAmount)}</td>
+                                              </tr>
+                                            </table>
+                                          </div>                                  
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                          <div class="dashSummary">                               
+                                            <table style="width:100%;">
+                                              <tr>
+                                                <td>Month</td>
+                                                <td align="right">#{appView.decimal(companyDashboardView.purchaseBox.monthlyAmount)}</td>
+                                              </tr>
+                                            </table>
+                                          </div>                                  
+                                        </h:panelGroup>                                
+                                      </h:panelGrid>
+                                    </td>                           
+                                  </tr>
+                                </table>                       
+                              </p:panel>
+                            </div>
+                          </li>
+                        </h:panelGroup>
+
+
+                        <h:panelGroup layout="block" >
+                          <li>
+                            <div>
+                              <p:panel id="coId" class="dashBox" style='border-radius:10px; margin-left:-5px;' >
+                                <table style="width:100%;">
+                                  <tr>
+                                    <td>
+                                      <p:commandLink  action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CUSTOMER_OUTSTANDING),list)}" process="@this" update="f1" immediate="true" style="color:#ffffff;margin-left: -10px;" >
+                                        <div class="dashHeadNormal">  <span >#{lang.customerOutstanding}</span>      </div>
+                                      </p:commandLink>
+                                      <div>
+                                        <table style="width:100%;color:#666;">                                       
+
+                                          <p:repeat value="#{companyDashboardView.topCustomerOutstandingList}" var="co" varStatus="status" >
+                                            <tr class="row">                                            
+                                              <td align="left" style="height:30px;padding-left: 0px;">                                              
+                                                <p:commandLink actionListener="#{popUpView.showLedgerBalance(co.id)}" oncomplete="unblock();">  <h:outputText value="#{co.name.length() gt 35 ? (fn:substring(co.name,0,35)):co.name } #{co.name.length() gt 35 ?'...':''}" title="#{co.name}" /> </p:commandLink>
+                                              </td>                                              
+                                              <td align="right" style="padding-right:0px;">#{appView.decimal(co.outstandingAmount)}</td>
+                                            </tr>
+                                          </p:repeat>
+                                        </table>
+                                      </div> 
+                                    </td>
+                                    <td valign="top" align="right">   
+                                      <div class="dashIcon" style="color:#FFF8E1;">
+                                        <span></span>  
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </p:panel>
+                            </div>
+                          </li>
+                        </h:panelGroup>
+                      </ul>
+                    </h:panelGroup>
+                  </ul>
+                </div>
+                <div class="popContent">
+
+                  <ul class="menu m-t-5 grid-4">
+                    <!--Cheque in Hand-->
+                    <p:panel id="chequeColId"  class="dashBox" >
+                      <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
+                        <f:facet name="header">
+                          <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_IN),list)}" process="@this" update="f1" immediate="true"  >
+                           <i class="fa fa-arrow-left" aria-hidden="true"></i> <h:outputText value=" #{lang.chequeInHand}" title="#{lang.chequeInHand}" />
+                          </p:commandLink>
+                        </f:facet>
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_IN),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeReview.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_IN),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeReview.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_IN),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeReview.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_IN),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque} #{lang.receipt}" title="#{lang.cheque} #{lang.receipt}" />
+                        </p:commandLink>                
+                        <h:outputText value="#{companyDashboardView.chequeReview.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
+                      </p:panelGrid>
+                    </p:panel>
+
+<!--                    <p:panel id="chequePdc"  class="dashBox m-l-10" >
+                      <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
+                        <f:facet name="header">
+                          <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_OUT),list)}" process="@this" update="f1" immediate="true"  >
+                            <h:outputText value="#{lang.chequeIssued}" title="#{lang.chequeIssued}" /> <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                          </p:commandLink>
+                        </f:facet>
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeIssued.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque} #{lang.payment}" title="#{lang.cheque} #{lang.payment}" />
+                        </p:commandLink>                
+                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
+                       </p:panelGrid>
+                    </p:panel>-->
+
+                  </ul>
+
+
+
+
+                </div>
+                <!--Cheque issued-->
+                
+<!--                <div class="popContent">
+
+                  <ul class="menu m-t-5 grid-4">
+                    Cheque in Hand
+                    <p:panel id="chequeIssuedId"  class="dashBox" >
+                      <p:panelGrid columns="2" styleClass="mDataTable noBorder fw">
+                        <f:facet name="header">
+                          <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,accountingConstant.CHEQUE_OUT),list)}" process="@this" update="f1" immediate="true"  >
+                            <h:outputText value="#{lang.chequeIssued}" title="#{lang.chequeIssued}" />
+                          </p:commandLink>
+                        </f:facet>
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUE_TODAY,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.today}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque} #{lang.today}" title="#{lang.cheque} #{lang.today}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeToday}" styleClass="label" style="background-color:#09a77b; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.CHEQUES_OVERDUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque}s #{lang.overdue}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque}s #{lang.overdue}" title="#{lang.cheque}s #{lang.overdue}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeOverDue}" styleClass="label" style="background-color:#fd4921; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.ACCOUNTING_CHEQUE_ENTRY,SYSTEMCONSTANT.UNDATED_CHEQUE,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.undated} #{lang.cheque}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.undated} #{lang.cheque}" title="#{lang.undated} #{lang.cheque}" />
+                        </p:commandLink>
+                        <h:outputText value="#{companyDashboardView.chequeIssued.undatedCheque}" styleClass="label" style="background-color:#42A5F5; " />
+                        <p:commandLink styleClass="text-left" action="#{main.setViewPath(companyDashboardView.getPath(FILE_CONSTANT.CHEQUE_RECEIPT_REPORT,accountingConstant.CHEQUE_OUT),list)}" title="#{lang.cheque} #{lang.receipt}" process="@this" update="f1" immediate="true"> 
+                          <h:outputText value="#{lang.cheque} #{lang.receipt}" title="#{lang.cheque} #{lang.receipt}" />
+                        </p:commandLink>                
+                        <h:outputText value="#{companyDashboardView.chequeIssued.chequeReceipt}" styleClass="label" style="background-color:#7caf42; " />
+                      </p:panelGrid>
+                    </p:panel>
+
+                  </ul>
+
+
+
+
+                </div>-->
+              </div>
+
+
+            </td>
+          </tr>
+        </table>
+        #{main.close()}
+      </ui:define> 
+    </div>
+  </ui:decorate> 
+
+</ui:composition>

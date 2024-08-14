@@ -1,0 +1,552 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{transporterView.switchTransporter(main, viewType)}
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.transporter}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? transporterView.transporter.transporterName : null}" />
+    <ui:param name="ids" value="transporter" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{transporterView.deleteTransporter(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('transporterWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{transporterView.cloneTransporter(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{transporterView.deleteTransporter(main)}" value="#{lang.delete}" onclick="wdgOff('transporterWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" styleClass="ignoreLoad"  />
+    </ui:define>
+
+    <!--<ui:define name="more"/>-->
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{transporterView.activeIndex}" styleClass="materialTabs">
+        <p:tab title="#{lang.transporter}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="transporter" />
+
+            <ui:define name="save" >
+              <h:commandButton action="#{transporterView.saveTransporter(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+                <f:ajax execute="f1" render="f1"  />
+              </h:commandButton>
+            </ui:define>
+
+            <!-- Transporter Name -->
+            <p:outputLabel value="#{lang.name}" for="transporterName" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{transporterView.transporter.transporterName}" maxlength="50" required="true" requiredMessage="#{lang.transporterName} #{lang.isRequired}" id="transporterName" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="transporterName" display="text"/>
+            </h:panelGroup>
+
+            <!-- Transporter Type -->
+            <p:outputLabel value="#{lang.type}" for="transporterTypeId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{transporterView.transporter.transporterType}" 
+                               required="true" requiredMessage="#{lang.type} #{lang.isRequired}"  styleClass="fw" id="transporterTypeId">
+                <f:selectItem itemLabel="Individual" itemValue="1"/>
+                <f:selectItem itemLabel="Company" itemValue="2" />
+                <p:ajax event="itemSelect" immediate="true" process="transporterTypeId" update="gstinLabel gstinDiv panDiv panLabelDiv" />
+              </p:selectOneMenu>
+              <p:message for="transporterTypeId" display="text" />
+            </h:panelGroup>
+
+            <!-- Country -->
+            <p:outputLabel value="#{lang.country}" for="transporterCountryId" rendered="false"/>            
+            <h:panelGroup id="countryDiv" rendered="false">
+              <p:autoComplete value="#{transporterView.transporter.countryId}" completeMethod="#{transporterView.countryAuto}" converter="wawo.LookupIntConverter" required="true"
+                              requiredMessage="#{lang.country} #{lang.isRequired}" id="transporterCountryId" var="c" itemValue="#{c}" itemLabel="#{c.countryName}" 
+                              emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                              autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+                <p:ajax event="itemSelect" immediate="true" process="countryDiv" update="transporterStateDiv transporterDistrictDiv pinDiv pinLabel phone1 gstinDiv gstinLabel panDiv currencyDiv" listener="#{transporterView.countrySelectEvent}"/>
+              </p:autoComplete>
+              <p:message for="transporterCountryId" display="text" />
+            </h:panelGroup>
+
+            <!-- GSTIN --> 
+            <h:panelGroup id="gstinLabel" >
+              <p:commandLink target="_blank"  onclick="window.open('#{SystemConstants.GST_URL}')"  > 
+                <p:outputLabel value="#{lang.gstin}" for="gstNo" title="#{lang.gstinabbr}" id="gstinValue" rendered="#{userRuntimeView.isGstRegime()  and transporterView.transporter.transporterType eq 2}"/>
+              </p:commandLink>
+            </h:panelGroup>
+            <h:panelGroup id="gstinDiv" >
+              <p:inputText styleClass="fw text-uppercase" value="#{transporterView.transporter.gstNo}" maxlength="15" id="gstNo" 
+                           required="true" requiredMessage="#{lang.gstin} #{lang.isRequired}" rendered="#{userRuntimeView.isGstRegime() and transporterView.transporter.transporterType eq 2}">
+                <f:validator validatorId="spica.scm.validators.GstinValidator" />
+                <p:ajax event="change" listener="#{transporterView.gstinChangeEventHandler}" update="panDiv countryDiv transporterStateDiv transporterDistrictDiv gstinDiv" process="gstinDiv" />
+              </p:inputText>
+              <p:message for="gstNo" display="text"/>
+            </h:panelGroup>
+
+            <!-- Pan No -->
+            <h:panelGroup id="panLabelDiv">
+              <p:outputLabel value="#{lang.pan} #{lang.sno}" for="panNoId" title="#{lang.panabbr}" rendered="#{transporterView.transporter.transporterType eq 2}" />
+              <p:outputLabel value="#{lang.pan} #{lang.sno}" for="pan" title="#{lang.panabbr}" rendered="#{transporterView.transporter.transporterType ne 2}" />
+            </h:panelGroup>
+            <h:panelGroup id="panDiv">
+              <p:inputText styleClass="fw text-uppercase" value="#{transporterView.transporter.panNo}" maxlength="10" id="panNoId"
+                           rendered="#{transporterView.transporter.transporterType eq 2}"
+                           required="true" requiredMessage="#{lang.pan} #{lang.isRequired}" readonly="#{userRuntimeView.isGstRegime()}">
+                <f:validator validatorId="spica.scm.validators.PanCardValidator" />
+              </p:inputText>
+              <p:inputText styleClass="fw text-uppercase" value="#{transporterView.transporter.panNo}" maxlength="10" id="pan"
+                           rendered="#{transporterView.transporter.transporterType ne 2}">
+                <f:validator validatorId="spica.scm.validators.PanCardValidator" />
+              </p:inputText>
+              <p:message for="panNoId" display="text" rendered="#{transporterView.transporter.transporterType eq 2}"/>
+              <p:message for="pan" display="text" rendered="#{transporterView.transporter.transporterType ne 2}"/>
+            </h:panelGroup>
+
+            <!-- transporter state -->
+            <p:outputLabel value="#{lang.state}" for="transporterStateId"/>
+            <h:panelGroup id="transporterStateDiv">
+              <p:autoComplete  value="#{transporterView.transporter.stateId}" completeMethod="#{transporterView.stateAuto}" converter="wawo.LookupIntConverter"   
+                               dropdown="true" required="true" requiredMessage="#{lang.state} #{lang.isRequired}" id="transporterStateId" var="s" 
+                               itemValue="#{s}" itemLabel="#{s.stateName ne null ? s.stateName +=' ('+=s.stateCode+=')' : ''}"
+                               emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                               autocomplete="off" forceSelection="true"  styleClass="fw" readonly="#{userRuntimeView.isGstRegime() and transporterView.isGst()}">
+                <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+                <p:ajax event="itemSelect" immediate="true" process="@this" update="transporterDistrictDiv" listener="#{transporterView.stateSelectEvent}"/>
+                <p:column styleClass="w-20">
+                  <h:outputText value="#{s.stateCode}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{s.stateName}" />
+                </p:column>
+              </p:autoComplete>
+              <p:message for="transporterStateId" display="text" />
+            </h:panelGroup>
+
+            <!-- transporter district -->
+            <p:outputLabel value="#{lang.district}" for="transporterDistrictId"/>
+            <h:panelGroup id="transporterDistrictDiv">
+              <p:autoComplete  value="#{transporterView.transporterAddress.districtId}" completeMethod="#{transporterView.districtAuto}" converter="wawo.LookupIntConverter"
+                               required="true" requiredMessage="#{lang.district} #{lang.isRequired}" id="transporterDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}"
+                               dropdown="true" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+              </p:autoComplete>
+              <p:message for="transporterDistrictId" display="text" />
+            </h:panelGroup>
+
+            <!-- Vendor Registered Address-->
+            <p:outputLabel value="Registered #{lang.address}" for="address" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{transporterView.transporterAddress.address}" cols="100" rows="2" maxlength="500" required="true"
+                                requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="address" display="text"/>
+            </h:panelGroup>
+
+            <!-- phone 1 -->
+            <h:panelGroup>
+              <p:outputLabel value="#{lang.phone} #{lang.no}" for="phone1" />          
+              <p:outputLabel value="(#{transporterView.transporter.countryId.phoneCode})" rendered="#{transporterView.transporter.countryId.phoneCode ne null}" />          
+            </h:panelGroup> 
+
+            <h:panelGroup>               
+              <p:inputText  value="#{transporterView.transporterAddress.phone1}" maxlength="#{transporterView.transporter.countryId.phoneNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                            autocomplete="off" id="phone1" styleClass="fw" title="#{lang.maximum} #{transporterView.transporter.countryId.phoneNumberLength} #{lang.digit}" >                  
+                <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+              </p:inputText>                 
+              <p:message for="phone1" display="text"/>
+            </h:panelGroup> 
+
+            <!-- Mobile Number-->
+            <h:panelGroup>
+              <p:outputLabel value="#{lang.mobile} #{lang.no}" for="phone2" />    
+              <p:outputLabel value="(#{transporterView.transporter.countryId.phoneCode})" rendered="#{transporterView.transporter.countryId.phoneCode ne null}" />          
+            </h:panelGroup> 
+
+            <h:panelGroup>               
+              <p:inputText  value="#{transporterView.transporterAddress.phone2}" maxlength="#{transporterView.transporter.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                            autocomplete="off" id="phone2" styleClass="fw" title="#{lang.maximum} #{transporterView.transporter.countryId.mobileNumberLength} #{lang.digit}" >                  
+                <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+              </p:inputText>                
+              <p:message for="phone2" display="text"/>
+            </h:panelGroup> 
+
+            <!--pin -->
+            <h:panelGroup id="pinLabel">
+              <p:outputLabel value="#{transporterView.pinLength==5 ? lang.zip:lang.pincode}" for="pin" />
+            </h:panelGroup>
+            <h:panelGroup id="pinDiv">
+              <p:inputNumber styleClass="fw" value="#{transporterView.transporterAddress.pin}" maxlength="#{transporterView.pinLength}" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{transporterView.pinValue}" decimalPlaces="0"  thousandSeparator="" validatorMessage="#{lang.requiredLength} is #{transporterView.pinLength} "
+                             id="pin" >
+
+
+                <f:validateLength minimum="#{transporterView.pinLength}"/>
+              </p:inputNumber>
+              <p:message for="pin" display="text"/>
+            </h:panelGroup>            
+
+
+            <p:outputLabel value="#{lang.description}" for="description" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{transporterView.transporter.description}" cols="100" rows="3" required="true" requiredMessage="#{lang.description} #{lang.isRequired}" maxlength="500" id="description" autoResize="false" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="description" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.note}" for="note" />
+            <h:panelGroup>
+              <p:inputTextarea styleClass="fw" value="#{transporterView.transporter.note}" cols="100" rows="3" maxlength="1000" id="note" autoResize="false" />
+              <p:message for="note" display="text"/>
+            </h:panelGroup>
+
+<!--            <p:outputLabel value="#{lang.transportMode}" for="transportMode" rendered="#{main.isEdit()}"/>
+            <h:panelGroup style="padding-left: 14px" id="ratecardDiv" rendered="#{main.isEdit()}">
+              <p:selectManyCheckbox id="transportMode" value="#{transporterView.transportModeSelected}"                                    
+                                    layout="responsive" columns="3" converter="omnifaces.SelectItemsConverter">
+                <f:selectItems value="#{scmLookupView.transportMode(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                <p:ajax listener="#{transporterView.transportModeEvent}" />
+              </p:selectManyCheckbox>
+              <p:message for="transportMode" />            
+
+            </h:panelGroup>-->
+
+<!--            <h:panelGroup layout="block" id="ratecardSubDiv" rendered="#{!facesContext.validationFailed}">                
+              <ui:repeat value="#{transporterView.transporterRateCard}" var="trans">
+                <p:outputLabel value="#{lang.lrRate} #{trans.transportModeId.title}"/>
+                <h:panelGroup>
+                  <p:inputNumber value="#{trans.lrRateFixed}" />                  
+                </h:panelGroup>
+              </ui:repeat>
+            </h:panelGroup>-->
+
+<!--            <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+            <h:panelGroup>
+              <p:inputNumber value="#{transporterView.transporter.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" />
+              <p:message for="sortOrder" display="text"/>
+            </h:panelGroup>-->
+            <!-- Currency -->
+            <p:outputLabel value="#{lang.currency}" for="currency"/>
+            <h:panelGroup id="currencyDiv">            
+              <p:selectOneMenu styleClass="L" id="currency" value="#{transporterView.transporter.currencyId}" required="true" requiredMessage="#{lang.currency} #{lang.isRequired}" converter="omnifaces.SelectItemsConverter" >
+                <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+                <f:selectItems  value="#{scmLookupView.currency(main)}" var="c" itemLabel="#{c.code}" itemValue="#{c}" />
+                <p:message for="currency" display="text"/>
+              </p:selectOneMenu>
+            </h:panelGroup> 
+
+            <p:outputLabel value="#{lang.status}" for="transporterStatusId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{transporterView.transporter.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+                               id="transporterStatusId">
+                <f:selectItems value="#{transporterView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+              </p:selectOneMenu>
+              <p:message for="transporterStatusId" display="text" />
+            </h:panelGroup>  
+
+            <!--Taxable-->
+            <p:outputLabel value="#{lang.taxable}" for="transporterTaxable"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{transporterView.transporter.taxable}" id="transporterTaxable" style="position: relative" styleClass="fw">
+                <f:selectItem itemValue="1" itemLabel="#{lang.taxableZone}" />
+                <f:selectItem itemValue="2" itemLabel="#{lang.taxableFreeZoneAllExempted}" />
+                <f:selectItem itemValue="3" itemLabel="#{lang.taxableFreeZoneFreeZoneExempted}" />
+              </p:selectOneMenu>
+              <p:message for="transporterTaxable" display="text" />
+            </h:panelGroup>
+          </ui:decorate>
+
+
+          <!--Transporter Freight Rate-->
+
+          <!--<div class="bar-N bg-default b-t-2 dotted"> <div class="L h5">  #{transporterView.transporter.transporterName} / #{lang.transporter} #{lang.rateCard} </div>  </div>-->
+          <!--          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                      <ui:param name="rendered" value="#{main.isEdit()}" />
+                    <ui:param name="label" value="#{transporterView.transporter.transporterName} / #{lang.transporter} #{lang.rateCard}" />
+                    <p:dataTable id="transporterRateCardTable" var="transporterRateCardVar" widgetVar="transporterRateCardWidget" value="#{transporterView.getTransporterRateCardList(main)}" 
+                                 rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  
+                                 tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+          
+                      <p:ajax event="rowEdit" update="transporterRateCardTable" listener="#{transporterRateCardView.onRowEdit(transporterRateCardVar)}"/>
+                      
+                      <p:column headerText="#{lang.title}" sortBy="#{transporterRateCardVar.transportModeId.title}" field="transport_mode_id.title">
+                        <h:outputText value="#{appView.display(transporterRateCardVar.transportModeId.title)}" title="#{appView.title(transporterRateCardVar.transportModeId.title)}" escape="false" />
+                      </p:column>
+          
+                      <p:column headerText="#{lang.lrRate}">
+                        <p:cellEditor>
+                          <f:facet name="output"><h:outputText value="#{appView.decimal(transporterRateCardVar.lrRateFixed)}" /></f:facet>
+                          <f:facet name="input"><p:inputText styleClass="fw" id="modelInput" value="#{transporterRateCardVar.lrRateFixed}" style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                      </p:column>
+                      <p:column style="width:50px">
+                        <p:rowEditor />
+                      </p:column>
+          
+                      <p:column headerText="#{lang.freightCharges}" >
+          
+                        <p:commandButton action="#{transporterView.transporterFreightRateListDialog(transporterRateCardVar)}" process="@this" immediate="true"  icon="fa fa-eye"
+                                         onstart="block()" oncomplete="unblock()" title="View">
+                        </p:commandButton>              
+                        <p:commandButton action="#{transporterView.transporterFreightRateNewDialog(transporterRateCardVar)}" icon="fa fa-plus" process="@this" immediate="true" 
+                                         onstart="block()" oncomplete="unblock()" title="New">
+                        </p:commandButton>
+          
+                      </p:column>
+          
+                    </p:dataTable>
+                      </ui:decorate>-->
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(transporterView.transporter.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(transporterView.transporter.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(transporterView.transporter.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(transporterView.transporter.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:tab>
+        <p:tab  title="#{lang.address}" disabled="#{main.isNew()}" >
+
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="transporterAddress" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{transporterView.transporterAddressNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"   rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="transporterAddressPopupReturned" actionListener="#{transporterView.transporterAddressPopupReturned()}" update="transporterAddressTable"  
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="transporterAddressTable" var="transporterAddressVar" widgetVar="transporterAddressWidget" value="#{transporterView.getTransporterAddressList(main)}" 
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('transporterAddressWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+
+              <p:column sortBy="#{transporterAddressVar.address}" field="address" filterBy="#{transporterAddressVar.address}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+                <h:outputText  title="#{appView.title(transporterAddressVar.address)}" escape="false" />
+                <p:commandLink action="#{transporterView.transporterAddressEditPopup(transporterAddressVar.id)}" value="#{appView.display(transporterAddressVar.address)}"
+                               process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.addressTypeId.title}" field="address_type_id.title" filterBy="#{transporterAddressVar.addressTypeId.title}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.addressType}" title="#{lang.addressType}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.addressTypeId.title)}" title="#{appView.title(transporterAddressVar.addressTypeId.title)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.stateId.stateName}" field="state_id.state_name">
+                <f:facet name="header"><h:outputText value="#{lang.state}" title="#{lang.state}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.stateId.stateName)}" title="#{appView.title(transporterAddressVar.stateId.stateName)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.districtId.districtName}" field="district_id.district_name">
+                <f:facet name="header"><h:outputText value="#{lang.district}" title="#{lang.district}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.districtId.districtName)}" title="#{appView.title(transporterAddressVar.districtId.districtName)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.territoryId.territoryName}" field="territory_id.territory_name">
+                <f:facet name="header"><h:outputText value="#{lang.territory}" title="#{lang.territory}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.territoryId.territoryName)}" title="#{appView.title(transporterAddressVar.territoryId.territoryName)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.phone1}" field="phone_1">
+                <f:facet name="header"><h:outputText value="#{lang.phone} #{lang.sno}" title="#{lang.phone} #{lang.sno}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.phone1)}" title="#{appView.title(transporterAddressVar.phone1)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.fax1}" field="fax_1">
+                <f:facet name="header"><h:outputText value="#{lang.fax} #{lang.sno}" title="#{lang.fax} #{lang.sno}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.fax1)}" title="#{appView.title(transporterAddressVar.fax1)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.email}" field="email">
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.email)}" title="#{appView.title(transporterAddressVar.email)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{transporterAddressVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterAddressVar.statusId.title)}" title="#{appView.title(transporterAddressVar.statusId.title)}" rendered="#{transporterAddressVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(transporterAddressVar.statusId.title)}" title="#{appView.title(transporterAddressVar.statusId.title)}" rendered="#{transporterAddressVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(transporterAddressVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(transporterAddressVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(transporterAddressVar.lastModifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(transporterAddressVar.lastModifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(transporterAddressVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+        <p:tab  title="#{lang.contact}" disabled="#{main.isNew()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="transporterContact" />
+
+            <ui:define name="menuleft">
+              <p:commandButton action="#{transporterView.userProfileNewPopup(0)}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>
+              <p:remoteCommand name="userProfilePopupReturned" actionListener="#{transporterView.transporterContactPopupReturned()}" update="transporterContactTable"  
+                               process="@this" immediate="true" />
+            </ui:define>
+
+            <p:dataTable id="transporterContactTable" var="transporterContactVar" widgetVar="transporterContactWidget" value="#{transporterView.getTransporterContactList(main)}" 
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('transporterContactWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+
+              <p:ajax event="rowEdit" update="transporterContactTable" listener="#{transporterContactView.onRowEdit(transporterContactVar)}"/>
+
+              <p:column sortBy="#{transporterContactVar.userProfileId.name}" field="name" filterBy="#{transporterContactVar.userProfileId.name}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterContactVar.userProfileId.name)}" title="#{appView.title(transporterContactVar.userProfileId.name)}" escape="false" />
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.phone} #{lang.sno}" title="#{lang.phone} #{lang.sno}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterContactVar.userProfileId.phone1)}" />
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(transporterContactVar.userProfileId.email)}" title="#{appView.title(transporterContactVar.userProfileId.email)}" escape="false"/>
+              </p:column>
+
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.designation}" title="#{lang.designation}"/></f:facet>
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{transporterContactVar.designationId.title}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:selectOneMenu styleClass="fw" value="#{transporterContactVar.designationId}" converter="omnifaces.SelectItemsConverter" style="width:100%">
+                      <f:selectItems value="#{transporterContactView.selectDesignationByTransporterContext(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                    </p:selectOneMenu>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>   
+
+              <p:column headerText="" styleClass="C"    style="text-align: center"> 
+                <f:facet name="header"><h:outputText value="#{lang.action}" title="#{lang.action}"/></f:facet>
+                <p:rowEditor />
+                <p:commandButton action="#{transporterView.deleteTransporterContact(main,transporterContactVar)}" process="@this" 
+                                 value="" update="transporterContactTable" icon="fa fa-trash">
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </p:column>
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(transporterContactVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(transporterContactVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(transporterContactVar.lastModifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(transporterContactVar.lastModifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(transporterContactVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>   
+          </ui:decorate>
+        </p:tab>
+
+        <p:tab title="#{lang.rateCard}" disabled="#{main.isNew()}">
+          <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="0" styleClass="materialTabs">
+            <o:importConstants type="spica.scm.service.TransporterService" var="cons" />
+            <p:tab title="#{lang.byRoad}">
+              #{transporterView.setTransporterMode(main, cons.byRoad)}
+
+              <ui:include src="rate_card.xhtml">
+                <ui:param name="ids" value="byRoad" /> 
+              </ui:include>
+
+            </p:tab>
+
+            <p:tab title="#{lang.byRail}">
+              #{transporterView.setTransporterMode(main,cons.byRail)}
+
+              <ui:include src="rate_card.xhtml">
+                <ui:param name="ids" value="byRail" /> 
+              </ui:include>
+
+            </p:tab>
+
+            <p:tab title="#{lang.byAir}">
+              #{transporterView.setTransporterMode(main, cons.byAir)}
+
+              <ui:include src="rate_card.xhtml">
+                <ui:param name="ids" value="byAir" /> 
+              </ui:include>
+
+            </p:tab>
+
+            <p:tab title="#{lang.bySea}">
+
+              #{transporterView.setTransporterMode(main, cons.bySea)}
+
+              <ui:include src="rate_card.xhtml">
+                <ui:param name="ids" value="bySea" /> 
+              </ui:include>
+            </p:tab>
+
+            <p:tab title="#{lang.byCourier}">
+
+              #{transporterView.setTransporterMode(main, cons.byCourier)}
+
+              <ui:include src="rate_card.xhtml">
+                <ui:param name="ids" value="byCourier" /> 
+              </ui:include>
+            </p:tab>
+
+          </p:tabView>
+        </p:tab>
+      </p:tabView>
+
+    </ui:define>
+
+
+    <ui:define name="list">
+      <p:dataTable id="transporterTable" var="transporterVar" widgetVar="transporterWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{transporterView.transporterLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{transporterVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{transporterView.transporterSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column  sortBy="#{transporterVar.transporterName}" field="id" filterBy="#{transporterVar.transporterName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.transporterName}" title="#{lang.transporterName}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{transporterVar.transporterName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{transporterView.transporter}" value="#{transporterVar}" />
+          </p:commandLink>
+        </p:column>        
+        <p:column  sortBy="#{transporterVar.description}" field="description">
+          <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+          <h:outputText value="#{appView.display(transporterVar.description)}" title="#{appView.title(transporterVar.description)}" escape="false" />
+        </p:column>
+        <p:column  sortBy="#{transporterVar.note}" field="note">
+          <f:facet name="header"><h:outputText value="#{lang.note}" title="#{lang.note}"/></f:facet>
+          <h:outputText value="#{appView.display(transporterVar.note)}" title="#{appView.title(transporterVar.note)}" escape="false" />
+        </p:column>
+<!--        <p:column headerText="#{lang.sortOrder}" sortBy="#{transporterVar.sortOrder}" field="sort_order" style="text-align: right">
+          <h:outputText value="#{appView.number(transporterVar.sortOrder)}" escape="false" />
+        </p:column>-->
+        <p:column sortBy="#{transporterVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(transporterVar.statusId.title)}" title="#{appView.title(transporterVar.statusId.title)}" rendered="#{transporterVar.statusId.id==1}" escape="false" />
+          <h:outputText value="#{appView.display(transporterVar.statusId.title)}" title="#{appView.title(transporterVar.statusId.title)}" rendered="#{transporterVar.statusId.id==3}" style="color:grey" escape="false" />
+        </p:column>
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(transporterVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(transporterVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(transporterVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(transporterVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(transporterVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+
+  <script>
+    function setEdit(id) {
+      $('#' + id + '\\:0\\:editRow > .ui-icon-pencil').trigger('click');
+    }
+  </script>
+</ui:composition>

@@ -1,0 +1,180 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+  #{consignmentCommodityView.switchConsignmentCommodity(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{consignmentCommodityView.consignmentCommodity.consignmentId.consignmentNo}" />
+    <ui:param name="subLabel" value="#{lang.commodity}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="consignmentCommodity" />
+    <ui:param name="newList" value="true" />
+    <ui:param name="deleteListMenu" value="false" />
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{consignmentCommodityView.cloneConsignmentCommodity(main)}" value="#{lang.clone}" process="f1"
+                  update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{consignmentCommodityView.consignmentCommodityPopupClose}"
+                       oncomplete="parent.consignmentCommodityPopupReturned(); closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{consignmentCommodityView.deleteConsignmentCommodity(main)}" value="#{lang.delete}"
+                       onclick="wdgOff('consignmentCommodityWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{consignmentCommodityView.saveConsignmentCommodity(main, false)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+      <h:commandButton action="#{consignmentCommodityView.saveConsignmentCommodity(main, true)}" value="#{lang.save} #{lang.andclose}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Invoice No -->
+      <p:outputLabel value="#{lang.invoiceNo}" for="invoiceNo" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{consignmentCommodityView.consignmentCommodity.invoiceNo}" maxlength="100" id="invoiceNo"
+                     readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}" required="true" requiredMessage="#{lang.invoiceNo} #{lang.isRequired}"/>
+        <p:message for="invoiceNo" display="text"/>
+      </h:panelGroup>
+
+      <!-- Invoice Date -->
+      <p:outputLabel value="#{lang.invoiceDate}" for="invoiceDate" />
+      <h:panelGroup>
+        <p:calendar value="#{consignmentCommodityView.consignmentCommodity.invoiceDate}" pattern="#{lang.datePattern}" 
+                    converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" maxlength="29" id="invoiceDate" showButtonPanel="true" 
+                    navigator="true" mask="true" readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}" 
+                    mindate="#{userRuntimeView.minDate}" maxdate="#{userRuntimeView.today}"
+                    required="true" requiredMessage="#{lang.invalidDate} #{lang.isRequired}"/>
+        <p:message for="invoiceDate" display="text"/>
+      </h:panelGroup>
+
+      <!-- Invoice File Path -->
+      <p:outputLabel value="#{lang.invoiceFilePath}" for="invoiceFilePath" />
+      <h:panelGroup id="invoiceFilePathPart">
+        <h:inputFile value="#{consignmentCommodityView.invoiceFilePathPart}"  maxlength="200" id="invoiceFilePath" disabled="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}"/>
+        <p:commandButton rendered="#{not empty consignmentCommodityView.consignmentCommodity.invoiceFilePath}" icon="fa fa-trash" title="#{lang.delete}"
+                         process="@this" oncomplete="hide('invoiceFilePathLink')" update="invoiceFilePathPart" partialSubmit="true" immediate="true"  style="width:30px" disabled="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}">
+          <f:setPropertyActionListener target="#{consignmentCommodityView.invoiceFilePathPart}" value="#{appIo.getRemoveFile()}" />
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentCommodityView.consignmentCommodity.invoiceFilePath)}" ajax="false" id="invoiceFilePathLink" disabled="#{consignmentCommodityView.isConfirmed()}" class="ignoreLoad">
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentCommodityView.consignmentCommodity.invoiceFilePath)}" />
+        </p:commandLink>
+        <p:message for="invoiceFilePath" display="text"/>
+      </h:panelGroup>
+
+      <!-- Commodity -->
+      <p:outputLabel value="#{lang.commodity}" for="consignmentCommodityCommodityId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{consignmentCommodityView.consignmentCommodity.commodityId}"  styleClass="fw" validator="#{consignmentCommodityView.validateCommodity}"
+                         id="consignmentCommodityCommodityId" converter="omnifaces.SelectItemsConverter" disabled="#{consignmentCommodityView.isConfirmed()}">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}"  />
+          <f:selectItems value="#{consignmentCommodityView.commodity}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          <p:ajax event="itemSelect" update="commodityNameDiv commodityNameLabelDiv" />
+        </p:selectOneMenu>
+        <p:message for="consignmentCommodityCommodityId" display="text" />
+      </h:panelGroup>
+
+      <!-- Commodity Name -->
+      <h:panelGroup id="commodityNameLabelDiv">
+        <p:outputLabel value="#{lang.commodity} #{lang.name}" for="commodityName" rendered="#{!consignmentCommodityView.commoditySelected}"/>
+      </h:panelGroup>
+      <h:panelGroup id="commodityNameDiv">
+        <p:inputText  rendered="#{!consignmentCommodityView.commoditySelected}" styleClass="fw" value="#{consignmentCommodityView.consignmentCommodity.commodityName}"
+                      maxlength="50" id="commodityName" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}"/>
+        <p:message for="commodityName" display="text" rendered="false"/>
+      </h:panelGroup>
+
+      <!-- Description -->
+      <p:outputLabel value="#{lang.description}" for="commodityDescription" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{consignmentCommodityView.consignmentCommodity.commodityDescription}" maxlength="200" id="commodityDescription" readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}"/>
+        <p:message for="commodityDescription" display="text"/>
+      </h:panelGroup>
+
+      <!-- Quantity -->
+      <p:outputLabel value="#{lang.qty}" for="commodityQty" />
+      <h:panelGroup layout="block" styleClass="row">
+        <div class="col-md-2">
+          <p:inputNumber value="#{consignmentCommodityView.consignmentCommodity.commodityQty}" converterMessage="#{lang.commodity} #{lang.qty} #{lang.invalidNumber}"
+                         decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="commodityQty"
+                         required="true" requiredMessage="#{lang.qty} #{lang.isRequired}" readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}"
+                         styleClass="fw" />
+        </div>
+        <div class="col-md-6" style="margin-top: -1px;">
+          <p:selectOneMenu value="#{consignmentCommodityView.consignmentCommodity.commodityQtyUnit}">
+            <f:selectItems value="#{consignmentCommodityView.consignmentPackingUnit}" var="p" itemValue="#{p.intValue}" itemLabel="#{p.itemLabel}" />
+          </p:selectOneMenu>
+        </div>
+        <p:message for="commodityQty" display="text"/>
+      </h:panelGroup>
+
+      <!-- Weight -->
+      <p:outputLabel value="#{lang.weight}" for="commodityWeight" />
+      <h:panelGroup layout="block" styleClass="row">
+        <div class="col-md-2">
+          <p:inputNumber value="#{consignmentCommodityView.consignmentCommodity.commodityWeight}" converterMessage="#{lang.commodity} #{lang.weight} #{lang.invalidNumber}"
+                         decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0.0" maxlength="5" id="commodityWeight" readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}"
+                         styleClass="fw" >
+          </p:inputNumber>
+          <p:message for="commodityWeight" display="text"/>
+        </div>
+        <div class="col-md-6" style="margin-top: -1px;">
+          <p:selectOneMenu value="#{consignmentCommodityView.consignmentCommodity.commodityWeightUnit}">
+            <f:selectItems value="#{consignmentCommodityView.consignmentWeightUnit}" var="w" itemValue="#{w.intValue}" itemLabel="#{w.itemLabel}" />
+          </p:selectOneMenu>
+        </div>
+      </h:panelGroup>
+
+      <!-- Value -->
+      <p:outputLabel value="#{lang.value}" for="commodityValue" />
+      <h:panelGroup>
+        <p:inputNumber value="#{consignmentCommodityView.consignmentCommodity.commodityValue}" converterMessage="#{lang.value} #{lang.invalidNumber}"
+                       decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commodityValue"
+                       readonly="#{consignmentCommodityView.isConfirmed() or userRole.isCustomer()}" required="true" requiredMessage="#{lang.value} #{lang.isRequired}"
+                       styleClass="fw w-100"
+                      />
+        <p:message for="commodityValue" display="text"/>
+      </h:panelGroup>
+
+      <!-- Debit Note No -->
+      <p:outputLabel value="#{lang.debitNoteNo}" for="debitNoteNo" rendered="false" />
+      <h:panelGroup rendered="false">
+        <p:inputText styleClass="fw" value="#{consignmentCommodityView.consignmentCommodity.debitNoteNo}" maxlength="100" id="debitNoteNo" readonly="#{consignmentCommodityView.isConfirmed()}"/>
+        <p:message for="debitNoteNo" display="text" />
+      </h:panelGroup>
+
+      <!-- Debit Note Date -->
+      <p:outputLabel value="#{lang.debitNoteDate}" for="debitNoteDate" rendered="false" />
+      <h:panelGroup rendered="false">
+        <p:calendar value="#{consignmentCommodityView.consignmentCommodity.debitNoteDate}" pattern="#{lang.datePattern}"
+                    converterMessage="#{lang.debitNoteDate} #{lang.invalidDate}" maxlength="29" id="debitNoteDate" showButtonPanel="true" 
+                    mindate="#{userRuntimeView.minDate}" maxdate="#{userRuntimeView.today}"
+                    navigator="true" mask="true" readonly="#{consignmentCommodityView.isConsignmentCancelled()}"/>
+        <p:message for="debitNoteDate" display="text"/>
+      </h:panelGroup>
+
+      <!-- Debit Note File Path -->
+      <p:outputLabel value="#{lang.debitNoteFilePath}" for="debitNoteFilePath" rendered="false" />
+      <h:panelGroup id="debitNoteFilePathPart" rendered="false">
+        <h:inputFile value="#{consignmentCommodityView.debitNoteFilePathPart}"  maxlength="200" id="debitNoteFilePath" readonly="#{consignmentCommodityView.isConsignmentCancelled()}"/>
+        <p:commandButton rendered="#{not empty consignmentCommodityView.consignmentCommodity.debitNoteFilePath}" icon="fa fa-trash" title="#{lang.delete}" process="@this"
+                         oncomplete="hide('debitNoteFilePathLink')" update="debitNoteFilePathPart" partialSubmit="true" immediate="true"  style="width:30px" disabled="#{consignmentCommodityView.isConsignmentCancelled()}">
+          <f:setPropertyActionListener target="#{consignmentCommodityView.debitNoteFilePathPart}" value="#{appIo.getRemoveFile()}" />
+        </p:commandButton>
+        <p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(consignmentCommodityView.consignmentCommodity.debitNoteFilePath)}" ajax="false" id="debitNoteFilePathLink" disabled="#{consignmentCommodityView.isConsignmentCancelled()}" class="ignoreLoad" >
+          <p:fileDownload value="#{appIo.downloadPrivate(consignmentCommodityView.consignmentCommodity.debitNoteFilePath)}" />
+        </p:commandLink>
+        <p:message for="debitNoteFilePath" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

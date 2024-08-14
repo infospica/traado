@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  <ui:composition template="/theme1/layoutDialog.xhtml" >
+    <ui:define name="content"  >
+      <h:form id="f1" prependId="false">
+        #{main.setViewPath(param.viewPath eq null ? main.viewPath : param.viewPath, param.viewType eq null ? main.viewType : param.viewType)}
+        #{vendorContactView.switchVendorContact(main, param.viewType eq null ? main.viewType : param.viewType)}
+        <ui:decorate template="/WEB-INF/resources/theme1/dialogForm.xhtml">
+          <ui:param name="label" value="#{vendorContactView.vendorContact.vendorId.vendorName} / #{main.isEdit() ? appView.display(vendorContactView.vendorContact.contactName) : lang.contact}" />
+          <ui:param name="ids" value="vendorContact" />
+
+          <ui:define name="menu1" >
+            <p:menuitem actionListener="#{vendorContactView.cloneVendorContact(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+          </ui:define>
+          <ui:define name="navLeftRight">
+            <p:commandButton actionListener="#{vendorContactView.vendorContactDialogClose}" value="#{lang.close}" partialSubmit="true" process="@this" immediate="true"  styleClass="btn btn-default"/>
+          </ui:define>
+          <ui:define name="deleteForm" >
+            <p:commandButton action="#{vendorContactView.deleteVendorContact(main)}" value="#{lang.delete}" onclick="wdgOff('vendorContactWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+          </ui:define>
+
+          <ui:define name="save" >
+            <h:commandButton action="#{vendorContactView.saveVendorContact(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+              <f:ajax execute="f1" render="f1" /></h:commandButton>
+          </ui:define>
+
+          <ui:define name="form">
+
+            <p:outputLabel value="#{lang.contactName}" for="contactName" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{vendorContactView.vendorContact.contactName}" maxlength="50" required="true" requiredMessage="#{lang.contactName} #{lang.isRequired}" id="contactName" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="contactName" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.designation}" for="vendorContactDesignationId"/>
+            <h:panelGroup>
+              <p:autoComplete  value="#{vendorContactView.vendorContact.designationId}" completeMethod="#{vendorContactView.designationAuto}" converter="wawo.LookupIntConverter"   
+                               id="vendorContactDesignationId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" 
+                               queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.designationClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.designationById()}"/>
+              </p:autoComplete><p:message for="vendorContactDesignationId" display="text" />
+            </h:panelGroup>            
+            <p:outputLabel value="#{lang.phone1}" for="phone1" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{vendorContactView.vendorContact.phone}" maxlength="10" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" id="phone1" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="phone1" display="text"/>
+            </h:panelGroup>            
+            <p:outputLabel value="#{lang.email}" for="email" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{vendorContactView.vendorContact.email}" maxlength="10" id="email" validator="wawo.EmailValidator"/>
+              <p:message for="email" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+            <h:panelGroup>
+              <p:inputNumber value="#{vendorContactView.vendorContact.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                            onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
+              <p:message for="sortOrder" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.status}" for="companyLicenseStatusId"/>
+            <h:panelGroup>
+              <p:autoComplete value="#{vendorContactView.vendorContact.statusId}" completeMethod="#{vendorContactView.statusAuto}" converter="wawo.LookupIntConverter"   
+                              required="true" requiredMessage="#{lang.status} #{lang.isRequired}"  id="companyLicenseStatusId" var="e" 
+                              itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
+              </p:autoComplete><p:message for="companyLicenseStatusId" display="text" />
+            </h:panelGroup> 
+          </ui:define>
+          <ui:define name="after">
+            <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+              <ui:define name="cby">#{appView.display(vendorContactView.vendorContact.createdBy)}</ui:define>
+              <ui:define name="cat">#{appView.dateTime(vendorContactView.vendorContact.createdAt)}</ui:define>
+              <ui:define name="uby">#{appView.display(vendorContactView.vendorContact.modifiedBy)}</ui:define>
+              <ui:define name="uat">#{appView.dateTime(vendorContactView.vendorContact.modifiedAt)}</ui:define>
+            </ui:decorate>
+          </ui:define>
+        </ui:decorate>
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>

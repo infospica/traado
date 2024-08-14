@@ -1,0 +1,255 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{userView.switchUser(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.user}" />
+    <ui:param name="ids" value="user" />
+    <ui:param name="newList" value="false"/>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{userView.deleteUser(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('userWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{userView.cloneUser(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{userView.deleteUser(main)}" value="#{lang.delete}" onclick="wdgOff('userWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{userView.saveUser(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.name}" for="name" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{userView.user.name}" maxlength="200" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" id="name" />
+        <p:message for="name" display="text"/>
+      </h:panelGroup>            
+      <p:outputLabel value="Working In" for="cname" />
+      <h:panelGroup>
+        <p:outputLabel styleClass="fw" value="#{userView.displayUserName()}" id="cname" />
+        <p:message for="cname" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{userView.user.email}" maxlength="100" required="true" requiredMessage="#{lang.email} #{lang.isRequired}" id="email" autocomplete="off"/>
+        <p:message for="email" display="text"/>
+      </h:panelGroup>            
+      <p:outputLabel value="#{lang.password}" for="password" rendered="#{!main.isEdit()}"/>
+      <h:panelGroup rendered="#{!main.isEdit()}">
+        <p:password  styleClass="fw" value="#{userView.user.password}" maxlength="100" required="true" requiredMessage="#{lang.password} #{lang.isRequired}" id="password" 
+                     autocomplete="off" rendered="#{!main.isEdit()}"/>
+        <p:message for="password" display="text"/>
+      </h:panelGroup>            
+      <p:outputLabel value="#{lang.phone}" for="phone" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{userView.user.phone}" maxlength="20" id="phone" />
+        <p:message for="phone" display="text"/>
+      </h:panelGroup>
+
+<!--      <p:outputLabel value="#{lang.status}" for="status" />
+ <h:panelGroup><p:inputNumber value="#{userView.user.statusId}" converterMessage="#{lang.status} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="status" /><p:message for="status" display="text"/></h:panelGroup>            
+      -->
+      <p:outputLabel value="#{lang.status}" for="secUserStatusId" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{userView.user.statusId}"  id="secUserStatusId" converter="omnifaces.SelectItemsConverter" styleClass="fw">
+          <f:selectItems value="#{scmLookupView.status(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu>
+        <p:message for="secUserStatusId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.role}" for="roles" rendered="#{userView.renderedUserRole(main)}"/>
+      <h:panelGroup  rendered="#{userView.renderedUserRole(main)}">
+
+        <p:selectManyCheckbox id="roles" value="#{userView.roleSelected}" layout="responsive" columns="3" converter="omnifaces.SelectItemsConverter" rendered="#{userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root}">
+          <f:selectItems value="#{userView.displayUserRole(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectManyCheckbox>
+        <ui:repeat var="e" value="#{userView.roleSelected}" rendered="#{!userRuntimeView.appUser.companyAdmin and !userRuntimeView.appUser.root}">
+          <p:outputLabel styleClass="fw" value="#{e.title}" id="role"/>
+        </ui:repeat>
+        <p:message for="roles" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.permitted} #{lang.company}" for="pname" />
+      <h:panelGroup>
+        <p:outputLabel styleClass="fw" value="#{userView.user.userProfileId.companyId.companyName}" id="pname" />
+        <p:message for="pname" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="Other #{lang.permitted} #{lang.company}" for="companyId" />
+      <h:panelGroup  rendered="#{main.isForm()}">
+
+        <p:selectManyCheckbox id="companyId" value="#{userView.companySelected1}" layout="responsive" columns="2" converter="omnifaces.SelectItemsConverter" rendered="#{userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root}">
+          <f:selectItems value="#{userView.displayCompanyName(main)}" var="e" itemLabel="#{e.companyName}" itemValue="#{e.companyId}" />
+          <p:ajax listener="#{userView.updateAccount}"/>
+        </p:selectManyCheckbox>
+        <ui:repeat var="e" value="#{userView.companySelected1}" rendered="#{!userRuntimeView.appUser.companyAdmin and !userRuntimeView.appUser.root}">
+          <p:outputLabel styleClass="fw" value="#{e.companyName}" id="companyId1"/>
+        </ui:repeat>        
+        <p:message for="companyId" />
+      </h:panelGroup> 
+
+      <p:outputLabel value="#{lang.all} #{lang.account} #{lang.permitted}" for="accId" />
+      <h:panelGroup rendered="#{main.isForm()}" >
+        <p:selectOneRadio value="#{userView.allAccPermission}" id="accId">
+          <f:selectItem itemValue="1" itemLabel="#{lang.yes}"/>
+          <f:selectItem itemValue="0" itemLabel="#{lang.no}"/>
+          <p:ajax listener="#{userView.updateAccount}" update="accountListId accountListLbl"/>
+        </p:selectOneRadio>
+        <p:message for="accId" />
+      </h:panelGroup> 
+
+      <h:panelGroup id="accountListLbl">
+        <p:outputLabel value="#{lang.permitted} #{lang.account}(s)" for="accountId" rendered="#{userView.allAccPermission==0}"/>
+      </h:panelGroup>
+      <h:panelGroup id="accountListId">
+        <p:autoComplete  multiple="true" value="#{userView.accountList}" completeMethod="#{userView.accountAuto}" rendered="#{userView.allAccPermission==0}"
+                         converter="wawo.LookupIntConverter"  cache="true" 
+                         id="accountId" var="e" itemValue="#{e}" itemLabel="#{e.accountTitle}" emptyMessage="#{lang.noResult}" dropdown="true"
+                         queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                         style="position:absolute" styleClass="fw">
+
+          <p:column style="width:300px;">
+            <h:outputText value="#{e.vendorId.vendorName}" />
+          </p:column>
+          <p:column style="width:30px;">
+            <h:outputText value="#{e.accountCode}" />
+          </p:column>
+          <p:column style="width:150px;">
+            <h:outputText value="#{e.companyTradeProfileId.title}" />
+          </p:column>
+
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>
+          <p:ajax event="itemSelect" listener="#{userView.onAccountSelect}" update="@this" />
+          <p:ajax event="itemUnselect" process="accountListId" immediate="true" listener="#{userView.onAccountUnSelect}" />
+        </p:autoComplete><p:message for="accountId" display="text" />
+      </h:panelGroup>
+      
+      <p:outputLabel value="#{lang.send} #{lang.notification}" for="notifyId" rendered="#{main.isNew()}"/>
+      <h:panelGroup rendered="#{main.isNew()}" >
+        <p:selectOneRadio value="#{userView.notify}" id="notifyId">
+          <f:selectItem itemValue="1" itemLabel="#{lang.yes}"/>
+          <f:selectItem itemValue="0" itemLabel="#{lang.no}"/>
+        </p:selectOneRadio>
+        <p:message for="notifyId" />
+      </h:panelGroup> 
+      
+      <h:outputLabel value="#{lang.login} cred." />
+      <p:outputLabel value="#{userView.user.login}" />
+
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(userView.user.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(userView.user.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(userView.user.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(userView.user.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <p:selectOneMenu value="#{userView.userFilter}">        
+        <f:selectItem itemValue="1" itemLabel="#{lang.company}"/>
+        <f:selectItem itemValue="2" itemLabel="#{lang.vendor}"/>
+        <f:selectItem itemValue="3" itemLabel="#{lang.customer}"/>
+        <f:selectItem itemValue="4" itemLabel="#{lang.transporter}"/>
+        <p:ajax update="userTable" />
+      </p:selectOneMenu>      
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="userTable" var="userVar" widgetVar="userWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{userView.userLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{userVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{userView.userSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{userVar.id}" field="id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{userVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{userView.user}" value="#{userVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.name}" sortBy="#{userVar.name}" field="name">
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userVar.name)}" title="#{appView.title(userVar.name)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.email}" sortBy="#{userVar.email}" field="email">
+          <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userVar.email)}" title="#{appView.title(userVar.email)}" escape="false" />
+        </p:column>
+        <!--<p:column headerText="#{lang.password}" sortBy="#{userVar.password}" field="password">
+        <h:outputText value="#{appView.display(userVar.password)}" title="#{appView.title(userVar.password)}" escape="false" />
+        </p:column>-->
+        <p:column headerText="#{lang.phone}" sortBy="#{userVar.phone}" field="phone">
+          <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userVar.phone)}" title="#{appView.title(userVar.phone)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.login}" sortBy="#{userVar.login}" field="login" >
+          <h:outputText value="#{userVar.login}" />
+        </p:column>
+
+        <p:column headerText="#{lang.status}" sortBy="#{userVar.statusId}" field="status" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userVar.statusId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.action}" exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.action}" title="#{lang.action}"/></f:facet>
+
+          <p:commandButton update="resetPwdDlg" process="@this" oncomplete="PF('pwdR').show();" icon="fa fa-undo" title="#{lang.reset} #{lang.password}" >
+            <f:setPropertyActionListener target="#{userView.user}" value="#{userVar}" />
+            <p:resetInput target="resetPwdDlg" />
+          </p:commandButton>
+
+          <p:commandButton rendered="#{main.appUser.root}" action="#{userRuntimeView.loginAs(main, userVar)}" process="@this" update="@all" icon="fa fa-user" title="#{lang.login}" >
+          </p:commandButton>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(userVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(userVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(userVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(userVar.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable>
+      <p:dialog id="resetPwdDlg" header="#{lang.reset} #{lang.password}" widgetVar="pwdR" modal="true" dynamic="true"  >
+        <p:messages id="pwdMess" closable="true" />
+        <h:panelGrid  columns="2" cellpadding="5">
+          <p:outputLabel value="#{userView.user.name} - #{lang.newform} #{lang.password} " for="passwordR" />
+          <h:panelGroup >
+            <p:password  styleClass="fw" value="#{userView.newPassword}" maxlength="100" required="false" requiredMessage="#{lang.password} #{lang.isRequired}" id="passwordR" autocomplete="off" />
+            <p:message for="passwordR" display="text"/>
+            Leave as blank to auto generate Password, Auto generated password shall be mailed to <b>#{userView.user.email}</b>
+          </h:panelGroup>
+          <p:spacer/>
+          <f:facet name="footer">    
+            <p:commandButton onclick="PF('pwdR').hide();" styleClass="btn btn-default"  value="#{lang.close}" immediate="true" />
+            <p:commandButton actionListener="#{userView.resetPassword(main)}" value="#{lang.reset} #{lang.password}" process="resetPwdDlg"
+                             styleClass="btn btn-danger" update="pwdMess"
+                             oncomplete="handleLoginRequest(xhr, status, args)" />
+          </f:facet>
+        </h:panelGrid>
+        <script type="text/javascript">
+          function handleLoginRequest(xhr, status, args) {
+            if (!args.validationFailed) {
+              PF('pwdR').hide();
+            }
+          }
+        </script>
+      </p:dialog>
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

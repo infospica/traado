@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+  <ui:insert name="toolForm" >
+    <h:panelGroup class="bar-T header" rendered="#{main.isForm() and toolForm eq null ? true : toolForm}" layout="block" >
+
+        <div class="L">
+        <ui:insert name="leftLeft" />
+        <ui:insert name="reset" >
+          <h:commandButton  action="#{main.setViewType(main.viewType)}" rendered="#{(reset eq null ? true : reset) and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}" value="#{lang.reset}" immediate="true" onclick="toTop()" styleClass="btn btn-default" >
+            <f:ajax execute="@this" render="f1" resetValues="true"/>
+          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+        </h:commandButton>
+        </ui:insert>
+        <ui:insert name="save" />
+        <ui:insert name="leftRight" />
+        </div>
+        <h:panelGroup styleClass="R" style="padding-left: 5%" layout="block">
+          <ui:insert name="formRight" />
+        </h:panelGroup>
+      <ui:insert name="toolCommon" />
+      <ui:insert name="moreForm" >
+        <h:panelGroup styleClass="L g" style="padding-left: 5%" rendered="#{main.isEdit()}" layout="block">
+            <p:commandButton id="#{ids}menuButton" rendered="#{more eq null ? true : more}" type="button" icon="fa fa-angle-down" value="#{lang.action}" iconPos="down" styleClass="btn btn-default"/>
+          <p:menu overlay="true" trigger="#{ids}menuButton" my="left top" at="left bottom" >
+            <p:menuitem  action="#{main.setViewType(newform)}" value="New" immediate="true" rendered="#{(newForm eq null ? true : newForm) and userRuntimeView.privilege.add==true}" process="@this" update="f1" onclick="block()" icon="fa fa-plus" iconPos="left">
+              <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+              </p:menuitem>
+            <ui:insert name="menu1" />
+            <ui:insert name="export" />
+          <p:separator />
+          <p:menuitem onclick="wdgOn('#{ids}WidgetDel')" value="#{lang.delete}" rendered="#{(deleteFormMenu eq null ? true : deleteFormMenu) and userRuntimeView.privilege.delete==true}" process="@this" immediate="true" icon="fa fa-trash" iconPos="left" styleClass="ignoreLoad"/>
+          </p:menu>
+        </h:panelGroup>
+      </ui:insert>
+    </h:panelGroup>
+  </ui:insert>
+</ui:composition>

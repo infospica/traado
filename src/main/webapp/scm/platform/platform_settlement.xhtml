@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{platformSettlementView.switchPlatformSettlement(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="Settlement" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="platformSettlement"/>
+    <ui:param name="toolForm" value="#{main.isNew()}"/>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{platformSettlementView.platformSettlementPopupClose}" oncomplete="parent.platformPopupReturned();closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{platformSettlementView.deletePlatformSettlement(main)}" value="#{lang.delete}" onclick="wdgOff('platformSettlementWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete"  rendered="#{userRuntimeView.privilege.delete==true}" />
+    </ui:define>
+    <ui:define name="save" >
+      <h:commandButton action="#{platformSettlementView.savePlatformSettlement(main)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{main.isNew() and (userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true)}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <p:outputLabel value="#{lang.settlementNote}" for="settlementNote" />
+      <h:panelGroup><p:inputTextarea value="#{platformSettlementView.platformSettlement.settlementNote}" cols="100" rows="2" maxlength="1000" id="settlementNote" autoResize="false" styleClass="fw" /><p:message for="settlementNote" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.settlementDoc}" for="settlementDoc" /><h:panelGroup id="settlementDocPart">
+        <h:inputFile value="#{platformSettlementView.settlementDocPart}"  maxlength="1000" id="settlementDoc"/>        
+        <p:commandButton rendered="#{not empty platformSettlementView.platformSettlement.settlementDoc}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this" oncomplete="hide('settlementDocLink')" update="settlementDocPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{platformSettlementView.settlementDocPart}" value="#{appIo.getRemoveFile()}" />    
+        </p:commandButton><p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(platformSettlementView.platformSettlement.settlementDoc)}" ajax="false" id="settlementDocLink" >   
+          <p:fileDownload value="#{appIo.downloadPrivate(platformSettlementView.platformSettlement.settlementDoc)}" />
+        </p:commandLink><p:message for="settlementDoc" display="text"/></h:panelGroup>
+     <!-- <p:outputLabel value="#{lang.platformSettlementSettlementTypeId}" for="platformSettlementSettlementTypeId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{platformSettlementView.platformSettlement.settlementTypeId}" completeMethod="#{platformSettlementView.platformSettlementTypeAuto}" converter="wawo.LookupIntConverter"   id="platformSettlementSettlementTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.platformSettlementTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.platformSettlementTypeById()}"/>
+        </p:autoComplete><p:message for="platformSettlementSettlementTypeId" display="text" />
+      
+      </h:panelGroup>-->
+      <!-- Small list combo -->
+      <p:outputLabel value="#{lang.platformSettlementSettlementTypeId}" />
+      <p:selectOneMenu disabled="true" value="#{platformSettlementView.platformSettlement.settlementTypeId}"  id="platformSettlementSettlementTypeId" converter="omnifaces.SelectItemsConverter">
+        <f:selectItems value="#{scmLookupView.platformSettlementType(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+      </p:selectOneMenu>     
+    </ui:define>
+
+    <ui:define name="after">
+      <style>.vtop{vertical-align: top;}</style>
+      <p:panelGrid columns="2" columnClasses="vtop #{sysRuntimeView.getGrid2()}} vtop" >
+
+        <p:dataTable id="platformTable1" var="platformVarDebit" widgetVar="platformWidget1" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     lazy="true" value="#{platformSettlementView.parent.debitList}"  rowKey="#{platformVarDebit.id}" scrollHeight="250"
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  
+                     scrollable="true" rendered="#{platformSettlementView.parent.debitList.size()>0}"  >
+          <p:column   styleClass="w-40" field="source_id.short_code">
+            <h:outputText styleClass="label" style="background-color: ##{platformVarDebit.sourceId.displayColor}" value="#{platformVarDebit.sourceId.shortCode}" title="#{appView.title(platformVarDebit.sourceId.title)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.date}" >
+            <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}"/></f:facet>
+            <h:outputText value="#{appView.date(platformVarDebit.createdAt)}" title="#{appView.dateTime(platformVarDebit.createdAt)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.product}">
+            <f:facet name="header"><h:outputText value="#{lang.product}" title="#{lang.product}"/></f:facet>
+            <h:outputText value="#{appView.display(platformVarDebit.productEntryDetailId.productDetailId.productBatchId.productId.productName)}" title="#{appView.title(platformVarDebit.productEntryDetailId.productDetailId.productBatchId.productId.productName)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.debit}" style="text-align: right">
+            <f:facet name="header"><h:outputText value="#{lang.debit}" title="#{lang.debit}"/></f:facet>
+            <h:outputText value="#{appView.decimal(platformVarDebit.debitAmountRequired)}" escape="false" />
+          </p:column>
+          <p:columnGroup type="footer">
+            <p:row>
+              <p:column  style="text-align:right" footerText="" />
+              <p:column  style="text-align:right" footerText="" />
+              <p:column  style="text-align:right" footerText="#{lang.total}:" />
+              <p:column   style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(platformSettlementView.parent.totalDebit)}" ></p:column>
+            </p:row>
+            <p:row>
+              <p:column  style="text-align:right" footerText=""/>
+              <p:column  style="text-align:right" footerText="" />
+              <p:column  style="text-align:right" footerText="#{lang.balance}:" rendered="#{platformSettlementView.parent.totalDebit lt platformSettlementView.parent.totalCredit}"/>
+              <p:column  style="text-align:right" rendered="#{platformSettlementView.parent.totalDebit lt platformSettlementView.parent.totalCredit}" styleClass="text-right" footerText="#{appView.decimal(platformSettlementView.getDrBalance())}" ></p:column>
+            </p:row>            
+          </p:columnGroup>           
+        </p:dataTable>
+
+        <p:dataTable id="platformTable" var="platformVarCredit" widgetVar="platformWidget"  tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     lazy="true" value="#{platformSettlementView.parent.creditList}"  rowKey="#{platformVarDebit.id}" scrollHeight="250"
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  
+                     scrollable="true" rendered="#{platformSettlementView.parent.creditList.size()>0}">
+          <p:column  styleClass="w-40" field="source_id.short_code">
+            <h:outputText styleClass="label" style="background-color: ##{platformVarCredit.sourceId.displayColor}" value="#{platformVarCredit.sourceId.shortCode}" title="#{appView.title(platformVarCredit.sourceId.title)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.date}">
+            <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}"/></f:facet>
+            <h:outputText value="#{appView.date(platformVarCredit.createdAt)}" title="#{appView.dateTime(platformVarCredit.createdAt)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.product}">
+            <f:facet name="header"><h:outputText value="#{lang.product}" title="#{lang.product}"/></f:facet>
+            <h:outputText value="#{appView.display(platformVarCredit.productEntryDetailId.productDetailId.productBatchId.productId.productName)}" title="#{appView.title(platformVarCredit.productEntryDetailId.productDetailId.productBatchId.productId.productName)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.credit}" style="text-align: right">
+            <f:facet name="header"><h:outputText value="#{lang.credit}" title="#{lang.credit}"/></f:facet>
+            <h:outputText value="#{appView.decimal(platformVarCredit.creditAmountRequired)}" escape="false" />
+          </p:column>
+          <p:columnGroup type="footer">
+            <p:row>
+              <p:column  style="text-align:right" footerText="" />
+              <p:column  style="text-align:right" footerText="" />
+              <p:column  style="text-align:right" footerText="#{lang.total}:" />             
+              <p:column  style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(platformSettlementView.parent.totalCredit)}" ></p:column>
+            </p:row>
+            <p:row>
+              <p:column  style="text-align:right" footerText=""/>
+              <p:column  style="text-align:right" footerText="" />
+              <p:column  style="text-align:right" footerText="#{lang.balance}:" rendered="#{platformSettlementView.parent.totalCredit lt platformSettlementView.parent.totalDebit}"/>             
+              <p:column  style="text-align:right" styleClass="text-right" rendered="#{platformSettlementView.parent.totalCredit lt platformSettlementView.parent.totalDebit}" footerText="#{appView.decimal(platformSettlementView.getCrBalance())}" ></p:column>
+            </p:row>            
+          </p:columnGroup>          
+        </p:dataTable> 	
+      </p:panelGrid>      
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(platformSettlementView.platformSettlement.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(platformSettlementView.platformSettlement.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(platformSettlementView.platformSettlement.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(platformSettlementView.platformSettlement.modifiedAt)}</ui:define>
+        <ui:define name="id">#{platformSettlementView.platformSettlement.id}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+
+</html>

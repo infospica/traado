@@ -1,0 +1,233 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"  xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{stockandsalesView.resetStockAndSalesView()}
+  <o:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.stockandsales}"/>
+    <ui:param name="ids" value="stockandsales"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList" >
+      <p:selectOneMenu id="reportType" value="#{stockandsalesView.reportType}"  styleClass="r-p-10"  required="true" >
+        <f:selectItem itemLabel="#{lang.summary}" itemValue="#{ReportConstant.SUMMARY_VIEW}" />
+        <f:selectItem itemLabel="#{lang.detail}" itemValue="#{ReportConstant.DETAIL_VIEW}" />       
+        <p:ajax event="itemSelect" listener="#{stockandsalesView.submitForm}" process="@this fromDate selectedDate" update="stockandsalesTable"/>
+      </p:selectOneMenu>
+
+      <h:panelGroup id="accountGroupDiv" styleClass="w-200 ib-m">
+        <p:autoComplete id='accountGroup'  value="#{stockandsalesView.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" 
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv " listener="#{stockandsalesView.accountGroupSelectEvent}"/>
+        </p:autoComplete>
+        <p:message for="accountGroup" />
+      </h:panelGroup>
+
+      <h:panelGroup id="accountDiv" >
+        <p:autoComplete id='account'  value="#{stockandsalesView.account}" completeMethod="#{stockandsalesView.accountAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                        title="#{lang.accountNumber}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.vendorId.vendorName}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountCode}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.companyTradeProfileId.title}" />
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv accountDiv reportType fromDate selectedDate" update="stockandsalesTable " listener="#{stockandsalesView.accountSelectEvent}"/>
+          <p:ajax event="change" listener="#{stockandsalesView.accountChangeEvent}" />
+        </p:autoComplete>
+      </h:panelGroup>
+
+
+      <!-- From Date -->
+      <p:calendar value="#{stockandsalesView.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="10" 
+                  id="fromDate" showButtonPanel="true" required="true" navigator="true" mask="true"  autocomplete="off" 
+                  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" 
+                  maxdate="#{stockandsalesView.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: stockandsalesView.today}">        
+        <p:ajax event="dateSelect"  process="@this" onstart="block();" oncomplete="unblock();"  update="selectedDate "/>          
+        <p:ajax event="change"  process="@this" onstart="block();" oncomplete="unblock();"  update="selectedDate "/>          
+      </p:calendar>
+
+      <!-- To Date -->
+      <p:calendar value="#{stockandsalesView.selectedDate}" pattern="#{lang.datePattern}" mask="true" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="10" size="10"
+                  id="selectedDate" showButtonPanel="true" required="true" navigator="true"  autocomplete="off" mindate="#{stockandsalesView.fromDate}"
+                  maxdate="#{stockandsalesView.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: stockandsalesView.today}">
+        <p:ajax event="dateSelect" immediate="true" onstart="block();" oncomplete="unblock();" update="fromDate"/>          
+      </p:calendar>
+
+      <p:commandButton value="#{lang.ok}" styleClass="btn btn-info" actionListener="#{stockandsalesView.submitForm}" process="@this reportType fromDate selectedDate" 
+                       update="stockandsalesTable" style="margin-left: 3px; margin-bottom: 4px;" onstart="block()" oncomplete="unblock()"  >
+      </p:commandButton>
+      <p:commandButton value="#{lang.export}" actionListener="#{stockandsalesView.export(main)}" immediate="true"  process="@this"  styleClass="btn btn-primary" 
+                       ajax="false" onstart="block()" oncomplete="unblock()" >
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="stockandsalesTable" var="row" widgetVar="stockandsalesWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{stockandsalesView.getStockAndSalesList(main)}"                  
+                   rowKey="#{row.id}"
+                   scrollable="true" scrollHeight="540"                  
+                   rowHover="true" reflow="true" draggableColumns="true">
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('stockandsalesWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column style="" headerText="#{lang.prodName}" sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hproductNameden">
+          <h:outputText value="#{row.productName}" title="#{appView.title(row.productName)}" escape="false" />
+        </p:column>
+        <p:column style="text-align: right;" headerText="#{lang.pack}" rendered="#{(stockandsalesView.reportType==ReportConstant.DETAIL_VIEW )?'true':'false'}" sortBy="#{row.prodPacking}"
+                  field="prod_packing" filterBy="#{row.prodPacking}" filterStyleClass="hprodPackingden">
+          <h:outputText value="#{appView.display(row.prodPacking)}" title="#{appView.title(row.prodPacking)}" escape="false" />
+        </p:column>
+        <p:column style="text-align: right;" headerText="#{lang.expDate}" rendered="#{(stockandsalesView.reportType==ReportConstant.DETAIL_VIEW )?'true':'false'}" sortBy="#{row.expiryDate}" 
+                  field="expiry_date" filterBy="#{row.expiryDate}" filterStyleClass="hexpiryDateden">
+          <h:outputText value="#{appView.date(row.expiryDate)}" escape="false" />
+        </p:column>
+        <p:column style="text-align: right;" headerText="#{lang.batch}" rendered="#{(stockandsalesView.reportType==ReportConstant.DETAIL_VIEW )?'true':'false'}" sortBy="#{row.prodBatch}" 
+                  field="prod_batch" filterBy="#{row.prodBatch}" filterStyleClass="hprodBatchden">
+          <h:outputText value="#{appView.display(row.prodBatch)}" title="#{appView.title(row.prodBatch)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.mrp}" rendered="#{(stockandsalesView.reportType==ReportConstant.DETAIL_VIEW )?'true':'false'}" sortBy="#{row.prodMrpValue}" 
+                  field="prod_mrp_value" style="text-align: right;" filterBy="#{row.prodMrpValue}" filterStyleClass="hprodMrpValueden">
+          <h:outputText value="#{appView.number(row.prodMrpValue)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.opStock}" rendered="true" sortBy="#{row.qtyAvailable}" field="qty_available" style="text-align: right;" 
+                  filterBy="#{row.qtyAvailable}" filterStyleClass="hqtyAvailableden">
+          <h:outputText value="#{appView.number(row.qtyAvailable)}" escape="false" />
+        </p:column>   
+
+        <p:column headerText="#{lang.opEntryQty}" rendered="true" sortBy="#{row.openEntryQty}" field="open_entry_qty" style="text-align: right;" 
+                  filterBy="#{row.openEntryQty}" filterStyleClass="hqtyAvailableden">
+          <h:outputText value="#{appView.number(row.openEntryQty)}" escape="false" title="#{appView.number(row.openEntryQty)}"/>
+        </p:column>  
+
+        <p:column headerText="#{lang.purch}" rendered="true" sortBy="#{row.purchaseQty}" field="purchase_qty" style="text-align: right;"
+                  filterBy="#{row.purchaseQty}" filterStyleClass="hpurchaseQtyden">
+          <h:outputText value="#{appView.number(row.purchaseQty)}" escape="false" />
+        </p:column>        
+        <p:column headerText="#{lang.purchRet}" rendered="true" sortBy="#{row.purchaseReturnQty}" field="purchase_return_qty" style="text-align: right;" 
+                  filterBy="#{row.purchaseReturnQty}" filterStyleClass="hpurchaseReturnQtyden">
+          <h:outputText value="#{appView.number(row.purchaseReturnQty)}" escape="false" />
+        </p:column>  
+        <p:column headerText="#{stockandsalesView.secondLastMonth}" rendered="true" sortBy="#{row.secondlastMonthSaleQty}" field="secondlast_month_sale_qty" 
+                  style="text-align: right;" filterBy="#{row.secondlastMonthSaleQty}" filterStyleClass="hsecondlastMonthSaleQtyden" >
+          <h:outputText value="#{appView.number(row.secondlastMonthSaleQty)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{stockandsalesView.lastMonth}" rendered="true" sortBy="#{row.lastMonthSaleQty}" field="last_month_sale_qty" style="text-align: right;" 
+                  filterBy="#{row.lastMonthSaleQty}" filterStyleClass="hlastMonthSaleQtyden" >
+          <h:outputText value="#{appView.number(row.lastMonthSaleQty)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.sales}(Grp)" sortBy="#{row.accgrpSalesQty}" rendered="true" field="sales_qty" style="text-align: right;" filterBy="#{row.accgrpSalesQty}" 
+                  filterStyleClass="hsalesQtyden"><h:outputText value="#{appView.number(row.accgrpSalesQty)}" styleClass="text-info" escape="false" />
+        </p:column>        
+        <p:column headerText="#{lang.saleRet}(Grp)" sortBy="#{row.accgrpSalesReturnQty}" rendered="true" field="sales_retun_qty" style="text-align: right;" 
+                  filterBy="#{row.accgrpSalesReturnQty}" filterStyleClass="hsalesRetunQtyden">
+          <h:outputText value="#{appView.number(row.accgrpSalesReturnQty)}" styleClass="text-info"  escape="false" />
+        </p:column> 
+
+        <p:column headerText="#{lang.sales}" sortBy="#{row.salesQty}" rendered="true" field="sales_qty" style="text-align: right;" filterBy="#{row.salesQty}" 
+                  filterStyleClass="hsalesQtyden"><h:outputText value="#{appView.number(row.salesQty)}" escape="false" />
+        </p:column>        
+        <p:column headerText="#{lang.saleRet}" sortBy="#{row.salesReturnQty}" rendered="true" field="sales_retun_qty" style="text-align: right;" 
+                  filterBy="#{row.salesReturnQty}" filterStyleClass="hsalesRetunQtyden">
+          <h:outputText value="#{appView.number(row.salesReturnQty)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.adj}" rendered="true" sortBy="#{row.stockAdjustQty}" field="stock_adjust_qty" style="text-align: right;" 
+                  filterBy="#{row.stockAdjustQty}" filterStyleClass="htotValueden">
+          <h:outputText value="#{appView.number(row.stockAdjustQty)}" escape="false" />
+        </p:column> 
+        <p:column headerText="#{lang.salesRate}" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'true':'false'}" sortBy="#{row.saleRate}" 
+                  field="landing_value" style="text-align: right;" filterBy="#{row.saleRate}" filterStyleClass="htotValueden">
+          <h:outputText value="#{appView.decimal(row.saleRate)}" escape="false" />
+        </p:column> 
+        <p:column headerText="#{lang.curStock}" sortBy="#{row.currentQty}" field="current_qty" style="text-align: right;" filterBy="#{row.currentQty}" 
+                  filterStyleClass="hcurrentQtyden"><h:outputText value="#{appView.number(row.currentQty)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.avRate}" sortBy="#{row.aveRate}" field="ave_rate" style="text-align: right;" filterBy="#{row.aveRate}" 
+                  filterStyleClass="hcurrentQtyden"><h:outputText value="#{appView.decimal(row.aveRate)}" escape="false" title="#{appView.number(row.aveRate)}"/>
+        </p:column>
+        <p:column headerText="#{lang.prod} #{lang.packing}" sortBy="#{row.prodPacking}" field="prod_packing" style="text-align: right;" filterBy="#{row.totValue}" 
+                  filterStyleClass="htotValueden"><h:outputText value="#{appView.display(row.prodPacking)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.stockValue}" sortBy="#{row.totValue}" field="tot_value" style="text-align: right;" filterBy="#{row.totValue}" 
+                  filterStyleClass="htotValueden"><h:outputText value="#{appView.decimal(row.totValue)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.netSales}" sortBy="#{row.netSales}" field="tot_value" style="text-align: right;" filterBy="#{row.netSales}" 
+                  filterStyleClass="htotValueden"><h:outputText value="#{appView.decimal(row.netSales)}" escape="false" />
+        </p:column>
+
+        <p:columnGroup type="footer">
+          <p:row rendered="true">   
+            <p:column  style="text-align:right;width:9%;" footerText="Opg.Stk Val:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.openingStockValue)}" ></p:column>
+            <p:column  style="text-align:right;width:9%;" footerText="Puchase Val:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.puchaseValue)}" ></p:column>    
+            <p:column  style="text-align:right;width:9%;" footerText="Sales Val: (#{lang.group})" styleClass="text-info" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.accgrpSalesValue)}" styleClass="text-info"  ></p:column>                 
+            <p:column  style="text-align:right;width:9%;" footerText="Sales Val:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.salesValue)}" ></p:column>                 
+            <p:column  style="text-align:right;width:9%;" footerText="Net Stk. Adjust.'s:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.stockAdjustmentValue)}" ></p:column>            
+          </p:row>
+          <p:row>  
+            <p:column  style="text-align:right;width:9%;" footerText="Closing.Stk Val:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.closingStockValue)}" ></p:column>
+            <p:column  style="text-align:right;width:9%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="Puchase Ret Val:" />
+            <p:column  style="text-align:right;width:11%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="#{appView.decimal(stockandsalesView.puchaseReturnValue)}" ></p:column>    
+            <p:column  style="text-align:right;width:9%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="Sales Ret Val:(#{lang.group})" styleClass="text-info"  />
+            <p:column  style="text-align:right;width:11%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="#{appView.decimal(stockandsalesView.accgrpSalesReturnValue)}" styleClass="text-info"  ></p:column>                 
+            <p:column  style="text-align:right;width:9%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="Sales Ret Val:" />
+            <p:column  style="text-align:right;width:11%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="#{appView.decimal(stockandsalesView.salesReturnValue)}" ></p:column>                 
+            <p:column  style="text-align:right;width:9%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="Open. Entry Val:" />
+            <p:column  style="text-align:right;width:11%;" rendered="#{stockandsalesView.reportType==ReportConstant.AUDIT_VIEW?'false':'true'}" footerText="#{appView.decimal(stockandsalesView.openingEntryValue)}" ></p:column>                 
+
+          </p:row>   
+          <p:row rendered="true"> 
+            <p:column  style="text-align:right;width:9%;" footerText="#{stockandsalesView.lastMonth}:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.lastMonthSaleValue)}" ></p:column>
+            <p:column  style="text-align:right;width:9%;" footerText="#{stockandsalesView.secondLastMonth}:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.secondLastMonthSaleValue)}" ></p:column>    
+            <p:column  style="text-align:right;width:9%;" footerText="" />
+            <p:column  style="text-align:right;width:11%;" footerText="" />
+            <p:column  style="text-align:right;width:9%;" footerText="Net Sale:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.netSaleValue)}" ></p:column>    
+            <p:column  style="text-align:right;width:9%;" footerText="Net Profit:" />
+            <p:column  style="text-align:right;width:11%;" footerText="#{appView.decimal(stockandsalesView.netProfitValue)}" ></p:column> 
+
+          </p:row>    
+        </p:columnGroup>                    
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

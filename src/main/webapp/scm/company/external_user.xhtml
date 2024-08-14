@@ -1,0 +1,240 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  #{externalUserView.switchExternalUser(main, main.viewType)}
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="ids" value="externalUser" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"       oncomplete="closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{externalUserView.deleteExternalUser(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('externalUserWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{externalUserView.cloneExternalUser(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{externalUserView.deleteExternalUser(main)}" value="#{lang.delete}" onclick="wdgOff('externalUserWidgetDel')"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{externalUserView.saveExternalUser(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+
+
+    <ui:define name="afterForm">
+
+      <p:panelGrid columns="4" rendered="#{main.isForm()}" layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid4}">
+
+
+        <!-- Name -->
+        <p:outputLabel value="#{lang.name}" for="name" />
+        <h:panelGroup>
+          <p:inputText value="#{externalUserView.externalUser.name}" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" id="name" 
+                       style="position: relative" styleClass="fw" autocomplete="off"/>
+          <p:message for="name" display="text" styleClass="fw" />
+        </h:panelGroup>
+        <!-- Token -->
+        <p:outputLabel value="#{lang.token}" for="token" />
+        <h:panelGrid columns="3" >
+          <p:inputText value="#{externalUserView.externalUser.token}" maxlength="50" required="true" requiredMessage="#{lang.token} #{lang.isRequired}" id="token" 
+                       style="position: relative;width:200px" styleClass="fw" autocomplete="off" />
+          <p:message for="token" display="text" styleClass="fw" />
+          <p:commandButton value="#{lang.generate} #{lang.token}" actionListener="#{externalUserView.generateToken()}"
+                           immediate="true"  process="@this"  styleClass="btn btn-info" update="token">
+          </p:commandButton>  
+        </h:panelGrid>
+        <!-- User Code -->
+<!--        <p:outputLabel value="#{lang.userCode}" for="userCode" />
+        <h:panelGroup >
+          <p:inputText value="#{externalUserView.externalUser.userCode}" maxlength="20" required="true" requiredMessage="#{lang.userCode} #{lang.isRequired}" id="userCode"
+                       autocomplete="off" style="position: relative" styleClass="fw" />
+          <p:message for="userCode" display="text" styleClass="fw" />
+        </h:panelGroup> -->
+
+        <!-- Email -->
+        <p:outputLabel value="#{lang.email}" for="email" />
+        <h:panelGroup>
+          <p:inputText value="#{externalUserView.externalUser.email}" maxlength="50" required="true" requiredMessage="#{lang.email} #{lang.isRequired}"
+                       id="email" validator="wawo.EmailValidator" styleClass="fw" style="position: relative" autocomplete="off"/>
+          <p:message for="email" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <p:outputLabel value="#{lang.accountGroup}" for="accountGroup" />
+        <h:panelGroup >
+          <p:autoComplete id="accountGroup"  value="#{externalUserView.externalUser.accountGroupId}" completeMethod="#{externalUserView.accountGroupAuto}" 
+                          converter="wawo.LookupIntConverter" scrollHeight="500" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"
+                          var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                              
+                          title="#{lang.accountGroup}">
+            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+            <p:column style="width:250px;">
+              <h:outputText value="#{e.groupName}" />
+            </p:column>
+          </p:autoComplete>                
+        </h:panelGroup>  
+        <!-- Address 1 -->
+        <p:outputLabel value="#{lang.address}" for="address1" />
+        <h:panelGroup>
+          <p:inputTextarea value="#{externalUserView.externalUser.address1}" cols="100" rows="3" maxlength="500"
+                           id="address1" autoResize="false" styleClass="fw" style="position: relative"/>
+          <p:message for="address1" display="text"/>
+        </h:panelGroup>
+        <h:panelGroup></h:panelGroup> <h:panelGroup></h:panelGroup>
+        <!-- phone 1 -->
+        <h:panelGroup>                 
+          <p:outputLabel value="#{lang.mobile} #{lang.no} 1 "  />
+          <p:outputLabel value="(#{userRuntimeView.company.countryId.phoneCode})" rendered="#{userRuntimeView.company.countryId.phoneCode ne null}" for="phone1"
+                         />                      
+        </h:panelGroup> 
+        <h:panelGroup id="mobileDiv">
+          <p:inputText readonly="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 1}"  value="#{externalUserView.externalUser.phone1}" maxlength="#{userRuntimeView.company.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                       autocomplete="off" id="phone1" styleClass="fw" title="#{lang.maximum} #{userRuntimeView.company.countryId.mobileNumberLength} #{lang.digit}"
+                       required="true" requiredMessage="#{lang.mobile} #{lang.no} #{lang.isRequired}">                  
+            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+            <p:ajax event="change" update="" />
+          </p:inputText>
+          <!--<h:outputLabel value="#{lang.maximum} #{userRuntimeView.company.countryId.phoneNumberLength} #{lang.digit}" />--> 
+          <p:tooltip id="phone1ToolTip" for="phone1" showEvent="focus" hideEvent="blur" />
+
+          <p:message for="phone1" display="text"/>
+        </h:panelGroup>
+        <h:panelGroup></h:panelGroup> <h:panelGroup></h:panelGroup>
+
+        <!--VERIFICATION-->
+        <!--        <h:panelGroup layout="block" style="text-align: left;" id="phoneVerifyDivBtn">
+                  <p:commandButton value="#{lang.verifyPhone}" styleClass="btn btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv"
+                                   actionListener="#{externalUserView.verifyPhone(main)}"
+                                   rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 0 and externalUserView.externalUser.otp eq null and (externalUserView.externalUser.phone1 ne null and externalUserView.externalUser.phone1.length() eq 10)}" />
+                  <p:commandButton value="#{lang.disableSMS}" styleClass="btn btn-primary" 
+                                   actionListener="#{externalUserView.disableSMS(main)}" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
+                                   rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 1 and externalUserView.externalUser.otp ne null and (externalUserView.externalUser.phone1 ne null and externalUserView.externalUser.phone1.length() eq 10)}" />
+                  <p:inputText value="#{externalUserView.verifyOtp}" styleClass="fw" placeholder="#{lang.placeholderOtp}"                      
+                               rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 0 and externalUserView.externalUser.otp ne null and (externalUserView.externalUser.phone1 ne null and externalUserView.externalUser.phone1.length() eq 10)}" />
+        
+                </h:panelGroup>-->
+        <!--        <h:panelGroup id="phoneVerifyDiv">  
+                     
+                  
+                  <p:commandButton value="#{lang.verifyOtp}" styleClass="btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
+                                   actionListener="#{externalUserView.verifyOtp(main)}"
+                                   rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 0 and externalUserView.externalUser.otp ne null and (externalUserView.externalUser.phone1 ne null and externalUserView.externalUser.phone1.length() eq 10)}" />
+                  <h:outputLabel value=" Or " style="padding-left:3px;padding-right:3px;"
+                                 rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 0 and externalUserView.externalUser.otp ne null and (externalUserView.externalUser.phone1 ne null and externalUserView.externalUser.phone1.length() eq 10)}" />
+                  <p:commandButton value="#{lang.resendOtp}" styleClass="btn-primary" update="phoneVerifyDivBtn phoneVerifyDiv mobileDiv"
+                                   actionListener="#{externalUserView.resendOtp(main)}"
+                                   rendered="#{userRuntimeView.company.companySettings.smsEnabled eq 1 and externalUserView.externalUser.phoneVerified eq 0 and externalUserView.externalUser.otp ne null and (externalUserView.externalUser.phone1 ne null and externalUserView.externalUser.phone1.length() eq 10)}" />
+                  
+                </h:panelGroup>-->
+
+        <!-- Mobile Number -->
+        <h:panelGroup>                 
+          <p:outputLabel value="#{lang.mobile} #{lang.no} 2" for="phone2" />
+          <p:outputLabel value="(#{userRuntimeView.company.countryId.phoneCode})" rendered="#{userRuntimeView.company.countryId.phoneCode ne null}" />                      
+        </h:panelGroup> 
+        <h:panelGroup>
+          <p:inputText  value="#{externalUserView.externalUser.phone2}" maxlength="#{userRuntimeView.company.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                        autocomplete="off" id="phone2" styleClass="fw" title="#{lang.maximum} #{userRuntimeView.company.countryId.mobileNumberLength} #{lang.digit}">                  
+            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+          </p:inputText>
+          <p:tooltip id="phone2ToolTip" for="phone2" showEvent="focus" hideEvent="blur" />
+          <p:message for="phone2" display="text"/>
+        </h:panelGroup>
+        <h:panelGroup></h:panelGroup> <h:panelGroup></h:panelGroup>
+        <!-- Status -->
+        <p:outputLabel value="#{lang.status}" for="externalUserStatusId"/>
+        <h:panelGroup>
+          <p:selectOneMenu value="#{externalUserView.externalUser.statusId}" converter="omnifaces.SelectItemsConverter" required="true"
+                           requiredMessage="#{lang.status} #{lang.isRequired}"  styleClass="fw"
+                           id="externalUserStatusId">
+            <f:selectItems value="#{externalUserView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+          </p:selectOneMenu>
+          <p:message for="externalUserStatusId" display="text" />
+        </h:panelGroup>
+
+        <h:panelGroup></h:panelGroup><h:panelGroup></h:panelGroup>
+      </p:panelGrid>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="externalUserTable" var="externalUserVar" widgetVar="externalUserWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{externalUserView.externalUserLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{externalUserVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{externalUserView.externalUserSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column headerText="#{lang.name}" sortBy="#{externalUserVar.name}" field="user_code" >
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{externalUserVar.name}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{externalUserView.externalUser}" value="#{externalUserVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column headerText="#{lang.companyName}" sortBy="#{externalUserVar.companyId.companyName}" field="company_id.company_name" rendered="false" >
+          <f:facet name="header"><h:outputText value="#{lang.companyName}" title="#{lang.companyName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(externalUserVar.companyId.companyName)}" title="#{appView.title(externalUserVar.companyId.companyName)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.userCode}" sortBy="#{externalUserVar.userCode}" field="name">
+          <f:facet name="header"><h:outputText value="#{lang.userCode}" title="#{lang.userCode}"/></f:facet>
+          <h:outputText value="#{appView.display(externalUserVar.userCode)}" title="#{appView.title(externalUserVar.userCode)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.phone} #{lang.sno}" sortBy="#{externalUserVar.phone1}" field="phone_1">
+          <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+
+          <h:outputText value="#{appView.display(externalUserVar.phone1)}" title="#{appView.title(externalUserVar.phone1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.email}" sortBy="#{externalUserVar.email}" field="email">
+          <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+
+          <h:outputText value="#{appView.display(externalUserVar.email)}" title="#{appView.title(externalUserVar.email)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.address}" sortBy="#{externalUserVar.address1}" field="address1" styleClass="wrap">
+          <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+          <h:outputText value="#{externalUserVar.address1}" title="#{appView.title(externalUserVar.address1)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.status}" sortBy="#{externalUserVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>       
+          <h:outputText value="#{appView.display(externalUserVar.statusId.title)}" title="#{appView.title(externalUserVar.statusId.title)}" 
+                        escape="false" styleClass="label" 
+                        style="background-color: #{sysRuntimeView.statusColorYesNo(externalUserVar.statusId.id)}"/>          
+        </p:column>
+<!--        <p:column headerText="#{lang.action}" >
+          <p:commandButton value="#{lang.reset} #{lang.password}" action="#{externalUserView.resetPassword()}"/>
+        </p:column>-->
+        <p:column styleClass="w-60">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.status}"/></f:facet>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(externalUserVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(externalUserVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(externalUserVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(externalUserVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(externalUserVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>
+

@@ -1,0 +1,193 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" >
+  <!--#{purchaseRegisterReportView.switchPurchaseRegistere(main)}-->
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="ids" value="productEntry" />
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="newList" value="false" />
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <!--    <ui:define name="newList">
+          <p:inputText styleClass="fw" id="productEntryST" onkeyup="return callDtFilter(this.value, 'productEntry');"  placeholder="#{lang.search}"/>
+        </ui:define>-->
+
+    <ui:define name="form"/>
+    <ui:define name="rightList" >
+      <h:panelGroup id="accountGroupDiv" rendered="true">
+        <p:autoComplete id='accountGroup'  value="#{purchaseRegisterReportView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" 
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-users" style="color:#000;"></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <i class="fa fa-users" style="color:#CCC;" ></i>
+            </p:fragment>
+          </p:column>
+          <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" immediate="true" process="accountGroupDiv" update="accountDiv reportList" listener="#{purchaseRegisterReportView.accountGroupSelectEvent}"/>
+        </p:autoComplete>    
+      </h:panelGroup>
+      <h:panelGroup id="accountDiv" >
+        <p:autoComplete id='account'  value="#{purchaseRegisterReportView.filterParameters.account}" completeMethod="#{purchaseRegisterReportView.accountAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                        title="#{lang.accountNumber}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.vendorId.vendorName}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountCode}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.companyTradeProfileId.title}" />
+          </p:column>
+          <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" immediate="true" process="accountDiv" update="reportList" listener="#{purchaseRegisterReportView.accountSelectEvent}"/>
+        </p:autoComplete>
+      </h:panelGroup>
+      <h:panelGroup>
+
+        <p:commandButton actionListener="#{purchaseRegisterReportView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate f1"  styleClass="btn" onclick="block();" />
+        <p:commandButton actionListener="#{purchaseRegisterReportView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate f1" styleClass="btn" onclick="block();" />
+
+        <p:calendar id="fromDate" value="#{purchaseRegisterReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" autocomplete="off"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1"  onfocus="this.select();"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" maxdate="#{purchaseRegisterReportView.filterParameters.today}" >
+          <p:ajax event="dateSelect" process="@this"  update="toDate productEntryTable " onstart="block();" oncomplete="unblock();" />
+          <p:ajax event="change" process="@this"  update="toDate productEntryTable " onstart="block();" oncomplete="unblock();" />
+
+        </p:calendar>
+        <p:calendar id="toDate" value="#{purchaseRegisterReportView.filterParameters.toDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" autocomplete="off"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" onfocus="this.select();"
+                    mindate="#{purchaseRegisterReportView.filterParameters.fromDate}"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" maxdate="#{purchaseRegisterReportView.filterParameters.today}" >
+          <p:ajax event="dateSelect" process="@this"  update="productEntryTable " onstart="block();" oncomplete="unblock();" />
+
+        </p:calendar>
+        <p:message for="fromDate" display="text" id="fmess"/>
+
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="reportList" >
+        <p:dataTable id="productEntryTable" var="productEntryVar" widgetVar="productEntryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{purchaseRegisterReportView.loadPurchaseRegisterList(main)}"  
+                     rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" 
+                     scrollHeight="700"  scrollable="false" >
+          <p:ajax event="page" oncomplete="unblock();" />
+          <f:facet name="header">
+            <p:outputPanel styleClass="hidden" >
+              <p:inputText id="globalFilter"  onkeyup="return PF('productEntryWidget').filter()" />
+            </p:outputPanel>
+          </f:facet> 
+          <p:column sortBy="#{productEntryVar.invoiceNo}" field="invoice_no" style="width:150px;">
+            <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+              <h:outputText value="#{appView.display(productEntryVar.invoiceNo)}" escape="false" />
+
+          </p:column>
+
+          <p:column sortBy="#{productEntryVar.accountInvoiceNo}" field="account_invoice_no" >
+            <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+            <h:outputText value="#{appView.display(productEntryVar.accountInvoiceNo)}" escape="false">
+            </h:outputText>
+          </p:column>
+
+          <p:column  sortBy="#{productEntryVar.invoiceDate}" field="invoice_date"  >
+            <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+            <h:outputText value="#{appView.date(productEntryVar.invoiceDate)}" escape="false" />
+          </p:column>
+
+          <p:column  sortBy="#{productEntryVar.productEntryDate}" field="product_entry_date"  >
+            <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+            <h:outputText value="#{appView.date(productEntryVar.productEntryDate)}" escape="false" />
+          </p:column>
+          <p:column sortBy="#{productEntryVar.invoiceAmountNet}" field="invoice_amount_net" style="text-align: right;" >
+            <f:facet name="header"><h:outputText value="#{lang.purchase} #{lang.value}" title="#{lang.purchase} #{lang.value}"/></f:facet>          
+            <h:outputText value="#{productEntryVar.invoiceAmountNet eq null ? '0.00' : appView.decimal(productEntryVar.invoiceAmountNet)}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(purchaseRegisterReportView.purchaseValue)}" />
+            </f:facet>
+          </p:column>
+
+          <p:column  sortBy="#{productEntryVar.invoiceAmountAssessable}" field="tax_assessable_value" style="text-align: right;" >
+            <f:facet name="header"><h:outputText value="#{lang.taxable} #{lang.value}" title="#{lang.taxable} #{lang.value}"/></f:facet>
+            <h:outputText value="#{appView.decimal(productEntryVar.invoiceAmountAssessable)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(purchaseRegisterReportView.taxableValue)}" />
+            </f:facet>
+          </p:column>
+
+          <p:column  sortBy="#{productEntryVar.invoiceAmount}" field="invoice_amount" style="text-align: right;" >
+            <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}"/></f:facet>
+            <h:outputText value="#{appView.decimal(productEntryVar.invoiceAmount)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(purchaseRegisterReportView.invoiceAmount)}" />
+            </f:facet>
+          </p:column>
+
+
+          <p:column  sortBy="#{productEntryVar.accountId.vendorId.vendorName}" field="vendor_name" style="text-align: right;width:300px;" >
+            <f:facet name="header"><h:outputText value="#{lang.supplier}" title="#{lang.supplier}"/></f:facet>
+            <h:outputText value="#{productEntryVar.accountId.vendorId.vendorName}" />
+          </p:column>
+          <p:column exportable="false" style="width:50px;"></p:column>
+
+
+<!--        <p:column  sortBy="#{productEntryVar.productEntryStatusId.title}" field="product_entry_status.title" >
+  <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+  <h:outputText value="#{productEntryVar.productEntryStatusId.title}" escape="false"  
+                styleClass="m-r-5 #{sysRuntimeView.statusStyle(productEntryVar.productEntryStatusId.id)}" 
+                style="background-color: #{sysRuntimeView.statusColor(productEntryVar.productEntryStatusId.id)}"/>          
+
+  <h:outputText value="Tax Variation" escape="false"  
+                styleClass="label"  rendered="#{productEntryVar.isTaxCodeModified eq 1}"
+                style="background-color: #f10b0b;"/>
+
+
+</p:column>-->
+
+          <!--          <p:column exportable="false">
+                      <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                      <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                        <ui:define name="cby">#{appView.display(productEntryVar.createdBy)}</ui:define>
+                        <ui:define name="cat">#{appView.dateTime(productEntryVar.createdAt)}</ui:define>
+                        <ui:define name="uby">#{appView.display(productEntryVar.modifiedBy)}</ui:define>
+                        <ui:define name="uat">#{appView.dateTime(productEntryVar.modifiedAt)}</ui:define>
+                        <ui:define name="id">#{appView.display(productEntryVar.id)}</ui:define>
+                      </ui:decorate>
+                    </p:column>-->
+        </p:dataTable>
+      </h:panelGroup>
+      <!--<h:outputLabel value=" #{lang.taxable} #{lang.value}: #{appView.decimal(purchaseRegisterReportView.taxableValue)} " />&#160;&#160;<h:outputLabel value=" , #{lang.invoiceAmount} : #{appView.decimal(purchaseRegisterReportView.invoiceAmount)}" />-->
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

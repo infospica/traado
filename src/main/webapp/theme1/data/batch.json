@@ -1,0 +1,141 @@
+[
+  [
+    {
+      "bid": 0,
+      "pid": 0,
+      "name": "AZ1",
+      "label": "AZ1",
+      "value": "AZ1",
+      "exp": "21/09/2016",
+      "price": 110.50,
+      "stkqty": 20
+    },
+    {
+      "bid": 1,
+      "pid": 0,
+      "name": "AZ2",
+      "label": "AZ2",
+      "value": "AZ2",
+      "exp": "21/09/2017",
+      "price": 110.50,
+      "stkqty": 100
+    },
+    {
+      "bid": 2,
+      "pid": 0,
+      "name": "AZ4",
+      "label": "AZ4",
+      "value": "AZ4",
+      "exp": "21/09/2017",
+      "price": 110.50,
+      "stkqty": 200
+    },
+    {
+      "bid": 3,
+      "pid": 0,
+      "name": "AZ-01-5",
+      "label": "AZ-01-5",
+      "value": "AZ-01-5",
+      "exp": "21/09/2017",
+      "price": 200.50,
+      "stkqty": 500
+    }
+  ],
+  [
+    {
+      "bid": 4,
+      "pid": 1,
+      "name": "CRO",
+      "label": "AZ2",
+      "value": "AZ2",
+      "exp": "21/09/2019",
+      "price": 60,
+      "stkqty": 2000
+    },
+    {
+      "bid": 5,
+      "pid": 1,
+      "name": "CROLLLO",
+      "label": "CROLLLO",
+      "value": "CROLLLO",
+      "exp": "21/09/2017",
+      "price": 50,
+      "stkqty": 1000
+
+    }
+  ],
+  [
+    {
+      "bid": 6,
+      "pid": 2,
+      "name": "B1",
+      "label": "B1",
+      "value": "B1",
+      "exp": "21/09/2016",
+      "price": 230.50,
+      "stkqty": 20
+    },
+    {
+      "bid": 7,
+      "pid": 2,
+      "name": "B2",
+      "label": "B2",
+      "value": "B2",
+      "exp": "21/09/2017",
+      "price": 230.50,
+      "stkqty": 100
+    },
+    {
+      "bid": 8,
+      "pid": 2,
+      "name": "BATCH4",
+      "label": "BATCH4",
+      "value": "BATCH4",
+      "exp": "21/09/2017",
+      "price": 230.50,
+      "stkqty": 200
+    },
+    {
+      "bid": 9,
+      "pid": 2,
+      "name": "BO-01-5",
+      "label": "BO-01-5",
+      "value": "BO-01-5",
+      "exp": "21/09/2017",
+      "price": 230.50,
+      "stkqty": 500
+    }
+  ],
+  [
+    {
+      "bid": 10,
+      "pid": 3,
+      "name": "Mox-092019",
+      "label": "Mox-092019",
+      "value": "Mox-092019",
+      "exp": "21/09/2019",
+      "price": 60,
+      "stkqty": 2000
+    },
+    {
+      "bid": 11,
+      "pid": 3,
+      "name": "Mox-092020",
+      "label": "Mox-092020",
+      "value": "Mox-092020",
+      "exp": "21/09/2020",
+      "price": 60,
+      "stkqty": 2000
+    },
+    {
+      "bid": 12,
+      "pid": 3,
+      "name": "Mox-092017",
+      "label": "Mox-092017",
+      "value": "Mox-092017",
+      "exp": "21/09/2017",
+      "price": 50,
+      "stkqty": 1000
+    }
+  ]
+]

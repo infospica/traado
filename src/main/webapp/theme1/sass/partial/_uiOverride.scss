@@ -1,0 +1,329 @@
+/* <-- uiOverride STYLE begins */
+
+.ui-menu.ui-widget,
+.ui-corner-all{
+	@include border-radius("0px !important");
+}
+
+.ui-widget {
+    font-size: inherit;
+    font-family: inherit;
+}
+
+.ui-autocomplete{
+	position:relative;
+	display: inline-block;
+	vertical-align: middle;
+	.ui-autocomplete-dropdown{
+		///*width: calc(100% - 34px);*/
+		position: absolute;
+		right: -1px;
+		top: 0px;
+	}
+	&+.btn{
+		margin-left: 5px;
+	}
+	.ui-button.ui-state-default{
+		background:none !important;
+		border: none !important;
+	}
+}
+
+.ui-fluid .ui-autocomplete,
+.ui-fluid .ui-autocomplete-input{
+	overflow: hidden;
+}
+
+.ui-button,
+.ui-button-icon-only,
+.ui-button-text-icon-left,
+.ui-button-text-icon-right,
+.ui-button-text-icon-primary,
+.ui-button-text-icon-secondary{
+	&.btn{
+		.ui-button-text {
+			padding-top: 0;
+			margin: 0 -8px;
+			padding-bottom: 0;
+		}
+	}
+}
+
+.ui-icon{
+	&.fa{text-indent:0;}
+}
+
+.ui-radiobutton .ui-radiobutton-box {
+    width: 17px;
+    height: 17px;
+	@include border-radius("50% !important");
+}
+
+.ui-menu.ui-widget{
+	@extend .bordrad0px !optional;
+	&.ui-separator{
+		border-color:$Brdr;
+		background-color:$Brdr;
+	}
+}
+
+.ui-messages{
+	&-info,
+	&-warn,
+	&-error,
+	&-fatal {
+		margin:0;
+	}
+}
+
+.ui-message-error, .ui-state-error, .ui-widget-content .ui-state-error, .ui-widget-header .ui-state-error{
+	border: none transparent;
+	background: none transparent;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+	background-image:none;
+}
+
+td,th{
+	&.ui-selection-column{
+		width:80px;
+		text-align:center;
+	}
+}
+
+.ui-selectonemenu{
+	.ui-selectonemenu-trigger{
+		width:28px;
+		&.ui-corner-right{
+			@include border-radius(0px);
+		}
+		.ui-icon {margin-top: 5px;}
+	}
+}
+
+.ui-selectonemenu-panel.ui-widget{
+	z-index:1050 !important;
+}
+
+.ui-chkbox{
+	.ui-chkbox-box {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	&.ui-widget{
+		& + label {
+			padding-left: 5px;
+			vertical-align: middle;
+			margin: 0px !important;
+		}
+	}
+}
+
+.mcacAnchor span{min-height: 1.1em;}
+
+.ui-menu.ui-widget li > .ui-menuitem-link{
+	position: relative;
+	padding-left: 20px;
+}
+
+.ui-outputlabel{
+	font-family: $prFontB;
+	&-rfi{ color: #e00; }
+}
+
+.ui-datatable{
+	&-scrollable{
+		&-body{ thead{display: none;} }
+	}
+
+	tr.ui-widget-content,
+	tbody.ui-widget-content{
+		border-right: 0px none transparent;
+		border-left: 0px none transparent;
+	}
+
+	.mDataTable{
+		border: 0px none transparent;
+		border-top: 1px solid rgba(0, 0, 0, 0.12);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+		thead th, tbody td,
+		tfoot td, tfoot th {
+			padding: 0 18px 12px 18px;
+		}
+		thead th, tfoot td {
+			text-align: left;
+		}
+
+		thead th{
+			border-style: none !important;
+		}
+
+		td, th{
+			&.ui-selection-column,
+			&.ui-selection-column {
+				text-align: center;
+				vertical-align: middle;
+			}
+		}
+		
+		.ui-state-default{
+			background: none;
+			text-shadow:none;
+		}
+		
+		tbody td{
+			padding-top: 12px;
+		}
+		thead th{
+			padding-bottom: 8px;
+		}
+		
+		.ui-datatable-odd,
+		.ui-datatable-even {
+			background: none;
+		}
+		.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight{
+			color: $Txt;
+			background-color: #e0e0e0; 
+			a{ color: $Txt; }
+		}
+		.ui-state-highlight .ui-icon {background-image: url("/scm/javax.faces.resource/images/ui-icons_333333_256x240.png.xhtml?ln=primefaces-bootstrap");}
+	}
+	.ui-paginator{
+		text-align: left;
+		margin-top: 30px;
+		border: 0px none transparent;
+		@extend .clearfix !optional;
+		&-pages{
+			padding: 0;
+			margin-left: 0px;
+			margin-right: 0px;
+		}
+		&-page,
+		&-next,
+		&-last,
+		&-first,
+		&-prev,
+		&-current{
+			margin-left: 0;
+			margin-right:-1px;
+		}
+		
+		.ui-widget-header,
+		&.ui-widget-header{
+			font-weight: normal;
+			background: $ClrF !important;
+			&.top{
+				border-bottom: $prBrdr 1px solid;
+			}
+			&.bottom{
+				border-top: $prBrdr 1px solid;
+			}
+		}
+		a{
+			color: $Txt;
+			padding: 10px 18px;
+			font-family: $prFontB;
+			background: #fff !important;
+			@include box-shadow("none !important");
+		}
+		
+		.ui-state-active{
+			color: $ClrF !important;
+			background:#007fbd !important;
+			border-color:#007fbd;
+		}
+		.ui-state-disabled{
+			cursor:not-allowed;
+			font-family: $prFont;
+		}
+	}
+	.ui-widget-header {
+		background: none;
+	}
+}
+
+.btnTrans,
+.searchBox{
+	.ui-button.ui-state-default{
+		background:none !important;
+		border: none !important;
+	}
+}
+
+ .ui-selectonemenu-trigger{
+	background:none !important;
+	border: none !important;
+}
+
+.ui-selectonemenu,
+.ui-inputfield,
+.ui-widget-content .ui-inputfield,
+.ui-widget-header .ui-inputfield{
+	@include box-shadow("0px !important");
+	border-color: transparent;
+	border-bottom-color: $prInputBrdr;
+	&:focus{
+		border-color: transparent;
+		border-bottom-color: $prInputBrdrFocus;
+	}
+	&.ui-state-focus{
+		@include box-shadow("none !important");
+		border-color: transparent;
+		border-bottom-color: $prInputBrdrFocus;
+	}
+}
+
+.conArea > .ui-tabs{ margin-top: -10px; }
+
+.materialTabs{
+	&.ui-tabs{
+		padding: 0px;
+		border: none transparent;
+		.ui-tabs-nav{
+			width: 100%;
+			padding: 0px;
+			background: $ClrF;
+			border: none transparent !important;
+			@include border-radius(2px);
+			@include box-shadow("0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12)");
+			@extend .flex !optional;
+			& > li {
+				margin: 0px;
+				padding: 0px;
+				font-size: 15px;
+				border: none transparent;
+				text-transform: uppercase;
+				background: none !important;
+				@include border-radius("0px !important");
+				@extend .cell !optional;
+				& > a {
+					width: 100%;
+					color: $Clr1;
+					display: block;
+					font-size: 15px;
+					text-align: center;
+					padding: 14px 15px;
+					border-bottom: transparent 2px solid;
+				}
+				&.ui-state-hover{
+					& > a {
+						color: lighten($Clr1, 10%);
+					}
+				}
+				&.ui-state-active{
+					border: none transparent;
+					& > a {
+						border-bottom-color: $prColor;
+					}
+				}
+			}
+		}
+		.ui-tabs-panel{
+			padding: 15px 0;
+		}
+	}
+}
+/* uiOverride STYLE ends --> */

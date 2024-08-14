@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{productDetailView.switchProductDetail(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productDetail}" />
+    <ui:param name="ids" value="productDetail" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productDetailView.deleteProductDetail(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productDetailWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productDetailView.cloneProductDetail(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productDetailView.deleteProductDetail(main)}" value="#{lang.delete}" onclick="wdgOff('productDetailWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productDetailView.saveProductDetail(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.productDetailProductByContractId}" for="productDetailProductByContractId"/><h:panelGroup>
+        <p:autoComplete value="#{productDetailView.productDetail.productByContractId}" completeMethod="#{productDetailView.productByContractAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productDetailProductByContractId} #{lang.isRequired}" id="productDetailProductByContractId" var="e" itemValue="#{e}" itemLabel="#{e.marginPercentage}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productByContractClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productByContractById()}"/>
+        </p:autoComplete><p:message for="productDetailProductByContractId" display="text" /></h:panelGroup>            
+      <p:outputLabel value="#{lang.batchNo}" for="batchNo" />
+      <h:panelGroup><p:inputText value="#{productDetailView.productDetail.batchNo}" maxlength="100" required="true" requiredMessage="#{lang.batchNo} #{lang.isRequired}" id="batchNo" /><p:message for="batchNo" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.expiryDateActual}" for="expiryDateActual" />
+      <h:panelGroup><p:calendar value="#{productDetailView.productDetail.expiryDateActual}" pattern="#{lang.datePattern}" converterMessage="#{lang.expiryDateActual} #{lang.invalidDate}" maxlength="29" id="expiryDateActual" showButtonPanel="true" navigator="true" mask="true"/><p:message for="expiryDateActual" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.expiryDateSales}" for="expiryDateSales" />
+      <h:panelGroup><p:calendar value="#{productDetailView.productDetail.expiryDateSales}" pattern="#{lang.datePattern}" converterMessage="#{lang.expiryDateSales} #{lang.invalidDate}" maxlength="29" id="expiryDateSales" showButtonPanel="true" navigator="true" mask="true"/><p:message for="expiryDateSales" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.valueMrp}" for="valueMrp" />
+      <h:panelGroup><p:inputNumber value="#{productDetailView.productDetail.valueMrp}" converterMessage="#{lang.valueMrp} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" requiredMessage="#{lang.valueMrp} #{lang.isRequired}" id="valueMrp" /><p:message for="valueMrp" display="text"/></h:panelGroup>
+
+      <p:outputLabel value="#{lang.productDetailProdDetailStatusId}" for="productDetailProdDetailStatusId"/><h:panelGroup>
+        <p:autoComplete value="#{productDetailView.productDetail.prodDetailStatusId}" completeMethod="#{productDetailView.prodDetailStatusAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productDetailProdDetailStatusId} #{lang.isRequired}" id="productDetailProdDetailStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.prodDetailStatusClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.prodDetailStatusById()}"/>
+        </p:autoComplete><p:message for="productDetailProdDetailStatusId" display="text" /></h:panelGroup>            
+      <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+      <h:panelGroup><p:inputText value="#{productDetailView.productDetail.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text"/></h:panelGroup>            
+      <p:outputLabel value="#{lang.lastModifiedBy}" for="lastModifiedBy" />
+      <h:panelGroup><p:inputText value="#{productDetailView.productDetail.lastModifiedBy}" maxlength="200" id="lastModifiedBy" /><p:message for="lastModifiedBy" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+      <h:panelGroup><p:calendar value="#{productDetailView.productDetail.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.lastModifiedAt}" for="lastModifiedAt" />
+      <h:panelGroup><p:calendar value="#{productDetailView.productDetail.lastModifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.lastModifiedAt} #{lang.invalidDate}" maxlength="29" id="lastModifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="lastModifiedAt" display="text"/></h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productDetailTable" var="productDetailVar" widgetVar="productDetailWidget" tableStyleClass="editLinks"
+                   lazy="true" value="#{productDetailView.productDetailLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productDetailVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"   
+                   selection="#{productDetailView.productDetailSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{productDetailVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productDetailVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productDetailView.productDetail}" value="#{productDetailVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.marginPercentage}" sortBy="#{productDetailVar.productByContractId.marginPercentage}" field="product_by_contract_id.margin_percentage"><h:outputText value="#{appView.display(productDetailVar.productByContractId.marginPercentage)}" title="#{appView.title(productDetailVar.productByContractId.marginPercentage)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.batchNo}" sortBy="#{productDetailVar.batchNo}" field="batch_no"><h:outputText value="#{appView.display(productDetailVar.batchNo)}" title="#{appView.title(productDetailVar.batchNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.expiryDateActual}" sortBy="#{productDetailVar.expiryDateActual}" field="expiry_date_actual" ><h:outputText value="#{appView.dateTime(productDetailVar.expiryDateActual)}" escape="false" /></p:column>
+        
+        <p:column headerText="#{lang.valueMrp}" sortBy="#{productDetailVar.valueMrp}" field="value_mrp" style="text-align: right"><h:outputText value="#{appView.decimal(productDetailVar.valueMrp)}" escape="false" /></p:column>
+        
+        <p:column headerText="#{lang.createdBy}" sortBy="#{productDetailVar.createdBy}" field="created_by"><h:outputText value="#{appView.display(productDetailVar.createdBy)}" title="#{appView.title(productDetailVar.createdBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.lastModifiedBy}" sortBy="#{productDetailVar.lastModifiedBy}" field="modified_by"><h:outputText value="#{appView.display(productDetailVar.lastModifiedBy)}" title="#{appView.title(productDetailVar.lastModifiedBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.createdAt}" sortBy="#{productDetailVar.createdAt}" field="created_at" ><h:outputText value="#{appView.dateTime(productDetailVar.createdAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.lastModifiedAt}" sortBy="#{productDetailVar.lastModifiedAt}" field="modified_at" ><h:outputText value="#{appView.dateTime(productDetailVar.lastModifiedAt)}" escape="false" /></p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

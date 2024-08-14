@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{productPackingView.switchProductPacking(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productPacking}" />
+    <ui:param name="ids" value="productPacking" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productPackingView.deleteProductPacking(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productPackingWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productPackingView.cloneProductPacking(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productPackingView.deleteProductPacking(main)}" value="#{lang.delete}" onclick="wdgOff('productPackingWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productPackingView.saveProductPacking(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">    
+      <p:outputLabel value="#{lang.packType}" for="productPackingPackType"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{productPackingView.productPacking.packType}" completeMethod="#{productPackingView.packTypeAuto}" converter="wawo.LookupIntConverter"   
+                        required="true" requiredMessage="#{lang.packType} #{lang.isRequired}" id="productPackingPackType" var="e" itemValue="#{e}" 
+                        itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                        autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.packTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.packTypeById()}"/>
+          <p:ajax event="itemSelect" update="untLblDiv untTxtDiv" listener="#{productPackingView.packTypeSelectEvent}"/>
+        </p:autoComplete>
+        <p:message for="productPackingPackType" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.title}" for="title"/>
+
+      <h:panelGroup >
+        <p:inputText value="#{productPackingView.productPacking.title}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title"/>
+        <p:message for="title" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <h:panelGroup id="untLblDiv">
+        <p:outputLabel value="#{lang.unit}" for="productUnit"  
+                       rendered="#{productPackingView.isPackTypePrimary()}"/>
+      </h:panelGroup >
+      <h:panelGroup id="untTxtDiv">
+        <p:selectManyCheckbox id="productUnit" value="#{productPackingView.selectedUnit}" layout="responsive" columns="3" 
+                              converter="omnifaces.SelectItemsConverter" 
+                              required="true" requiredMessage="#{lang.unit} #{lang.isRequired}"  
+                              rendered="#{productPackingView.isPackTypePrimary()}">
+          <f:selectItems value="#{productPackingView.getUnitSelected()}" var="type" itemLabel="#{type.title}" itemValue="#{type}" />
+        </p:selectManyCheckbox>
+        <p:message for="productUnit" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{productPackingView.productPacking.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
+                       thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(productPackingView.productPacking.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(productPackingView.productPacking.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(productPackingView.productPacking.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(productPackingView.productPacking.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(productPackingView.productPacking.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productPackingTable" var="productPackingVar" widgetVar="productPackingWidget"
+                   lazy="true" value="#{productPackingView.productPackingLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productPackingVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productPackingView.productPackingSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{productPackingVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+            <p:commandLink action="#{main.setViewType(editform)}" value="#{productPackingVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productPackingView.productPacking}" value="#{productPackingVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{productPackingVar.packType.title}" field="pack_type.title">
+          <f:facet name="header"><h:outputText value="#{lang.packType}" title="#{lang.packType}"/></f:facet>
+          <h:outputText value="#{appView.display(productPackingVar.packType.title)}" title="#{appView.title(productPackingVar.packType.title)}" escape="false" />
+        </p:column>
+<!--        <p:column  sortBy="#{productPackingVar.sortOrder}" field="sort_order" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+          <h:outputText value="#{appView.number(productPackingVar.sortOrder)}" escape="false" />
+        </p:column>-->
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(productPackingVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productPackingVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productPackingVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productPackingVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(productPackingVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>  
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

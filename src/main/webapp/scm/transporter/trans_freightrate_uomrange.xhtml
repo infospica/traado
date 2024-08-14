@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core" >
+  #{transFreightrateUomrangeView.switchTransFreightrateUomrange(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.freightrateUomrange}" />
+    <ui:param name="ids" value="transFreightrateUomrange" />
+    <ui:define name="newList"/>
+    <ui:define name="more"/>
+    <ui:define name="leftRightList">          
+
+      <p:commandButton action="#{transFreightrateUomrangeView.addNewFreightrateUomrange()}" update="transFreightrateUomrangeTable" immediate="true" process="@this" icon="fa fa-plus" 
+                       iconPos="left" styleClass="btn btn-info"  oncomplete="jQuery('.ui-datatable-data tr').first().find('span.ui-icon-pencil').each(function(){jQuery(this).click()});">
+
+      </p:commandButton>
+
+    </ui:define>
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{transFreightrateUomrangeView.uomRangePopupClose()}"                       
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="list" >    
+      <p:dataTable id="transFreightrateUomrangeTable" var="transFreightrateUomrangeVar" widgetVar="transFreightrateUomrangeWidget"
+                   value="#{transFreightrateUomrangeView.getTransporterFrieghtUomRangeList(main)}"   
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  
+                   tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+        <p:ajax event="rowEdit" update="transFreightrateUomrangeTable" listener="#{transFreightrateUomrangeView.onRowEdit}"/>
+
+<!--            <p:column headerText="#{lang.id}" sortBy="#{transFreightrateUomrangeVar.id}" field="id" >
+              <h:outputText  title="#{appView.title(transFreightrateUomrangeVar.id)}" escape="false" />
+              <p:commandLink action="#{transporterFreightRateView.transporterUomRangeEditDialog(transFreightrateUomrangeVar.id)}" value="#{transFreightrateUomrangeVar.id}" 
+                             process="@this" update="f1" immediate="true" onstart="block()" 
+                             oncomplete="unblock()" title="#{lang.editMe}">
+
+                <p:ajax event="dialogReturn" listener="#{transporterFreightRateView.transporterUomRangeDialogReturn}" update="transFreightrateUomrangeTable" />
+              </p:commandLink>
+            </p:column>-->
+        
+
+        <p:column headerText="#{lang.rangeFrom}" sortBy="#{transFreightrateUomrangeVar.rangeFrom}" field="range_from" style="text-align: right">
+          <p:cellEditor >
+            <f:facet name="output">
+              <h:outputText value="#{appView.number(transFreightrateUomrangeVar.rangeFrom)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{transFreightrateUomrangeVar.rangeFrom}" required="true" requiredMessage="#{lang.rangeFrom} #{lang.isRequired}"
+                               decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="rangeFrom"/>
+                <p:message for="rangeFrom" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+        <p:column headerText="#{lang.rangeTo}" sortBy="#{transFreightrateUomrangeVar.rangeTo}" field="range_to" style="text-align: right">
+          <p:cellEditor >
+            <f:facet name="output"> 
+              <h:outputText value="#{appView.number(transFreightrateUomrangeVar.rangeTo)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{transFreightrateUomrangeVar.rangeTo}" required="true" requiredMessage="#{lang.rangeTo} #{lang.isRequired}"
+                               decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="rangeTo"/>
+                <p:message for="rangeTo" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+
+        <p:column headerText="#{lang.rate}" sortBy="#{transFreightrateUomrangeVar.rateFixedPerBaseUom}" field="rate_fixed_per_base_uom" style="text-align: right">
+          <p:cellEditor >
+            <f:facet name="output">
+              <h:outputText value="#{appView.decimal(transFreightrateUomrangeVar.rateFixedPerBaseUom)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{transFreightrateUomrangeVar.rateFixedPerBaseUom}" decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="99" minValue="0.0" 
+                               symbol="#{appView.currencySymbol} " maxlength="5" id="rateFixedPerBaseUom"
+                               required="true" requiredMessage="#{lang.rate} #{lang.isRequired}"/>
+                <p:message for="rateFixedPerBaseUom" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+        
+        <p:column >
+          <p:rowEditor />
+        </p:column>
+
+        <p:column>
+          <p:commandButton action="#{transFreightrateUomrangeView.deleteTtransFreightrateUomrange(main,transFreightrateUomrangeVar)}" process="@this" 
+                           value="" update="transFreightrateUomrangeTable" icon="fa fa-trash">
+            <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+          </p:commandButton>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

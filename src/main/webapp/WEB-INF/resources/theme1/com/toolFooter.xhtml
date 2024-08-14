@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+  <ui:insert name="toolFooter">
+    <p:blockUI block="f1" widgetVar="wdgBlock" >
+      <h:panelGroup layout="block" >
+        <h:outputText style="font-weight: bold; font-family: Arial; font-size: 13px; color:black;" value="#{lang.wait}" /><br/>
+        <i class="fa fa-spinner fa-spin"></i>
+      </h:panelGroup>
+    </p:blockUI>
+  </ui:insert>
+</ui:composition>
+
+

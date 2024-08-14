@@ -1,0 +1,174 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{accountingGroupView.switchAccountingGroup(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.accountingGroup}" />
+    <ui:param name="ids" value="accountingGroup" />
+
+    <ui:define name="rightList" rendered="#{main.isList()}"  >
+      <!--<h:panelGroup layout="block" styleClass="L" id="selectedAccountingHead">-->
+      <p:selectOneMenu value="#{accountingGroupView.selectedAccountingHead}" converter="omnifaces.SelectItemsConverter">
+        <f:selectItem itemLabel="#{lang.all}" itemValue="#{null}" />
+        <f:selectItems value="#{accountingGroupView.accountingHeadSelect()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        <p:ajax event="itemSelect" process="@this" update="accountingGroupTable" />
+        <!--<p:ajax event="itemSelect" process="selectedAccountingHead" listener="#{accountingGroupView.groupFilter}" update="accountingGroupTable" />--> 
+      </p:selectOneMenu>
+      <!--</h:panelGroup>-->
+    </ui:define> 
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountingGroupView.deleteAccountingGroup(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountingGroupWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountingGroupView.cloneAccountingGroup(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountingGroupView.deleteAccountingGroup(main)}" value="#{lang.delete}" onclick="wdgOff('accountingGroupWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:defaultCommand target="btnSave" />
+      <h:commandButton  action="#{accountingGroupView.saveAccountingGroup(main)}" value="#{lang.save}" onclick="toTop()" id="btnSave" styleClass="btn btn-primary"><f:ajax execute="accountingGroupF" render="f1"  /></h:commandButton>
+    </ui:define>   
+
+    <ui:define name="form">
+      <p:outputLabel value="#{lang.accountingGroup} #{lang.name}" for="title" />
+      <h:panelGroup>
+        <p:inputText value="#{accountingGroupView.accountingGroup.title}" maxlength="200" required="true" requiredMessage="#{lang.accountingGroup} #{lang.isRequired}" id="title" styleClass="fw" />
+        <p:message for="title" display="text" styleClass="fw" />
+      </h:panelGroup>        
+
+      <p:outputLabel value="#{lang.parent} #{lang.accountingGroup}  #{lang.name}" for="parentId" />
+      <h:panelGroup>
+        <p:autoComplete value="#{accountingGroupView.accountingGroup.parentId}" completeMethod="#{accountingGroupView.accountingGroupAuto}" converter="wawo.LookupIntConverter"   
+                        id="parentId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true"
+                        queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingGroupById()}"/>
+        </p:autoComplete>
+        <p:message for="parentId" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.accountingHead}" for="accountingGroupAccountingHeadId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{accountingGroupView.accountingGroup.accountingHeadId}" completeMethod="#{accountingGroupView.accountingHeadAuto}" converter="wawo.LookupIntConverter"
+                        required="true" requiredMessage="#{lang.accountingHead} #{lang.isRequired}" id="accountingGroupAccountingHeadId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true"
+                        queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingHeadClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingHeadById()}"/>
+        </p:autoComplete>
+        <p:message for="accountingGroupAccountingHeadId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup> <p:inputTextarea  styleClass="fw" value="#{accountingGroupView.accountingGroup.description}" cols="100" rows="2" maxlength="500"  id="description" autoResize="false" />
+        <p:message for="description" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountingGroupView.accountingGroup.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup> 
+    </ui:define>
+    <ui:define name="afterForm">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+        #{accountingGroupView.loadAccountingLedgerList(main)}
+      <p:dataTable id="accountingLedgerTable" var="accountingLedgerVar" widgetVar="accountingLedgerWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{accountingGroupView.accountingLedgerLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountingLedgerVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column sortBy="#{accountingLedgerVar.title}" field="t1.title" >
+          <f:facet name="header"><h:outputText value="#{lang.ledger}" title="#{lang.ledger}"/></f:facet>
+          <p:commandLink action="#{accountingGroupView.openLedgerPopup(accountingLedgerVar)}" value="#{appView.display(accountingLedgerVar.title)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+
+          </p:commandLink>
+        </p:column>
+<!--        <p:column sortBy="#{accountingLedgerVar.accountingGroupId.title}" field="t2.title">
+          <f:facet name="header"><h:outputText value="#{lang.accountingGroup}" title="#{lang.accountingGroup}"/></f:facet>
+          <h:outputText value="#{appView.display(accountingLedgerVar.accountingGroupId.title)}" title="#{appView.title(accountingLedgerVar.accountingGroupId.title)}" escape="false" />
+        </p:column>-->
+
+        <p:column sortBy="#{accountingLedgerVar.entityId}" field="t1.entity_id" style="text-align: center">
+          <f:facet name="header"><h:outputText value="#{lang.entity}" title="#{lang.entity}"/></f:facet>
+          <h:outputText value="#{appView.number(accountingLedgerVar.entityId)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountingLedgerVar.accountingEntityTypeId.title}" field="t3.title">
+          <f:facet name="header"><h:outputText value="#{lang.entityType}" title="#{lang.entityType}"/></f:facet>
+          <h:outputText value="#{appView.display(accountingLedgerVar.accountingEntityTypeId.title)}" title="#{appView.title(accountingLedgerVar.accountingEntityTypeId.title)}" escape="false" />
+        </p:column>
+        <!--
+                <p:column headerText="#{lang.companyName}" sortBy="#{accountingLedgerVar.companyId.companyName}" field="company_id.company_name">
+                  <h:outputText value="#{appView.display(accountingLedgerVar.companyId.companyName)}" title="#{appView.title(accountingLedgerVar.companyId.companyName)}" escape="false" />
+                </p:column>-->
+        <p:column sortBy="#{accountingLedgerVar.sortOrder}" field="t1.sort_order">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+          <h:outputText value="#{appView.number(accountingLedgerVar.sortOrder)}" title="#{appView.number(accountingLedgerVar.sortOrder)}" escape="false" />
+        </p:column>
+        <p:column exportable="false">
+          <f:facet name="header">
+            <h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(accountingLedgerVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountingLedgerVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountingLedgerVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountingLedgerVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(accountingLedgerVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(accountingGroupView.accountingGroup.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(accountingGroupView.accountingGroup.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(accountingGroupView.accountingGroup.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(accountingGroupView.accountingGroup.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(accountingGroupView.accountingGroup.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="accountingGroupTable" var="accountingGroupVar" widgetVar="accountingGroupWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{accountingGroupView.accountingGroupLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountingGroupVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{accountingGroupView.accountingGroupSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.accountingGroup}" sortBy="#{accountingGroupVar.title}" field="t1.title" >
+          <f:facet name="header"><h:outputText value="#{lang.accountingGroup}" title="#{lang.accountingGroup}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(accountingGroupVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{accountingGroupView.accountingGroup}" value="#{accountingGroupVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{accountingGroupVar.parentId.title}" field="t2.title">
+          <f:facet name="header"><h:outputText value="#{lang.parent} #{lang.accountingGroup}" title="#{lang.parent} #{lang.accountingGroup}"/></f:facet>
+          <h:outputText value="#{appView.display(accountingGroupVar.parentId.title)}" title="#{appView.title(accountingGroupVar.parentId.title)}" escape="false" />
+        </p:column>
+        <p:column  sortBy="#{accountingGroupVar.accountingHeadId.title}" field="t3.title" style="text-align: center">
+          <f:facet name="header"><h:outputText value="#{lang.accountingHead}" title="#{lang.accountingHead}"/></f:facet>
+          <h:outputText value="#{appView.display(accountingGroupVar.accountingHeadId.title)}" escape="false" />
+        </p:column>
+        <p:column  sortBy="#{accountingGroupVar.sortOrder}" field="t1.sort_order" style="text-align: center">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+          <h:outputText value="#{appView.number(accountingGroupVar.sortOrder)}" escape="false" />
+        </p:column>
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(accountingGroupVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountingGroupVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountingGroupVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountingGroupVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(accountingGroupVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

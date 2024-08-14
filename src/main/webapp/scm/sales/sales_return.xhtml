@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesReturnView.switchSalesReturn(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{salesReturnView.pageTitle}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? salesReturnView.salesReturn.invoiceNo : null}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? salesReturnView.salesReturn.salesReturnStatusId.title : null}" />
+    <ui:param name="ids" value="salesReturn" />
+    <ui:param name="showForm" value="false" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesReturnView.deleteSalesReturn(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesReturnWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesReturnView.cloneSalesReturn(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesReturnView.deleteSalesReturn(main)}" value="#{lang.delete}" onclick="wdgOff('salesReturnWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >      
+    </ui:define>   
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <p:selectOneMenu value="#{salesReturnView.salesReturnTypeFilter}" >
+        <f:selectItem itemValue="#{null}" itemLabel="All" />
+        <f:selectItems value="#{salesReturnView.salesReturnTypeList}" var="s" itemValue="#{s.intValue}" itemLabel="#{s.itemLabel}" />            
+        <p:ajax update="salesReturnTable" listener="#{salesReturnView.salesReturnTypeFilterSelectEvent(main)}" />
+      </p:selectOneMenu>
+
+      <p:commandButton value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{salesReturnView.actionResetAllSalesReturn(main)}"
+                       rendered="#{userRole.isRoot() and main.edit}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="newList">
+      <p:commandButton id="accountBtn" type="button" value="#{lang.newform}" immediate="true" partialSubmit="true" process="@this" update="accountPanel" 
+                       styleClass="btn btn-info" rendered="#{!salesReturnView.tradeClosed}">
+      </p:commandButton>
+      <p:overlayPanel id="accountPanel" widgetVar="panel" for="accountBtn" hideEffect="fade" showEvent="click" hideEvent="click" 
+                      showCloseIcon="true" dynamic="false" style="width:auto">
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <!-- Sales Return - Saleable / (Damaged/Expired) -->
+          <h:outputText value="#{lang.salesReturn}" />
+          <p:selectOneRadio value="#{salesReturnView.salesReturnType}"  id="salesReturnTypeId"
+                            converter="omnifaces.SelectItemsConverter">
+            <f:selectItems value="#{salesReturnView.salesReturnTypeList}" var="s" itemValue="#{s.intValue}" itemLabel="#{s.itemLabel}" />            
+          </p:selectOneRadio>
+        </h:panelGroup>
+
+        <!-- Action Buttons -->
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <p:commandButton action="#{salesReturnView.actionNewForm(main)}" value="#{lang.create}" styleClass="btn btn-primary"
+                           process="accountPanel" update="f1">            
+          </p:commandButton>          
+        </h:panelGroup>
+
+      </p:overlayPanel>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="salesReturnTable" var="salesReturnVar" widgetVar="salesReturnWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesReturnView.salesReturnLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesReturnVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesReturnView.salesReturnSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column sortBy="#{salesReturnVar.invoiceNo}" field="scm_sales_return.invoice_no" style="width: 10%" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{salesReturnVar.invoiceNo}" process="@this" update="f1" immediate="true" 
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesReturnView.salesReturn}" value="#{salesReturnVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{salesReturnVar.accountInvoiceNo}" field="scm_sales_return.account_invoice_no" style="width: 8%" >
+          <f:facet name="header"><h:outputText value="#{lang.regno}" title="#{lang.regno}"/></f:facet>
+          <h:outputText value="#{appView.display(salesReturnVar.accountInvoiceNo)}" title="#{appView.title(salesReturnVar.accountInvoiceNo)}" escape="false" />          
+        </p:column>        
+
+        <p:column sortBy="#{salesReturnVar.customerId.customerName}" field="customer_id.customer_name" style="width: 15%" >
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(salesReturnVar.customerId.customerName)}" title="#{appView.title(salesReturnVar.customerId.customerName)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{salesReturnVar.consignmentId.consignmentNo}" field="consignment_id.consignment_no" style="width: 10%" >
+          <f:facet name="header"><h:outputText value="#{lang.consignmentNo}" title="#{lang.consignmentNo}"/></f:facet>
+          <h:outputText value="#{appView.display(salesReturnVar.consignmentId.consignmentNo)}" title="#{appView.title(salesReturnVar.consignmentId.consignmentNo)}" escape="false" />
+        </p:column>
+
+<!--        <p:column sortBy="#{salesReturnVar.invoiceDate}" field="scm_sales_return.invoice_date" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.date(salesReturnVar.invoiceDate)}" escape="false" />
+        </p:column>-->
+        <p:column sortBy="#{salesReturnVar.entryDate}" field="scm_sales_return.entry_date" style="width: 8%" >
+          <f:facet name="header"><h:outputText value="#{lang.invoice} / #{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(salesReturnVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{salesReturnVar.invoiceAmount}" field="scm_sales_return.invoice_amount" style="width: 6%" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(salesReturnVar.invoiceAmount)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{salesReturnVar.salesReturnType}" field="scm_sales_return.sales_return_type" style="width: 8%" >
+          <f:facet name="header"><h:outputText value="#{lang.category}" title="#{lang.category}"/></f:facet>
+          <h:outputText value="#{salesReturnVar.salesReturnType eq 1 ? 'Saleable' : 'Damaged' }" escape="false" />
+        </p:column>
+        <p:column sortBy="#{salesReturnVar.returnSplit}" field="scm_sales_return.return_split" style="width: 8%" >
+          <f:facet name="header"><h:outputText value="#{lang.type}"/></f:facet>
+          <h:outputText value="#{(salesReturnVar.returnSplit eq null || salesReturnVar.returnSplit eq 0)? 'NORMAL' : (salesReturnVar.returnSplitForGstFiling eq null || salesReturnVar.returnSplitForGstFiling eq 0)?'SPLIT':'GST SPLIT'}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{salesReturnVar.salesReturnStatusId.title}" field="sales_return_status_id.title" style="width: 6%" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>          
+          <h:outputText value="#{appView.display(salesReturnVar.salesReturnStatusId.title)}" title="#{appView.title(salesReturnVar.salesReturnStatusId.title)}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(salesReturnVar.salesReturnStatusId.id)}" style="background-color: #{sysRuntimeView.statusColor(salesReturnVar.salesReturnStatusId.id)}"/>          
+        </p:column>
+
+        <!-- Remarks -->
+        <p:column headerText="#{lang.remarks}" sortBy="#{salesReturnVar.note}" field="scm_sales_return.note"
+                  width="300" style="text-align:left;padding-left: 5px;white-space: normal;width: 9%"  styleClass="wrap">
+          <h:outputText value="#{appView.display(salesReturnVar.note)}" title="#{salesReturnVar.note}" />
+        </p:column>
+        <p:column exportable="false" style="width: 4%" >
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesReturnVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesReturnVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesReturnVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesReturnVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesReturnVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>   
+  </ui:decorate>
+
+  <ui:fragment rendered="#{main.isForm() and salesReturnView.taxCalculator.salesReturnForm eq '/scm/sales/gst_india/sales_return_gst_india.xhtml'}">    
+    <ui:include src="/scm/sales/gst_india/sales_return_gst_india.xhtml" />
+  </ui:fragment>
+</ui:composition>

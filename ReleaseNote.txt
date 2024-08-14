@@ -1,0 +1,130 @@
+Release Note
+============
+
+v 1.0 221019
+
+Enh  DR/CR popup close on enter
+Enh  Proper styling for account group in accounting transaction
+  
+
+v 0.3 100919
+
+Expense - Reimburse
+-------------------
+
+Make auto tax calculation now tax is readonly
+
+Accounting transaction
+----------------------
+
+1. Option to add account group for already set records
+2. entry date will be set as default date in document date.
+3. on enter close in bill popup
+4. tab index issue from in bill popup
+
+Ledger Balance
+--------------
+
+1. Option to select a ledgers and go to details
+
+Accounting transaction
+----------------------
+
+1. Delete accounting transaction, remove the item from parent list.
+2. Filter value in search is not retained 
+3. Filter and then filter by other filters like date, summary and voucher type doesnt work
+
+
+v 0.2 170819
+
+
+Accounting transaction
+----------------------
+  Receipt 
+  --------
+  1. if only one account group then automatically set that a/c group.
+  2. A/c group is visible and mandatory if multiple a/c groups are available
+  3. A/c group for opening entry.
+  4. On part receipt then keep the balance under that account group
+  
+  Journal 
+  -------
+  5. multiple debit and credit under journal.
+  6. option to choose a/c group on customer having multiple a/c group
+  
+  expense
+  -------
+  7. option to choose a/c group on customer having multiple a/c group
+
+  debit note
+  ----------
+  8. option to choose a/c group on customer having multiple a/c group
+
+  credit note 
+  -----------
+  9. option to choose a/c group on customer having multiple a/c group
+
+  10 payment
+  ----------
+  10. option to choose a/c group on customer having multiple a/c group
+  11. option to choose multiple party in payment
+  12. payment tds must be credit in payment
+
+  11 Ledger
+  ----------
+  13. Opening entry as multiple account group opening entry
+  14. Record Opening entry under Account Group in account transaction.
+  15. Option to choose account group in opening entry split popup 
+  16. Migration of existing open entry under account group
+
+17. Allow delete only if the entry comes directly via accounting transaction, entries from sales/purchase delete not allowed
+18. Enter on search field throws error, blocked enter as it works in keyup
+
+Sales
+-----
+19. Map with Account Group in account transaction.
+21. Print invoice new format.
+
+Sales Return
+------------
+22. Map with Account Group in account transaction.
+
+Sales - Debit and Credit note
+-----------------------------
+23. Map with Account Group in account transaction.
+
+
+v 0.1 240419
+
+Ledger Master
+-------------
+1. Option to choose RCM
+2. Option to choose TDS and Pan no
+3. dropdown option for Accounting group.
+
+Accounting transaction
+----------------------
+Expense - 
+  4. First Auto complete - display Sundry creditors expenses group
+  5. Tax - Auto compute tax based on the tax code percentage
+  6. Round off option
+
+Payment
+  6 Provision to select TDS value.
+
+All screen in accounting
+------------------------
+
+1. Common date moved to top and changes will reflect in header in all screens
+2. Moved all the accounting constant to Accounting constants.
+
+
+3.SAC Code and Tax - If linking is possible!!!
+Remove comma from number fields in excel export.                   
+Possible issue in missing opening balance in Ledger data correction 
+performance issue in trading account, profit and loss and balance sheet in accounting                   
+
+GST Report        
+Lock edit after GST filing.
+Receipt or payment self settlement with out a cheque or cash payment
+

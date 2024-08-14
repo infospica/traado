@@ -1,0 +1,1538 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" 
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" xmlns:o="http://omnifaces.org/ui"  >
+  #{accountView.switchAccount(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.account}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? accountView.account.accountCode : null}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? accountView.account.accountStatusId.title : null}" />
+    <ui:param name="ids" value="account" />
+    <ui:param name="deleteListMenu" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountView.deleteAccount(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>    
+    <ui:define name="menu1" >
+    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+
+      <p:tabView  prependId="false" id="accountContractTabs" dynamic="true" cache="false" activeIndex="#{accountView.activeIndex}" styleClass="materialTabs">
+        <p:ajax event="tabChange" oncomplete="unblock();" />
+        <!-- Account Tab -->
+        <p:tab  title="#{lang.account}" titleStyle="small;color:#a94442;'&gt; #{accountUtilView.isScondaryVendorAccount(accountView.account) ? accountView.primaryVendorName  : ''}&lt;/small&gt;"  id="accountTab"  >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="account" />
+            <ui:param name="reset" value="#{accountUtilView.isAccountActivable(accountView.account)}" />
+            <ui:param name="cols" value="4" />
+            <ui:param name="deleteFormMenu" value="#{!accountUtilView.isActiveAccount(accountView.account)}" />
+            <ui:param name="styleClass" value="#{sysRuntimeView.getGrid4()}" />
+
+            <ui:define name="deleteForm" >
+              <p:commandButton action="#{accountView.deleteAccount(main)}" value="#{lang.delete}" onclick="wdgOff('accountWidgetDel')"
+                               partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+            </ui:define>
+
+            <ui:define name="save" >
+              <p:commandButton action="#{accountView.saveAccount(main, 2)}" value="#{lang.saveAsDraft}"
+                               rendered="#{accountUtilView.isDraftAccount(accountView.account)}" update="f1"  process="f1"
+                               onclick="toTop()" styleClass="btn btn-primary">
+              </p:commandButton>
+
+              <h:commandButton type="button" value="#{lang.confirm}" onclick="PF('accountConfirmDlgVar').show();"
+                               rendered="#{accountUtilView.isAccountActivable(accountView.account)}"
+                               styleClass="btn btn-primary">
+              </h:commandButton>
+
+              <p:commandButton value="#{lang.edit}" rendered="#{accountUtilView.isActiveAccount(accountView.account) and !accountView.editMode}"
+                               immediate="true" styleClass="btn btn-primary" process="@this" update="accountContractTabs">
+                <f:setPropertyActionListener target="#{accountView.editMode}" value="#{true}" />
+              </p:commandButton>
+
+              <p:commandButton value="#{lang.save}" rendered="#{accountView.editMode}" action="#{accountView.actionUpdateAccount(main)}"
+                               styleClass="btn btn-primary" process="accountF" update="accountF f1" onclick="block();" oncomplete="unblock();" >
+              </p:commandButton>
+
+              <h:commandButton type="button" value="#{lang.saveAsInactive}" onclick="PF('accountInactiveDlgVar').show();"
+                               rendered="#{accountUtilView.isActiveAccount(accountView.account)}"
+                               styleClass="btn btn-danger">
+              </h:commandButton>
+
+              <h:commandButton type="button" value="#{lang.resume}" onclick="PF('resumeAccountDlgVar').show();"
+                               rendered="#{accountUtilView.isAccountSuspended(accountView.account)}"
+                               styleClass="btn btn-danger">
+              </h:commandButton>
+            </ui:define>
+
+            <ui:define name="formRight" >
+              <div class="p-t-10">
+                <!-- Trade Type -->
+                <h:outputText value="#{lang.tradeProfile} #{lang.colon} " rendered="#{main.isEdit()}" />
+                <h:panelGroup rendered="#{main.isEdit()}">
+                  <p:outputLabel value="#{accountView.account.companyTradeProfileId.title}" id="actradetype"
+                                 style="#{accountView.account.companyTradeProfileId.title ne null ? 'color: dodgerblue;' : '' }"/>
+                </h:panelGroup>
+                <p:spacer width="5" />
+
+                <!-- Account Status -->
+                <h:outputText value="#{lang.status} #{lang.colon} " styleClass="m-l-5" rendered="#{main.isEdit()}" />
+                <h:panelGroup rendered="#{main.isEdit()}">
+                  <p:outputLabel style="#{accountView.account.accountStatusId.title ne null ? 'color: dodgerblue;' : '' }" value="#{accountView.account.accountStatusId.title}" />
+                </h:panelGroup>
+
+                <!-- Contract Status -->
+                <h:outputText value="#{lang.contract} #{lang.colon} " styleClass="m-l-5" rendered="#{main.isEdit()}" />
+                <h:panelGroup rendered="#{main.isEdit()}">
+                  <p:outputLabel
+                    style="#{accountView.contract.contractStatusId.title ne null ? 'color: dodgerblue;' : 'color:red;' }"
+                    value="#{accountView.contract.contractStatusId.title ne null ? accountView.contract.contractStatusId.title : 'Contract Not Defined.' }" />
+                </h:panelGroup>
+              </div>
+            </ui:define>
+
+            <!-- Vendor -->
+            <p:outputLabel value="#{lang.vendor}" for="accountVendorId"/>
+            <h:panelGroup layout="block" id='vendorDiv'>
+              <p:autoComplete  value="#{accountView.account.vendorId}" tabindex="1" completeMethod="#{accountView.vendorAuto}" converter="wawo.LookupIntConverter"
+                               required="true" requiredMessage="#{lang.vendor} #{lang.isRequired}" id="accountVendorId" var="e"
+                               itemValue="#{e}" itemLabel="#{e.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="25"
+                               converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="false" styleClass="fw" dynamic="true"
+                               disabled="#{accountUtilView.isActiveAccount(accountView.account)}">
+                <f:attribute name="clazz" value="#{scmLookupView.vendorClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.vendorById()}"/>
+                <p:ajax event="itemSelect" update="purchaseChannelDiv salesChannelDiv vendorBankDiv vendorAddressDiv vendorAddressPanel accountTitle tradeTypeDiv accountTradeTypeId interStateDiv pointOfPurchaseDiv tinDiv gstDiv cstDiv" 
+                        listener="#{accountView.updateVendorDetails}" />
+              </p:autoComplete>
+              <p:message for="accountVendorId" display="text" />
+            </h:panelGroup>
+
+            <!-- Company Bank -->
+            <p:outputLabel value="#{lang.companyBank}" for="accountCompanyBankId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{accountView.account.companyBankId}"  id="accountCompanyBankId" styleClass="fw"
+                               converter="omnifaces.SelectItemsConverter"
+                               disabled="#{!accountView.accountEditable}">
+                <f:selectItems value="#{accountView.companyBank()}" var="e" itemValue="#{e}" itemLabel="#{e.accountName}" />
+              </p:selectOneMenu>
+              <p:message for="accountCompanyBankId" display="text" />
+            </h:panelGroup>
+
+            <!-- Account Code -->
+            <p:outputLabel value="#{lang.account} / #{lang.vendor} #{lang.code}" for="accountCode" />
+            <h:panelGroup>
+              <p:inputText value="#{accountView.account.accountCode}" tabindex="2" maxlength="3" required="true" styleClass="fw text-uppercase" autocomplete="off"
+                           requiredMessage="#{lang.accountCode} #{lang.isRequired}" id="accountCode"
+                           readonly="#{!accountView.accountEditable}" />
+              <p:message for="accountCode" display="text"/>
+            </h:panelGroup>
+
+            <!-- Company Address -->
+            <p:outputLabel value="#{lang.companyAddress}" for="accountCompanyAddressId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{accountView.account.companyAddressId}" tabindex="8"  id="accountCompanyAddressId"
+                               styleClass="fw" converter="omnifaces.SelectItemsConverter"
+                               disabled="#{!accountView.accountEditable}">
+                <f:selectItems value="#{accountView.companyAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.address}" />
+              </p:selectOneMenu>
+              <p:message for="accountCompanyAddressId" display="text" />
+            </h:panelGroup>
+
+            <!-- Account Title -->
+            <p:outputLabel value="#{lang.accountTitle}" for="accountTitle" />
+            <h:panelGroup>
+              <p:inputText value="#{accountView.account.accountTitle}" tabindex="3" maxlength="100" id="accountTitle" styleClass="fw"
+                           required="true" requiredMessage="#{lang.accountTitle} #{lang.isRequired}" autocomplete="off"
+                           readonly="#{!accountView.accountEditable}" />
+              <p:message for="accountTitle" display="text"/>
+            </h:panelGroup>
+
+            <!-- Vendor Bank -->
+            <p:outputLabel value="#{lang.vendorBank}" for="accountVendorBankId"/>
+            <h:panelGroup id="vendorBankDiv">
+              <p:selectOneMenu value="#{accountView.account.vendorBankId}"  id="accountVendorBankId"
+                               styleClass="fw" tabindex="9" disabled="#{!accountView.accountEditable}"
+                               converter="omnifaces.SelectItemsConverter">
+                <f:selectItems value="#{accountView.vendorBank()}" var="e" itemValue="#{e}" itemLabel="#{e.accountName}" />
+              </p:selectOneMenu>
+              <p:message for="accountVendorBankId" display="text" />
+            </h:panelGroup>
+
+            <!-- Vendor VAT and TIN -->
+            <p:outputLabel value="#{lang.vat} / #{lang.tin} #{lang.sno}" for="tin" title="#{lang.tinabbr}" rendered="#{userRuntimeView.isVatRegime()}" />
+            <h:panelGroup id="tinDiv" rendered="#{userRuntimeView.isVatRegime()}">
+              <p:inputText styleClass="fw" value="#{accountView.account.tin}" tabindex="4" maxlength="11" required="true"
+                           requiredMessage="#{lang.tin} #{lang.isRequired}" readonly="#{!accountView.accountEditable}"
+                           id="tin" validator="wawo.WhiteSpaceValidator" >
+                <f:validateLength minimum="11"/>
+              </p:inputText>
+              <p:message for="tin" display="text"/>
+            </h:panelGroup>
+
+            <!--  Vendor GST Registration number -->
+            <p:outputLabel value="#{lang.gstin}" for="gstNumber" title="#{lang.gstinabbr}" rendered="#{userRuntimeView.isGstRegime()}" />
+            <h:panelGroup id="gstDiv" rendered="#{userRuntimeView.isGstRegime()}">
+              <p:inputText styleClass="fw text-uppercase" tabindex="5" value="#{accountView.account.gstNo}" maxlength="12" required="true"
+                           disabled="true" autocomplete="off"
+                           requiredMessage="#{lang.gstNo} #{lang.isRequired}" id="gstNumber" validator="wawo.WhiteSpaceValidator">
+              </p:inputText>
+              <p:message for="gstNumber" display="text"/>
+            </h:panelGroup>
+
+            <!-- Vendor Address -->
+            <p:outputLabel value="#{lang.vendorAddress}" for="accountVendorAddress" rendered="#{userRuntimeView.isVatRegime()}"/>
+            <h:panelGroup id="vendorAddressPanel" rendered="#{userRuntimeView.isVatRegime()}">
+              <p:selectOneMenu value="#{accountView.account.vendorAddressId}"  id="accountVendorAddress" tabindex="10"
+                               styleClass="fw" converter="omnifaces.SelectItemsConverter" disabled="#{!accountView.accountEditable}">
+                <f:selectItems value="#{accountView.vendorAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.address}" />
+              </p:selectOneMenu>
+              <p:message for="accountVendorAddress" display="text" />
+            </h:panelGroup>
+
+
+            <!--  Vendor CST Registration number -->
+            <p:outputLabel value="#{lang.cst} #{lang.sno}" for="cstRegNumber" title="#{lang.cstabbr}" rendered="#{userRuntimeView.isVatRegime()}" />
+            <h:panelGroup id="cstDiv" rendered="#{userRuntimeView.isVatRegime()}">
+              <p:inputText styleClass="fw text-uppercase" tabindex="5" value="#{accountView.account.cstRegNo}" maxlength="12" required="true"
+                           readonly="#{!accountView.accountEditable}"
+                           requiredMessage="#{lang.cstRegNumber} #{lang.isRequired}" id="cstRegNumber" validator="wawo.WhiteSpaceValidator">
+              </p:inputText>
+              <p:message for="cstRegNumber" display="text"/>
+            </h:panelGroup>
+
+            <!-- Inter State -->
+            <p:outputLabel value="#{lang.interState}" for="isInterState" rendered="#{userRuntimeView.isVatRegime()}" />
+            <h:panelGroup id="interStateDiv" rendered="#{userRuntimeView.isVatRegime()}">
+              <p:selectOneRadio value="#{accountView.account.isPurchaseInterstate}" tabindex="7"  id="isInterState"
+                                disabled="#{accountView.disableInterState()}" >
+                <f:selectItems value="#{accountView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax process="interStateDiv" update="pointOfPurchaseDiv" />
+              </p:selectOneRadio>
+              <p:message for="isInterState" display="text"/>
+            </h:panelGroup>
+
+            <!-- Vendor Address -->
+            <p:outputLabel value="#{lang.vendorAddress}" for="accountVendorAddressId" rendered="#{userRuntimeView.isGstRegime()}"/>
+            <h:panelGroup id="vendorAddressDiv" rendered="#{userRuntimeView.isGstRegime()}">
+              <p:selectOneMenu value="#{accountView.account.vendorAddressId}"  id="accountVendorAddressId" tabindex="10"
+                               styleClass="fw" converter="omnifaces.SelectItemsConverter" disabled="#{!accountView.accountEditable}">
+                <f:selectItems value="#{accountView.vendorAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.address}" />
+              </p:selectOneMenu>
+              <p:message for="accountVendorAddressId" display="text" />
+            </h:panelGroup>
+
+            <!-- Trade Type -->
+            <p:outputLabel value="#{lang.tradeType}" for="accountTradeTypeId" />
+            <h:panelGroup id="tradeTypeDiv">
+              <p:selectOneMenu value="#{accountView.account.companyTradeProfileId}"  tabindex="6"
+                               required="true" requiredMessage="#{lang.tradeType} #{lang.isRequired}"
+                               styleClass="fw" id="accountTradeTypeId" converter="omnifaces.SelectItemsConverter"
+                               disabled="#{accountView.account.vendorId.vendorId ne null or accountUtilView.isActiveAccount(accountView.account)}">
+                <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                <f:selectItems value="#{accountView.getLookupTradeProfileList()}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                <p:ajax event="itemSelect" process="@this" immediate="true" update="pointOfPurchaseDiv interStateDiv" listener="#{accountView.updatePointOfPurchase}" />
+              </p:selectOneMenu>
+              <p:message for="accountTradeTypeId" display="text" />
+            </h:panelGroup>
+
+            <!-- Purchase ledger -->
+            <p:outputLabel value="#{lang.purchaseLedger}" for="purchaseLedgerId" />
+            <h:panelGroup >
+              <p:autoComplete  value="#{accountView.account.purchaseLedgerId}" tabindex="11" completeMethod="#{accountView.accountingLedgerPurchaseItemsAuto}" converter="wawo.LookupIntConverter"
+                               required="true" requiredMessage="#{lang.purchaseLedger} #{lang.isRequired}" id="purchaseLedgerId" var="e"
+                               itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                               converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw"
+                               disabled="#{accountUtilView.isActiveAccount(accountView.account)}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>                
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.title}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountingGroupId.title}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountingGroupId.parentId.title}" />
+                </p:column>
+              </p:autoComplete>
+              <p:message for="purchaseLedgerId" display="text" />
+            </h:panelGroup>
+
+            <!-- Scheme Applicable -->
+            <p:outputLabel value="Scheme " for="freeSchemeApplicable"  />
+            <h:panelGroup layout="block" id="schemeApplicableDiv">
+              <p:selectOneRadio id="freeSchemeApplicable" value="#{accountView.account.isSchemeApplicable}" disabled="#{!accountView.accountEditable}" 
+                                required="true" requiredMessage="Scheme is required." layout="grid" columns="1">
+                <f:selectItem itemLabel="Quantity Scheme" itemValue="1" />                
+              </p:selectOneRadio>
+            </h:panelGroup>
+            <!-- Supplier Claim Ledger -->
+            <p:outputLabel value="#{lang.supplier} #{lang.claim} #{lang.ledger}" for="supplierClaimLedgerId" />
+            <h:panelGroup >
+              <p:autoComplete  value="#{accountView.account.supplierClaimLedgerId}" tabindex="11" completeMethod="#{accountView.accountingLedgerSupplierClaimItemsAuto}" converter="wawo.LookupIntConverter"
+                               id="supplierClaimLedgerId" var="e"
+                               itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                               converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw"
+                               readonly="#{!accountView.accountEditable}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>                
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.title}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountingGroupId.title}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountingGroupId.parentId.title}" />
+                </p:column>
+              </p:autoComplete>
+              <p:message for="supplierClaimLedgerId" display="text" />
+            </h:panelGroup>
+            <!-- Point of Purchasae -->
+            <p:outputLabel value="#{lang.pointOfPurchase}" for="pointOfPurchase" rendered="#{userRuntimeView.isVatRegime()}" />
+            <h:panelGroup id="pointOfPurchaseDiv" rendered="#{userRuntimeView.isVatRegime()}">
+              <h:outputText value="N/A" rendered="#{!accountView.pointOfPurchaseApplicable}" />
+              <p:selectOneMenu value="#{accountView.account.purchaseLevel}"  id="pointOfPurchase" converter="omnifaces.SelectItemsConverter"
+                               rendered="#{accountView.pointOfPurchaseApplicable}" styleClass="fw"
+                               disabled="#{accountUtilView.isInterStatePurchase(accountView.account) or accountUtilView.isActiveAccount(accountView.account)}"
+                               >
+                <f:selectItems value="#{accountView.listPurchaseLevel}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+              </p:selectOneMenu>
+              <p:message for="pointOfPurchase" display="text"/>
+            </h:panelGroup>
+
+            <!-- Purchase Channel -->  
+            <p:outputLabel value="#{lang.purchaseDocument} " for="purchaseChannelId" />
+            <h:panelGroup layout="block" id="purchaseChannelDiv">
+              <p:selectOneRadio id="purchaseChannelId" value="#{accountView.account.purchaseChannel}" 
+                                disabled="#{accountView.account.vendorId.vendorId ne null or main.edit}" layout="grid" 
+                                required="true" requiredMessage="#{lang.purchaseChannel} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="Individual" itemValue="1" />
+                <f:selectItem itemLabel="Group" itemValue="2" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Sales Channel -->
+            <p:outputLabel value="#{lang.salesDocument}" for="salesChannelId"  />
+            <h:panelGroup layout="block" id="salesChannelDiv">
+              <p:selectOneRadio id="salesChannelId" value="#{accountView.account.salesChannel}" disabled="#{accountView.account.vendorId.vendorId ne null or main.edit}" 
+                                layout="grid" 
+                                required="true" requiredMessage="#{lang.purchaseChannel} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="Individual" itemValue="1" />
+                <f:selectItem itemLabel="Group" itemValue="2" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Render Ptr -->
+            <p:outputLabel value="#{lang.showPtr}" for="showPtrId"  />
+            <h:panelGroup layout="block" id="ptrDiv">
+              <p:selectOneRadio id="showPtrId" value="#{accountView.account.renderPtr}" layout="grid"  disabled="#{!accountView.accountEditable}" 
+                                required="true" requiredMessage="#{lang.showPtr} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!--Render Pts -->
+            <p:outputLabel value="#{lang.showPts}" for="showPtsId"  />
+            <h:panelGroup layout="block" id="ptsDiv">
+              <p:selectOneRadio id="showPtsId" value="#{accountView.account.renderPts}" layout="grid"  disabled="#{!accountView.accountEditable}" 
+                                required="true" requiredMessage="#{lang.showPts} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Show in sales -->
+            <p:outputLabel value="#{lang.showInSales}" for="showSales" />
+            <h:panelGroup layout="block" id="showSalesDiv">
+              <p:selectOneRadio id="showSales" value="#{accountView.account.showInSales}" layout="grid"  disabled="#{!accountView.accountEditable}" 
+                                required="true" requiredMessage="#{lang.showInSales} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+              </p:selectOneRadio>
+            </h:panelGroup>          
+
+            <p:outputLabel value="#{lang.ptsDerivationCriteria}" for="ptsDerCriteria"  />
+            <h:panelGroup layout="block" id="ptsDerCriteriaDiv">
+              <p:selectOneRadio id="ptsDerCriteria" value="#{accountView.account.ptsDerivationCriteria}" layout="grid"  disabled="#{!accountView.accountEditable}" 
+                                required="true" requiredMessage="#{lang.ptsDerivationCriteria} #{lang.isRequired}" columns="1">
+                <f:selectItem itemLabel="#{lang.derivePtsFromMrpPtr}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.deriveFromRate}" itemValue="2" />
+                <f:selectItem itemLabel="#{lang.deriveFromLandRate}" itemValue="3" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+            <!--             note 
+                        <p:outputLabel value="#{lang.note}" for="note" rendered="#{userRuntimeView.isVatRegime()}" />
+                        <h:panelGroup><p:inputTextarea  styleClass="fw" tabindex="12" value="#{accountView.account.note}"
+                                                        readonly="#{!accountView.accountEditable}" rendered="#{userRuntimeView.isVatRegime()}"
+                                                        cols="100" rows="3" maxlength="500" id="note" autoResize="false" />
+                          <p:message for="note" display="text"/>
+                        </h:panelGroup>-->
+
+            <!-- Limit in sales return By sales -->
+            <p:outputLabel value="#{lang.limitReturnQtyBySales}" for="limitReturn" />
+            <h:panelGroup layout="block" id="limitReturnsDiv">
+              <p:selectOneRadio id="limitReturn" value="#{accountView.account.limitReturnBySales}" layout="grid"  disabled="#{!accountView.accountEditable}" 
+                                required="true" requiredMessage="#{lang.limitReturnQtyBySales} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+
+            <p:outputLabel value="" />
+            <h:panelGroup></h:panelGroup>
+            <!-- Service as expense -->
+
+
+
+            <p:outputLabel value="#{lang.sales} #{lang.expense} 1" for="serviceExpense" rendered="#{accountView.defaultAccountGroup ne null}" />
+            <h:panelGroup layout="block" id="serviceExpenseDiv" rendered="#{accountView.defaultAccountGroup ne null}">
+              <p:selectOneRadio id="serviceExpense" value="#{accountView.defaultAccountGroup.serviceAsExpense}" required="true" disabled="#{!accountView.accountEditable}" 
+                                requiredMessage="#{lang.sales} #{lang.expense} 1 #{lang.isRequired}" layout="grid" columns="2"  >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />  
+                <p:ajax event="valueChange" listener="#{accountView.updateExpenseLedger()}" update="expenseLedgerLabelDiv expenseLedgerDIV"  />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Expense Ledger -->
+            <h:panelGroup id="expenseLedgerLabelDiv" rendered="#{accountView.defaultAccountGroup ne null}">
+              <p:commandLink id="cl2" actionListener="#{popUpView.openSalesExpenseLedger()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                <p:outputLabel value="#{lang.sales} #{lang.expense} 1 #{lang.ledger}"  for="selectLedgerId" rendered="#{accountView.defaultAccountGroup.serviceAsExpense eq 1}" />
+              </p:commandLink>
+            </h:panelGroup>
+            <h:panelGroup layout="block" id="expenseLedgerDIV" rendered="#{accountView.defaultAccountGroup ne null}" >                
+              <p:autoComplete  value="#{accountView.defaultAccountGroup.expenseLedgerId}" tabindex="1" completeMethod="#{accountView.salesExpenseLedgerAuto}" disabled="#{!accountView.accountEditable}" 
+                               rendered="#{accountView.defaultAccountGroup.serviceAsExpense eq 1}" converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.sales} #{lang.expense} #{lang.ledger} #{lang.isRequired}" 
+                               id="selectLedgerId" var="sel" itemValue="#{sel}" itemLabel="#{sel.title}" autocomplete="off" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="99"
+                               converterMessage="#{lang.invalidSelection}" forceSelection="false" styleClass="fw" dynamic="true" dropdownMode="true" dropdown="true">
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}" />
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}" />
+
+              </p:autoComplete>
+              <p:message for="selectLedgerId" display="text" />
+            </h:panelGroup>
+
+            <!-- Service 2 as expense -->
+
+            <p:outputLabel value="#{lang.sales} #{lang.expense} 2" for="serviceExpense2" rendered="#{accountView.defaultAccountGroup ne null}" />
+            <h:panelGroup layout="block" id="serviceExpense2Div" rendered="#{accountView.defaultAccountGroup ne null}">
+              <p:selectOneRadio id="serviceExpense2" value="#{accountView.defaultAccountGroup.service2Enabled}" required="true" disabled="#{!accountView.accountEditable}" 
+                                requiredMessage="#{lang.sales} #{lang.expense} 2 #{lang.isRequired}" layout="grid" columns="2"  >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />  
+                <p:ajax event="valueChange" listener="#{accountView.updateExpenseLedger2()}" update="expenseLedger2LabelDiv expenseLedger2DIV"  />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Expense Ledger -->
+            <h:panelGroup id="expenseLedger2LabelDiv" rendered="#{accountView.defaultAccountGroup ne null}">
+              <p:commandLink id="cl2service" actionListener="#{popUpView.openSalesExpenseLedger2()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                <p:outputLabel value="#{lang.sales} #{lang.expense} 2 #{lang.ledger}"  for="selectLedger2Id" rendered="#{accountView.defaultAccountGroup.service2Enabled eq 1}" />
+              </p:commandLink>
+            </h:panelGroup>
+            <h:panelGroup layout="block" id="expenseLedger2DIV" rendered="#{accountView.defaultAccountGroup ne null}" >                
+              <p:autoComplete  value="#{accountView.defaultAccountGroup.service2LedgerId}" tabindex="1" completeMethod="#{accountView.salesExpenseLedgerAuto}" disabled="#{!accountView.accountEditable}" 
+                               rendered="#{accountView.defaultAccountGroup.service2Enabled eq 1}" converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.sales} #{lang.expense} #{lang.ledger} #{lang.isRequired}" 
+                               id="selectLedger2Id" var="sel" itemValue="#{sel}" itemLabel="#{sel.title}" autocomplete="off" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="99"
+                               converterMessage="#{lang.invalidSelection}" forceSelection="false" styleClass="fw" dynamic="true" dropdownMode="true" dropdown="true">
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}" />
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}" />
+
+              </p:autoComplete>
+              <p:message for="selectLedger2Id" display="text" />
+            </h:panelGroup>
+            <!-- note -->
+            <p:outputLabel value="#{lang.note}" for="note2"  />
+            <h:panelGroup >
+              <p:inputTextarea  styleClass="fw" tabindex="12" value="#{accountView.account.note}"
+                                readonly="#{!accountView.accountEditable}" 
+                                cols="100" rows="2" maxlength="500" id="note2" autoResize="false" />
+              <p:message for="note2" display="text"/>
+            </h:panelGroup>  
+
+
+          </ui:decorate>
+
+          <h:panelGroup layout="block" styleClass="row">
+
+            <!-- Sale Prefix -->
+            <h:panelGroup layout="block" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="rendered" value="#{main.isEdit()}" />
+                <ui:param name="label" value="#{lang.sales} #{lang.prefix} / #{lang.group}" />
+                <ui:define name="menuleft">
+                  <p:remoteCommand name="accountGroupListReturned" actionListener="#{accountView.accountGroupDocPrefixReturned()}"
+                                   update="accountGrpTable tradeTypeDiv accountGrpPriceListTable debitCreditTable purchasePrefixTable"
+                                   process="@this" immediate="true" />
+                </ui:define>
+                <p:dataTable id="accountGrpTable" var="accountGrpDocPrefixVar" widgetVar="accountGrpWidget" value="#{accountView.getAccountGroupDocPrefix(main)}"
+                             rowHover="true" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+
+                  <p:column headerText="#{lang.prefix}" sortBy="#{accountGrpDocPrefixVar.docPrefix}" field="name">
+                    <p:commandLink action="#{accountView.accountGroupDocPrefixEditDialog(accountGrpDocPrefixVar.id)}"
+                                   value="#{appView.display(accountGrpDocPrefixVar.docPrefix)}" process="@this" immediate="true"
+                                   title="#{lang.editMe}">
+                    </p:commandLink>
+                  </p:column>
+                  <p:column headerText="#{lang.prefixType}">
+                    <h:outputText value="#{accountGrpDocPrefixVar.prefixTypeId.title}" escape="false" />
+                  </p:column>
+                  <p:column headerText="#{lang.sequence}" style="text-align: right">
+                    <h:outputText value="#{appView.number(accountGrpDocPrefixVar.docNumberCounter)}" escape="false" />
+                  </p:column>
+                </p:dataTable>
+                <p:remoteCommand name="accountGroupPriceListReturned" actionListener="#{accountView.accountGroupDocPrefixDialogReturn}"
+                                 update="accountGrpPriceListTable"  process="@this" immediate="true" />
+              </ui:decorate>
+            </h:panelGroup>
+
+            <!-- Purchase Prefix -->
+            <h:panelGroup layout="block" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="rendered" value="#{main.isEdit()}" />
+                <ui:param name="label" value="#{lang.purchase} #{lang.prefix}" />
+                <p:dataTable id="purchasePrefixTable" var="purchasePrefixVar" widgetVar="purchasePrefixWidget" value="#{accountView.getAccountGroupDocPurchasePrefixList(main)}"
+                             rowHover="true" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+
+                  <p:column headerText="#{lang.prefix}" sortBy="#{purchasePrefixVar.docPrefix}" field="invoice_prefix">
+                    <p:commandLink action="#{accountView.accountGroupPurchaseDocPrefixEditDialog(purchasePrefixVar.id)}"
+                                   value="#{appView.display(purchasePrefixVar.docPrefix)}" process="@this" immediate="true"
+                                   title="#{lang.editMe}" rendered="#{accountView.account.companyId.docPrefixBasedOnCompany==0}">
+                    </p:commandLink>
+                    <h:outputText value="#{appView.display(purchasePrefixVar.docPrefix)}" escape="false" rendered="#{accountView.account.companyId.docPrefixBasedOnCompany==1}"/>
+                  </p:column>
+                  <p:column headerText="#{lang.prefixType}">
+                    <h:outputText value="#{appView.display(purchasePrefixVar.prefixTypeId.title)}" escape="false" />
+
+                  </p:column>
+                  <p:column headerText="#{lang.sequence}"  style="text-align: right">
+                    <h:outputText value="#{appView.number(purchasePrefixVar.docNumberCounter)}" escape="false" />
+                  </p:column>
+                </p:dataTable>
+
+                <p:remoteCommand name="accountPrefixDialogReturned" actionListener="#{accountView.accountGroupPurchaseDocPrefixListReturned()}"
+                                 update="purchasePrefixTable"  process="@this" immediate="true" />
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <h:panelGroup layout="block" styleClass="row">
+            <h:panelGroup layout="block" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="rendered" value="#{main.isEdit()}" />
+                <ui:param name="label" value="#{lang.priceList}" />
+                <ui:param name="ids" value="priceList" />
+                <ui:define name="menuleft">
+                  <p:commandButton action="#{accountView.addNewAccountGroupPriceList}" update="accountGrpPriceListTable"
+                                   partialSubmit="true" process="@this" icon="fa fa-plus" styleClass="btn btn-info"
+                                   title="#{lang.add} #{lang.newform} #{lang.priceList}" oncomplete="setEdit('accountGrpPriceListTable');">
+                  </p:commandButton>
+                </ui:define>
+                <p:dataTable id="accountGrpPriceListTable" var="accountGrpPriceVar" widgetVar="accountGrpPriceWidget"
+                             value="#{accountView.getAccountGroupPriceList(main)}" editable="true"
+                             rowHover="false" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+                  <p:ajax event="rowEdit" listener="#{accountView.onAccountGroupPriceListRowEdit}" update="@this" />
+                  <p:column headerText="#{lang.name}" sortBy="#{accountGrpPriceVar.title}" field="name">
+                    <p:cellEditor>
+                      <f:facet name="output">
+                        <h:outputText value="#{appView.display(accountGrpPriceVar.title)}" title="#{appView.title(accountGrpPriceVar.title)}" rendered="#{accountGrpPriceVar.isDefault==0}" escape="false" />
+                        <h:outputText value="#{appView.display(accountGrpPriceVar.title)}" title="#{appView.title(accountGrpPriceVar.title)}" rendered="#{accountGrpPriceVar.isDefault==1}" style="color:green" escape="false"/>
+                      </f:facet>
+                      <f:facet name="input">
+                        <div id="abcd"> 
+                          <p:inputText id="txtplt" value="#{accountGrpPriceVar.title}" required="true" requiredMessage="" style="width:100%"  />
+                        </div>
+                      </f:facet>
+                    </p:cellEditor>
+                  </p:column>
+                  <p:column headerText="#{lang.variation} #{lang.percentageSymbol}" sortBy="#{accountGrpPriceVar.variationPercentage}" field="name">
+                    <p:cellEditor>
+                      <f:facet name="output">
+                        <h:outputText value="#{accountGrpPriceVar.variationPercentage} #{lang.percentageSymbol}" escape="false" rendered="#{accountGrpPriceVar.isDefault==0}"/>
+                        <h:outputText value="N/A" escape="false" rendered="#{accountGrpPriceVar.isDefault==1}"/>
+                      </f:facet>r
+                      <f:facet name="input">
+                        <p:inputNumber value="#{accountGrpPriceVar.variationPercentage}" converterMessage="#{lang.variationPercentage} #{lang.invalidNumber}"
+                                       decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="p" required="true"
+                                       maxlength="5" id="variationPercentage" styleClass="fw"/>
+                      </f:facet>
+                    </p:cellEditor>
+                  </p:column>
+                  <p:column headerText="" styleClass="C" style="width:50px;">
+                    <p:rowEditor id="editRow" />
+                  </p:column>
+                  <p:column headerText="#{lang.action}">
+                    <p:commandButton value="" icon="fa fa-eye"  action="#{accountView.defaultProductPriceListFormDialog(accountGrpPriceVar)}"
+                                     rendered="#{accountGrpPriceVar.id ne null}"
+                                     process="@this" immediate="true" title="#{lang.view} #{lang.priceList}">
+                    </p:commandButton>
+                    <p:commandButton value="" icon="fa fa-trash"  action="#{accountView.deleteAccountGroupPriceList(main, accountGrpPriceVar)}"
+                                     process="@this" update="accountGrpPriceListTable" immediate="true" title="#{lang.delete}" 
+                                     oncomplete="toTop();"
+                                     rendered="#{accountGrpPriceVar.isDefault eq 0 or accountGrpPriceVar.id eq null}">
+                      <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+                    </p:commandButton>
+                  </p:column>
+                </p:dataTable>
+
+              </ui:decorate>
+              <script>
+                function setEdit(id) {
+                  $('#' + id + '\\:0\\:editRow > .ui-row-editor-pencil').trigger('click');
+                  $('#' + id + '\\:0\\:txtplt').focus();
+                }
+              </script>
+            </h:panelGroup>
+
+            <h:panelGroup layout="block" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="rendered" value="#{main.isEdit()}" />
+                <ui:param name="label" value="#{lang.debit} / #{lang.credit}" />
+
+                <p:dataTable id="debitCreditTable" var="debitCreditVar" widgetVar="purchasePrefixDebitCreditWidget" value="#{accountView.getAccountGroupDocDebitCreditList(main)}"
+                             rowHover="true" reflow="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks">
+
+                  <p:column headerText="#{lang.prefix}" sortBy="#{purchasePrefixDebitCreditVar.docPrefix}" field="debitCredit">
+                    <p:commandLink action="#{accountView.accountDebitCreditEditDialog(debitCreditVar.id)}"
+                                   value="#{appView.display(debitCreditVar.docPrefix)}" process="@this" immediate="true"
+                                   title="#{lang.editMe}">
+                    </p:commandLink>
+                  </p:column>
+                  <p:column headerText="#{lang.prefixType}">
+                    <h:outputText value="#{appView.display(debitCreditVar.prefixTypeId.title)}" escape="false" />
+
+                  </p:column>
+                  <p:column headerText="#{lang.sequence}"  style="text-align: right">
+                    <h:outputText value="#{appView.number(debitCreditVar.docNumberCounter)}" escape="false" />
+                  </p:column>
+                </p:dataTable>
+
+                <p:remoteCommand name="debitCreditReturned" actionListener="#{accountView.accountGroupDocDebitCreditListReturned()}"
+                                 update="debitCreditTable"  process="@this" immediate="true" />
+              </ui:decorate>
+            </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="row">
+              <h:panelGroup layout="block" styleClass="col-md-6">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                  <ui:param name="rendered" value="#{main.isEdit()}" />
+                  <ui:param name="label" value="#{lang.decimalPrecision}" />
+                  <ui:param name="ids" value="decimalPrecision" />
+                  <p:fragment id ="decimalPrecisionDiv">   
+                    <div style="padding-left: 20px;padding-bottom: 20px;">
+                      <h:panelGrid columns="2">
+                        <h:panelGroup>
+                          <h:outputText value="#{lang.decimalPrecisionSales}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                          <p:selectOneMenu value="#{accountView.defaultAccountGroup.customerDecimalPrecision}"  id="customerDecimalPrecision" styleClass="fw">
+                            <f:selectItem itemLabel="2" itemValue="#{2}" />
+                            <f:selectItem itemValue="#{3}" itemLabel="3" />
+                            <f:selectItem itemValue="#{4}" itemLabel="4" />
+                            <p:ajax process="@this" immediate="true" />
+                          </p:selectOneMenu>
+                        </h:panelGroup>  
+                        <h:panelGroup>
+                          <h:outputText value="#{lang.decimalPrecisionPurchase}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                          <p:selectOneMenu value="#{accountView.account.supplierDecimalPrecision}"  id="supplierDecimalPrecision" styleClass="fw">
+                            <f:selectItem itemLabel="2" itemValue="#{2}" />
+                            <f:selectItem itemValue="#{3}" itemLabel="3" />
+                            <f:selectItem itemValue="#{4}" itemLabel="4" />
+                            <p:ajax process="@this" immediate="true" />
+                          </p:selectOneMenu>
+                        </h:panelGroup>  
+                      </h:panelGrid>
+                    </div>
+                  </p:fragment>
+                </ui:decorate>
+              </h:panelGroup>
+            </h:panelGroup>
+          </h:panelGroup>
+        </p:tab>
+        <!--End Of Account Tab-->
+
+        <!--Contract Tab-->
+        <p:tab title="#{lang.contract}" id="contractTab" rendered="#{main.isEdit()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="contract" />
+            <ui:param name="newForm" value="false" />
+            <ui:param name="reset" value="#{!accountView.isActiveContract() and !accountView.isSuspendContract()}" />
+            <ui:param name="more" value="#{accountView.draftContract and accountView.contract.id ne null}" />
+
+            <ui:define name="deleteForm" >
+              <p:commandButton action="#{accountView.deleteContract(main)}" value="#{lang.delete}" onclick="wdgOff('accountWidgetDel')"
+                               partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+            </ui:define>
+
+            <ui:define name="save" >
+              <h:commandButton action="#{accountView.saveContract(main)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
+                               rendered="#{!accountView.isActiveContract() and !accountView.isSuspendContract() }">
+                <f:ajax execute="contractTab" render="f1"  />
+              </h:commandButton>
+
+              <h:commandButton value="#{lang.confirm}" type="button" styleClass="btn btn-primary" rendered="#{accountView.isActivableContract()}"
+                               onclick="PF('confirmDlgVar').show();">
+              </h:commandButton>
+
+              <h:commandButton type="button" value="#{lang.renew}"
+                               onclick="PF('renewDlgVar').show();"
+                               styleClass="btn btn-success" rendered="#{accountView.isActiveContract()}">
+              </h:commandButton>
+
+              <h:commandButton type="button" value="#{lang.suspend}"
+                               onclick="PF('suspendDlgVar').show();"
+                               styleClass="btn btn-danger" rendered="#{accountView.isActiveContract()}">
+              </h:commandButton>
+
+              <h:commandButton type="button" value="#{lang.resume}"
+                               onclick="PF('resumeDlgVar').show();"
+                               styleClass="btn btn-default" rendered="#{accountView.isSuspendContract()}">
+              </h:commandButton>
+
+            </ui:define>
+            <ui:define name="formRight" >
+
+              <div class="p-t-10">
+                <!-- Vendor -->
+                <h:outputText value="#{lang.vendor} #{lang.colon} " />
+                <h:panelGroup>
+                  <p:outputLabel value="#{accountView.account.vendorId.vendorName}" id="vendrname" style="color: dodgerblue;" />
+                </h:panelGroup>
+                <p:spacer width="5" />
+
+                <!-- Trade Type -->
+                <h:outputText value="#{lang.tradeProfile} #{lang.colon} " />
+                <h:panelGroup>
+                  <p:outputLabel value="#{accountView.account.companyTradeProfileId.title}" id="ctradetype" style="color: dodgerblue;" />
+                </h:panelGroup>
+                <p:spacer width="5" />
+
+                <!-- Version Number -->
+                <h:outputText value="#{lang.version} #{lang.colon} " rendered="#{accountView.contractCreated}" />
+                <h:panelGroup rendered="#{accountView.contractCreated}">
+                  <p:outputLabel value="#{accountView.contract.versionNo}" id="versionNo" style="color: dodgerblue;" />
+                </h:panelGroup>
+
+                <!-- Contract Status -->
+                <h:outputText value="#{lang.status} #{lang.colon} " styleClass="m-l-5" rendered="#{accountView.contractCreated}" />
+                <h:panelGroup rendered="#{accountView.contractCreated}">
+                  <p:outputLabel value="#{accountView.getContractStatus(accountView.contract.contractStatusId)}" style="color: dodgerblue;" />
+                </h:panelGroup>
+              </div>
+            </ui:define>
+            <ui:define name="more"/>
+
+            <!-- Contract Code -->
+            <p:outputLabel value="#{lang.contractCode}" for="contractCode" />
+            <h:panelGroup>
+              <p:inputText value="#{accountView.contract.contractCode}" maxlength="50" id="contractCode" styleClass="fw" autocomplete="off"
+                           required="true" requiredMessage="#{lang.contractCode} #{lang.isRequired}"
+                           readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+              <p:message for="contractCode" display="text"/>
+            </h:panelGroup>
+
+            <!-- Contract Title -->
+            <p:outputLabel value="#{lang.contractTitle}" for="contractTitle" />
+            <h:panelGroup>
+              <p:inputText value="#{accountView.contract.contractTitle}" maxlength="200" required="true" requiredMessage="#{lang.contractTitle} #{lang.isRequired}" autocomplete="off"
+                           id="contractTitle" styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+              <p:message for="contractTitle" display="text"/>
+            </h:panelGroup>
+
+            <!-- Valid From -->
+            <p:outputLabel value="#{lang.validFrom}" for="validFrom" />
+            <h:panelGroup>
+              <p:calendar value="#{accountView.contract.validFrom}" pattern="#{lang.datePattern}" converterMessage="#{lang.validFrom} #{lang.invalidDate}" maxlength="29"
+                          required="true" requiredMessage="#{lang.validFrom} #{lang.isRequired}" id="validFrom" showButtonPanel="true" navigator="true" mask="true"
+                          mindate="#{userRuntimeView.minDate}" autocomplete="off"
+                          disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+              <p:message for="validFrom" display="text"/>
+            </h:panelGroup>
+
+            <!-- Valid To -->
+            <p:outputLabel value="#{lang.validTo}" for="validTo" />
+            <h:panelGroup>
+              <p:calendar value="#{accountView.contract.validTo}" pattern="#{lang.datePattern}" converterMessage="#{lang.validTo} #{lang.invalidDate}" maxlength="29"
+                          required="true" requiredMessage="#{lang.validTo} #{lang.isRequired}" id="validTo" showButtonPanel="true" navigator="true" mask="true"
+                          mindate="#{userRuntimeView.minDate}" autocomplete="off"
+                          disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+              <p:message for="validTo" display="text"/>
+            </h:panelGroup>
+
+            <!-- Document Copy Path -->
+            <p:outputLabel value="#{lang.documentCopyPath}" for="documentCopyPath" />
+            <h:panelGroup id="documentCopyPathPart">
+              <h:inputFile value="#{accountView.documentCopyPathPart}"  maxlength="200" id="documentCopyPath" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+              <p:commandButton rendered="#{not empty accountView.contract.documentCopyPath}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this"
+                               oncomplete="hide('documentCopyPathLink')" update="documentCopyPathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                <f:setPropertyActionListener target="#{accountView.documentCopyPathPart}" value="#{appIo.getRemoveFile()}" />
+              </p:commandButton><p:spacer width="5"/>
+              <p:commandLink value="#{appIo.fileName(accountView.contract.documentCopyPath)}" ajax="false" id="documentCopyPathLink" class="ignoreLoad" >
+                <p:fileDownload value="#{appIo.downloadPrivate(accountView.contract.documentCopyPath)}" />
+              </p:commandLink><p:message for="documentCopyPath" display="text"/>
+            </h:panelGroup>
+
+            <!-- Note -->
+            <p:outputLabel value="#{lang.note}" for="cnote" />
+            <h:panelGroup>
+              <p:inputTextarea value="#{accountView.contract.note}" cols="100" rows="3" maxlength="500" id="cnote" autoResize="false" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+              <p:message for="cnote" display="text"/>
+            </h:panelGroup>
+
+          </ui:decorate>
+
+          <div class="row">
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.deposit}" />
+                <ui:param name="ids" value="depost" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Deposit Amount -->
+                <p:outputLabel value="#{lang.depositAmount}" for="depositAmount" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.depositAmount}" converterMessage="#{lang.depositAmount} #{lang.invalidNumber}" decimalPlaces="2"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="depositAmount" />
+                  <p:message for="depositAmount" display="text"/>
+                </h:panelGroup>
+
+                <!-- Deposit Interest Rate Percent -->
+                <p:outputLabel value="#{lang.depositInterestRatePercent}" for="depositInterestRatePercent" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.depositInterestRatePercent}" converterMessage="#{lang.depositInterestRatePercent} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" autocomplete="off"
+                                 maxlength="5" id="depositInterestRatePercent" styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                  <p:message for="depositInterestRatePercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- Contract Deposit Interest Claim Freq -->
+                <p:outputLabel value="#{lang.depositInterestClaimFreq}" for="contractDepositInterestClaimFreqId"/>
+                <h:panelGroup>
+                  <p:autoComplete value="#{accountView.contract.depositInterestClaimFreqId}" completeMethod="#{accountView.periodsAuto}"
+                                  disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}"
+                                  converter="wawo.LookupIntConverter" id="contractDepositInterestClaimFreqId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                                  cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                  <p:message for="contractDepositInterestClaimFreqId" display="text" />
+                </h:panelGroup>
+
+
+                <!-- Deposit Interest Claim Due Day -->
+                <p:outputLabel value="#{lang.depositInterestClaimDueDay}" for="depositInterestClaimDueDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.depositInterestClaimDueDay}" converterMessage="#{lang.depositInterestClaimDueDay} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{appView.daySymbol}" styleClass="fw" autocomplete="off"
+                                 maxlength="10" id="depositInterestClaimDueDay" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                  <p:message for="depositInterestClaimDueDay" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.stock}" />
+                <ui:param name="ids" value="stock" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Stock Holding Ratio Factor -->
+                <p:outputLabel value="#{lang.stockHoldingRatioFactor}" for="stockHoldingRatioFactor" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.stockHoldingRatioFactor}" maxlength="10" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="100" id="stockHoldingRatioFactor"
+                                 required="true" requiredMessage="#{lang.stockHoldingRatio} #{lang.isRequired}" autocomplete="off"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                  <p:message for="stockHoldingRatioFactor" display="text"/>
+                </h:panelGroup>
+
+                <!-- Stock Holding Ratio Avg Months -->
+                <p:outputLabel value="#{lang.stockHoldingRatioAvgMonths}" for="stockHoldingRatioAvgMonths" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.stockHoldingRatioAvgMonths}" converterMessage="#{lang.stockHoldingRatioAvgMonths} #{lang.invalidNumber}"
+                                 required="true" requiredMessage="#{lang.stockHoldingRatioAvgMonths} #{lang.isRequired}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol=" #{lang.monthSymbol}" symbolPosition="s" styleClass="fw"
+                                 maxlength="10" id="stockHoldingRatioAvgMonths" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                  <p:message for="stockHoldingRatioAvgMonths" display="text"/>
+                </h:panelGroup>
+
+                <!-- Stock Status Report Frequency -->
+                <p:outputLabel value="#{lang.stockStatusReportFreq}" for="contractStockStatusReportFreqId"/>
+                <h:panelGroup>
+                  <p:autoComplete value="#{accountView.contract.stockStatusReportFreqId}" completeMethod="#{accountView.periodsAuto}"
+                                  converter="wawo.LookupIntConverter" inputStyleClass="fw" styleClass="fw"
+                                  id="contractStockStatusReportFreqId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                                  cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                                  disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                  <p:message for="contractStockStatusReportFreqId" display="text" />
+                </h:panelGroup>
+
+                <!--Stock Status Report Due Day-->
+                <p:outputLabel value="#{lang.stockStatusReportDueDay}" for="stockStatusReportDueDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.stockStatusReportDueDay}" converterMessage="#{lang.stockStatusReportDueDay} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="stockStatusReportDueDay" />
+                  <p:message for="stockStatusReportDueDay" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.nearExpiryDays}" for="nearExpiryDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.nearExpiryDays}" converterMessage="#{lang.nearExpiryDays} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="300" minValue="0" symbol="#{appView.daysSymbol}" symbolPosition="s" maxlength="10" id="nearExpiryDays" />
+                  <p:message for="nearExpiryDays" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+          </div>
+
+          <div class="row">
+            <h:panelGroup styleClass="col-md-6" layout="block">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.purchasePolicy}" />
+                <ui:param name="ids" value="purchasePolicy" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <!-- Purchase Credit Days Applicable From -->
+                <p:outputLabel value="#{lang.purchaseCreditdaysAppliFrom}" for="purchaseCreditdaysAppliFrom" />
+                <h:panelGroup>
+                  <p:selectOneMenu value="#{accountView.contract.purchaseCreditdaysAppliFrom}"  id="purchaseCreditdaysAppliFrom" styleClass="fw" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                    <f:selectItems value="#{accountView.listPurchaseCreditOn}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneMenu>
+                  <p:message for="purchaseCreditdaysAppliFrom" display="text"/>
+                </h:panelGroup>
+
+                <!-- Purchase Credit Days -->
+                <p:outputLabel value="#{lang.purchaseCreditDays}" for="purchaseCreditDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.purchaseCreditDays}" converterMessage="#{lang.purchaseCreditDays} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" maxlength="10" id="purchaseCreditDays" />
+                  <p:message for="purchaseCreditDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Cash Discount on Advance -->
+                <p:outputLabel value="#{lang.cashDiscountOnAdvance}" for="immediatePurchPayDiscPer" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.immediatePurchPayDiscPer}" converterMessage="#{lang.immediatePurchPayDiscPer} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" autocomplete="off"
+                                 maxlength="5" id="immediatePurchPayDiscPer" styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                  <p:message for="immediatePurchPayDiscPer" display="text"/>
+                </h:panelGroup>
+
+                <!-- Is Factory Direct -->
+                <p:outputLabel value="#{lang.factoryDirect}" for="isFactoryDirect" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup layout="block" id="factoryDirectDiv" rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputText value="N/A" rendered="#{!accountView.superStockiest}" />
+                  <p:selectOneRadio value="#{accountView.contract.isFactoryDirect}"  id="isFactoryDirect"
+                                    rendered="#{accountView.superStockiest}"
+                                    style="display: inline-table;vertical-align: bottom;" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax update="exciseDutySpan" />
+                  </p:selectOneRadio>
+                  <h:panelGroup id="exciseDutySpan"  style="display: inline-block;padding: 6px;vertical-align: top;">
+                    <h:outputText rendered="#{accountView.isFactoryDirect()}" value="#{lang.exciseDutyApplicable}" />
+                  </h:panelGroup>
+                  <p:message for="isFactoryDirect" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </h:panelGroup>
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.salesPolicy}" />
+                <ui:param name="ids" value="salesPolicy" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Sales Credit Days -->
+                <p:outputLabel value="#{lang.salesCreditDays}" for="salesCreditDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.salesCreditDays}" converterMessage="#{lang.salesCreditDays} #{lang.invalidNumber}" decimalPlaces="0"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" symbolPosition="s" maxlength="10" id="salesCreditDays" />
+                  <p:message for="salesCreditDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Immediate Sales Pay Disc Per -->
+                <p:outputLabel value="#{lang.immediateSalesPayDiscPer}" for="immediateSalesPayDiscPer" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.immediateSalesPayDiscPer}" converterMessage="#{lang.immediateSalesPayDiscPer} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" autocomplete="off"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"
+                                 maxlength="5" id="immediateSalesPayDiscPer" />
+                  <p:message for="immediateSalesPayDiscPer" display="text"/>
+                </h:panelGroup>
+
+                <!-- PTR Margin Percent -->
+                <p:outputLabel value="#{lang.ptrMarginPercent}" for="ptrMarginPercent" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.ptrMarginPercent}" converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}" decimalPlaces="3" autocomplete="off"
+                                 styleClass="fw" required="true" requiredMessage="#{lang.ptrMarginPercent} #{lang.isRequired}" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="100" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="ptrMarginPercent" />
+                  <p:message for="ptrMarginPercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- PTS Margin Percent -->
+                <p:outputLabel value="#{lang.ptsMarginPercent}" for="ptsMarginPercent" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.ptsMarginPercent}" converterMessage="#{lang.ptsMarginPercent} #{lang.invalidNumber}" decimalPlaces="3"
+                                 styleClass="fw" required="true" requiredMessage="#{lang.ptsMarginPercent} #{lang.isRequired}" autocomplete="off"
+                                 readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="100" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="ptsMarginPercent" />
+                  <p:message for="ptsMarginPercent" display="text"/>
+                </h:panelGroup>
+
+              </ui:decorate>
+            </div>
+          </div>
+
+          <div class="row">
+
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.returnPolicy}" />
+                <ui:param name="ids" value="returnPolicy" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Return Expired Item Within Days-->
+                <p:outputLabel value="#{lang.returnExpItemWithinDays}" for="returnExpItemWithinDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.returnExpItemWithinDays}" converterMessage="#{lang.returnExpItemWithinDays} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{appView.daysSymbol}" symbolPosition="s" maxlength="10" id="returnExpItemWithinDays" />
+                  <p:message for="returnExpItemWithinDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Return Damaged Item Within Days -->
+                <p:outputLabel value="#{lang.returnDmgItemWithinDays}" for="returnDmgItemWithinDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.returnDmgItemWithinDays}" converterMessage="#{lang.returnDmgItemWithinDays} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{appView.daysSymbol}" symbolPosition="s" maxlength="10" id="returnDmgItemWithinDays" />
+                  <p:message for="returnDmgItemWithinDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Return Non-moving Item Within Day-->
+                <p:outputLabel value="#{lang.returnNonmvgItemWithinDay}" for="returnNonmvgItemWithinDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.returnNonmvgItemWithinDay}" converterMessage="#{lang.returnNonmvgItemWithinDay} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{appView.daysSymbol}" symbolPosition="s" maxlength="10" id="returnNonmvgItemWithinDay" />
+                  <p:message for="returnNonmvgItemWithinDay" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.claimableExpense}" />
+                <ui:param name="ids" value="claimableExpense" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />               
+
+                <!-- Loading Expense Claimable -->
+                <p:outputLabel value="#{lang.loadingExpenseClaimable}" for="loadingExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{accountView.contract.loadingExpenseClaimable}"  id="loadingExpenseClaimable" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="loadingExpenseClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Unloading Expense Claimable -->
+                <p:outputLabel value="#{lang.unloadingExpenseClaimable}" for="unloadingExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{accountView.contract.unloadingExpenseClaimable}"  id="unloadingExpenseClaimable" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="unloadingExpenseClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Freight Expense Claimable -->
+                <p:outputLabel value="#{lang.freightExpenseClaimable}" for="freightExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{accountView.contract.freightExpenseClaimable}"  id="freightExpenseClaimable" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="freightExpenseClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Other Expense Claimable
+                <p:outputLabel value="#{lang.otherExpenseClaimable}" for="otherExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{accountView.contract.otherExpenseClaimable}"  id="otherExpenseClaimable" >
+                    <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="otherExpenseClaimable" display="text"/>
+                </h:panelGroup> -->
+              </ui:decorate>
+            </div>
+
+            <h:panelGroup styleClass="col-md-6" layout="block" rendered="false">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.statutoryForm}" />
+                <ui:param name="ids" value="statutoryForm" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Contract Statutory Submission Freq -->
+                <p:outputLabel value="#{lang.statutorySubmissionFreq}" for="contractStatutorySubmissionFreqId"/>
+                <h:panelGroup>
+                  <p:autoComplete value="#{accountView.contract.statutorySubmissionFreqId}" completeMethod="#{accountView.periodsAuto}"
+                                  inputStyleClass="fw"
+                                  converter="wawo.LookupIntConverter"   id="contractStatutorySubmissionFreqId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}"
+                                  dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw"
+                                  disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                  <p:message for="contractStatutorySubmissionFreqId" display="text" />
+                </h:panelGroup>
+
+                <!-- Statutory Submission Due Day-->
+                <p:outputLabel value="#{lang.statutorySubmissionDueDay}" for="statutorySubmisssionDueDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{accountView.contract.statutorySubmissionDueDay}" converterMessage="#{lang.statutorySubmissionDueDay} #{lang.invalidNumber}"
+                                 styleClass="fw" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="statutorySubmisssionDueDay" />
+                  <p:message for="statutorySubmisssionDueDay" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </h:panelGroup>
+          </div>
+
+          <div class="row">
+            <h:panelGroup layout="block" id="benefitTypeDiv" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.contractRemunerationTerms}" />
+                <ui:param name="ids" value="contractBenefit" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <!-- commission Claim Frequency-->
+                <p:outputLabel value="#{lang.commissionClaimFrequency}" for="contractCommissionClaimFrequencyId" rendered="#{accountView.isBenefitByCommission()}"/>
+                <h:panelGroup rendered="#{accountView.isBenefitByCommission()}">
+                  <p:autoComplete value="#{accountView.contract.commissionClaimFrequencyId}" completeMethod="#{accountView.periodsAuto}"
+                                  converter="wawo.LookupIntConverter" inputStyleClass="fw" styleClass="fw"
+                                  required="true" requiredMessage="#{lang.commissionClaimFrequency} #{lang.isRequired}"
+                                  id="contractCommissionClaimFrequencyId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                                  cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                                  style="position: relative" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                  <p:message for="contractCommissionClaimFrequencyId" display="text" />
+                </h:panelGroup>
+
+                <!-- Commission Claim Due Day -->
+                <p:outputLabel value="#{lang.commissionClaimDueDay}" for="commissionClaimDueDay" rendered="#{accountView.isBenefitByCommission()}" />
+                <h:panelGroup rendered="#{accountView.isBenefitByCommission()}">
+                  <p:inputNumber value="#{accountView.contract.commissionClaimDueDay}" converterMessage="#{lang.commissionClaimDueDay} #{lang.invalidNumber}"
+                                 styleClass="fw" required="true" requiredMessage="#{lang.commissionClaimDueDay} #{lang.isRequired}" autocomplete="off"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="commissionClaimDueDay"
+                                 readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                  <p:message for="commissionClaimDueDay" display="text"/>
+                </h:panelGroup>
+
+                <!-- Commission Applicable On -->
+                <p:outputLabel value="#{lang.commissionApplicableOn}" for="commissionApplicableOn" rendered="#{accountView.isBenefitByCommission()}"  />
+                <h:panelGroup rendered="#{accountView.isBenefitByCommission()}" >
+                  <p:selectOneMenu value="#{accountView.contract.commissionApplicableOn}"  id="commissionApplicableOn" styleClass="fw"
+                                   required="true" requiredMessage="#{lang.commissionApplicableOn} #{lang.isRequired}"
+                                   disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                    <f:selectItems value="#{accountView.listCommissionOn}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax listener="#{accountView.ajaxBehaviorEventHandler}"/>
+                  </p:selectOneMenu>
+                  <p:message for="commissionApplicableOn" display="text"/>
+                </h:panelGroup>
+
+                <!-- Commission By Range Yes : No -->
+                <p:outputLabel value="#{lang.commissionByRange}" rendered="#{accountView.isBenefitByCommission()}"/>
+                <h:panelGroup rendered="#{accountView.isBenefitByCommission()}">
+                  <p:selectOneRadio value="#{accountView.contract.commissionByRange}" immediate="true" disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItems value="#{accountView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax listener="#{accountView.ajaxEventCommissionByRange}" 
+                            update="commissionValuePercentDiv commissionValuePercentLabel commissionValueFixedDiv commissionValueFixedLabel rangeDiv commissionValueId" />
+                  </p:selectOneRadio>
+                </h:panelGroup>
+
+                <!-- Commission Value - Fixed : Percentage -->
+                <p:outputLabel value="" rendered="#{accountView.isBenefitByCommission()}"/>
+                <h:panelGroup rendered="#{accountView.isBenefitByCommission()}" id="commissionValueId">
+                  <p:selectOneRadio value="#{accountView.contract.commissionValueType}" disabled="#{accountView.isCommissionRangeExist() or accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <f:selectItems value="#{accountView.listCommissionValueType}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax listener="#{accountView.ajaxBehaviorEventHandler}" update="commissionValuePercentDiv commissionValuePercentLabel commissionValueFixedDiv commissionValueFixedLabel rangeDiv" />
+                  </p:selectOneRadio>
+                </h:panelGroup>
+
+                <!-- Commission Value Percent -->
+                <h:panelGroup id="commissionValueFixedLabel">
+                  <p:outputLabel styleClass="perc" value="#{lang.commissionValueFixed}" for="commissionValueFixed"
+                                 rendered="#{accountView.isFixedCommissionByRange()}"  />
+                </h:panelGroup>
+                <h:panelGroup id="commissionValueFixedDiv" >
+                  <p:inputNumber value="#{accountView.contract.commissionValueFixed}" converterMessage="#{lang.commissionValueFixed} #{lang.invalidNumber}"
+                                 decimalPlaces="2" styleClass="fw" required="true" requiredMessage="#{lang.commissionValueFixed} #{lang.isRequired}" autocomplete="off"
+                                 rendered="#{accountView.isFixedCommissionByRange()}" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commissionValueFixed" />
+                  <p:message for="commissionValueFixed" display="text"/>
+                </h:panelGroup>
+
+                <!-- Commission Value Percent -->
+                <h:panelGroup id="commissionValuePercentLabel">
+                  <p:outputLabel value="#{lang.commissionValuePercent}" for="commissionValuePercent"
+                                 rendered="#{accountView.isPercentageCommissionByRange()}" />
+                </h:panelGroup>
+
+                <h:panelGroup id="commissionValuePercentDiv">
+                  <p:inputNumber value="#{accountView.contract.commissionValuePercent}" converterMessage="#{lang.commissionValuePercent} #{lang.invalidNumber}"
+                                 rendered="#{accountView.isPercentageCommissionByRange()}" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}"
+                                 decimalPlaces="2" styleClass="fw" required="true" requiredMessage="#{lang.commissionValuePercent} #{lang.isRequired}" autocomplete="off"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="commissionValuePercent" />
+                  <p:message for="commissionValuePercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- Margin Percentage -->
+                <p:outputLabel value="#{lang.marginPercentage}" for="marginPercentage" rendered="#{accountView.isBenefitByMarginPercentage()}" />
+                <h:panelGroup rendered="#{accountView.isBenefitByMarginPercentage()}">
+                  <p:inputNumber   value="#{accountView.contract.marginPercentage}" required="true" requiredMessage="#{lang.marginPercentage} #{lang.isRequired}"
+                                   converterMessage="#{lang.marginPercentage} #{lang.invalidNumber}" decimalPlaces="2"  autocomplete="off"
+                                   onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="marginPercentage"
+                                   readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                    <p:ajax listener="#{accountView.actionCalculateTotalMargin}" update="totalmargin" />
+                  </p:inputNumber>
+                  <p:message for="marginPercentage" display="text"/>
+                </h:panelGroup>
+
+                <!-- Vendor Reserve Percent -->
+                <p:outputLabel value="#{lang.vendorReservePercent}" for="vendorReservePercent" rendered="#{accountView.isBenefitByMarginPercentage()}" />
+                <h:panelGroup rendered="#{accountView.isBenefitByMarginPercentage()}">
+                  <p:inputNumber value="#{accountView.contract.vendorReservePercent}" converterMessage="#{lang.vendorReservePercent} #{lang.invalidNumber}"
+                                 decimalPlaces="2" readonly="#{accountView.isActiveContract() or accountView.isSuspendContract()}" autocomplete="off"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="vendorReservePercent" >
+                    <p:ajax listener="#{accountView.actionCalculateTotalMargin}" update="totalmargin" />
+                  </p:inputNumber>
+                  <p:message for="vendorReservePercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- Total Margin -->
+                <p:outputLabel value="#{lang.totalMargin}" rendered="#{accountView.isBenefitByMarginPercentage()}" />
+                <h:panelGroup id="totalmargin" rendered="#{accountView.isBenefitByMarginPercentage()}">
+                  <p:inputNumber value="#{accountView.totalMargin}" 
+                                 decimalPlaces="2" readonly="true"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" />
+                </h:panelGroup>
+
+              </ui:decorate>
+            </h:panelGroup>
+
+          </div>
+          <h:panelGroup id="rangeDiv" rendered="#{main.isForm()}">
+            <h:panelGroup layout="block" styleClass="row" rendered="#{accountView.isCommisionByRange()}">
+              <h:panelGroup layout="block" id="TypeDiv" styleClass="col-md-6">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                  <ui:param name="label" value="#{lang.commissionByRange}" />
+                  <ui:param name="cols" value="1" />
+                  <ui:define name="menuleft">
+                    <p:commandButton id="addNewCommision" action="#{accountView.addNewContractCommiByRange()}" oncomplete="refreshDatatable();"
+                                     update="commisionRangeDiv" process="TypeDiv" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info">
+                    </p:commandButton>
+                  </ui:define>
+
+                  <p:importConstants type="spica.sys.SystemConstants"/>
+                  <h:panelGroup layout="block" id="commisionRangeDiv">
+                    <h:inputHidden value="#{accountView.currentRow}" id='rownum' />
+                    <p:remoteCommand actionListener="#{accountView.actionInsertOrUpdateCommissionRange(main)}" process="commisionRangeDiv"
+                                     update="commisionRangeDiv"  name="commisionRange" oncomplete="refreshDatatable();" />
+                    <h:panelGroup layout="block" pt:data-fast-input="true" id="commissionTable" styleClass="table-responsive">
+                      <p:dataTable id="contractCommTable" var="contractCommVar" widgetVar="contractCommWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                                   value="#{accountView.contractCommiByRangeList}" 
+                                   rowIndexVar="rowIndex" rows="#{main.pageData.pageSize}" rowKey="#{contractCommVar.id}"
+                                   rowHover="true" reflow="false">
+
+                        <!-- Range From -->
+                        <p:column headerText="#{lang.rangeFrom}">
+                          <h:panelGroup id="rangeFromDiv">
+                            <p:inputNumber id="rangeFrom" value="#{contractCommVar.rangeFrom}"  minValue="0"
+                                           required="true" requiredMessage="#{lang.rangeFrom} #{lang.isRequired}"
+                                           validator="#{accountView.validateRangeFrom}"
+                                           onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+                              <p:ajax event="change" update="rangeTo" process="rangeFromDiv" />
+                            </p:inputNumber>
+                            <p:focus for="rangeFrom"/>
+
+                            <h:inputHidden value="#{rowIndex}" id="serialNo" />
+
+                            <p:message for="rangeFrom" display="text"/>
+                          </h:panelGroup>
+                        </p:column>
+
+                        <!-- Range To -->
+                        <p:column headerText="#{lang.rangeTo}">
+                          <h:panelGroup id="rangeToDiv">
+                            <p:inputNumber id="rangeTo" value="#{contractCommVar.rangeTo}"  minValue="0"
+                                           required="true" requiredMessage="#{lang.rangeTo} #{lang.isRequired}"
+                                           validator="#{accountView.validateRangeTo}" 
+                                           onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+
+                              <p:ajax event="change" update="rangeTo" process="rangeToDiv"  />
+                            </p:inputNumber>
+                            <p:message for="rangeTo" display="text"/>
+                          </h:panelGroup>
+                        </p:column>
+
+                        <!--Value Type-->
+                        <p:column headerText="#{lang.type}">
+                          <h:panelGroup id="valueTypeDiv">
+                            <p:selectOneMenu id="valueType" value="#{contractCommVar.commissionValueType}" style="width:125px" >
+                              <f:selectItem itemLabel="#{lang.percentage}" itemValue="#{SystemConstants.COMMISSION_AMOUNT_AS_PERCENTAGE}"  />
+                              <f:selectItem itemLabel="#{lang.fixed}" itemValue="#{SystemConstants.COMMISSION_AMOUNT_AS_FIXED}" />
+                              <p:ajax event="change" update="valueDiv" process="@this"/>
+                            </p:selectOneMenu>
+                          </h:panelGroup>
+                        </p:column>
+
+                        <!--value-->
+                        <p:column headerText="#{lang.value}" >
+                          <h:panelGroup id="valueDiv">
+                            <p:inputNumber id="valueFixed" value="#{contractCommVar.valueFixed}"  minValue="0.0"
+                                           required="true" requiredMessage="#{lang.valueFixed} #{lang.isRequired}" 
+                                           styleClass="submit_item fw" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="9999999" maxlength="7" autocomplete="off"
+                                           rendered="#{contractCommVar.commissionValueType eq SystemConstants.COMMISSION_AMOUNT_AS_FIXED}" >
+                            </p:inputNumber>
+                            <p:message for="valueFixed" display="text"/>
+                            <p:inputNumber id="valuePercentage" value="#{contractCommVar.valuePercentage}" minValue="0.0"
+                                           required="true" requiredMessage="#{lang.valuePercentage} #{lang.isRequired}"
+                                           styleClass="submit_item fw" 
+                                           inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="100.00" maxlength="5" autocomplete="off"
+                                           rendered="#{contractCommVar.commissionValueType eq SystemConstants.COMMISSION_AMOUNT_AS_PERCENTAGE or contractCommVar.commissionValueType eq null}" >
+                            </p:inputNumber>
+                            <p:message for="valuePercentage" display="text"/>
+                          </h:panelGroup>
+                        </p:column>
+
+                        <!-- Action Column -->
+                        <p:column style="width:40px" >
+                          <p:commandButton  process="@this" update="contractCommTable" partialSubmit="true"
+                                            tabindex="-1"
+                                            actionListener="#{accountView.deleteContractCommissionRange(main,contractCommVar)}"   title="Delete" iconPos="left" icon="fa fa-trash" >
+                            <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                          </p:commandButton>
+                        </p:column>
+
+                      </p:dataTable>
+                    </h:panelGroup>
+
+                  </h:panelGroup>
+                </ui:decorate>
+              </h:panelGroup>
+            </h:panelGroup>
+
+            <script>
+              //<![CDATA[
+              function refreshDatatable() {
+                page.refresh();
+              }
+
+              function submitForm(params) {
+                commisionRange([{name: 'rownumber', value: params[2]}]);
+                return false;
+              }
+
+              function setFocus() {
+                var r = $('#rownum').val();
+                if (!isNaN(r)) {
+                  var nextRow = parseInt(r) + 1;
+                  console.log('NextRow :' + nextRow);
+                  $('#contractCommTable\\:' + nextRow + '\\:rangeFrom_input').focus();
+                }
+
+              }
+
+              $(document).ready(function (e) {
+                refreshDatatable();
+              });
+              //]]>
+            </script>
+          </h:panelGroup>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(accountView.contract.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountView.contract.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountView.contract.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountView.contract.modifiedAt)}</ui:define>
+            <ui:define name="version">
+              <p:commandButton action="#{accountView.contractListDialog()}"
+                               immediate="true" process="@this" icon="fa fa-history" update="@this"  >
+              </p:commandButton>
+            </ui:define>
+          </ui:decorate>
+        </p:tab>
+        <!--End Of Contract Tab-->
+      </p:tabView>
+      <!-- Contract Confirm dialog -->
+      <p:dialog id="confirmDlg" widgetVar="confirmDlgVar" header="Confirmation Required" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="Are you sure you want to proceed?" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.confirmContract(main)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="contractTab" render="f1 globalAccount"   />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('confirmDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+      <!-- Contract Renew dialog -->
+      <p:dialog id="renewDlg" widgetVar="renewDlgVar" header="Confirmation Required" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="Are you sure you want to proceed?" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.renewContract(main)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="contractTab" render="f1"   />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('renewDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+      <!-- Contract Renew dialog -->
+      <p:dialog id="suspendDlg" widgetVar="suspendDlgVar" header="Confirmation Required" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="Are you sure you want to proceed?" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.suspendContract(main)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="contractTab" render="f1"   />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('suspendDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+      <!-- Contract Resume dialog -->
+      <p:dialog id="resumeDlg" widgetVar="resumeDlgVar" header="Confirmation Required" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="Are you sure you want to proceed?" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.resumeContract(main)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="contractTab" render="f1"   />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('redumeDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+      <!-- Account Confirm dialog -->
+      <p:dialog id="accountConfirmDlg" widgetVar="accountConfirmDlgVar" header="Confirmation Required" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="Are you sure you want to proceed?" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.saveAccount(main, 1)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="accountF" render="f1"  />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('accountConfirmDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+      <!-- Account Inactive dialog -->
+      <p:dialog id="accountInactiveDlg" widgetVar="accountInactiveDlgVar" header="#{lang.confirmationReqruired}" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="#{lang.warningmsg}" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.saveAccount(main, 3)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="accountF" render="f1"  />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('accountInactiveDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+      <p:dialog id="resumeAccountDlg" widgetVar="resumeAccountDlgVar" header="#{lang.confirmationReqruired}" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="#{lang.warningmsg}" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <h:commandButton action="#{accountView.actionUpdateAccountStatus(main)}" value="#{lang.yes}" styleClass="btn btn-primary">
+            <f:ajax execute="accountF" render="f1"  />
+          </h:commandButton>
+          <h:commandButton type="button" value="#{lang.no}" styleClass="btn btn-primary" onclick="PF('resumeAccountDlgVar').hide();">
+          </h:commandButton>
+        </div>
+      </p:dialog>
+
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="accountTable" var="accountVar" widgetVar="accountWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{accountView.accountLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true"
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{accountView.accountSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Account Code -->
+        <p:column sortBy="#{accountVar.accountCode}" field="account_code">
+          <f:facet name="header"><h:outputText value="#{lang.accountCode}" title="#{lang.accountCode}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(accountVar.accountCode)}" process="@this" update="f1" immediate="true"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{accountView.account}" value="#{accountVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Trade Type -->
+        <p:column  sortBy="#{accountVar.companyTradeProfileId.title}" field="company_trade_profile_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.tradeType}" title="#{lang.tradeType}"/></f:facet>
+          <h:outputText value="#{appView.display(accountVar.companyTradeProfileId.title)}" title="#{appView.title(accountVar.companyTradeProfileId.title)}" escape="false" />
+        </p:column>
+
+        <!-- Vendor Name -->
+        <p:column  sortBy="#{accountVar.accountId.accountCode}" field="account_id.account_code.">
+          <f:facet name="header"><h:outputText value="#{lang.primary} #{lang.account}" title="#{lang.primary} #{lang.account}"/></f:facet>
+          <h:outputText value="#{appView.display(accountVar.accountId.accountCode)}" title="#{appView.title(accountVar.accountId.accountCode)}" escape="false" />
+        </p:column>
+
+        <!-- Primary Account -->
+        <p:column  sortBy="#{accountVar.vendorId.vendorName}" field="vendor_id.vendor_name">
+          <f:facet name="header"><h:outputText value="#{lang.vendor}" title="#{lang.vendorName}"/></f:facet>
+          <h:outputText value="#{appView.display(accountVar.vendorId.vendorName)}" title="#{appView.title(accountVar.vendorId.vendorName)}" escape="false" />
+        </p:column>
+
+        <!-- Account Status -->
+        <p:column  sortBy="#{accountVar.accountStatusId.title}" field="account_status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.accountStatus}" title="#{lang.accountStatus}"/></f:facet>
+          <h:outputText value="#{appView.display(accountVar.accountStatusId.title)}" title="#{appView.title(accountVar.accountStatusId.title)}" escape="false" />
+        </p:column>
+
+        <!-- Contract Status -->
+        <p:column>
+          <f:facet name="header"><h:outputText value="#{lang.contractStatus}" title="#{lang.contractStatus}"/></f:facet>
+          <h:outputText value="Contract Not Defined." escape="false" rendered="#{accountVar.contract eq null}" />
+          <h:outputText value="#{appView.display(accountVar.contract.contractStatusId.title)}" escape="false" rendered="#{accountVar.contract ne null}" />
+        </p:column>
+
+        <!-- Contract Expiry Date -->
+        <p:column>
+          <f:facet name="header"><h:outputText value="#{lang.contract} #{lang.expiry}"/></f:facet>
+          <h:outputText value="#{appView.date(accountVar.contract.validTo)}" escape="false" rendered="#{accountVar.contract ne null}" />
+        </p:column>
+
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(accountVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(accountVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>  
+</ui:composition>

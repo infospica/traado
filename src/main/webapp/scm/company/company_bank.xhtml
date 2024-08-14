@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{companyBankView.switchCompanyBank(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{companyBankView.companyBank.companyId.companyName}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? appView.display(companyBankView.companyBank.bankId.name) :lang.bank}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="companyBank" />
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{companyBankView.cloneCompanyBank(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{companyBankView.companyBankContactDialogClose}"
+                       oncomplete="parent.companyBankPopupReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{companyBankView.deleteCompanyBank(main)}" value="#{lang.delete}" onclick="wdgOff('companyBankWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{companyBankView.saveCompanyBank(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+    <ui:define name="form">
+
+      <!-- account Name-->
+      <p:outputLabel value="#{lang.accountName}" for="accountName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBankView.companyBank.accountName}" maxlength="50" required="true" requiredMessage="#{lang.accountName} #{lang.isRequired}" 
+                     id="accountName" validator="wawo.WhiteSpaceValidator" autocomplete="off"/>
+        <p:message for="accountName" display="text"/>
+      </h:panelGroup>
+
+      <!--account Number-->
+      <p:outputLabel value="#{lang.accountNumber}" for="accountNumber" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBankView.companyBank.accountNo}" maxlength="18" required="true" requiredMessage="#{lang.accountNumber} #{lang.isRequired}" 
+                     id="accountNumber" validator="wawo.WhiteSpaceValidator" autocomplete="off">
+          <f:validateRegex pattern="^[0-9 ]+$" />
+          <f:validateLength minimum="6"/>
+        </p:inputText>
+        <p:message for="accountNumber" display="text"/>
+      </h:panelGroup>
+
+      <!-- account Type-->
+      <p:outputLabel value="#{lang.accountType}" for="companyBankBankAccountTypeId"/>
+      <h:panelGroup>
+        <p:selectOneMenu styleClass="fw" value="#{companyBankView.companyBank.bankAccountTypeId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.bankAccountType} #{lang.isRequired}" 
+                         id="companyBankBankAccountTypeId">
+          <f:selectItems value="#{scmLookupView.bankAccountType(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+          <p:ajax event="itemSelect" process="@this"
+                        update="accountLimitLabel accountLimitDiv aaccountInterestLabel aaccountInterestDiv expiryDateLabel expiryDateDiv interestPayableDaysLabel interestPayableDaysDiv"
+                        listener="#{companyBankView.accountTypeSelectEvent}" />
+        </p:selectOneMenu>
+        <p:message for="companyBankBankAccountTypeId" display="text" />
+      </h:panelGroup>
+
+      <!--bank-->
+      <p:outputLabel value="#{lang.bank}" for="companyBankBankId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{companyBankView.companyBank.bankId}" completeMethod="#{companyBankView.bankAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.companyBank} #{lang.isRequired}" id="companyBankBankId" var="e" itemValue="#{e}" itemLabel="#{e.name}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" dynamic="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.bankClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.bankById()}"/>
+        </p:autoComplete>
+        <p:message for="companyBankBankId" display="text" />
+      </h:panelGroup>
+
+      <!-- branch Name-->
+      <p:outputLabel value="#{lang.branchName}" for="branchName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBankView.companyBank.branchName}" maxlength="50" required="true" requiredMessage="#{lang.branchName} #{lang.isRequired}" 
+                     id="branchName" validator="wawo.WhiteSpaceValidator" autocomplete="off"/>
+        <p:message for="branchName" display="text"/>
+      </h:panelGroup>
+
+      <!-- branch Code -->
+      <p:outputLabel value="#{lang.branchCode}" for="branchCode" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBankView.companyBank.branchCode}" maxlength="18" autocomplete="off"
+                     id="branchCode" />
+        <!--validator="wawo.WhiteSpaceValidator"/>-->
+        <p:message for="branchCode" display="text"/>
+      </h:panelGroup>
+
+      <!--ifsc Code-->
+      <p:outputLabel value="#{lang.ifscCode}" for="ifscCode" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBankView.companyBank.ifscCode}" maxlength="11" id="ifscCode" autocomplete="off" >
+        </p:inputText>
+        <p:outputLabel value="(Eg:HDFC0000123)"/>
+        <p:message for="ifscCode" display="text"/>
+      </h:panelGroup>
+
+      <!--branch Address-->
+      <p:outputLabel value="#{lang.branchAddress}" for="branchAddress" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{companyBankView.companyBank.branchAddress}" cols="100" rows="2" maxlength="500" id="branchAddress" autoResize="false" />
+        <p:message for="branchAddress" display="text"/>
+      </h:panelGroup>
+      
+      <!-- Account limit -->
+      <h:panelGroup id="accountLimitLabel" >
+        <p:outputLabel value="#{lang.accountLimit}" for="accountLimit" rendered="#{companyBankView.companyBank.isOverDraft() or companyBankView.companyBank.isCreditCard()}" />
+      </h:panelGroup>
+      <h:panelGroup id="accountLimitDiv">
+        <p:inputNumber styleClass="fw" value="#{companyBankView.companyBank.accountLimit}" rendered="#{companyBankView.companyBank.isOverDraft() or companyBankView.companyBank.isCreditCard()}" maxlength="3"  decimalPlaces="2"
+                     id="accountLimit" autocomplete="off" />
+        <p:message for="accountLimit" display="text"  />
+      </h:panelGroup>
+      
+      <!-- Account interest -->
+      <h:panelGroup id="aaccountInterestLabel">
+        <p:outputLabel value="#{lang.accountInterest}" for="accountInterest" rendered="#{companyBankView.companyBank.isOverDraft() or companyBankView.companyBank.isCreditCard()}" />
+      </h:panelGroup>
+      <h:panelGroup id="aaccountInterestDiv">
+        <p:inputNumber styleClass="fw" value="#{companyBankView.companyBank.accountInterest}" rendered="#{companyBankView.companyBank.isOverDraft() or companyBankView.companyBank.isCreditCard()}" maxlength="3"  decimalPlaces="2" 
+                     id="accountInterest" autocomplete="off"/>
+        <p:message for="accountInterest" display="text" />
+      </h:panelGroup>
+      
+      <!-- Expiry date -->
+      <h:panelGroup id="expiryDateLabel">
+        <p:outputLabel value="#{lang.expiryDate}" for="expiryDate" rendered="#{companyBankView.companyBank.isCreditCard()}" />
+      </h:panelGroup>
+      <h:panelGroup id="expiryDateDiv">
+        <p:calendar id="expiryDate" value="#{companyBankView.companyBank.expiryDate}" rendered="#{companyBankView.companyBank.isCreditCard()}" mask="true" pattern="#{lang.datePattern}" />
+        <p:message for="expiryDate" display="text" />
+      </h:panelGroup>
+      
+       <!-- Interest payable days -->
+      <h:panelGroup id="interestPayableDaysLabel">
+        <p:outputLabel value="#{lang.interestPayableDays}" for="interestPayableDays" rendered="#{companyBankView.companyBank.isCreditCard()}" />
+      </h:panelGroup>
+      <h:panelGroup id="interestPayableDaysDiv">
+        <p:inputNumber styleClass="fw" value="#{companyBankView.companyBank.interestPayableDays}" maxlength="3" autocomplete="off"
+                     id="interestPayableDays" rendered="#{companyBankView.companyBank.isCreditCard()}" />
+        <p:message for="interestPayableDays" display="text" />
+      </h:panelGroup>
+
+      <!--Sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{companyBankView.companyBank.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" autocomplete="off"/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="companyBankStatusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{companyBankView.companyBank.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+                         id="companyBankStatusId">
+          <f:selectItems value="#{companyBankView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="companyBankStatusId" display="text" />
+      </h:panelGroup> 
+
+      <h:panelGroup></h:panelGroup>
+      <h:panelGroup></h:panelGroup>
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(companyBankView.companyBank.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(companyBankView.companyBank.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(companyBankView.companyBank.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(companyBankView.companyBank.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+
+</html>

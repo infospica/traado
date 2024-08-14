@@ -1,0 +1,16 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+  <script  src="#{request.contextPath}/theme1/js/app-timeout.js" type="text/javascript" language="JavaScript" />
+  <script type="text/javascript">  function trackTimeout() {
+      startPageTimer(#{session.maxInactiveInterval}, 300, "#{request.contextPath}/login?reason=expired", "dialog-countdown");
+    }
+  </script>
+  <p:dialog header="#{lang.timeoutHeader}" widgetVar="timeoutDialog" showEffect="fade" hideEffect="fade" modal="true"  closable="false" draggable="false" resizable="false" >
+    <p><i class="fa fa-exclamation-triangle"></i>You will be logged off in <span id="dialog-countdown"></span> seconds. </p>
+    <p:spacer height="100px"/>
+    <div>
+      <p:commandButton rendered="#{!main.popup}" value="#{lang.timeoutLogout}" action="#{userRuntimeView.logoutUser}" process="@this" immediate="true" id="logoff" styleClass="btn btn-default" /> <p:spacer width="30"/>
+      <p:commandButton value="#{lang.timeoutStay}" onclick="restartTimeout()" id="logon"  process="@this" immediate="true" styleClass="btn btn-primary" />
+    </div>
+  </p:dialog>
+  <p:remoteCommand  name="keepAlive" action="#{userRuntimeView.keepAlive}" async="true" immediate="true" ignoreAutoUpdate="true" process="@this" />
+</ui:composition>

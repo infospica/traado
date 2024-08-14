@@ -1,0 +1,108 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"> 
+  <div style="width:100%; border:solid 1px #000;border-top-style: none;" >
+    <table style="width:100%;border-collapse: collapse;" border="0">
+      <tr>
+        <td style="width:73%;" align="left" valign="top">
+          <div style="width:100%;border: solid 1px #000000;border-top-style: none;border-bottom-style: none;border-left-style: none;">
+            <table style="font-size:7.5px;">
+              <tr style="font-size: 7.5px;">
+                <td align="left" style="width:150px;">
+                  Total items: <span class="data"><b>#{invoicePrintView.invoiceItemList.size()}</b></span> 
+                  Total Qty: <span class="data"><b> #{invoicePrintView.salesInvoice.productNetQuantity}</b></span> </td>
+                <td> 
+                  &#160;&#160;&#160;&#160;&#160;No.of Cases&#160; <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.noOfBoxes}</b></span> 
+                  &#160;&#160;&#160;&#160;&#160;&#160;Net Weight <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.weight}</b></span>
+                  #{invoicePrintView.salesInvoice.weightUnit}</td>
+                <td> </td>
+              </tr>
+            </table>
+          </div>
+          <ui:fragment rendered="#{invoicePrintView.salesInvoice.isSalesInterstate==sysConstant.INTERSTATE}">
+            <table border="0"  style="width:100%;border-left-style: none;font-size: 7.5px;">
+              <tr class="data" style="font-size: 7.5px;border-collapse: collapse;">
+                <td class="cellTable" align="center" ><b>GST %</b></td>
+                <td class="cellTable" align="center" ><b>Taxable</b></td>
+                <td class="cellTable" align="center" ><span class="data"><b>Tax Value</b></span></td>
+              </tr>
+              <ui:repeat var="igst" value="#{invoicePrintView.salesInvoice.invoiceGroup}" varStatus="grpStatus">
+                <tr>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;" >#{igst.taxCode.ratePercentage}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;">#{appView.decimal(igst.assessableValue)}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;border-right:1px solid #000;" >#{appView.decimal(igst.invoiceIgstValue)}&#160;</td>
+                </tr>
+              </ui:repeat>
+            </table>
+          </ui:fragment>
+          <!-- CGST & SGST -->
+          <ui:fragment rendered="#{invoicePrintView.salesInvoice.isSalesInterstate==sysConstant.INTRASTATE}">
+            <table border="0" style="width:100%; border-left-style: none;" >
+              <tr class="data"  style="font-size: 7.5px;border-collapse: collapse;">
+                <td class="cellTable" align="center" style="border-left-style: none;" >GST %</td>
+                <td class="cellTable" align="center" >Taxable</td>
+                <td class="cellTable" align="center" >SGST</td>
+                <td class="cellTable" align="center" >Tax</td>
+                <td class="cellTable" align="center" >CGST</td>
+                <td class="cellTable" align="center" >Tax</td>
+                <td class="cellTable" align="center" ><span >Tax value</span></td>
+              </tr>
+              <ui:repeat var="invgrp" value="#{invoicePrintView.salesInvoice.invoiceGroup}" varStatus="grpStatus">
+                <tr class="data" style="font-size: 7.5px;">
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;" >#{invgrp.taxCode.ratePercentage}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;">#{appView.decimal(invgrp.assessableValue)}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;">#{appView.decimal(userRuntimeView.getGstTaxCode(invgrp.taxCode, accountingConstant.TAX_TYPE_CGST).ratePercentage)}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;">#{appView.decimal(invgrp.invoiceCgstValue)}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;">#{appView.decimal(userRuntimeView.getGstTaxCode(invgrp.taxCode, accountingConstant.TAX_TYPE_SGST).ratePercentage)}&#160;</td>
+                  <td class="verticalLine" align="right" valign="middle">#{appView.decimal(invgrp.invoiceSgstValue)}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;border-right:1px solid #000;">#{appView.decimal(invgrp.invoiceIgstValue)}&#160;</td>
+                </tr>
+              </ui:repeat>
+            </table>
+          </ui:fragment>
+          <div style="border:1px solid #000000;border-bottom-style: none;border-left-style: none; padding: 5px;min-height: 45px;" class="data" >
+            Invoice Amount in words: <b>
+              <span>#{invoicePrintView.curencyWords(invoicePrintView.salesInvoice.invoiceAmount)}&#160; 
+                <h:outputText value="#{lang.only}" rendered="#{invoicePrintView.salesInvoice.invoiceAmount gt 0}" /> </span>
+            </b><br />
+            <p:repeat var="mfg" value="#{invoicePrintView.manufactureList}" varStatus="status" rendered="#{invoicePrintView.companySettings.showManufacturer==1}" >
+              #{mfg.code}&#160;-&#160;
+              #{mfg.name} <h:outputLabel value="," rendered="#{ invoicePrintView.manufactureList.size() > (status.index + 1) }" />
+            </p:repeat>
+          </div>
+        </td>
+        <td  valign="top">
+          <div class="data" style="padding:5px;border:solid 1px #000;border:none;">
+            <table border="0" style="width:100%;">
+              <tr>
+                <td style="height:12px;"> Goods Value</td>
+                <td align="right" >#{appView.decimal(invoicePrintView.salesInvoice.invoiceAmountNet)}</td>
+              </tr>
+              <tr>
+                <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Inv. Disc.</td>
+                <td align="right">-#{appView.decimal(invoicePrintView.salesInvoice.invoiceDiscountValue)}</td>
+              </tr>
+              <tr>
+                <td style="height:12px;" >GST Value</td>
+                <td align="right">#{appView.decimal(invoicePrintView.salesInvoice.invoiceAmountIgst)}</td>
+              </tr>
+              <tr>
+                <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Cash Disc.</td>
+                <td align="right">
+                  -#{appView.decimal(invoicePrintView.getCahDisc(invoicePrintView.salesInvoice.cashDiscountValue))}           
+                  <!--#{(appView.decimal(invoicePrintView.salesInvoice.cashDiscountValue))>0?ppView.decimal(invoicePrintView.salesInvoice.cashDiscountValue):'0.00'}-->
+                </td>
+              </tr>
+              <tr>
+                <td align="right" style="height:12px;" >&#160;&#160;&#160;&#160;&#160;&#160;Round Off</td>
+                <td align="right">#{appView.decimal(invoicePrintView.salesInvoice.invoiceRoundOff)}</td>
+              </tr>
+              <tr class="dataTitle">
+                <td style="height:15px; width:70px;font-size: 9px;" ><b> Net Amount</b></td>
+                <td align="right" style="font-size: 9px;"> <b>#{appView.decimal(invoicePrintView.salesInvoice.invoiceAmount)}</b></td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</ui:composition>

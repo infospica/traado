@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{tcsReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <o:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="purchaseLedger"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <h:panelGroup id="accountGroupDiv" rendered="true">
+        <p:autoComplete id='accountGroup'  value="#{tcsReportView.filterParameters.accountGroup}" completeMethod="#{tcsReportView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" 
+                        title="#{lang.accountGroup}" scrollHeight="400" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-users" style="color:#000;"></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <i class="fa fa-users" style="color:#CCC;" ></i>
+            </p:fragment>
+          </p:column>
+          <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" immediate="true" process="accountGroupDiv" update="tcsReportTable" listener="#{tcsReportView.setTcsReportList(null)}"/>
+        </p:autoComplete>    
+      </h:panelGroup>
+
+      <p:commandButton actionListener="#{tcsReportView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate tcsReportTable"  styleClass="btn" onclick="block();" oncomplete="unblock();"/>
+      <p:commandButton actionListener="#{tcsReportView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate tcsReportTable" styleClass="btn" onclick="block();" oncomplete="unblock();" />
+
+      <p:calendar value="#{tcsReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="13" size="10"
+                  id="fromDate" showButtonPanel="true" navigator="true" mask="true"  >
+        <p:ajax event="dateSelect" process="@this" update="tcsReportTable" listener="#{tcsReportView.setTcsReportList(null)}"   />
+      </p:calendar>
+      <p:calendar value="#{tcsReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="13" size="10" 
+                  id="selectedToDate" showButtonPanel="true" navigator="true" mask="true"  >
+        <p:ajax event="dateSelect" process="@this"  update="tcsReportTable" listener="#{tcsReportView.setTcsReportList(null)}"  />
+      </p:calendar>
+
+      <p:commandButton value="#{lang.export}" actionListener="#{tcsReportView.export(main)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false">
+      </p:commandButton>
+    </ui:define>
+
+
+
+    <ui:define name="list">
+      <p:dataTable id="tcsReportTable" var="row" widgetVar="tcsReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{tcsReportView.getTcsReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}" 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('tcsReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+
+        <p:column sortBy="#{row.customerName}" field="customer_name" filterBy="#{row.customerName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden"><f:facet name="header">
+            <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showSalesInvoice(row.id)}" immediate="true"  >
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>     
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.panNo}" field="pan_no" filterBy="#{row.panNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.pan} #{lang.no}" title="#{lang.pan} #{lang.no}"/></f:facet>
+          <h:outputText value="#{appView.display(row.panNo)}" title="#{appView.title(rowpanNogstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.invoiceAmount}" field="invoice_amount" styleClass="text-right" filterBy="#{row.invoiceAmount}" filterStyleClass="hidden" >
+          <f:facet name="header"><h:outputText value="#{lang.billAmount} #{lang.withTcs}" title="#{lang.purchaseRate} #{lang.withTcs}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.invoiceAmount)}"  escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(tcsReportView.totalBillAmount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceAmountSubtotal}" field="invoice_amount_subtotal" styleClass="text-right" filterBy="#{row.invoiceAmountSubtotal}" filterStyleClass="hidden" >
+          <f:facet name="header"><h:outputText value="#{lang.billAmount} #{lang.withouTcs}" title="#{lang.purchaseRate} #{lang.withouTcs}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.invoiceAmountSubtotal)}"  escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(tcsReportView.totalBillAmountWithoutTcs)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.tcsNetAmount}" field="tcs_net_amount" styleClass="text-right" filterBy="#{row.tcsNetAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.tcs} #{lang.amount}" title="#{lang.tcs} #{lang.amount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.tcsNetAmount)}" escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(tcsReportView.totaltcsAmount)}" />
+          </f:facet>
+        </p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

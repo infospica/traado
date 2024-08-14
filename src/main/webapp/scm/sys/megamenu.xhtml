@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<!--  <link href="#{request.contextPath}/theme1/css/dev.css" type="text/css" rel="stylesheet" />-->
+  <!-- Overlay panel for mega menu -->
+  <h:form id="frmMega" prependId="false">
+
+    <p:overlayPanel  widgetVar="overLayMenu" id="imagePanel" hideEffect="fade"  style="width:#{!userRuntimeView.appUser.userProfileId.preferedMenu?'1200px':'450px'};
+                       " styleClass="megaMenu" onHide="rc()" >
+      <p:remoteCommand name="rc" update="searchMenu fluidDivMenuId" action="#{userRuntimeView.clearSerach}" />
+      <h:panelGroup  rendered="#{!userRuntimeView.appUser.userProfileId.preferedMenu}">
+<!--        <h:panelGroup rendered="#{!main.appUser.root}">-->
+        <table style="width:100%;">
+          <tr>
+            <td style="width: 75%;">
+              <h:panelGroup styleClass="searchBox m m-r-5 fw">
+                <h:inputText id="searchMenu" styleClass="fw" value="#{userRuntimeView.search}"  autocomplete="off" >
+                  <p:ajax event="keyup" process="@this" update="fluidDivMenuId" delay="500" />
+                </h:inputText>
+                <p:commandButton icon="fa fa-search" styleClass="btn" 
+                                 process="@this,searchMenu" update="fluidDivMenuId" title="#{lang.search}" 
+                                 />
+              </h:panelGroup>
+            </td>
+            <td style="width: 25%;" align="right">
+              <table>
+                <tr>                 
+                  <td>
+                    <p:selectOneButton value="#{userRuntimeView.appUser.userProfileId.menuStatus}" styleClass="oneBtn" rendered="#{!main.appUser.root}">
+                      <f:selectItems value="#{userRuntimeView.megaMenuFilters}" var="m" itemLabel="#{m.label}" itemValue="#{m.value}" />
+                      <p:ajax event="change" process="@this" listener="#{userRuntimeView.changeMenuStatusFilter(main)}" update="fluidDivMenuId"  />
+                    </p:selectOneButton>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </h:panelGroup>
+
+
+      <h:panelGroup id="fluidDivMenuId" style="height: auto;overflow-x: auto; ">
+        <div class="popupMegaMenu" id="popupMegaMenu" style="background:transparent;">
+          <div class="popContent">
+            <ul class="menu m-t-20 #{!userRuntimeView.appUser.userProfileId.preferedMenu?'grid-4':'grid-1'}" style="text-align: left;">
+              <h:panelGroup  id="recentId"  styleClass="menu grid"> 
+                <h:panelGroup rendered="#{userRuntimeView.quickMenuList.size() gt 0}" layout="block">
+                  <li>
+                    <div style="text-align: left;">
+                      <a href="#" class="ignoreLoad">
+                        <div >
+                          <i class="fa fa-history" aria-hidden="true"></i>&#160; 
+                          <h:outputLabel value="#{lang.recently} #{lang.used}" />
+                        </div>
+                      </a>
+                      <ul>
+                        <p:repeat var="qmSrc" value="#{userRuntimeView.quickMenuList}">
+                          <li>
+                            <div>
+                              <p:commandLink id="qsm"  action="#{main.setViewPath(qmSrc.pageUrl,list)}" process="@this"
+                                             update="globalCompanyDiv globalAccount  f1" 
+                                             immediate="true" onclick="block()" oncomplete="PF('overLayMenu').hide();unblock();" >                    
+                                <f:setPropertyActionListener target="#{userRuntimeView.menuActive}" value="#{qmSrc}"/>
+                                <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+                                <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                                <f:setPropertyActionListener target="#{main.pageData.searchKeyWord}" value="#{null}" />
+                                <span class="icon #{qmSrc.parentId.iconPath}" title="#{qmSrc.parentId.title}"></span> <i class="fa fa-angle-right m-x-5" style="color: #08c;"></i> <span>#{qmSrc.title}</span>
+                              </p:commandLink>
+                              <p:contextMenu for="qsm">
+                                <p:menuitem value="#{lang.remove}" styleClass="ignoreLoad" partialSubmit="true" process="@this"  icon="fa fa-remove" actionListener="#{userRuntimeView.menuRemove(qmSrc)}" update="recentId"  />
+                              </p:contextMenu>  
+                            </div> 
+                          </li>
+                        </p:repeat>
+                      </ul>
+                    </div>
+                  </li>
+                </h:panelGroup>
+              </h:panelGroup>
+              <p:repeat value="#{userRuntimeView.megaMenu}" var="menu" rendered="#{!userRuntimeView.appUser.userProfileId.preferedMenu}" >
+                <h:panelGroup layout="block" 
+                              rendered="#{(menu.favFound or userRuntimeView.appUser.userProfileId.menuStatus == 1) and ( menu.parentIdMenu.size()>0 )}">
+                  <li>
+                    <div>
+                      <a href="#" class="ignoreLoad">
+                        <div >
+                          <span class="icon #{menu.iconPath == null ? 'fa fa-pie-chart' : menu.iconPath}"></span>
+                          &#160; <p:outputLabel value="#{menu.title}" />
+                        </div>
+
+                      </a>
+                      <ul >
+                        <p:repeat value="#{menu.parentIdMenu}" var="sm" >
+                          <h:panelGroup id="sMenu" layout="block" rendered="#{userRuntimeView.isValidMenu(sm)}">
+                            <li>
+                              <div class="c">                             
+                                <div class="L">
+                                  <p:commandLink id="xm" value="#{sm.title}" action="#{main.setViewPath(sm.pageUrl,list)}" process="@this" update="globalCompanyDiv globalAccount f1"  
+                                                 immediate="true" onclick="block()" oncomplete="PF('overLayMenu').hide();unblock();" >                    
+                                    <f:setPropertyActionListener target="#{userRuntimeView.menuActive}" value="#{sm}"/>
+                                    <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+                                    <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                                    <f:setPropertyActionListener target="#{main.pageData.searchKeyWord}" value="#{null}" />
+                                  </p:commandLink>
+                                </div>
+                                <div class="R">
+                                  <h:panelGroup rendered="#{!main.appUser.root}">
+                                    <p:commandButton icon="fa fa-star-o" styleClass="btn btn-mtl btn-link btn-primary" actionListener="#{userRuntimeView.addOrRemoveFav(main,sm)}" 
+                                                     immediate="true" process="@this" update="fluidDivMenuId"  title="#{lang.like}"  rendered="#{!sm.favorite}"  />
+                                    <p:commandButton icon="fa fa-star" styleClass="btn btn-mtl btn-link btn-primary"  actionListener="#{userRuntimeView.addOrRemoveFav(main,sm)}" 
+                                                     immediate="true" process="@this" update="fluidDivMenuId"  title="#{lang.dislike}"   rendered="#{sm.favorite and userRuntimeView.appUser.userProfileId.menuStatus==1}" />
+                                  </h:panelGroup> 
+                                </div>
+                              </div>
+                            </li>
+                          </h:panelGroup>                      
+                        </p:repeat>                     
+                      </ul>
+                    </div>
+                  </li>
+                </h:panelGroup>
+              </p:repeat>
+            </ul>
+          </div>
+        </div>    
+      </h:panelGroup>
+    </p:overlayPanel>
+  </h:form>
+
+
+
+</ui:composition>

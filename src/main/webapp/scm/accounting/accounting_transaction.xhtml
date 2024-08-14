@@ -1,0 +1,578 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <!--#{accountingMainView.init(main)}--> 
+  #{journalView.switchJournal(main, viewType)}
+  <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+  <!--    <f:websocket channel="journalChannel" onmessage="function(message){alert(message)}" />-->
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{main.isList() ? lang.accountingTransaction : journalView.filterJournal.getVoucherTypeId().getTitle() }" />
+    <ui:param name="subLabel" value="#{main.isList() ? null : journalView.filterJournal.getDocumentNumber()}" />
+    <ui:param name="ids" value="journalAll" />
+    <ui:param name="reset" value="#{main.isNew()}" />
+    <ui:param name="search" value="false" />
+    <ui:define name="defaultCommand" >
+      <p:commandButton id="noSubmit" process="@none" type="button" style="display:none"/>
+      <p:defaultCommand target="noSubmit"/>
+    </ui:define>
+
+    <ui:define name="leftLeftList" >
+      <h:panelGroup styleClass="searchBox m m-r-5"  >
+        <p:inputText  id="journalAllST" onkeyup="return callDtFilter(this.value, 'journalAll');PF('journalAllWidget').clearFilters()" value="#{journalView.filterValue}" placeholder="#{lang.search}" >
+          <!--          <p:ajax event="keyup" process="@this" partialSubmit="true" update="listFooter" />-->
+        </p:inputText>      
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton  value="#{lang.btnYes}" oncomplete="wdgOff('journalAllWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{journalView.cloneAccountingTransaction(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton value="#{lang.delete}" onclick="wdgOff('journalAllWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    <ui:define name="save" >       
+      <p:commandButton actionListener="#{journalView.save(main,true)}" value="#{lang.confirm}" process="f1" update="f1" onclick="block()" styleClass="btn btn-primary" rendered="#{main.isNew()}"/>
+      <p:commandButton actionListener="#{journalView.save(main,false)}" value="#{lang.confirm} #{lang.andAdd}"  process="f1" update="f1" onclick="block()" styleClass="btn btn-primary" rendered="#{main.isNew()}"/>
+             <script type="text/javascript">
+              //<![CDATA[     
+              function docItemFocus(dr, index) {
+                if(dr){
+                   $('#journalTable\\:'+index+'\\:debit_input').focus();
+                 $('#journalTable\\:'+index+'\\:debit_input').change();
+                }
+                 else {
+                   $('#journalTable\\:'+index+'\\:credit_input').focus();
+                 $('#journalTable\\:'+index+'\\:credit_input').change();
+               }
+                return false;
+              }
+              //]]>
+            </script>
+    </ui:define>
+    <ui:define name="more">
+      <div class="L g" style="padding-left: 5%">
+        <p:commandButton id="newJournalBtn" type="button" icon="fa fa-angle-down" value="#{lang.newform}" iconPos="down" styleClass="btn btn-info"/>
+        <p:menu overlay="true" trigger="newJournalBtn" my="left top" at="left bottom"  >
+          <c:forEach var="voucherType" items="#{scmLookupView.accountingVoucherType(main)}">
+            <p:menuitem  immediate="true" value="#{voucherType.title}" update="f1" iconPos="left" icon="#{voucherType.styleIcon}" actionListener="#{journalView.newTransaction(main,voucherType)}"  rendered="#{voucherType.id ne 8 and voucherType.id ne 9 and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}">
+            </p:menuitem>
+            <p:separator rendered="#{voucherType.lineBreak eq '1'}" />
+          </c:forEach>
+        </p:menu>  
+      </div>
+    </ui:define>
+    <ui:define name="leftLeft" >
+    </ui:define>
+    <ui:define name="moreForm" >
+
+      <h:panelGroup styleClass="L" style="#{main.isNew() ? 'padding-left: 2%;':''}" >                    
+        <h:outputLabel value="#{lang.entryDate}:" styleClass="fw w-80"/>   
+        <p:inplace rendered="#{journalView.filterJournal.id ne null and journalView.filterJournal.entityId eq null}" id="event" editor="true" event="dblclick" label="#{appView.date(journalView.filterJournal.entryDate)}" styleClass="fw" >
+          <p:calendar value="#{journalView.filterJournal.entryDate}" pattern="#{lang.datePattern}" validatorMessage="#{lang.entryDate} #{lang.invalidDate}"
+                      required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" styleClass="fw w-80" autocomplete="off"
+                      converterMessage="#{lang.entryDate} #{lang.invalidDate}" title="#{lang.entryDate}" mask="true"
+                      maxlength="8" size="8"  id="entryDate" showButtonPanel="true" navigator="true" mindate="#{userRuntimeView.getMinEntryDate()}" maxdate="#{userRuntimeView.getMaxEntryDate()}" />
+          <p:ajax event="save" listener="#{journalView.editEntryDate(main)}" update="entryDateMess dateDisp" />
+          <p:message for="entryDate" id="entryDateMess" />
+        </p:inplace>
+        <p:calendar rendered="#{journalView.filterJournal.id eq null or journalView.filterJournal.entityId ne null}" value="#{journalView.filterJournal.entryDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" styleClass="fw w-80" validatorMessage="#{lang.entryDate} #{lang.invalidDate}"
+                    converterMessage="#{lang.entryDate} #{lang.invalidDate}" title="#{lang.entryDate}" mask="true" autocomplete="off"
+                    maxlength="8" size="8"  id="entryDate1" showButtonPanel="true" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.getMaxEntryDate()}" navigator="true" disabled="#{main.edit}" >
+          <p:ajax event="select" process="@this" update="dateDisp entryDateMess1" />
+          <p:ajax event="change" process="@this"  update="dateDisp entryDateMess1" />
+        </p:calendar>
+
+        <!--        <h:panelGroup >-->
+        <p:calendar id="dateDisp" readonly="true" value="#{journalView.filterJournal.entryDate}"  pattern="EEEE, MMM d" disabled="true" size="15" styleClass="fw p-l-5"  />
+        <p:message for="entryDate1" id="entryDateMess1" display="text" />
+        <!--              </h:panelGroup>-->
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" style="#{main.isNew() ? 'padding-left: 2%;':''}"  >   
+        <p:commandButton value="#{lang.print}" actionListener="#{journalView.print()}"
+                         immediate="true"  process="@this"  styleClass="btn btn-info" />
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" style="#{main.isNew() ? 'padding-left: 2%;':''}" layout="block"  rendered="#{(main.isNew() or main.isEdit()) and !main.popup}">    
+        <p:commandButton id="newJournalBtn1" type="button" icon="fa fa-angle-down" value="#{lang.newform}" iconPos="down" styleClass="btn btn-info"/>
+        <p:menu overlay="true" trigger="newJournalBtn1" my="left top" at="left bottom"  >
+          <c:forEach var="voucherType" items="#{scmLookupView.accountingVoucherType(main)}">
+            <p:menuitem  immediate="true" value="#{voucherType.title}"  update="f1" resetValues="true" iconPos="left" icon="#{voucherType.styleIcon}" actionListener="#{journalView.newTransaction(main,voucherType)}"  rendered="#{voucherType.id ne 8 and voucherType.id ne 9 and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}">
+            </p:menuitem>
+            <p:separator rendered="#{voucherType.lineBreak eq '1'}" />
+          </c:forEach>
+        </p:menu>
+        <!--<p:commandButton id="cloneJournalBtn" immediate="true" process="@this" update="f1" actionListener="#{journalView.cloneTransaction(main)}" type="button" icon="fa fa-angle-down" value="#{lang.clone}" iconPos="down" styleClass="btn btn-default" rendered="#{main.appUser.root and main.isForm() and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}"/>-->
+        <h:panelGroup styleClass="p-l-30">
+          <h:commandButton actionListener="#{journalView.cloneTransaction(main)}" value="#{lang.clone}" onclick="block()" styleClass="btn btn-default" rendered="#{main.isEdit() and main.appUser.root and main.isForm() and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}">
+            <f:ajax execute="@this" render="f1"  />
+          </h:commandButton>     
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>    
+    <ui:define name="newList" />
+    <ui:define name="formRight" > 
+<!--      <h:panelGroup rendered="#{journalView.filterJournal.isReceipt() and !main.isNew()}">
+        <p:commandButton value="#{lang.print}" styleClass="btn btn-primary L" actionListener="#{journalView.showPdf()}" ajax="true" />
+      </h:panelGroup>-->
+      <h:panelGroup>    
+<!--        <h:commandButton action="#{journalView.save(main)}" value="#{lang.update}" onclick="block()" styleClass="L btn btn-primary" rendered="#{userRuntimeView.privilege.modify and main.isEdit() and journalView.editable}">
+          <f:ajax execute="f1" render="f1"  />
+        </h:commandButton>  -->
+      </h:panelGroup>  
+      <h:panelGroup>        
+        <p:selectOneMenu styleClass="L" id="currency" value="#{journalView.filterJournal.currencyId}" required="true" requiredMessage="#{lang.currency} #{lang.isRequired}" converter="omnifaces.SelectItemsConverter" >
+          <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+          <f:selectItems  value="#{scmLookupView.currency(main)}" var="c" itemLabel="#{c.code}" itemValue="#{c}" />
+          <p:message for="currency" display="text"/>
+        </p:selectOneMenu>
+      </h:panelGroup> 
+      <p:commandButton actionListener="#{journalView.actionDeleteTransaction(main)}" icon="fa fa-trash" process="@this" styleClass="btn btn-default R" 
+                       rendered="#{userRuntimeView.privilege.delete==true and main.isEdit() and 
+                                   (journalView.filterJournal.entityId eq null or journalView.filterJournal.isOpeningEntry())
+                                   and  journalView.filterJournal.processedAt eq null }" update="f1" tabindex="-1" >
+        <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="form"> </ui:define>
+    <ui:define name="afterForm">
+      <p:remoteCommand name="transactionDetailItemReturned" actionListener="#{journalView.transactionDetailItemDialogReturn}"
+                       process="@this" immediate="true" update="njTable journalTable narration accountGroupDiv settleDiv partyLedgerId" />      
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <h:panelGroup pt:data-fast-input="true" class="table-responsive" rendered="#{main.isForm()}">
+
+        <ui:include src="/scm/accounting/tran_journal.xhtml" />
+        <ui:include src="/scm/accounting/tran_fixed.xhtml" />
+
+
+        <p:panelGrid  styleClass="mDataTable noHover fw" >          
+          <p:row>
+            <p:column styleClass="w-60 text-left" >              
+            </p:column>
+            <p:column  styleClass="text-left">
+              <h:panelGroup id="partyLedgerId">            
+                <h:outputText  rendered="#{journalView.filterJournal.accountGroupId ne null or journalView.accountGroupList.size() gt 0 }" styleClass="fw" value="#{journalView.getPartyLedger()}" /> 
+              </h:panelGroup>
+              <h:panelGroup id="accountGroupDiv" >
+                <h:outputText value=" - #{journalView.filterJournal.accountGroupId.groupName}" styleClass="fw" rendered="#{journalView.filterJournal.accountGroupId ne null and main.isEdit()}"/>   
+                <h:outputText value=" - #{journalView.filterJournal.accountGroupId.groupName}" styleClass="fw" rendered="#{journalView.filterJournal.accountGroupId ne null and !journalView.isAccountGroup() and main.isNew()}" />   
+                <p:selectOneMenu value="#{journalView.filterJournal.accountGroupId}" id="accountGroupId" rendered="#{journalView.isAccountGroup() and main.isNew()}" 
+                                 disabled="#{accountingMainView.selectedAccountGroup.id ne null}"
+                                 converter="omnifaces.SelectItemsConverter" filter="true" var="ag" required="#{journalView.isAccountGroup()}" requiredMessage="#{lang.accountGroup} #{lang.isRequired}">
+                  <f:selectItem itemLabel="#{lang.all} #{lang.accountGroup}" itemValue="#{null}" />
+                  <f:selectItems value="#{journalView.accountGroupList}" var="a" itemValue="#{a}" itemLabel="#{a.groupName}" />
+                  <p:column styleClass="w-340">
+                    <h:outputText value="#{ag.groupName}" />
+                  </p:column>
+                  <p:column>
+                    <h:outputText value="#{ag.groupCode}" />
+                  </p:column>             
+                  <p:ajax event="itemSelect" update="partyLedgerId" />
+                </p:selectOneMenu>  
+                <p:message for="accountGroupId" id="accountGroupIdMess" />
+
+                <p:selectOneMenu value="#{journalView.filterJournal.accountGroupId}" id="accountGroupId2" rendered="#{journalView.isAccountGroup() and main.isEdit() and journalView.filterJournal.accountGroupId eq null}" 
+                                 converter="omnifaces.SelectItemsConverter" filter="true" var="ag" required="#{journalView.isAccountGroup()}" requiredMessage="#{lang.accountGroup} #{lang.isRequired}">
+                  <f:selectItem itemLabel="#{lang.all} #{lang.accountGroup}" itemValue="#{null}" />
+                  <f:selectItems value="#{journalView.accountGroupList}" var="a" itemValue="#{a}" itemLabel="#{a.groupName}" />
+                  <p:column styleClass="w-340">
+                    <h:outputText value="#{ag.groupName}" />
+                  </p:column>
+                  <p:column>
+                    <h:outputText value="#{ag.groupCode}" />
+                  </p:column>                   
+                </p:selectOneMenu>  
+                <p:message for="accountGroupId2" id="accountGroupIdMess2" />
+                <p:commandButton value="#{lang.update}" actionListener="#{journalView.updateAccountGroup(main)}" process="@this accountGroupId2" update="accountGroupDiv" rendered="#{journalView.isAccountGroup() and main.isEdit() and journalView.filterJournal.accountGroupId eq null}"/>         
+              </h:panelGroup>     
+            </p:column>
+            <p:column styleClass="w-100 text-right">  
+              <h:panelGroup  styleClass="text-right" id="debitTotalDiv1"  rendered="#{journalView.filterJournal.isJournal() or journalView.filterJournal.isOpeningEntry()}" ><h:outputText value="#{appView.decimal(journalView.debitTotal)}"/></h:panelGroup>
+            </p:column>            
+            <p:column styleClass="w-180 text-right">
+              <!--<h:panelGroup  styleClass="text-right" id="debitTotalDiv"  rendered="#{!journalView.filterJournal.isJournal()}" ><h:outputText value="#{appView.decimal(journalView.debitTotal)}"/></h:panelGroup>-->
+              <h:panelGroup  styleClass="text-right" id="creditTotalDiv"  rendered="#{journalView.filterJournal.isJournal() or journalView.filterJournal.isOpeningEntry()}" ><h:outputText value="#{appView.decimal(journalView.creditTotal)}"/></h:panelGroup>
+            </p:column>
+            <p:column styleClass="w-40 text-right">
+            </p:column>
+            <p:column styleClass="w-220 text-right">
+            </p:column>
+          </p:row>        
+        </p:panelGrid>
+        <p:inputTextarea  value="#{journalView.filterJournal.narration}" maxlength="1000" id="narration" styleClass="fw"  placeholder="#{lang.narration}"/>
+
+
+
+<!--<p:remoteCommand name="insertOrUpdateTransactionItem" actionListener="#{journalView.addNewTaxRaw()}" update="njTable" />-->
+
+
+      </h:panelGroup>
+      <h:panelGroup id="focusJournal" >
+        <p:focus context="journalTable"  rendered="#{journalView.filterJournal.isJournal()}"/> 
+        <p:focus context="nonJournalFixed" rendered="#{!journalView.filterJournal.isJournal()}"/>        
+      </h:panelGroup>
+      <p:remoteCommand name="hotkeySave" actionListener="#{journalView.save(main)}" update="f1" />
+      <h:outputScript name="enableHotkeySave.js" library="js" target="head"/>
+      <!--      <script type="text/javascript">
+              //<![CDATA[     
+              function submitForm(params) {
+                insertOrUpdateTransactionItem([{name: 'rownumber', value: params[2]}]);
+                $('#njTable\\:0\\:ledgerTaxId_input').focus();
+                return false;
+              }
+              //]]>
+            </script>-->
+    </ui:define>
+    <ui:define name="navRight">
+      <h:panelGroup styleClass="L" rendered="#{main.isList()}">   
+        <p:commandButton actionListener="#{journalView.backOrNext(-1,userRuntimeView.company,true)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fmess fromDate"
+                         styleClass="btn" onstart="block();" oncomplete="PF('journalAllWidget').filter();unblock();"/>
+        <p:commandButton actionListener="#{journalView.backOrNext(1,userRuntimeView.company,true)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fmess fromDate" 
+                         styleClass="btn" onstart="block();" oncomplete="PF('journalAllWidget').filter();unblock();"/>
+
+        <p:calendar id="fromDate" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}" 
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" 
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}">
+          <p:ajax event="dateSelect" process="@this" listener="#{journalView.onFromDateSelect}" update="fmess toDate" oncomplete="PF('journalAllWidget').filter()"/>
+        </p:calendar>
+        <p:message for="fromDate" display="text" id="fmess"/>
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" rendered="#{main.isList()}">
+        <p:calendar id="toDate" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}">
+          <p:ajax event="dateSelect" process="@this" listener="#{journalView.onToDateSelect}" update="tmess" oncomplete="PF('journalAllWidget').filter()"/>
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>      
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" rendered="#{main.isList()}">
+        <p:commandButton actionListener="#{journalView.backOrNext(-1,userRuntimeView.company,false)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fmess toDate" styleClass="btn" onstart="block();" oncomplete="PF('journalAllWidget').filter();unblock();"/>
+        <p:commandButton actionListener="#{journalView.backOrNext(1,userRuntimeView.company,false)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fmess toDate" styleClass="btn" onstart="block();" oncomplete="PF('journalAllWidget').filter();unblock();"/>
+      </h:panelGroup>
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times" iconPos="right"/>
+    </ui:define>
+    <ui:define name="rightList" >
+
+      <p:selectOneMenu id="voucherType" value="#{accountingMainView.selectedVoucherType}" >
+        <f:selectItem itemLabel="#{lang.all}" itemValue="#{null}" />
+        <f:selectItems  value="#{scmLookupView.accountingVoucherType(main)}" var="item" itemLabel="#{item.title}" itemValue="#{item.id}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{journalView.voucherTypeFilter}"  oncomplete="PF('journalAllWidget').filter()"/>
+      </p:selectOneMenu> 
+      <p:selectOneMenu id="summary" value="#{accountingMainView.selectedSummary}" >
+        <f:selectItem itemLabel="Summary" itemValue="#{1}" />
+        <f:selectItem itemLabel="Detail" itemValue="#{2}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{journalView.summaryFilter}" oncomplete="PF('journalAllWidget').filter();updatejournalAllTable()"/>
+      </p:selectOneMenu> 
+    </ui:define>
+    <ui:define name="list">
+      <p:remoteCommand name="updatejournalAllTable" oncomplete="journalAllTable" />
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:dataTable id="journalAllTable" var="journalVar" widgetVar="journalAllWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{journalView.getJournalAllList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{journalVar.id}"
+                   rowHover="true" reflow="false" draggableColumns="true" scrollable="false" 
+                   rowsPerPageTemplate="#{AccountingConstant.PAGE_SIZE},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+                   >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('journalAllWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column styleClass="w-80" sortBy="#{journalVar.accountingTransactionId.entryDate}" filterBy="#{journalVar.accountingTransactionId.entryDate}" field="t2.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}"/></f:facet>
+          <h:outputText value="#{appView.date(journalVar.accountingTransactionId.entryDate)}"   escape="false" />
+        </p:column>
+        <p:column styleClass="w-120" sortBy="#{journalVar.accountingTransactionId.documentNumber}" filterBy="#{journalVar.accountingTransactionId.documentNumber}" field="t2.document_number" >
+          <f:facet name="header"><h:outputText value="#{lang.no}" title="#{lang.no}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{journalVar.accountingTransactionId.documentNumber}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+<!--          <h:outputText value="#{journalVar.accountingTransactionId.documentNumber}" title="#{journalVar.accountingTransactionId.documentNumber}"   escape="false" />-->
+            <f:setPropertyActionListener target="#{journalView.filterJournal}" value="#{journalVar.accountingTransactionId}" />
+          </p:commandLink>
+        </p:column>
+        <p:column  styleClass="w-240" sortBy="#{journalVar.accountingLedgerId.title}" filterBy="#{journalVar.accountingLedgerId.title}" field="t2.title" rendered="#{accountingMainView.selectedSummary eq 2}">
+          <f:facet name="header"><h:outputText value="#{lang.by}" title="#{lang.by}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showLedgerBalance(journalVar.accountingLedgerId)}" value="#{journalVar.accountingLedgerId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+          </p:commandLink>
+        </p:column>
+        <p:column  styleClass="w-240" sortBy="#{journalVar.accountingTransactionId.ledgerDebitId.title}" filterBy="#{journalVar.accountingTransactionId.ledgerDebitId.title}" field="t2.title" rendered="#{accountingMainView.selectedSummary eq 1}" >
+          <f:facet name="header"><h:outputText value="#{lang.by}" title="#{lang.by}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showLedgerBalance(journalVar.accountingTransactionId.ledgerDebitId)}" value="#{journalVar.accountingTransactionId.ledgerDebitId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.view} #{lang.ledger}">
+          </p:commandLink>
+        </p:column>
+        <p:column styleClass="w-240" sortBy="#{journalVar.accountingTransactionId.ledgerCreditId.title}" filterBy="#{journalVar.accountingTransactionId.ledgerCreditId.title}" field="t2.title" rendered="#{accountingMainView.selectedSummary eq 1}">
+          <f:facet name="header"><h:outputText value="#{lang.to}" title="#{lang.to}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showLedgerBalance(journalVar.accountingTransactionId.ledgerCreditId)}" value="#{journalVar.accountingTransactionId.ledgerCreditId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+          </p:commandLink>
+        </p:column>        
+        <p:column styleClass="w-100" sortBy="#{journalVar.accountingTransactionId.voucherTypeId.title}" filterBy="#{journalVar.accountingTransactionId.voucherTypeId.title}" >
+          <f:facet name="header"><h:outputText value="#{lang.voucherType}" title="#{lang.voucherType}"/></f:facet>
+          <h:outputText value="#{appView.display(journalVar.accountingTransactionId.voucherTypeId.title)}" title="#{journalVar.accountingTransactionId.accountingEntityTypeId.title} #{journalVar.accountingTransactionId.entityId}" escape="false" />
+        </p:column>        
+        <p:column sortBy="#{journalVar.debit}" filterBy="#{journalVar.debit}" field="debit" styleClass="w-120 text-right" >
+          <f:facet name="header"><h:outputText value="#{lang.debit}" title="#{lang.debit}"/></f:facet>
+          <h:outputText styleClass="label" style="background-color: #{journalView.getColor(journalVar.accountingTransactionId.id)}" value="#{appView.decimal(journalVar.debit)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{journalVar.credit}" filterBy="#{journalVar.credit}" field="credit" styleClass="w-120 text-right" rendered="#{accountingMainView.selectedSummary eq 2}">
+          <f:facet name="header"><h:outputText value="#{lang.credit}" title="#{lang.credit}"/></f:facet>
+          <h:outputText styleClass="label" style="background-color: #{journalView.getColor(journalVar.accountingTransactionId.id)}" value="#{appView.decimal(journalVar.credit)}" rendered="#{journalVar.credit gt 0}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{journalVar.referenceDocumentNo}" field="ref_document_no" styleClass="w-160 text-left" filterBy="#{journalVar.accountingTransactionId.refDocumentNo}"  >
+          <f:facet name="header"><h:outputText value="#{lang.refInvoiceNo}" title="#{lang.refInvoiceNo}"/></f:facet>
+          <h:outputText value="#{journalVar.accountingTransactionId.refDocumentNo}" title="#{journalVar.accountingTransactionId.refDocumentNo}" escape="false" />
+        </p:column>  
+        <p:column sortBy="#{journalVar.narration}" field="narration" filterBy="#{journalVar.accountingTransactionId.narration}"
+                  style="text-align:left;white-space: normal;"  styleClass="w-340 wrap"  >
+          <f:facet name="header"><h:outputText value="#{lang.narration}" title="#{lang.narration}"/></f:facet>
+          <h:outputText value="#{journalVar.narration}" title="#{journalVar.accountingTransactionId.narration}" escape="false" />
+        </p:column>
+
+        <p:columnGroup type="footer">
+          <p:row style="fw">
+            <p:column  style="text-align:right" footerText="" />
+            <p:column  style="text-align:right" footerText="" />
+            <p:column  style="text-align:right" footerText="" />
+            <p:column  style="text-align:right" footerText="Totals:" />
+            <p:column  style="text-align:right" footerText="" rendered="#{accountingMainView.selectedSummary==1}"></p:column>
+            <p:column style="text-align:right" rendered="#{accountingMainView.selectedSummary==2}" >
+              <f:facet name="footer">
+                <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_CR}"  value="#{appView.decimal(journalView.debitTotal)}" />
+              </f:facet>
+            </p:column>
+            <p:column style="text-align:right" >
+              <f:facet name="footer">
+                <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_CR}"  value="#{appView.decimal(journalView.creditTotal)}" />
+              </f:facet>
+            </p:column>
+            <p:column style="text-align:right"  footerText="" />   
+            <p:column style="text-align:right"  footerText="" />   
+          </p:row>
+        </p:columnGroup>
+      </p:dataTable>
+    </ui:define>
+
+    <ui:define name="after">
+      <h:panelGroup id="settleDiv">
+        <!-- bill details -->
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="#{lang.details}" />  
+          <ui:param name="rendered" value="#{main.isForm() and journalView.partyDetail.detailItem.size() gt 0}" />  
+          <p:dataTable id="accountingTransactionDetailItemTable" var="detailItemVar" widgetVar="accountingTransactionDetailItemWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{journalView.partyDetail.detailItem}" rowIndexVar="rowIndex" >
+            <p:column headerText="#{lang.docType}" >
+              <h:outputText value="#{detailItemVar.documentTypeId.title}" escape="false" />           
+            </p:column>
+            <p:column headerText="#{lang.documentNo}" >
+              <h:outputText value="#{detailItemVar.documentNumber}" escape="false" rendered="#{journalView.filterJournal.entityId eq null}" />   
+              <p:commandLink action="#{journalView.showDetails(detailItemVar)}" value="#{appView.display(detailItemVar.documentNumber)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{journalView.filterJournal.entityId ne null and detailItemVar.documentNumber ne null}"/>
+            </p:column>
+            <p:column headerText="#{lang.document} #{lang.date}">
+              <h:outputText value="#{appView.date(detailItemVar.documentDate)}" escape="false"/>           
+            </p:column>
+            <p:column headerText="#{lang.reference} #{lang.no}" >
+              <h:outputText value="#{detailItemVar.referNumber}" escape="false" />
+            </p:column>          
+            <p:column headerText="#{lang.cleared} #{lang.date}" rendered="#{journalView.filterJournal.isPayment() || journalView.filterJournal.isReceipt()}">
+              <h:outputText  value="#{appView.date(detailItemVar.processedAt)}" escape="false"/>
+            </p:column>          
+            <p:column headerText="#{lang.amount}" style="text-align: right"> 
+              <h:outputText styleClass="text-right"  value="#{appView.decimal(detailItemVar.netAmount)}" escape="false"/>
+            </p:column>
+          </p:dataTable> 
+        </ui:decorate>
+        <!-- bill details -->
+        <!-- settlement start -->
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="#{lang.settlement}" />      
+          <ui:param name="rendered" value="#{main.isForm() and journalView.partyDetail.settlementList.size() gt 0}" />  
+          <p:dataTable id="acSettlementTable" var="acSettlementVar" widgetVar="acSettlementWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{journalView.partyDetail.settlementList}" rendered="#{(journalView.filterJournal.isJournal() or journalView.filterJournal.isPayment() or journalView.filterJournal.isReceipt())}">
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+              <p:commandLink  actionListener="#{popUpView.journalDetails(acSettlementVar.transactionDetailItemId.accountingTransactionDetailId)}"  value="#{appView.display(acSettlementVar.transactionDetailItemId.documentTypeId.title)}" title="#{appView.title(acSettlementVar.transactionDetailItemId.documentTypeId.title)}"  process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+  <!--                <h:outputText value="#{appView.display(acSettlementVar.transactionDetailItemId.documentTypeId.title)}" escape="false" />-->
+            </p:column>
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+              <h:outputText value="#{appView.display(acSettlementVar.transactionDetailItemId.documentNumber)}" escape="false" rendered="#{acSettlementVar.transactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId eq null and acSettlementVar.transactionDetailItemId.documentNumber ne null}"/>
+              <p:commandLink action="#{journalView.showDetailsSettlement(acSettlementVar.transactionDetailItemId)}" value="#{appView.display(acSettlementVar.transactionDetailItemId.documentNumber)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{acSettlementVar.transactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId ne null and acSettlementVar.transactionDetailItemId.documentNumber ne null}">
+              </p:commandLink>                
+            </p:column>
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.reference} #{lang.no}" title="#{lang.reference} #{lang.no}"/></f:facet>
+              <h:outputText value="#{appView.display(acSettlementVar.transactionDetailItemId.referNumber)}" escape="false" />
+            </p:column>                           
+            <p:column styleClass="w-180">
+              <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}" /></f:facet>
+              <h:outputText value="#{appView.date(acSettlementVar.transactionDetailItemId.documentDate)}" escape="false" />
+            </p:column>
+
+            <p:column rendered="#{main.isNew()}">
+              <f:facet name="header"><h:outputText value="#{lang.adjustment} #{lang.docNo}" title="#{lang.adjustment} #{lang.documentNo}"/></f:facet>
+              <h:outputText value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.documentNumber)}" escape="false" rendered="#{acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId eq null and acSettlementVar.adjustedTransactionDetailItemId.documentNumber ne null}"/>
+              <!--<h:outputText value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.referNumber)}" escape="false" rendered="#{acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId eq null and acSettlementVar.adjustedTransactionDetailItemId.documentNumber ne null}"/>-->
+              <p:commandLink styleClass="fw" action="#{journalView.showDetailsSettlement(acSettlementVar.adjustedTransactionDetailItemId)}" value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.documentNumber)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId ne null and acSettlementVar.adjustedTransactionDetailItemId.documentNumber ne null}" />
+            </p:column>            
+            <p:column rendered="#{main.isNew()}">
+              <f:facet name="header"><h:outputText value="#{lang.amount}" title="#{lang.amount}"/></f:facet>
+              <h:outputText styleClass="fw" value="#{appView.decimal(acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.credit gt 0 ? acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.credit : acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.debit)}" />
+            </p:column> 
+            <p:column rendered="#{main.isEdit()}" styleClass="w-180 text-right" style="text-align: right">
+              <f:facet name="header"><h:outputText value="#{lang.amount}" title="#{lang.amount}" /></f:facet>
+              <h:outputText value="#{appView.decimal(acSettlementVar.transactionDetailItemId.netAmount)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-180 text-right" style="text-align: right">
+              <f:facet name="header"><h:outputText value="Amt Settled" title="Amt Settled" /></f:facet>
+              <h:outputText value="#{appView.decimal(acSettlementVar.settledAmount)}" escape="false" />
+            </p:column>
+
+            <p:columnGroup type="footer">
+              <p:row>
+                <p:column rendered="#{main.isNew()}"/>
+                <p:column rendered="#{main.isNew()}"/>
+                <p:column style="text-align:right" footerText=""/>
+                <p:column style="text-align:right" footerText=""/>
+                <p:column style="text-align:right" footerText=""/>
+                <p:column rendered="#{main.isEdit()}" style="text-align:right" footerText=""/>
+                <p:column style="font-weight: bold;" footerText="Amt Settled"/>
+                <p:column style="text-align:right;font-weight: bold;" styleClass="text-right;b">
+                  <f:facet name="footer">
+                    <h:panelGroup id="debitTotalDiv" layout="block" >
+                      #{appView.decimal(journalView.totalPaid)}
+                    </h:panelGroup>
+                  </f:facet>
+                </p:column>
+              </p:row>
+              <p:row>
+                <p:column rendered="#{main.isNew()}"/>
+                <p:column rendered="#{main.isNew()}"/>
+                <p:column style="text-align:right" footerText=""/>
+                <p:column style="text-align:right" footerText=""/>
+                <p:column style="text-align:right" footerText=""/>
+                <p:column rendered="#{main.isEdit()}" style="text-align:right" footerText=""/>
+                <p:column style="font-weight: bold;" footerText="#{lang.balance}"/>
+                <p:column style="text-align:right;font-weight: bold;" styleClass="text-right"><f:facet name="footer"><h:panelGroup id="debitTotalDiv11" layout="block" >#{appView.decimal(journalView.advancePaid)}</h:panelGroup></f:facet></p:column>
+              </p:row>              
+            </p:columnGroup>              
+          </p:dataTable> 	
+          <p:dataTable id="acSettlementTablePurchase" var="acSettlementVar" widgetVar="acSettlementWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{journalView.partyDetail.settlementList}" rendered="#{!(journalView.filterJournal.isJournal() or journalView.filterJournal.isPayment() or journalView.filterJournal.isReceipt())}">
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+              <p:commandLink  actionListener="#{popUpView.journalDetails(acSettlementVar.adjustedTransactionDetailItemId.accountingTransactionDetailId)}"  value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.documentTypeId.title)}" title="#{appView.title(acSettlementVar.adjustedTransactionDetailItemId.documentTypeId.title)}"  process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+  <!--                <h:outputText value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.documentTypeId.title)}" escape="false" />-->
+            </p:column>
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+              <h:outputText value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.documentNumber)}" escape="false" />
+            </p:column>
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.reference} #{lang.no}" title="#{lang.reference} #{lang.no}"/></f:facet>
+              <h:outputText value="#{appView.display(acSettlementVar.adjustedTransactionDetailItemId.referNumber)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-180">
+              <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}" /></f:facet>
+              <h:outputText value="#{appView.date(acSettlementVar.adjustedTransactionDetailItemId.documentDate)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-180 text-right" style="text-align: right">
+              <f:facet name="header"><h:outputText value="#{lang.amount}" title="#{lang.amount}" /></f:facet>
+              <h:outputText value="#{appView.decimal(acSettlementVar.adjustedTransactionDetailItemId.netAmount)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-180 text-right" style="text-align: right">
+              <f:facet name="header"><h:outputText value="Amt Settled" title="Amt Settled" /></f:facet>
+              <h:outputText value="#{appView.decimal(acSettlementVar.settledAmount)}" escape="false" />
+            </p:column>
+          </p:dataTable> 	            
+        </ui:decorate>
+        <h:panelGroup layout="block" rendered="#{main.isForm() and journalView.partyDetail.settlementAdjustedList.size() gt 0}">
+          <h:panelGroup layout="block" styleClass="col-md-12">
+            <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+              <ui:param name="label" value="#{lang.adjustment}" />      
+              <p:dataTable id="adjustmentTable" var="adjustmentVar" widgetVar="adjustmentWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                           value="#{journalView.partyDetail.settlementAdjustedList}" >
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+                  <p:commandLink  actionListener="#{popUpView.journalDetails(adjustmentVar.adjustedTransactionDetailItemId.accountingTransactionDetailId)}"  value="#{appView.display(adjustmentVar.adjustedTransactionDetailItemId.documentTypeId.title)}" title="#{appView.title(adjustmentVar.adjustedTransactionDetailItemId.documentTypeId.title)}"  process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+                  <h:outputText value="#{appView.display(adjustmentVar.adjustedTransactionDetailItemId.documentNumber)}" escape="false" rendered="#{adjustmentVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId eq null and adjustmentVar.adjustedTransactionDetailItemId.documentNumber ne null}"/>
+                  <p:commandLink action="#{journalView.showDetails(adjustmentVar.adjustedTransactionDetailItemId)}" value="#{appView.display(adjustmentVar.adjustedTransactionDetailItemId.documentNumber)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{adjustmentVar.adjustedTransactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId ne null and adjustmentVar.adjustedTransactionDetailItemId.documentNumber ne null}">
+                  </p:commandLink>                
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.reference} #{lang.no}" title="#{lang.reference} #{lang.no}"/></f:facet>
+                  <h:outputText value="#{appView.display(adjustmentVar.adjustedTransactionDetailItemId.referNumber)}" escape="false" />
+                </p:column>
+                <p:column styleClass="w-180">
+                  <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}" /></f:facet>
+                  <h:outputText value="#{appView.date(adjustmentVar.adjustedTransactionDetailItemId.documentDate)}" escape="false" />
+                </p:column>
+                <p:column styleClass="w-180 text-right" style="text-align: right">
+                  <f:facet name="header"><h:outputText value="#{lang.amount}" title="#{lang.amount}" /></f:facet>
+                  <h:outputText value="#{appView.decimal(adjustmentVar.adjustedTransactionDetailItemId.netAmount)}" escape="false" />
+                </p:column>
+                <p:column styleClass="w-180 text-right" style="text-align: right">
+                  <f:facet name="header"><h:outputText value="Amt Settled" title="Amt Settled" /></f:facet>
+                  <h:outputText value="#{appView.decimal(adjustmentVar.settledAmount)}" escape="false" />
+                </p:column>
+              </p:dataTable>
+            </ui:decorate>
+          </h:panelGroup>
+        </h:panelGroup> 
+        <h:panelGroup layout="block" rendered="#{main.isForm() and journalView.partyDetail.settlementUsedList.size() gt 0}">
+          <h:panelGroup layout="block" styleClass="col-md-12">
+            <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+              <ui:param name="label" value="Used in" />      
+              <p:dataTable id="usedTable" var="usedVar" widgetVar="usedWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                           value="#{journalView.partyDetail.settlementUsedList}"   >
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+                  <p:commandLink  actionListener="#{popUpView.journalDetails(usedVar.transactionDetailItemId.accountingTransactionDetailId)}"  value="#{appView.display(usedVar.transactionDetailItemId.documentTypeId.title)}" title="#{appView.title(usedVar.transactionDetailItemId.documentTypeId.title)}"  process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+<!--                  <h:outputText value="#{appView.display(usedVar.transactionDetailItemId.documentNumber)}" escape="false" rendered="#{usedVar.transactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId eq null and usedVar.transactionDetailItemId.documentNumber ne null}"/>
+                <p:commandLink action="#{journalView.showDetails(usedVar.transactionDetailItemId)}" value="#{appView.display(usedVar.transactionDetailItemId.documentNumber)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{usedVar.transactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId ne null and usedVar.transactionDetailItemId.documentNumber ne null}">
+                  </p:commandLink> -->
+
+                  <h:outputText value="#{appView.display(usedVar.transactionDetailItemId.documentNumber)}" escape="false" rendered="#{usedVar.transactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId eq null and usedVar.transactionDetailItemId.documentNumber ne null}"/>
+                  <p:commandLink action="#{journalView.showDetailsSettlement(usedVar.transactionDetailItemId)}" value="#{appView.display(usedVar.transactionDetailItemId.documentNumber)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{usedVar.transactionDetailItemId.accountingTransactionDetailId.accountingTransactionId.entityId ne null and usedVar.transactionDetailItemId.documentNumber ne null}">
+                  </p:commandLink>  
+
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.reference} #{lang.no}" title="#{lang.reference} #{lang.no}"/></f:facet>
+                  <h:outputText value="#{appView.display(usedVar.transactionDetailItemId.referNumber)}" escape="false" />
+                </p:column>
+                <p:column styleClass="w-180">
+                  <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.date}" /></f:facet>
+                  <h:outputText value="#{appView.date(usedVar.transactionDetailItemId.documentDate)}" escape="false" />
+                </p:column>
+                <p:column styleClass="w-180 text-right" style="text-align: right">
+                  <f:facet name="header"><h:outputText value="#{lang.amount}" title="#{lang.amount}" /></f:facet>
+                  <h:outputText value="#{appView.decimal(usedVar.transactionDetailItemId.netAmount)}" escape="false" />
+                </p:column>
+                <p:column styleClass="w-180 text-right" style="text-align: right">
+                  <f:facet name="header"><h:outputText value="Amt Settled" title="Amt Settled" /></f:facet>
+                  <h:outputText value="#{appView.decimal(usedVar.settledAmount)}" escape="false" />
+                </p:column>
+              </p:dataTable> 	 
+            </ui:decorate>
+          </h:panelGroup>
+        </h:panelGroup> 
+        <!-- settlement end -->
+      </h:panelGroup>
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(journalView.filterJournal.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(journalView.filterJournal.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(journalView.filterJournal.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(journalView.filterJournal.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(journalView.filterJournal.id)}</ui:define>
+      </ui:decorate>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesAgentCommissionView.switchSalesAgentCommission(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesAgentCommission}" />
+    <ui:param name="ids" value="salesAgentCommission" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesAgentCommissionView.deleteSalesAgentCommission(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesAgentCommissionWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesAgentCommissionView.cloneSalesAgentCommission(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesAgentCommissionView.deleteSalesAgentCommission(main)}" value="#{lang.delete}" onclick="wdgOff('salesAgentCommissionWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesAgentCommissionView.saveSalesAgentCommission(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">  
+
+      <!--Title-->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{salesAgentCommissionView.salesAgentCommission.title}" maxlength="100" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text"/></h:panelGroup>            
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(salesAgentCommissionView.salesAgentCommission.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(salesAgentCommissionView.salesAgentCommission.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(salesAgentCommissionView.salesAgentCommission.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(salesAgentCommissionView.salesAgentCommission.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="salesAgentCommissionTable" var="salesAgentCommissionVar" widgetVar="salesAgentCommissionWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesAgentCommissionView.salesAgentCommissionLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesAgentCommissionVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{salesAgentCommissionView.salesAgentCommissionSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.title}" sortBy="#{salesAgentCommissionVar.title}" field="title" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{salesAgentCommissionVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesAgentCommissionView.salesAgentCommission}" value="#{salesAgentCommissionVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.log}">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesAgentCommissionVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesAgentCommissionVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesAgentCommissionVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesAgentCommissionVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesAgentCommissionVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>   
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

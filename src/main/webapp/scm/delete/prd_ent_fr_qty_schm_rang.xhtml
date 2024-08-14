@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{prdEntFrQtySchmRangView.switchPrdEntFrQtySchmRang(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.prdEntFrQtySchmRang}" />
+    <ui:param name="ids" value="prdEntFrQtySchmRang" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{prdEntFrQtySchmRangView.deletePrdEntFrQtySchmRang(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('prdEntFrQtySchmRangWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{prdEntFrQtySchmRangView.clonePrdEntFrQtySchmRang(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{prdEntFrQtySchmRangView.deletePrdEntFrQtySchmRang(main)}" value="#{lang.delete}" onclick="wdgOff('prdEntFrQtySchmRangWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{prdEntFrQtySchmRangView.savePrdEntFrQtySchmRang(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+
+        <p:outputLabel value="#{lang.prdEntFrQtySchmRangProductEntryDetailId}" for="prdEntFrQtySchmRangProductEntryDetailId"/>
+        <h:panelGroup>
+          <p:autoComplete value="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRang.productEntryDetailId}" completeMethod="#{prdEntFrQtySchmRangView.productEntryDetailAuto}" converter="wawo.LookupIntConverter"   id="prdEntFrQtySchmRangProductEntryDetailId" var="e" itemValue="#{e}" itemLabel="#{e.productQuantity}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.productEntryDetailClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productEntryDetailById()}"/>
+        </p:autoComplete><p:message for="prdEntFrQtySchmRangProductEntryDetailId" display="text" /></h:panelGroup>
+        
+        <p:outputLabel value="#{lang.rangeFrom}" for="rangeFrom" />
+        <h:panelGroup>
+          <p:inputNumber value="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRang.rangeFrom}" converterMessage="#{lang.rangeFrom} #{lang.invalidNumber}" 
+                         decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="rangeFrom" />
+          <p:message for="rangeFrom" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.rangeTo}" for="rangeTo" />
+        <h:panelGroup>
+          <p:inputNumber value="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRang.rangeTo}" converterMessage="#{lang.rangeTo} #{lang.invalidNumber}" 
+                         decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="rangeTo" />
+          <p:message for="rangeTo" display="text"/>
+        </h:panelGroup>
+        
+        <p:outputLabel value="#{lang.freeQty}" for="freeQty" />
+        <h:panelGroup>
+          <p:inputNumber value="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRang.freeQty}" converterMessage="#{lang.freeQty} #{lang.invalidNumber}" 
+                         decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="freeQty" />
+          <p:message for="freeQty" display="text"/>
+        </h:panelGroup>
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="prdEntFrQtySchmRangTable" var="prdEntFrQtySchmRangVar" widgetVar="prdEntFrQtySchmRangWidget" tableStyleClass="editLinks"
+        lazy="true" value="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRangLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{prdEntFrQtySchmRangVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+        selection="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRangSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{prdEntFrQtySchmRangVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{prdEntFrQtySchmRangVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{prdEntFrQtySchmRangView.prdEntFrQtySchmRang}" value="#{prdEntFrQtySchmRangVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.productQuantity}" sortBy="#{prdEntFrQtySchmRangVar.productEntryDetailId.productQuantity}" field="product_entry_detail_id.product_quantity"><h:outputText value="#{appView.display(prdEntFrQtySchmRangVar.productEntryDetailId.productQuantity)}" title="#{appView.title(prdEntFrQtySchmRangVar.productEntryDetailId.productQuantity)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.rangeFrom}" sortBy="#{prdEntFrQtySchmRangVar.rangeFrom}" field="range_from" style="text-align: right"><h:outputText value="#{appView.number(prdEntFrQtySchmRangVar.rangeFrom)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.rangeTo}" sortBy="#{prdEntFrQtySchmRangVar.rangeTo}" field="range_to" style="text-align: right"><h:outputText value="#{appView.number(prdEntFrQtySchmRangVar.rangeTo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.freeQty}" sortBy="#{prdEntFrQtySchmRangVar.freeQty}" field="free_qty" style="text-align: right"><h:outputText value="#{appView.number(prdEntFrQtySchmRangVar.freeQty)}" escape="false" /></p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

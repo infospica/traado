@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+  #{consignmentCommodityInvoiceView.switchConsignmentCommodityInvoice(main, "list")}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{consignmentCommodityInvoiceView.parent.consignmentNo}" />
+    <ui:param name="subLabel" value="#{lang.commodity}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="consignmentCommodityInvoice" />
+    <ui:param name="newList" value="true" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:define name="more"/>
+    <ui:define name="newList"/>
+    <ui:param name="search" value="false"/>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{consignmentCommodityView.consignmentCommodityPopupClose}" 
+                       oncomplete="parent.consignmentCommodityPopupReturned(); closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="leftRightList" >
+      <p:commandButton  actionListener="#{consignmentCommodityInvoiceView.insertConsignmentPR(main)}" onclick="return preListSelect('invoiceWidget', 'wdgOk', null);" title="#{lang.select}"
+                        oncomplete="parent.consignmentCommodityPopupReturned();closePopup()" rendered="#{main.isList() and consignmentCommodityInvoiceView.parent.consignmentTypeId.id==3}" 
+                        icon="fa fa-check"  iconPos="left" styleClass="btn btn-primary" value="#{lang.select}">
+      </p:commandButton>
+      <p:commandButton  actionListener="#{consignmentCommodityInvoiceView.insertConsignmentSales(main)}" onclick="return preListSelect('invoiceWidget', 'wdgOk', null);" title="#{lang.select}"
+                        oncomplete="parent.consignmentCommodityPopupReturned();closePopup()" rendered="#{main.isList() and consignmentCommodityInvoiceView.parent.consignmentTypeId.id==2}" 
+                        icon="fa fa-check"  iconPos="left" styleClass="btn btn-primary" value="#{lang.select}">
+      </p:commandButton>      
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="invoiceTable" var="invoiceVar" widgetVar="invoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{consignmentCommodityInvoiceView.getPRInvoiceList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{invoiceVar.id}"
+                   selection="#{consignmentCommodityInvoiceView.purchaseReturnInvSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" 
+                   draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" rendered="#{consignmentCommodityInvoiceView.parent.consignmentTypeId.id==3}" >
+        <p:column selectionMode="multiple" exportable="false" />              
+        <p:column headerText="#{lang.invoiceNo}" sortBy="#{invoiceVar.invoiceNo}" field="invoice_no">
+          <h:outputText value="#{appView.display(invoiceVar.invoiceNo)}" title="#{appView.title(invoiceVar.invoiceNo)}" escape="false" />
+        </p:column>  
+        <p:column headerText="#{lang.invoiceDate}" sortBy="#{invoiceVar.invoiceDate}" field="invoice_date">
+          <h:outputText value="#{appView.date(invoiceVar.invoiceDate)}" title="#{appView.date(invoiceVar.invoiceDate)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.noOfBoxes}" sortBy="#{invoiceVar.noOfBoxes}" field="no_of_boxes">
+          <h:outputText value="#{invoiceVar.noOfBoxes}" title="#{invoiceVar.noOfBoxes}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.weight}" sortBy="#{invoiceVar.weight}" field="weight">
+          <h:outputText value="#{invoiceVar.weight}" title="#{invoiceVar.weight}" escape="false" />
+        </p:column>
+      </p:dataTable> 	
+      <p:dataTable id="salesInvoiceTable" var="invoiceVar" widgetVar="invoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{consignmentCommodityInvoiceView.getSalesInvoiceList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{invoiceVar.id}"
+                   selection="#{consignmentCommodityInvoiceView.salesInvoiceSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" 
+                   draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" rendered="#{consignmentCommodityInvoiceView.parent.consignmentTypeId.id==2}" >
+        <p:column selectionMode="multiple" exportable="false" />              
+        <p:column headerText="#{lang.invoiceNo}" sortBy="#{invoiceVar.invoiceNo}" field="invoice_no">
+          <h:outputText value="#{appView.display(invoiceVar.invoiceNo)}" title="#{appView.title(invoiceVar.invoiceNo)}" escape="false" />
+        </p:column>  
+        <p:column headerText="#{lang.invoiceDate}" sortBy="#{invoiceVar.invoiceDate}" field="invoice_date">
+          <h:outputText value="#{appView.date(invoiceVar.invoiceDate)}" title="#{appView.date(invoiceVar.invoiceDate)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.value}" sortBy="#{invoiceVar.invoiceAmountNet}" field="invoice_amount_net">
+          <h:outputText value="#{appView.decimal(invoiceVar.invoiceAmountNet)}" title="#{appView.decimal(invoiceVar.invoiceAmountNet)}" escape="false" />
+        </p:column>        
+        <p:column headerText="#{lang.noOfBoxes}" sortBy="#{invoiceVar.noOfBoxes}" field="no_of_boxes">
+          <h:outputText value="#{invoiceVar.noOfBoxes}" title="#{invoiceVar.noOfBoxes}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.weight}" sortBy="#{invoiceVar.weight}" field="weight">
+          <h:outputText value="#{invoiceVar.weight}" title="#{invoiceVar.weight}" escape="false" />
+        </p:column>
+      </p:dataTable>       
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,271 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{purchaseReqView.switchPurchaseReq(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReq}" />
+    <ui:param name="ids" value="purchaseReq" />
+    <ui:param name="reset" value="#{purchaseReqView.isDraft() ? true : false}" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? purchaseReqView.purchaseReq.purchaseRequisitionStatusId.title : null}" />    
+    <ui:param name="deleteFormMenu" value="#{purchaseReqView.isDraft()}" />
+
+    <ui:define name="leftRightList" >
+      <p:commandButton value="#{lang.createPurchaseOrder}" styleClass="btn btn-info m m-r-5 L" process="@this"                       
+                       onclick="preListSelect('purchaseReqWidget', 'wdgOk', 'newPoConfirm');"  />
+
+      <p:selectOneMenu converter="omnifaces.SelectItemsConverter"
+                       value="#{purchaseReqView.filterValue}" styleClass="m m-r-5 L">
+        <f:selectItem itemLabel="#{lang.all} #{lang.status}" itemValue="#{null}" />
+        <f:selectItems value="#{purchaseReqView.purchaseReqStatusList}" var="e" itemValue="#{e.id}" itemLabel="#{e.title}" />
+        <f:attribute name="filterKey" value="scm_purchase_req.purchase_requisition_status_id" />
+        <p:ajax event="itemSelect" listener="#{purchaseReqView.purchaseReqStatusFilterEventHandler}" process="@this" update="purchaseReqTable" />
+      </p:selectOneMenu>
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{purchaseReqView.deletePurchaseReq(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('purchaseReqWidgetDelConf')"
+                       process="f1" update="f1" rendered="#{!purchaseReqView.confirmed}" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>    
+
+    <ui:define name="menu1" >
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{purchaseReqView.deletePurchaseReq(main)}" value="#{lang.delete}" onclick="wdgOff('purchaseReqWidgetDel')" 
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:commandButton action="#{purchaseReqView.savePurchaseReq(main, 1)}" value="#{lang.saveAsDraft}" 
+                       rendered="#{purchaseReqView.isDraft()}" process="f1" update="f1"
+                       onclick="toTop()" styleClass="btn btn-info">       
+      </p:commandButton>     
+      <p:commandButton id="saveBtnConfirm" value="#{lang.confirm}" rendered="#{purchaseReqView.isDraft()}" styleClass="btn btn-info" 
+                       action="#{purchaseReqView.savePurchaseReq(main, 3)}" process="f1" update="f1" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Vendor -->
+      <p:outputLabel value="#{lang.vendor}" />
+      <h:panelGroup layout="block">
+        <h:outputLabel styleClass="txtView" value="#{purchaseReqView.purchaseReq.accountId.vendorId.vendorName}" />
+      </h:panelGroup>
+
+      <!-- Requisition No -->
+      <p:outputLabel value="#{lang.requisitionNo}" />
+      <h:panelGroup layout="block">
+        <h:outputLabel styleClass="txtView" value="#{purchaseReqView.purchaseReq.requisitionNo}" />
+        <input type="hidden" value="#{purchaseReqView.purchaseReq.requisitionNo}" id="requisitionNo" />
+      </h:panelGroup>
+
+      <!-- Requisition Date -->
+      <p:outputLabel value="#{lang.requisitionDate}" />
+      <h:panelGroup layout="block">
+        <p:calendar value="#{purchaseReqView.purchaseReq.requisitionDate}" pattern="#{lang.datePattern}"
+                    disabled="#{purchaseReqView.isConfirmed()}" showOn="button" readonly="true" tabindex="-1"
+                    styleClass="test" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                    maxlength="29" id="requisitionDate" showButtonPanel="true" navigator="true" mask="true"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after" >
+      <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm()}" >
+
+        <h:panelGroup layout="block" id="purchaseReqTableDiv" styleClass="table-responsive" pt:data-fast-input="true" pt:data-watermark="#{purchaseReqView.confirmed ? 'block' : 'true'}">
+
+          <p:remoteCommand name="insertOrUpdatePurchaseReqItem" action="#{purchaseReqView.actionInsertOrUpdatePurchaseReqItem(main)}"
+                           process="f1" update="purchaseReqTableDiv" oncomplete="refreshDatatable();" />
+
+          <p:remoteCommand name="updatePurchaseReqTableFooter" process="@this" update="purchaseReqItemTable:purchaseReqTableFooter" />
+
+          <p:focus context="purchaseReqItemTable" id="focusId" />
+          <p:dataTable id="purchaseReqItemTable" var="purchaseReqItemVar" widgetVar="purchaseReqItemWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       rowIndexVar="rowIndex" value="#{purchaseReqView.purchaseReqItemList}" >            
+
+            <p:column width="61" style="text-align: center;">
+              <f:facet name="header"><h:outputText value="Sno" title="Serail Numner"/></f:facet>
+              <h:outputText value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!-- Product -->
+            <p:column headerText="Product">
+              <h:panelGroup layout="block" id="productIdDiv">
+                <p:autoComplete id="productId" styleClass="fw" value="#{purchaseReqItemVar.productId}" completeMethod="#{purchaseReqView.completeProduct}"
+                                inputStyleClass="fw" converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative" 
+                                cache="true" queryDelay="500" maxResults="30" title="#{purchaseReqItemVar.productId.productName}"
+                                readonly="#{!purchaseReqView.draft}"
+                                var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+                  <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                  <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                  <p:ajax event="itemSelect"  process="productIdDiv" listener="#{purchaseReqView.productSelectEvent(main, purchaseReqItemVar)}" update="currentQtyDiv suggestedQtyDiv" ></p:ajax>              
+                </p:autoComplete>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Qty -->
+            <p:column >
+              <f:facet name="header">
+                <h:outputText value="#{lang.qty}" />                
+              </f:facet>
+              <h:panelGroup layout="block" id="productQtyDiv">
+                <p:inputNumber id="productQty" value="#{purchaseReqItemVar.qtyRequired}" size="10" minValue="0" maxlength="9" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="999999999"
+                               decimalPlaces="0" styleClass="fw"
+                               autocomplete="off" >
+                  <p:ajax event="change" process="productQtyDiv" listener="#{purchaseReqView.productQtyBlurEvent}" 
+                          oncomplete="updatePurchaseReqTableFooter();" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>            
+
+            <!-- Current Qty -->
+            <p:column >
+              <f:facet name="header">
+                <h:outputText value="Current Qty" title="Current Product Quantity in Stock" />                
+              </f:facet>
+              <h:panelGroup layout="block" id="currentQtyDiv">
+                <p:inputNumber id="currentQty" value="#{purchaseReqItemVar.currentQty}" size="10" minValue="0" maxlength="9" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999"
+                               decimalPlaces="0"  styleClass="fw" readonly="true" autocomplete="off"  />
+              </h:panelGroup>
+            </p:column>            
+
+            <!-- Suggested Qty -->
+            <p:column >
+              <f:facet name="header">
+                <h:outputText value="Suggested Qty" title="Suggested Quantity" />
+              </f:facet>
+              <h:panelGroup layout="block" id="suggestedQtyDiv">
+                <p:inputNumber id="suggestedQty" value="#{purchaseReqItemVar.qtySuggested}" size="10" minValue="0" maxlength="9" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999"
+                               decimalPlaces="0" styleClass="fw" readonly="true" />
+              </h:panelGroup>
+            </p:column>    
+
+            <!-- Action Icons -->
+            <p:column headerText="">
+              <p:commandButton process="@this" value="" update="purchaseReqItemTable" icon="fa fa-trash" tabindex="-1"
+                               rendered="#{purchaseReqView.draft}"
+                               actionListener="#{purchaseReqView.actionDeletePurchaseReqItem(main, purchaseReqItemVar)}">
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </p:column>
+
+            <f:facet name="footer">
+              <h:panelGroup layout="block" id="purchaseReqTableFooter">
+                <p:panelGrid>
+                  <p:row>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Items :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:80px !important; " >#{purchaseReqView.purchaseReqItemList.size()}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Qty :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{purchaseReqView.productNetQuantity}</p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                    <p:column style="font-weight: bold;"></p:column>                    
+                  </p:row>
+                </p:panelGrid>
+              </h:panelGroup>
+            </f:facet>
+
+          </p:dataTable> 
+        </h:panelGroup>
+        <script>
+          //<![CDATA[
+          function submitForm(params) {
+            insertOrUpdatePurchaseReqItem([{name: 'rownumber', value: params[2]}]);
+            $('#purchaseReqItemTable\\:0\\:productId_input').focus();
+            return false;
+          }
+
+          function refreshDatatable() {
+            page.refresh();
+          }
+
+          $(document).ready(function (e) {
+            refreshDatatable();
+          });
+
+          //]]>
+        </script>
+
+      </h:panelGroup>
+
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:param name="cnf" value="true" />
+        <ui:define name="cby">#{appView.display(purchaseReqView.purchaseReq.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(purchaseReqView.purchaseReq.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(purchaseReqView.purchaseReq.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(purchaseReqView.purchaseReq.modifiedAt)}</ui:define>
+        <ui:define name="coby">#{appView.display(purchaseReqView.purchaseReq.confirmedBy)}</ui:define>
+        <ui:define name="coat">#{appView.dateTime(purchaseReqView.purchaseReq.confirmedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(purchaseReqView.purchaseReq.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseReqTable" var="purchaseReqVar" widgetVar="purchaseReqWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{purchaseReqView.purchaseReqLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseReqVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{purchaseReqView.purchaseReqSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column sortBy="#{purchaseReqVar.requisitionNo}" field="scm_purchase_req.requisition_no" >
+          <f:facet name="header"><h:outputText value="#{lang.requisitionNo}" title="#{lang.requisitionNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseReqVar.requisitionNo}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{purchaseReqView.purchaseReq}" value="#{purchaseReqVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{purchaseReqVar.requisitionDate}" field="scm_purchase_req.requisition_date" >
+          <f:facet name="header"><h:outputText value="#{lang.requisitionDate}" title="#{lang.requisitionDate}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(purchaseReqVar.requisitionDate)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{purchaseReqVar.purchaseRequisitionStatusId.title}" field="purchase_requisition_status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(purchaseReqVar.purchaseRequisitionStatusId.title)}" title="#{appView.title(purchaseReqVar.purchaseRequisitionStatusId.title)}" escape="false" />
+        </p:column>       
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:param name="cnf" value="true" />
+            <ui:define name="cby">#{appView.display(purchaseReqVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(purchaseReqVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(purchaseReqVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(purchaseReqVar.modifiedAt)}</ui:define>
+            <ui:define name="coby">#{appView.display(purchaseReqVar.confirmedBy)}</ui:define>
+            <ui:define name="coat">#{appView.dateTime(purchaseReqVar.confirmedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(purchaseReqVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable>
+
+      <!--
+              Purchase Order create confirmation dialog
+      -->
+      <p:dialog rendered="#{main.isList()}" widgetVar="newPoConfirm" draggable="no" resizable="no" modal="true"
+                header="#{lang.confirmPurchaseOrder}">
+        <dl>
+          <dt><h:outputText value="#{lang.confirmPurchaseOrderMessage}" /></dt>
+          <dd>
+            <ul>
+              <li><h:outputText value="#{lang.confirmed}"  /></li>
+              <li><h:outputText value="#{lang.partiallyProcessed}"  /></li>
+            </ul>
+          </dd>
+        </dl>
+        <h:commandButton value="#{lang.yes}" action="#{main.setViewPath('/scm/purchase/gst_india/purchase_order_gst_india.xhtml',newform)}"
+                         onclick="wdgOff('newPoConfirm')" >
+          <f:ajax execute="purchaseReqTable" render="f1" />
+          <f:setPropertyActionListener target="#{purchaseOrderGstIndiaView.purchaseReqSelectedArray}" value="#{purchaseReqView.purchaseReqSelected}"/>
+        </h:commandButton>
+        <p:commandButton  value="#{lang.btnNo}" onclick="wdgOff('newPoConfirm')" type="button"  />
+      </p:dialog>      
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

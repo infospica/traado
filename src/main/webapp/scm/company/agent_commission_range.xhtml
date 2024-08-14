@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core" >
+  #{agentCommissionRangeView.switchAgentCommissionRange(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.agentCommissionRange}" />
+    <ui:param name="ids" value="agentCommissionRange" />
+    <ui:define name="newList"/>
+    <ui:define name="more"/>
+    <ui:define name="leftRightList">          
+
+      <p:commandButton action="#{agentCommissionRangeView.addNewCommissionRange()}" update="agentCommissionRangeTable" immediate="true" process="@this" icon="fa fa-plus" 
+                       iconPos="left" styleClass="btn btn-info"  oncomplete="jQuery('.ui-datatable-data tr').first().find('span.ui-icon-pencil').each(function(){jQuery(this).click()});">
+
+      </p:commandButton>
+
+    </ui:define>
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{agentCommissionRangeView.commissionRangePopupClose()}"                       
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="list" >    
+      <p:dataTable id="agentCommissionRangeTable" var="agentCommissionRangeVar" widgetVar="agentCommissionRangeWidget"
+                   value="#{agentCommissionRangeView.getAgentCommissionRangeList(main)}"   
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  
+                   tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+        <p:ajax event="rowEdit" update="agentCommissionRangeTable" listener="#{agentCommissionRangeView.onRowEdit}"/>
+
+       
+
+        <p:column headerText="#{lang.rangeFrom}" sortBy="#{agentCommissionRangeVar.rangeFrom}" field="range_from" style="text-align: right">
+          <p:cellEditor >
+            <f:facet name="output">
+              <h:outputText value="#{appView.number(agentCommissionRangeVar.rangeFrom)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{agentCommissionRangeVar.rangeFrom}" required="true" requiredMessage="#{lang.rangeFrom} #{lang.isRequired}"
+                               decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="rangeFrom"/>
+                <p:message for="rangeFrom" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+        <p:column headerText="#{lang.rangeTo}" sortBy="#{agentCommissionRangeVar.rangeTo}" field="range_to" style="text-align: right">
+          <p:cellEditor >
+            <f:facet name="output"> 
+              <h:outputText value="#{appView.number(agentCommissionRangeVar.rangeTo)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{agentCommissionRangeVar.rangeTo}" required="true" requiredMessage="#{lang.rangeTo} #{lang.isRequired}"
+                               decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="rangeTo"/>
+                <p:message for="rangeTo" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+        
+        <p:column headerText="#{lang.valueFixed}" sortBy="#{agentCommissionRangeVar.valueFixed}" field="value_fixed" style="text-align: right">
+          <p:cellEditor rendered="#{agentCommissionRangeVar.salesAgentContractId.commissionType==1}">
+            <f:facet name="output">
+              <h:outputText value="#{appView.decimal(agentCommissionRangeVar.valueFixed)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{agentCommissionRangeVar.valueFixed}" decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="99" minValue="0.0" 
+                               symbol="#{appView.currencySymbol} " maxlength="5" id="valueFixed"
+                               required="true" requiredMessage="#{lang.valueFixed} #{lang.isRequired}" />
+                <p:message for="valueFixed" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+        <p:column headerText="#{lang.valuePercentage}" sortBy="#{agentCommissionRangeVar.valuePercentage}" field="value_percentage" style="text-align: right">
+          <p:cellEditor rendered="#{agentCommissionRangeVar.salesAgentContractId.commissionType==2}">
+            <f:facet name="output">
+              <h:outputText value="#{appView.decimal(agentCommissionRangeVar.valuePercentage)}" escape="false" />
+            </f:facet>
+            <f:facet name="input">
+              <h:panelGroup>
+                <p:inputNumber value="#{agentCommissionRangeVar.valuePercentage}" decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="99" minValue="0.0" 
+                               symbol="#{appView.percentageSymbol} " maxlength="5" id="valuePercentage"
+                               required="true" requiredMessage="#{lang.rate} #{lang.isRequired}" />
+                <p:message for="valuePercentage" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+        
+         <p:column >
+          <p:rowEditor />
+        </p:column>
+
+        <p:column headerText="#{lang.action}">
+          <p:commandButton action="#{agentCommissionRangeView.deleteAgentCommissionRange(main,agentCommissionRangeVar)}" process="@this" 
+                           value="" update="agentCommissionRangeTable" icon="fa fa-trash">
+            <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+          </p:commandButton>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

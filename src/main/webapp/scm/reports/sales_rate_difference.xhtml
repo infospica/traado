@@ -1,0 +1,202 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{salesRateDifferenceView.setSalesRateDifferenceList(null)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <o:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.rateDeviation} #{lang.report} #{salesRateDifferenceView.filterParameters.reportType!=0?salesRateDifferenceView.reportNames.get(salesRateDifferenceView.filterParameters.reportType) :''} "/>
+    <ui:param name="ids" value="#{salesRateDifferenceView.reportNames.get(salesRateDifferenceView.filterParameters.reportType)}"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList" >
+
+      <p:selectOneMenu id="reportType" value="#{salesRateDifferenceView.filterParameters.reportType}"  styleClass="l-p-10" valueChangeListener="#{salesRateDifferenceView.applyFilter}"  >
+        <f:selectItem itemLabel="#{lang.selectReportNameCombo}" itemValue="#{null}" />
+        <f:selectItem itemLabel="#{lang.invoiceProductWise}" itemValue="#{ReportConstant.DIFF_INVOICE_PRODUCT_WISE}" />
+        <f:selectItem itemLabel="#{lang.customerProductWise}" itemValue="#{ReportConstant.DIFF_CUSTOMER_PRODUCT_WISE}" />
+        <p:ajax event="itemSelect" process="reportType account customer " update="f1" onstart="block()" oncomplete="unblock()" />
+      </p:selectOneMenu>
+
+      <p:autoComplete id='account'  value="#{salesRateDifferenceView.filterParameters.account}" completeMethod="#{userRuntimeView.accountAuto}" converter="wawo.LookupIntConverter" 
+                      var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="50" 
+                      scrollHeight="500"
+                      converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                      title="#{lang.accountNumber}">
+        <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+        <p:column style="width: 250px;">
+          <h:outputText value="#{e.vendorId.vendorName}" />
+        </p:column>
+        <p:column style="width: 50px;">
+          <h:outputText value="#{e.accountCode}" />
+        </p:column>
+        <p:column style="width: 300px;">
+          <h:outputText value="#{e.companyTradeProfileId.title}" />
+        </p:column>
+      </p:autoComplete>      
+
+      <p:autoComplete id='customer'   value="#{salesRateDifferenceView.filterParameters.customer}" completeMethod="#{salesRateDifferenceView.customerAuto}" converter="wawo.LookupIntConverter" 
+                      var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                      converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectCustomerCombo}" autocomplete="off" forceSelection ="true" required="false" title="#{lang.customerName}">
+        <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>           
+      </p:autoComplete> 
+      <!-- From Date -->
+      <p:calendar value="#{salesRateDifferenceView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="13" 
+                  id="fromDate" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.fromDate}"  onclick="this.select();" onfocus="this.select();"
+                  maxdate="#{salesRateDifferenceView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: salesRateDifferenceView.filterParameters.today}"
+                  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"  >
+        <p:ajax event="dateSelect" listener="#{salesRateDifferenceView.setSalesRateDifferenceList(null)}" update="toDate InvoiceProductWiseTable CustomerProductWiseTable" process="@this" onstart="block();" oncomplete="unblock();"  />
+        <p:ajax event="change" listener="#{salesRateDifferenceView.setSalesRateDifferenceList(null)}" update="toDate InvoiceProductWiseTable CustomerProductWiseTable" process="@this" onstart="block();" oncomplete="unblock();"  />
+
+      </p:calendar>
+
+      <!-- To Date -->
+      <p:calendar value="#{salesRateDifferenceView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="13" 
+                  id="toDate" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.toDate}"  onclick="this.select();" onfocus="this.select();"
+                  mindate="#{salesRateDifferenceView.filterParameters.fromDate}"           
+                  maxdate="#{salesRateDifferenceView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: salesRateDifferenceView.filterParameters.today}"
+                  >
+        <p:ajax event="dateSelect" listener="#{salesRateDifferenceView.setSalesRateDifferenceList(null)}" process="@this"  update="InvoiceProductWiseTable CustomerProductWiseTable" onstart="block();" oncomplete="unblock();"  />
+
+      </p:calendar>
+
+      <p:commandButton value="#{lang.ok}" actionListener="#{salesRateDifferenceView.submitForm}" styleClass="btn btn-info" process="reportType account customer " update="f1"  style="margin-left: 3px; margin-bottom: 4px;" onstart="block()" oncomplete="unblock()"  >
+      </p:commandButton>
+
+    </ui:define>
+
+
+
+    <ui:define name="list">
+      <p:selectCheckboxMenu   id="columns" value="#{salesRateDifferenceView.selectedColumns}" label="Columns" 
+                              filter ="true" filterMatchMode="startsWith" panelStyle="width:250px" >
+        <f:selectItems value="#{salesRateDifferenceView.columnNames}"  />
+        <p:ajax event="change" listener="#{salesRateDifferenceView.applyColumnFilter}" update="reportList" />
+      </p:selectCheckboxMenu>
+
+      <h:panelGroup id="reportList" >
+
+
+
+        <p:dataTable id="InvoiceProductWiseTable" var="row" widgetVar="salesRateDifferenceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{salesRateDifferenceView.getSalesRateDifferenceList(main)}" 
+                     rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" 
+                     scrollable="false" scrollHeight="540"                                     
+                     rendered="#{salesRateDifferenceView.filterParameters.reportType eq '1'}" >
+
+          <p:column headerText="#{lang.supplier}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.supplierName}" sortBy="#{row.supplierName}"  filterBy="#{row.supplierName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.invoiceNo}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceNo}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+            <p:commandLink actionListener="#{salesRateDifferenceView.openSalesInvoicePopup(row.id)}">
+              <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+            </p:commandLink>
+          </p:column>
+          <p:column headerText="#{lang.invoiceDate}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceDate}" sortBy="#{row.invoiceDate}"  filterBy="#{row.invoiceDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.invoiceDate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.customerName}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.customerName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.gstNo}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.productName}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.productName}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.hsnCode}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.hsnCode}" sortBy="#{row.hsnCode}"  filterBy="#{row.hsnCode}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.packType}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.packType}" sortBy="#{row.packType}"  filterBy="#{row.packType}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.packType)}" title="#{appView.title(row.packType)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.batchNo}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.batchNo}" sortBy="#{row.batchNo}"  filterBy="#{row.batchNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.expiryDate}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.expiryDate}" sortBy="#{row.expiryDate}"  filterBy="#{row.expiryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.expiryDate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.qty}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.qty}" sortBy="#{row.qty}"  styleClass="text-right" filterBy="#{row.qty}" filterStyleClass="hidden"><h:outputText value="#{appView.number(row.qty)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.qtyFree}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.qtyFree}" sortBy="#{row.qtyFree}"  styleClass="text-right" filterBy="#{row.qtyFree}" filterStyleClass="hidden"><h:outputText value="#{appView.number(row.qtyFree)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.landingPrice}"  sortBy="#{row.landingRate}"  styleClass="text-right" filterBy="#{row.valuePts}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.landingRate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.mrp}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.valueMrp}" sortBy="#{row.valueMrp}"  styleClass="text-right" filterBy="#{row.valueMrp}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.valueMrp)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.rate}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.valuePts}" sortBy="#{row.valuePts}"  styleClass="text-right" filterBy="#{row.valuePts}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.valuePts)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.rateDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.rateDeviation}" sortBy="#{row.rateDeviation}"  styleClass="text-right text-danger" filterBy="#{row.rateDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.rateDeviation)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.goodsValue}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.goodsValue}" sortBy="#{row.goodsValue}"  styleClass="text-right" filterBy="#{row.goodsValue}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.goodsValue)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.schemeDiscount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.schemeDiscount}" sortBy="#{row.schemeDiscount}"  styleClass="text-right" filterBy="#{row.schemeDiscount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.schemeDiscount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.schemeDiscDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.schemeDiscDeviation}" sortBy="#{row.schemeDiscDeviation}"  styleClass="text-right text-danger" filterBy="#{row.schemeDiscDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.schemeDiscDeviation)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.productDiscount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.productDiscount}" sortBy="#{row.productDiscount}"  styleClass="text-right" filterBy="#{row.productDiscount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.productDiscount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.productDiscDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.productDiscDeviation}" sortBy="#{row.productDiscDeviation}"  styleClass="text-right text-danger" filterBy="#{row.productDiscDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.productDiscDeviation)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.invoiceDiscount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceDiscount}" sortBy="#{row.invoiceDiscount}"  styleClass="text-right" filterBy="#{row.invoiceDiscount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.invoiceDiscount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.invoiceDiscDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceDiscDeviation}" sortBy="#{row.invoiceDiscDeviation}"  styleClass="text-right text-danger" filterBy="#{row.invoiceDiscDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.invoiceDiscDeviation)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.igst}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.igst}" sortBy="#{row.igst}" styleClass="text-right" filterBy="#{row.igst}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.igst)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.cgst}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.cgst}" sortBy="#{row.cgst}"  styleClass="text-right" filterBy="#{row.cgst}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.cgst)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.sgst}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.sgst}" sortBy="#{row.sgst}"  styleClass="text-right" filterBy="#{row.sgst}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.sgst)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.netAmount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.netAmount}" sortBy="#{row.netAmount}"  styleClass="text-right" filterBy="#{row.netAmount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+
+        </p:dataTable>
+
+
+
+        <p:dataTable id="CustomerProductWiseTable" var="row" widgetVar="salesRateDifferenceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{salesRateDifferenceView.getSalesRateDifferenceList(main)}"                    
+                     scrollable="false" scrollHeight="540"    
+                     rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" 
+                     rendered="#{salesRateDifferenceView.filterParameters.reportType eq '2'}" >
+
+          <p:column headerText="#{lang.supplier}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.supplierName}" sortBy="#{row.supplierName}"  filterBy="#{row.supplierName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.customerName}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.customerName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.gstNo}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.invoiceNo}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceNo}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+            <p:commandLink actionListener="#{salesRateDifferenceView.openSalesInvoicePopup(row.id)}">
+              <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+            </p:commandLink>
+          </p:column>
+          <p:column headerText="#{lang.invoiceDate}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceDate}" sortBy="#{row.invoiceDate}"  filterBy="#{row.invoiceDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.invoiceDate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.productName}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.productName}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.hsnCode}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.hsnCode}" sortBy="#{row.hsnCode}"  filterBy="#{row.hsnCode}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.packType}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.packType}" sortBy="#{row.packType}"  filterBy="#{row.packType}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.packType)}" title="#{appView.title(row.packType)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.batchNo}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.batchNo}" sortBy="#{row.batchNo}"  filterBy="#{row.batchNo}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.expiryDate}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.expiryDate}" sortBy="#{row.expiryDate}"  filterBy="#{row.expiryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.expiryDate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.qty}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.qty}" sortBy="#{row.qty}"  styleClass="text-right" filterBy="#{row.qty}" filterStyleClass="hidden"><h:outputText value="#{appView.number(row.qty)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.qtyFree}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.qtyFree}" sortBy="#{row.qtyFree}"  styleClass="text-right" filterBy="#{row.qtyFree}" filterStyleClass="hidden"><h:outputText value="#{appView.number(row.qtyFree)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.landingPrice}"  sortBy="#{row.landingRate}"  styleClass="text-right" filterBy="#{row.valuePts}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.landingRate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.mrp}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.valueMrp}" sortBy="#{row.valueMrp}"  styleClass="text-right" filterBy="#{row.valueMrp}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.valueMrp)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.rate}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.valuePts}" sortBy="#{row.valuePts}"  styleClass="text-right" filterBy="#{row.valuePts}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.valuePts)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.rateDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.rateDeviation}" sortBy="#{row.rateDeviation}"  styleClass="text-right text-danger" filterBy="#{row.rateDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.rateDeviation)}" escape="false" /></p:column>
+
+
+          <p:column headerText="#{lang.goodsValue}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.goodsValue}" sortBy="#{row.goodsValue}"  styleClass="text-right" filterBy="#{row.goodsValue}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.goodsValue)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.schemeDiscount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.schemeDiscount}" sortBy="#{row.schemeDiscount}"  styleClass="text-right" filterBy="#{row.schemeDiscount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.schemeDiscount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.schemeDiscDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.schemeDiscDeviation}" sortBy="#{row.schemeDiscDeviation}"  styleClass="text-right text-danger" filterBy="#{row.schemeDiscDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.schemeDiscDeviation)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.productDiscount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.productDiscount}" sortBy="#{row.productDiscount}"  styleClass="text-right" filterBy="#{row.productDiscount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.productDiscount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.productDiscDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.productDiscDeviation}" sortBy="#{row.productDiscDeviation}"  styleClass="text-right text-danger" filterBy="#{row.productDiscDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.productDiscDeviation)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.invoiceDiscount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceDiscount}" sortBy="#{row.invoiceDiscount}"  styleClass="text-right" filterBy="#{row.invoiceDiscount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.invoiceDiscount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.invoiceDiscDeviation}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.invoiceDiscDeviation}" sortBy="#{row.invoiceDiscDeviation}"  styleClass="text-right text-danger" filterBy="#{row.invoiceDiscDeviation}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.invoiceDiscDeviation)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.igst}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.igst}" sortBy="#{row.igst}" styleClass="text-right" filterBy="#{row.igst}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.igst)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.cgst}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.cgst}" sortBy="#{row.cgst}"  styleClass="text-right" filterBy="#{row.cgst}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.cgst)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.sgst}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.sgst}" sortBy="#{row.sgst}"  styleClass="text-right" filterBy="#{row.sgst}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.sgst)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.netAmount}" rendered="#{salesRateDifferenceView.companyCustomerSalesRender.netAmount}" sortBy="#{row.netAmount}"  styleClass="text-right" filterBy="#{row.netAmount}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+
+        </p:dataTable>
+
+
+
+
+      </h:panelGroup>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

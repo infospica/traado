@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core" >
+  #{commodityView.switchCommodity(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.commodity}" />
+    <ui:param name="ids" value="commodity" />
+    <ui:param name="newList" value="false" />
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{commodityView.cloneCommodity(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{commodityView.vendorCommodityDialogClose}"
+                       oncomplete="parent.vendorLicenseDialogReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="more" > </ui:define>
+    
+    <ui:define name="leftRightList" >
+      <p:commandButton  actionListener="#{commodityView.insertVendorCommodity(main)}" onclick="return preListSelect('commodityWidget', 'wdgOk', null);" 
+                        title="#{lang.select}"
+                        oncomplete="parent.vendorCommodityDialogReturned();closePopup()" rendered="#{main.isList()}" 
+                        icon="fa fa-check"  iconPos="left" styleClass="btn btn-primary" value="#{lang.select}">
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="commodityTable" var="commodityVar" widgetVar="commodityWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{commodityView.commodityLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{commodityVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{commodityView.commoditySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />              
+        <p:column headerText="#{lang.title}" sortBy="#{commodityVar.title}" field="title">
+          <h:outputText value="#{appView.display(commodityVar.title)}" title="#{appView.title(commodityVar.title)}" escape="false" />
+        </p:column>              
+      </p:dataTable> 	
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

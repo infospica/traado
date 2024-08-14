@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{supplierGroupView.switchSupplierGroup(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.supplierGroup}" />
+    <ui:param name="ids" value="supplierGroup" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  onclick="closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{supplierGroupView.deleteSupplierGroup(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('supplierGroupWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{supplierGroupView.cloneSupplierGroup(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{supplierGroupView.deleteSupplierGroup(main)}" value="#{lang.delete}" onclick="wdgOff('supplierGroupWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{supplierGroupView.saveSupplierGroup(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-success"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Title -->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText value="#{supplierGroupView.supplierGroup.title}" maxlength="200" id="title" validator="wawo.WhiteSpaceValidator" 
+                     styleClass="fw" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" autocomplete="off" />
+        <p:message for="title" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Code -->
+<!--      <p:outputLabel value="#{lang.code}" for="code" />
+      <h:panelGroup>
+        <p:inputText value="#{supplierGroupView.supplierGroup.code}" maxlength="3" id="code" validator="wawo.WhiteSpaceValidator"
+                     required="true" requiredMessage="#{lang.code} #{lang.isRequired}" styleClass="fw text-uppercase" autocomplete="off" />
+        <p:message for="code" display="text" styleClass="fw" />
+      </h:panelGroup>-->
+
+      <!-- Description -->
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup>
+        <p:inputTextarea value="#{supplierGroupView.supplierGroup.description}" cols="100" rows="3" maxlength="1000" id="description" autoResize="false" styleClass="fw" />
+        <p:message for="description" display="text"/>
+      </h:panelGroup>
+
+      <!-- Status -->
+      <p:outputLabel value="#{lang.status}" for="supplierGroupStatusId" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{supplierGroupView.supplierGroup.statusId}"  id="supplierGroupStatusId" converter="omnifaces.SelectItemsConverter" styleClass="fw">
+          <f:selectItems value="#{scmLookupView.status(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu><p:message for="supplierGroupStatusId" display="text" />
+      </h:panelGroup>      
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(supplierGroupView.supplierGroup.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(supplierGroupView.supplierGroup.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(supplierGroupView.supplierGroup.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(supplierGroupView.supplierGroup.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(supplierGroupView.supplierGroup.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="supplierGroupTable" var="supplierGroupVar" widgetVar="supplierGroupWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{supplierGroupView.supplierGroupLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{supplierGroupVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{supplierGroupView.supplierGroupSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Title -->
+        <p:column sortBy="#{supplierGroupVar.title}" field="scm_supplier_group.title">
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(supplierGroupVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{supplierGroupView.supplierGroup}" value="#{supplierGroupVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Code -->
+<!--        <p:column sortBy="#{supplierGroupVar.code}" field="scm_supplier_group.code">
+          <f:facet name="header"><h:outputText value="#{lang.code}" title="#{lang.code}"/></f:facet>
+          <h:outputText value="#{appView.display(supplierGroupVar.code)}" title="#{appView.title(supplierGroupVar.code)}" escape="false" />
+        </p:column>-->
+
+        <!-- Description -->
+        <p:column sortBy="#{supplierGroupVar.description}" field="scm_supplier_group.description">
+          <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+          <h:outputText value="#{appView.display(supplierGroupVar.description)}" title="#{appView.title(supplierGroupVar.description)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{supplierGroupVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(supplierGroupVar.statusId.title)}" title="#{appView.title(supplierGroupVar.statusId.title)}" escape="false" />
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(supplierGroupVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(supplierGroupVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(supplierGroupVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(supplierGroupVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(supplierGroupVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>   
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

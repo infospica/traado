@@ -1,0 +1,1680 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"  >
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+    <ui:param name="label" value="#{lang.invoiceEntry}" />
+    <ui:param name="ids" value="productEntryGst" />
+    <ui:param name="rendered" value="#{main.isForm()}" />
+    <ui:param name="deleteFormMenu" value="#{productEntryView.draft}" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="more" value="#{!main.popup}" />
+
+    <ui:define name="deleteForm" >
+      <p:commandButton id="b4" action="#{productEntryView.deleteProductEntry(main)}" value="#{lang.delete}" onclick="wdgOff('productEntryWidgetDel')"
+                       rendered="#{productEntryView.draft}"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    <ui:define name="export" >
+      <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false"
+                  rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad">
+        <p:dataExporter type="xls" target="invoiceEntrydt1" fileName="#{productEntryView.productEntry.invoiceNo}" pageOnly="false" postProcessor="#{excelExportView.postProcessXLS}" />        
+      </p:menuitem>
+    </ui:define>
+
+    <ui:define name="save" >
+
+      <p:commandButton id="b3" action="#{productEntryView.saveProductEntry(main, sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" onclick="toTop();" 
+                       styleClass="btn btn-primary"
+                       rendered="#{productEntryView.draft and userRuntimeView.privilege.modify eq true and !productEntryView.taxCodeModified}"
+                       process="f1" update="f1">
+      </p:commandButton>
+
+      <p:commandButton id="b1" value="#{lang.confirm}" styleClass="btn btn-info" 
+                       type="button" rendered="#{productEntryView.draft and main.edit and !productEntryView.taxCodeModified}" >
+        <p:ajax event="click" listener="#{productEntryView.calculateTotalDiscounts()}" immediate="true" oncomplete="confirmProductEntry(#{productEntryView.productEntry.openingStockEntry});"
+                update="peConfirmDlg ieConfirmDlgVar"/>
+      </p:commandButton>
+
+      <p:commandButton id="butTx" value="Confirm Tax Variation" styleClass="btn btn-warning"
+                       action="#{productEntryView.actionUpdateTaxVariation(main, sysConstant.DRAFT)}"
+                       rendered="#{productEntryView.taxCodeModified}"
+                       process="@this" update="f1">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:commandButton id="but1" value="Correct PTR &amp; PTS" styleClass="btn btn-warning"
+                       action="#{productEntryView.actionCorrectPtrAndPtsValues(main)}"
+                       rendered="#{productEntryView.draft and main.edit and productEntryView.productPresetModified and !productEntryView.taxCodeModified}"
+                       process="@this" update="f1">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:tooltip for="but1" value="Product Presets are modified. &lt;br /&gt; Please verify the product's PTR and PTS values."
+                 escape="false" widgetVar="butTooltipVar" />
+
+      <p:commandButton id="b2" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{productEntryView.actionResetInvoiceEntry(main)}" onstart="block();" oncomplete="unblock();"
+                       rendered="#{productEntryView.confirmed  and !productEntryView.taxCodeModified and userRuntimeView.privilege.resetToDraft==true
+                                   and !productEntryView.tradeClosed}" >
+        <p:confirm id="c1"  header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:commandButton id="rsiBtn" value="Related Items" styleClass="btn btn-info" process="@this" update="@this"
+                       type="button" rendered="#{productEntryView.confirmed and userRole.isRoot() and !productEntryView.taxCodeModified}" >
+      </p:commandButton>
+
+    </ui:define>
+
+    <ui:define name="leftLeft">
+    </ui:define>
+
+    <ui:define name="formRight" >
+      <!--<p:panelGrid columns="2">-->
+      <h:panelGroup styleClass="L">
+        <!--<div>-->
+        <!-- Up Coming Documet No -->
+        <h:outputText rendered="#{!productEntryView.confirmed}" value="#{lang.next} #{lang.documentNo} #{lang.colon} "> </h:outputText>
+        <p:outputLabel styleClass="m-r-10" value="#{productEntryView.upcomingInvoiceNumber}" style="color:#900;" rendered="#{!productEntryView.confirmed}"  />
+        <!-- Document No -->
+        <h:outputText rendered="#{productEntryView.confirmed}" value="#{lang.documentNo} #{lang.colon} "> </h:outputText>
+        <p:outputLabel styleClass="m-r-10" value="#{productEntryView.productEntry.accountInvoiceNo}" style="color:#900;" rendered="#{productEntryView.confirmed}"  />
+        <!-- Vendor Name -->
+        <span>#{lang.vendor} #{lang.colon} </span>
+        <label class="m-r-10" style="color: dodgerblue">#{accountUtilView.getVendorName(productEntryView.productEntry.accountId)}</label>
+
+        <!-- Trade Profile -->
+        <span>#{lang.tradeProfile} #{lang.colon} </span>
+        <label class="m-r-10" style="color: dodgerblue">#{accountUtilView.getTradeProfileTitle(productEntryView.productEntry.accountId)}</label>
+
+        <!-- Vendor GSTIN -->
+        <span>#{lang.gstin} #{lang.colon} </span>
+        <label class="m-r-10 text-uppercase" style="color: dodgerblue">#{accountUtilView.getGstin(productEntryView.productEntry.accountId)}</label>
+        <span>#{lang.outstanding} #{lang.colon} </span>
+        <label class="m-r-10" style="color:#{sysRuntimeView.statusColor(productEntryView.outstandingAmount>0?2:0)}">#{appView.decimal(productEntryView.outstandingAmount)}</label>
+        <!--</div>-->
+      </h:panelGroup>
+      <h:panelGroup rendered="#{!main.isNew()}" styleClass="L">
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-left"  disabled="#{!productEntryView.isPreviousButton()}" title="Previous #{lang.productEntry}"
+                         actionListener="#{productEntryView.nextOrPreviousInvoice(main,-1)}" immediate="true" update="f1 p5 p6 p7" onclick="block();" oncomplete="unblock();" />
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-right" iconPos="right" disabled="#{!productEntryView.isNextButton()}" title="#{lang.next} #{lang.productEntry}"
+                         actionListener="#{productEntryView.nextOrPreviousInvoice(main,1)}" immediate="true" update="f1 p5 p6 p7" onclick="block();" oncomplete="unblock();" />
+      </h:panelGroup>
+      <!--</p:panelGrid>-->
+    </ui:define>
+
+    <ui:define name="after" >
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <h:panelGroup id="p4" rendered="#{main.isForm()}" styleClass="m-x--10" >
+        <p:overlayPanel  id="relatedItemPanel" for="rsiBtn" widgetVar="srPanel" modal="true" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true"
+                         dynamic="false" style="width: 500px;" >
+          <h:panelGroup layout="block">
+            <h:panelGroup id="relatedItemDiv">
+              <p:dataTable id="relatedItemTable" var="relatedItemVar" value="#{productEntryView.relatedItemsList}" tableStyleClass="mDataTable mDataTable-center editLinks"
+                           rows="10"
+                           paginator="true" paginatorAlwaysVisible="false"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="5,10,15">
+                <p:column headerText="#{lang.invoiceNo}">
+                  <h:outputText value="#{relatedItemVar.invoiceNo}" />
+                </p:column>
+                <p:column headerText="#{lang.invoice} #{lang.type}">
+                  <h:outputText value="#{relatedItemVar.title}" />
+                </p:column>
+              </p:dataTable>
+            </h:panelGroup>
+          </h:panelGroup>
+        </p:overlayPanel>
+
+        <h:panelGroup id="p5" layout="block" rendered="#{productEntryView.openingStockEntry}" styleClass="table-responsive" pt:data-fast-input="true" pt:data-watermark="#{productEntryView.confirmed ? 'block' : 'true'}">
+          <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="pg1" columnClasses="#{sysRuntimeView.grid4}">
+            <f:facet name="header">
+              <p:row>
+                <p:column id="col1"><p:outputLabel id="lb8" value="#{lang.invoiceNo}" for="txt1" /></p:column>
+                <p:column id="col2"><p:outputLabel id="lb10" value="#{lang.entryDate}" for="cal1" /></p:column>
+                <p:column id="col3"><p:outputLabel id="lb11" value="#{lang.productDiscount}" style="color: cornflowerblue;" for="cb1" /></p:column>
+                <p:column id="col4"><p:outputLabel id="lb12" value="#{lang.cashDiscount}" style="color: hotpink;" for="cb2" /></p:column>
+                <p:column id="col5"><p:outputLabel id="lb13" value="#{lang.difference}" for="txt2" /></p:column>
+                <p:column id="col6"><p:outputLabel id="lb14" value="#{lang.invoiceAmount}" for="txt3" /></p:column>
+              </p:row>
+            </f:facet>
+
+            <p:row>
+              <!-- Invoice No -->
+              <p:column>
+                <p:inputText id="txt1" styleClass="prNum w-200" required="true" requiredMessage="#{lang.invoiceNo} #{lang.isRequired}" autocomplete="off"
+                             value="#{productEntryView.productEntry.invoiceNo}" maxlength="20" title="#{lang.invoiceNo}" />
+                <p:message for="txt1" display="text" />
+              </p:column>
+
+              <!-- Entry Date -->
+              <p:column>
+                <p:calendar value="#{productEntryView.productEntry.productEntryDate}" pattern="#{lang.datePattern}" inputStyleClass="w-100"
+                            required="true" requiredMessage="#{lang.productEntryDate} #{lang.isRequired}" 
+                            validator="#{sysRuntimeView.dateLteToday}"
+                            converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                            maxlength="29" id="cal1" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}"/>
+                <p:message for="cal1" display="text"/>
+              </p:column>
+
+              <p:column>
+                <p:selectBooleanCheckbox value="#{productEntryView.lineDiscountApplicable}" id="cb1" >
+                  <p:ajax process="@this" update="invoiceEntrydt1 txt7" listener="#{productEntryView.productDiscountChangeEventHandler}" />
+                </p:selectBooleanCheckbox>
+              </p:column>
+
+              <p:column>
+                <p:selectBooleanCheckbox value="#{productEntryView.cashDiscountApplicable}" id="cb2" >
+                  <p:ajax process="@this" update="p21" listener="#{productEntryView.actionApplyCashDiscount}" />
+                </p:selectBooleanCheckbox>
+              </p:column>
+
+              <!-- invoice Difference -->
+              <p:column styleClass="w-100">
+                <p:inputNumber value="#{productEntryView.productEntry.invoiceAmountVariation}" converterMessage="#{lang.roundOff} #{lang.invalidNumber}"
+                               decimalPlaces="3"  title="#{lang.roundOff}" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999.99" symbol="#{appView.currencySymbol} "
+                               maxlength="10" id="txt2" disabled="true">
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Invoice Amount -->
+              <p:column>
+                <h:panelGroup id="p6" layout="block">
+                  <p:inputNumber value="#{productEntryView.productEntry.invoiceAmount}" converterMessage="#{lang.invoiceAmount} #{lang.invalidNumber}" decimalPlaces="3"
+                                 required="true" requiredMessage="#{lang.amount} #{lang.isRequired}" title="#{lang.invoiceAmount}"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="10" id="txt3" >
+                    <p:ajax event="change" process="p6" listener="#{productEntryView.invoiceAmountChangeEventHandler}" update="txt2" />
+                  </p:inputNumber>
+                </h:panelGroup>
+                <p:message for="txt3" />
+              </p:column>
+            </p:row>
+          </p:panelGrid>
+        </h:panelGroup>
+
+        <h:panelGroup id="p7" layout="block" rendered="#{!productEntryView.openingStockEntry}" styleClass="table-responsive" pt:data-fast-input="true" pt:data-watermark="#{productEntryView.confirmed ? 'block' : 'true'}">
+          <p:focus for="txt4" />
+          <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="pg2" columnClasses="#{sysRuntimeView.grid4}">
+
+            <f:facet name="header">
+              <p:row>
+                <p:column id="col7"><p:outputLabel id="lbl15" value="#{lang.invoiceNo}" for="txt4" /></p:column>
+                <p:column id="col9"><p:outputLabel id="lbl17" value="#{lang.entryDate}" for="cal3" /></p:column>
+                <p:column id="col8"><p:outputLabel id="lbl16" value="#{lang.invoiceDate}" for="cal2" /></p:column>                
+                <p:column id="col10"><p:outputLabel id="lbl18"  value="#{lang.discountValue}" style="color: coral;" for="txt5" /></p:column>
+                <p:column id="col11"><p:outputLabel id="lbl19" value="#{lang.discountPerc}" style="color: coral;" for="txt6" /></p:column>
+                <p:column id="tcscol" rendered="#{productEntryView.productEntry.companyId.tcsEnabled eq 1}"><p:outputLabel id="tcsLabel" value="#{lang.tcs} #{lang.amount}"  for="tcsTxt" /></p:column>
+                <p:column id="col12"><p:outputLabel id="lbl20" value="#{lang.difference}" for="txt7" /></p:column>
+                <p:column id="col13"><p:outputLabel id="lbl21" value="#{lang.invoiceAmount}" for="txt8" /></p:column>
+              </p:row>
+            </f:facet>
+
+            <p:row>
+              <!-- Invoice No -->
+              <p:column>
+                <p:inputText id="txt4" styleClass="prNum w-200" required="true" requiredMessage="#{lang.invoiceNo} #{lang.isRequired}" autocomplete="off"
+                             value="#{productEntryView.productEntry.invoiceNo}" maxlength="20" title="#{lang.invoiceNo}" />
+                <p:message for="txt4" display="text" />
+              </p:column>
+
+              <!-- Entry Date -->
+              <p:column>
+                <p:calendar value="#{productEntryView.productEntry.productEntryDate}" pattern="#{lang.datePattern}" inputStyleClass="w-100"
+                            required="true" requiredMessage="#{lang.productEntryDate} #{lang.isRequired}"
+                            validator="#{sysRuntimeView.dateLteToday}" autocomplete="off" 
+                            maxdate="#{userRuntimeView.maxEntryDate}" mindate="#{userRuntimeView.minEntryDate}"
+                            converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                            maxlength="29" id="cal3" showButtonPanel="true" navigator="true" mask="true" >
+                  <p:ajax event="dateSelect"  process="@this" update="cal2"  />
+                  <p:ajax event="change"  process="@this" update="cal2"  />
+                </p:calendar>
+                <p:message for="cal3" display="text"/>
+              </p:column>
+
+              <!-- Invoice Date -->
+              <p:column>
+                <p:calendar value="#{productEntryView.productEntry.invoiceDate}" pattern="#{lang.datePattern}" inputStyleClass="w-100"
+                            required="true" requiredMessage="#{lang.invoiceDate} #{lang.isRequired}"
+                            validator="#{sysRuntimeView.dateLteToday}" autocomplete="off" mindate="#{productEntryView.minInvoiceDate}"
+                            converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                            maxlength="29" id="cal2" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.maxEntryDate}">
+                  <p:ajax event="dateSelect" listener="#{productEntryView.invoiceDateSelectEvent}" process="@this" update="cal3" />
+                </p:calendar>
+                <p:message for="cal2" display="text"/>
+              </p:column>              
+
+              <!-- Invoice Discount value -->
+              <p:column>
+                <h:panelGroup layout="block" id="p8">
+                  <p:inputNumber value="#{productEntryView.productEntry.invoiceAmountDiscountValue}" 
+                                 converterMessage="#{lang.invoiceAmountDiscountValue} #{lang.invalidNumber}"
+                                 title="#{lang.invoiceAmountDiscountValue}" disabled="#{sysConstant.DISCOUNT_IN_PERCENTAGE eq productEntryView.productEntry.isInvoiceDiscountInPercentage}"
+                                 decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="6"
+                                 id="txt5" valueChangeListener="#{productEntryView.invoiceAmountDiscountValueBlurEvent}" >
+                    <p:ajax event="change" process="p8" update="invoiceEntrydt1 p9 txt7 p10 dt2" />
+                  </p:inputNumber> <p:message for="txt5" display="text"></p:message>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- Invoice Discount % -->
+              <p:column>
+                <h:panelGroup layout="block" id="p9">
+                  <p:inputNumber value="#{productEntryView.productEntry.invoiceAmountDiscountPerc}" converterMessage="#{lang.invoiceAmountDiscountPerc} #{lang.invalidNumber}"
+                                 title="#{lang.invoiceAmountDiscountPerc}" disabled="#{sysConstant.DISCOUNT_IN_VALUE eq productEntryView.productEntry.isInvoiceDiscountInPercentage}"
+                                 decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100" minValue="0.0" symbol="#{appView.percentageSymbol} "
+                                 maxlength="5" id="txt6" symbolPosition="s" valueChangeListener="#{productEntryView.invoiceAmountDiscountPercBlurEvent}" >
+                    <p:ajax event="change" process="p9" update="txt5 invoiceEntrydt1 txt7 p10 dt2" />
+                  </p:inputNumber>
+                  <p:message for="txt6" display="text"/>
+                </h:panelGroup>
+              </p:column>
+              <!-- TCS Amount -->
+              <p:column rendered="#{productEntryView.productEntry.companyId.tcsEnabled eq 1}">
+                <h:panelGroup layout="block" id="tcs">
+                  <p:inputNumber value="#{productEntryView.productEntry.tcsNetValue}" converterMessage="#{lang.tcs} #{lang.invalidNumber}" decimalPlaces="3"
+                                 requiredMessage="#{lang.amount} #{lang.isRequired}" title="#{lang.invoiceAmount}"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="10" id="tcsTxt" autocomplete="off" >
+                    <p:ajax event="change" process="@this" listener="#{productEntryView.invoiceAmountChangeEventHandler}" update="p22 invoiceEntrydt1 txt7" />
+                  </p:inputNumber>
+                </h:panelGroup>
+                <p:message for="tcsTxt" display="text" id="tcsAmountmsg"/>
+              </p:column>
+              <!-- invoice Difference -->
+              <p:column styleClass="w-100">
+                <p:inputNumber value="#{productEntryView.productEntry.invoiceAmountVariation}" converterMessage="#{lang.roundOff} #{lang.invalidNumber}"
+                               decimalPlaces="3"  title="#{lang.roundOff}" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999.99" symbol="#{appView.currencySymbol} "
+                               maxlength="10" id="txt7" disabled="true" >
+                </p:inputNumber>
+                <p:message for="txt7" display="text" />
+              </p:column>
+
+              <!-- Invoice Amount -->
+              <p:column>
+                <h:panelGroup layout="block" id="p10">
+                  <p:inputNumber value="#{productEntryView.productEntry.invoiceAmount}" converterMessage="#{lang.invoiceAmount} #{lang.invalidNumber}" decimalPlaces="3"
+                                 required="true" requiredMessage="#{lang.amount} #{lang.isRequired}" title="#{lang.invoiceAmount}"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="10" id="txt8" autocomplete="off" >
+                    <p:ajax event="change" process="p10" listener="#{productEntryView.invoiceAmountChangeEventHandler}" update="txt7 txt6 txt5 p8" />
+                  </p:inputNumber>
+                </h:panelGroup>
+                <p:message for="txt8" display="text" id="invoiceAmountMsg"/>
+              </p:column>
+            </p:row>
+          </p:panelGrid>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" id="purchaseHistoryPanel">
+          <p:overlayPanel widgetVar="purchaseHistoryVar" dynamic="true" showEffect= "fade" hideEffect="fade"  showCloseIcon="true" dismissable="false">
+            <p:outputPanel id="purchaseDetail" style="text-align:center;">
+              <p:panelGrid>
+                <f:facet name="header">
+                  <p:row>
+                    <p:column colspan="6">#{appView.display(productEntryView.productName)}</p:column>
+                  </p:row>
+                  <p:row>
+                    <p:column>#{lang.invoiceNo}</p:column>
+                    <p:column>#{lang.supplier}</p:column>
+                    <p:column>#{lang.invoiceDate}</p:column>
+                    <p:column>#{lang.batchNo}</p:column>
+                    <p:column>#{lang.qty}</p:column>
+                    <p:column>#{lang.qtyFree}</p:column>
+                    <p:column>#{lang.rate}</p:column>
+                    <p:column>#{lang.landingPrice}</p:column>
+                    <p:column>#{lang.pts}</p:column>
+                    <p:column>#{lang.ptr}</p:column>
+                    <p:column>#{lang.mrp}</p:column>
+                  </p:row>
+                </f:facet>
+
+                <ui:repeat value="#{productEntryView.productInvoiceDetailList}" var="invoiceDetail">
+                  <p:row>
+                    <p:column>#{invoiceDetail.invoiceNo}</p:column>
+                    <p:column>#{invoiceDetail.accountCode}</p:column>
+                    <p:column>#{appView.date(invoiceDetail.invoiceDate)}</p:column>
+                    <p:column>#{invoiceDetail.batchNo}</p:column>
+                    <p:column>#{invoiceDetail.qty}</p:column>
+                    <p:column>#{invoiceDetail.qtyFree}</p:column>
+                    <p:column>#{invoiceDetail.valueRate}</p:column>
+                    <p:column>#{appView.decimal(invoiceDetail.landRate)}</p:column>
+                    <p:column>#{invoiceDetail.valuePts}</p:column>
+                    <p:column>#{invoiceDetail.valuePtr}</p:column>
+                    <p:column>#{invoiceDetail.valueMrp}</p:column>
+                  </p:row>
+                </ui:repeat>
+              </p:panelGrid>
+            </p:outputPanel>
+          </p:overlayPanel>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="afterForm" >
+
+      <h:panelGroup layout="block" id="p11" styleClass="card" rendered="#{main.isForm() and !productEntryView.openingStockEntry}" pt:data-watermark="#{productEntryView.confirmed ? 'block' : 'true'}">
+        <p:remoteCommand name="consignmentReturned" process="@this" actionListener="#{productEntryView.consignmentPopupReturned(main)}" update="p12 p14" />
+
+        <p:panelGrid id="pg3"  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                     columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+          <!-- Consignment -->
+          <p:commandLink actionListener="#{popUpView.openConsignment(productEntryView.productEntry)}" process="@this" immediate="true" id="cl1" >
+            <p:outputLabel value="#{lang.consignment}" for="som1" id="lbl22" />
+          </p:commandLink>
+          <h:panelGroup layout="block" id="p12">
+            <p:selectOneMenu value="#{productEntryView.consignmentRate}"  id="som1" styleClass="fw"
+                             converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.consignment} #{lang.isRequired}" >
+              <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+              <f:selectItems value="#{productEntryView.lookUpConsignmentByAccount(main)}" var="e" itemValue="#{e}" itemLabel="#{e.consignmentNo}" />
+              <p:ajax event="itemSelect" process="p12" listener="#{productEntryView.consignmentRateItemSelectEvent}"
+                      update="p14" />
+            </p:selectOneMenu>
+            <p:message for="som1" display="text" />
+          </h:panelGroup>
+
+          <!-- Purchase Credit -->
+          <p:outputLabel id="lbl23" value="#{lang.purchaseCredit}" />
+          <h:panelGroup id="p13">
+            <p:inputNumber value="#{productEntryView.productEntry.purchaseCreditDays}" id="txt9"
+                           thousandSeparator="" decimalPlaces="0" />
+            <p:outputLabel id="lbl24" value="Days applicable from #{contractUtilView.getPurchaseCreditApplicableFrom(productEntryView.productEntry.contractId)} (#{productEntryView.productEntry.contractId.purchaseCreditDays} Days)"/>
+          </h:panelGroup>
+
+          <!-- LR Amount -->
+          <label>#{lang.nonReimbursement} #{lang.amount} </label>
+          <h:panelGroup id="p14">
+            <p:inputNumber value="#{productEntryView.productEntry.totalExpenseAmount}" decimalPlaces="3"
+                           onfocus="this.select()" inputStyleClass="text-right" maxValue="#{productEntryView.lrAmountMax eq null ? 999999 : productEntryView.lrAmountMax}" minValue="0.0"
+                           symbol="#{appView.currencySymbol} " maxlength="15" id="txt10" >
+            </p:inputNumber>
+            <p:inputText value="#{productEntryView.lrAmount}" disabled="true"  />
+          </h:panelGroup>
+
+          <!-- Sales Credit Days -->
+          <label>#{lang.salesCreditDays} </label>
+          <h:panelGroup id="p15">
+            <p:inputNumber decimalPlaces="0" thousandSeparator="" value="#{productEntryView.productEntry.salesCreditDays}" id="txt11" />
+            <p:outputLabel id="lbl27" value="(#{productEntryView.productEntry.contractId.salesCreditDays} Days)"/>
+          </h:panelGroup>
+
+          <!-- Vendor Reserve Percent-->
+          <p:outputLabel id="lbl28" value="#{lang.vendorReserve} #{lang.percentageSymbol}"  rendered="#{accountUtilView.isSuperStockiest(productEntryView.productEntry.accountId)}" />
+          <h:panelGroup rendered="#{accountUtilView.isSuperStockiest(productEntryView.productEntry.accountId)}" id="p16">
+            <p:inputNumber value="#{productEntryView.productEntry.vendorReservePercentage}" decimalPlaces="1" onfocus="this.select()" inputStyleClass="text-right" maxValue="99" minValue="0.0"
+                           symbol="#{appView.percentageSymbol} " maxlength="5" id="txt12" symbolPosition="s">
+              <p:ajax event="change" process="p16" update="@this"/>
+            </p:inputNumber>
+            <p:outputLabel id="lbl29" value="(#{productEntryView.productEntry.contractId.vendorReservePercent}%)" rendered="#{not empty productEntryView.productEntry.contractId.vendorReservePercent}"/>
+          </h:panelGroup>
+
+          <!-- Product Discount | Special Discount Applicable -->
+          <label style="color: cornflowerblue;">#{lang.productDiscount}</label>
+          <h:panelGroup layout="block" id="p17">
+            <h:panelGroup>
+              <p:selectBooleanCheckbox value="#{productEntryView.lineDiscountApplicable}" id="cb3" >
+                <p:ajax process="p17" update="p21 invoiceEntrydt1 txt7" listener="#{productEntryView.productDiscountChangeEventHandler}" />
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Empty -->
+          <h:panelGroup>
+            <h:outputLabel rendered="#{main.edit and (userRole.isRoot() or userRuntimeView.privilege.modifyTax eq true) and productEntryView.draft}"  style="color: cornflowerblue;" value="Modify Tax Code"></h:outputLabel>
+          </h:panelGroup>
+          <h:panelGroup>
+            <h:panelGroup rendered="#{main.edit and (userRole.isRoot() or userRuntimeView.privilege.modifyTax eq true) and productEntryView.draft}">
+              <p:selectBooleanCheckbox value="#{productEntryView.taxEditable}" id="cb33" >                
+                <p:ajax event="change" update="invoiceEntrydt1"/>
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Cash Discount | Cash Discount Taxable Applicable -->
+          <label style="color: hotpink;">#{lang.cashDiscount}</label>
+          <h:panelGroup layout="block" id="p18" >
+            <h:panelGroup id="p19">
+              <p:selectBooleanCheckbox value="#{productEntryView.cashDiscountApplicable}" id="cb4" >
+                <p:ajax process="p18" update="p18 p22" listener="#{productEntryView.actionApplyCashDiscount}" />
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup id="p20" rendered="#{productEntryView.cashDiscountApplicable}">
+              <label>#{lang.cashDiscountTaxable} </label>
+              <p:selectBooleanCheckbox value="#{productEntryView.taxableCashDiscount}" id="cb5" >
+                <p:ajax process="p18" update="p22" listener="#{productEntryView.actionApplyCashDiscount}" />
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Remarks -->
+          <p:outputLabel value="#{lang.remarks}" for="remarks" />
+          <h:panelGroup id="remarks" >
+            <p:inputTextarea value="#{productEntryView.productEntry.note}"
+                             cols="50" rows="1" maxlength="500" id="note" autoResize="false" styleClass="fw" />
+          </h:panelGroup>
+          <!--Discounts Applicable for Services-->
+          <label >Is <span style="color: coral;">#{lang.invoice}</span>/<span style="color: hotpink;">#{lang.cashDiscount}</span> Applicable For Services</label>
+          <h:panelGroup id="discountForService">
+            <p:selectBooleanCheckbox value="#{productEntryView.discountsApplicableForServices}" disabled="#{productEntryView.disableServiceDiscount}" >
+
+              <p:ajax process="discountForService" update="p22 dt2 invoiceEntrydt1" listener="#{productEntryView.discountsApplicableForServicesListener}" />
+            </p:selectBooleanCheckbox>
+          </h:panelGroup>
+          <p:outputLabel value=""  />
+
+          <!-- Purchase from sales-->
+          <p:commandButton action="#{popUpView.purchasefromSalesPopup(main, productEntryView.productEntry)}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus"
+                           iconPos="left" styleClass="btn btn-info" rendered="#{productEntryView.isDraft() and productEntryView.productEntry.id ne null and productEntryView.productEntry.accountId.vendorId.isCompany eq 1}" 
+                           value="#{lang.add} #{lang.purchase}">
+          </p:commandButton>
+
+          <p:remoteCommand name="purchaseFromSalesPopupReturned" actionListener="#{productEntryView.purchaseFromSalesPopupReturned(main)}"
+                           update="invoiceEntrydt1 p22 p11 txt5 txt6 txt7 txt8 tcs"  process="@this" immediate="true" oncomplete="refreshDatatable();" />
+
+
+        </p:panelGrid>
+      </h:panelGroup>
+
+      <h:panelGroup layout="block" rendered="#{main.isForm() and main.edit}"  id="p21">
+        <style>
+          .vtop{vertical-align: top;}
+          .old{
+            background-color: #fca752 !important;
+            background-image: none !important;
+            color: #000000 !important;}
+          </style>
+
+
+
+          <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
+
+          <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" pt:data-fast-input="true" >
+          <p:dataTable id="invoiceEntrydt1" var="productEntryDetailVar" widgetVar="productEntryDetailWidget" rowIndexVar="rowIndex"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{productEntryView.productEntryDetailList}"
+                       rows="50"
+                       paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"  
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="50,100,150" rowKey="#{productEntryDetailVar.id eq null ? 0:productEntryDetailVar.id}"
+                       rowSelectMode="checkbox" selection="#{productEntryView.selectedProductEntryDetails}">
+
+            <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+            <p:ajax event="rowSelectCheckbox"  />
+            <p:ajax event="rowUnselectCheckbox" />
+            <p:ajax event="toggleSelect" />
+
+            <p:column id="col14" styleClass="w-40" style="text-align: center;">
+              <f:facet name="header"><h:outputText value="#{lang.sno}" title="#{lang.serialNumber}"/></f:facet>
+              <h:outputText value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!-- Product -->
+            <p:column styleClass="w-200" id="col15" exportable="false">
+              <f:facet name="header">
+                <p:commandLink id="cl2" actionListener="#{productEntryView.openProduct()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                  #{lang.product}
+                </p:commandLink>
+                <h:outputText id="lbl32" value="#{lang.product}" rendered="#{main.popup}" />
+              </f:facet>
+
+              <!--<h:panelGroup layout="block" id="p23" >-->
+              <h:outputText id="ac2" value="#{productEntryDetailVar.productSummary.productName}" rendered="#{!productEntryView.draft}"  />
+              <p:autoComplete id="ac1" styleClass="fw" value="#{productEntryDetailVar.productSummary}"
+                              completeMethod="#{productEntryView.completeProductDetail}" 
+                              converter="spica.scm.converter.ProductSummaryConverter"
+                              disabled="#{productEntryView.confirmed}" 
+                              autocomplete="off" style="position: relative"
+                              panelStyle="width:700px !important;"
+                              cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" scrollHeight="600" title="#{productEntryDetailVar.productSummary.productName}"
+                              var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true" rendered="#{productEntryView.draft}">
+                <p:column style="width:275px;">
+                  #{prod.productName}
+                </p:column>
+                <!--                <p:column style="width: 130px;">
+                                  <f:facet name="header"><label>#{lang.batch}</label></f:facet>
+                #{prod.batch}
+          </p:column>
+          <p:column style="width: 100px;">
+            <f:facet name="header"><label>#{lang.packSize}</label></f:facet>
+                #{prod.packSize}
+          </p:column>
+          <p:column>
+            <f:facet name="header"><label>#{lang.expiry}</label></f:facet>
+                #{prod.expiryDate}
+          </p:column>
+          <p:column>
+            <f:facet name="header">#{lang.mrp}</f:facet>
+                #{prod.mrpValue}
+            </p:column>
+            <p:column rendered="#{accountUtilView.isInterStatePurchase(productEntryView.productEntry.accountId)}">
+              <f:facet name="header">#{lang.igst}</f:facet>
+                #{prod.gstPercentage}
+            </p:column>
+            <p:column rendered="#{accountUtilView.isIntraStatePurchase(productEntryView.productEntry.accountId)}">
+              <f:facet name="header">#{lang.cgst}</f:facet>
+                #{prod.gstPercentage/2}
+            </p:column>
+            <p:column rendered="#{accountUtilView.isIntraStatePurchase(productEntryView.productEntry.accountId)}">
+              <f:facet name="header">#{lang.sgst}</f:facet>
+                #{prod.gstPercentage/2}
+            </p:column>-->
+                <f:attribute name="productEntryItem" value="#{productEntryDetailVar}"/>
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true"
+                        update="txt16 txt31 txt17 txt18 txt27 txt30 txt0
+                        txt29 txt19 txt20 txt21 txt22 txt27 txt28 txt0 txt31 txt32 txt33 toolTipContent purchaseDetail ac4"
+                        listener="#{productEntryView.productSelectEvent(productEntryDetailVar, rowIndex)}" oncomplete="focusToBatch(#{rowIndex}); 
+                        openPurchaseHistoryOverlayPanel(xhr, status, args);"
+                        />
+              </p:autoComplete>
+              <!--</h:panelGroup>-->
+            </p:column>
+            <p:column  exportable="true"  >
+              <h:inputHidden  value="#{productEntryDetailVar.productSummary.productName}" rendered="#{productEntryDetailVar.productSummary.productName ne null}" />
+            </p:column>
+
+            <!-- Batch -->
+            <p:column id="col17" styleClass="w-200" exportable="false">
+              <f:facet name="header"><h:outputText id="lbl34" value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+              <h:outputText id="ac3" value="#{productEntryDetailVar.productSummary.batch}" rendered="#{!productEntryView.draft}"  />
+              <p:autoComplete id="ac4" styleClass="fw" value="#{productEntryDetailVar.productSummary}"
+                              completeMethod="#{productEntryView.completeProductBatch}" 
+                              converter="spica.scm.converter.ProductSummaryConverter"
+                              disabled="#{productEntryView.confirmed}"
+                              autocomplete="off" style="position: relative"
+                              panelStyle="width:700px !important;" dropdown="true"
+                              cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" scrollHeight="600" title="#{productEntryDetailVar.productSummary.batch}"
+                              var="prod" itemLabel="#{prod.batch}" itemValue="#{prod}" forceSelection="true" rendered="#{productEntryView.draft}">
+                <p:column style="width: 130px;">
+                  <f:facet name="header"><label>#{lang.batch}</label></f:facet>
+                      #{prod.batch}
+                </p:column>
+                <p:column style="width: 100px;">
+                  <f:facet name="header"><label>#{lang.pack}</label></f:facet>
+                      #{prod.packSize}
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><label>#{lang.expiry}</label></f:facet>
+                      #{prod.expiryDate}
+                </p:column>
+                <p:column>
+                  <f:facet name="header">#{lang.mrp}</f:facet>
+                    #{prod.mrpValue}
+                </p:column>
+                <p:column rendered="#{productEntryView.igstTransaction}">
+                  <f:facet name="header">#{lang.igst}</f:facet>
+                    #{prod.gstPercentage}
+                </p:column>
+                <p:column rendered="#{!productEntryView.igstTransaction}">
+                  <f:facet name="header">#{lang.cgst}</f:facet>
+                    #{prod.gstPercentage/2}
+                </p:column>
+                <p:column rendered="#{!productEntryView.igstTransaction}">
+                  <f:facet name="header">#{lang.sgst}</f:facet>
+                    #{prod.gstPercentage/2}
+                </p:column>
+                <f:attribute name="productEntryItem" value="#{productEntryDetailVar}"/>
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true"
+                        update="txt16 txt31 txt17 txt18 txt27 txt30 txt0
+                        txt29 txt19 txt20 txt21 txt22 txt27 txt28 txt0 txt31 txt32 txt33 toolTipContent pdescTxt"
+                        listener="#{productEntryView.productBatchSelectEvent(productEntryDetailVar, rowIndex)}" oncomplete="focusToQty(#{rowIndex});" />
+              </p:autoComplete>
+            </p:column> 
+            <p:column style="visibility: hidden" exportable="true" >
+              <f:facet name="header" ><h:outputText value="#{lang.batch}"/></f:facet>
+              <h:inputHidden value="#{productEntryDetailVar.productSummary.batch}" rendered="#{productEntryDetailVar.productSummary.productName ne null}" />
+            </p:column>
+
+            <p:column id="col18" exportable="false" style="width: 10px" >
+              <p:commandButton id="b4" process="@this" value="" icon="fa fa-cog" tabindex="-1" pt:data-ignore-focus="true" 
+                               action="#{productEntryView.actionOpenProductPopup(productEntryDetailVar, rowIndex)}" >
+              </p:commandButton>
+            </p:column>
+
+            <!--             Pack Unit 
+                        <p:column id="col16">
+                          <f:facet name="header"><h:outputText id="lbl33" value="#{lang.pack}" title="#{lang.productPacking}"/></f:facet>
+                          <h:outputText id="txt14" value="#{productEntryDetailVar.packSize}" />
+                        </p:column>
+            -->
+            <!-- Pack Description -->
+            <p:column id="pdescCol">
+              <f:facet name="header"><h:outputText id="pdesc" value="#{lang.pDesc}" title="#{lang.packing} #{lang.description}"/></f:facet>
+              <h:outputText id="pdescTxt" value="#{productEntryDetailVar.packingDescription}" />
+            </p:column>
+
+            <!-- Expiry Date -->
+            <p:column id="col19" >
+              <f:facet name="header"><h:outputText id="lbl35" value="#{lang.expiry}" title="#{lang.expiryDateActual}"/></f:facet>
+              <h:outputText id="txt16" value="#{sysRuntimeView.dateToMMYY(productEntryDetailVar.expiryDate)}" />
+            </p:column>
+
+            <!-- Tax Code -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxRatePercentage}"/></f:facet>
+              <h:outputText id="txt0" value="#{productEntryDetailVar.taxCodeId.ratePercentage}" rendered="#{!productEntryView.taxEditable}" />
+              <p:selectOneMenu value="#{productEntryDetailVar.taxCodeId}" converter="omnifaces.SelectItemsConverter"                                
+                               id="tx12" rendered="#{productEntryView.taxEditable}">                
+                <f:selectItems value="#{productEntryView.taxCodeList}" var="tx" itemValue="#{tx}" itemLabel="#{tx.code}" />                
+                <p:ajax event="itemSelect" process="tx12" oncomplete="updateInvoiceSummery();"
+                        update="txt15 txt16 txt31 txt17 txt18 txt27 txt30 txt0
+                        txt29 txt19 txt20 txt21 txt22 txt27 txt28 txt0 txt31 txt32 txt33 toolTipContent purchaseDetail"
+                        listener="#{productEntryView.taxRateChangeEvent(main, productEntryDetailVar)}" />
+              </p:selectOneMenu>
+            </p:column>
+
+            <!-- Tertiary Qty -->
+            <p:column id="col20" styleClass="w-60"> 
+              <f:facet name="header"><h:outputText id="lbl36" value="" title="#{lang.productTertairyQuantity}"/></f:facet>
+              <p:inputNumber id="txt17" disabled="#{productEntryDetailVar.packTertiary ne null ? false : true}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="9999" decimalPlaces="3" minValue="0.0" readonly="#{productEntryView.confirmed}"
+                             placeholder="#{productEntryDetailVar.packTertiary.title}"
+                             value="#{productEntryDetailVar.productTertairyQuantity}"
+                             title="1 #{productEntryDetailVar.packTertiary.title} = #{productEntryDetailVar.packTertiarySecondaryQty} #{productEntryDetailVar.packSecondary.title}" >
+                <p:ajax event="change" process="txt17"
+                        update="txt19 txt20 txt18 txt32 txt33 txt23 txt24 txt7 txt2"
+                        listener="#{productEntryView.tertiaryQtyBlurEvent(productEntryDetailVar)}" />
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Secondary Qty -->
+            <p:column id="col21" styleClass="w-80">
+              <f:facet name="header"><h:outputText id="lbl37" value="" title="#{lang.productSecondaryQuantity}"/></f:facet>
+              <p:inputNumber id="txt18" disabled="#{productEntryDetailVar.packSecondary ne null ? false : true}" readonly="#{productEntryView.confirmed}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="9999" decimalPlaces="3" minValue="0.0" placeholder="#{productEntryDetailVar.packSecondary.title}"
+                             value="#{productEntryDetailVar.productSecondaryQuantity}"
+                             title="1 #{productEntryDetailVar.packSecondary.title} = #{productEntryDetailVar.packSecondaryPrimaryQty} #{productEntryDetailVar.packPrimary.title}">
+                <p:ajax event="blur" process="txt18" update="txt19 txt17 txt20 txt32 txt33 txt23 txt24 txt7 txt2"
+                        listener="#{productEntryView.secondaryQtyBlurEvent(productEntryDetailVar)}" />
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Primary Qty -->
+            <p:column id="col22" styleClass="w-80">
+              <f:facet name="header"><h:outputText id="lbl38" value="Qty" title="#{lang.product} #{lang.quantity}"/></f:facet>
+              <p:inputNumber id="txt19" value="#{productEntryDetailVar.productQuantity}" disabled="#{productEntryView.confirmed}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0"
+                             decimalPlaces="#{productEntryView.productEntry.openingStockEntry eq 1 ? 2:0}"
+                             title="#{lang.packSize} - #{productEntryDetailVar.packingDescription}">
+                <p:ajax event="blur" process="txt19" oncomplete="updateInvoiceSummery();"
+                        update="txt17 txt18 txt32 txt33 txt23 txt24 txt7 txt2"
+                        listener="#{productEntryView.primaryQtyBlurEvent(productEntryDetailVar)}" />
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Free Qty -->
+            <p:column id="col23" styleClass="w-60">
+              <f:facet name="header"><h:outputText id="lbl39" style="color: deepskyblue;" value="#{lang.Free}&lt;br/&gt;#{lang.qty}" title="#{lang.productFreeQuantity}" escape="false" /></f:facet>
+              <!--<h:panelGroup layout="block" id="p28" >-->
+              <p:inputNumber id="txt20" value="#{productEntryDetailVar.productQuantityFree}"
+                             validator="#{productEntryView.validateProductFreeScheme}" decimalPlaces="0"
+                             readonly="#{productEntryView.productEntry.openingStockEntry eq 1 and productEntryDetailVar.productQuantityDamaged gt 0}"
+                             disabled="#{(productEntryView.openingStockEntry and productEntryDetailVar.isSchemeDiscountInPercentage ne null)
+                                         or productEntryView.confirmed}"
+                             inputStyle="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" minValue="0" >
+                <p:ajax event="blur" process="txt20" update="txt21 txt22 txt32 txt33 txt7 txt2 txt29 txt18"
+                        listener="#{productEntryView.productFreeQtyBlurEvent(productEntryDetailVar)}"
+                        oncomplete="updateInvoiceSummery();"
+                        />
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Scheme Discount Value -->
+            <p:column id="col24" rendered="#{productEntryView.productEntry.quantityOrFree eq 1}" styleClass="w-80">
+              <f:facet name="header"><h:outputText id="lbl40" style="color: deepskyblue;" value="#{lang.s}.#{lang.disc}" title="#{lang.schemeDiscountValue}"/></f:facet>
+              <p:inputNumber id="txt21" value="#{productEntryDetailVar.schemeDiscountValue}"  inputStyle="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}" 
+                             disabled="#{!productEntryView.openingStockEntry or productEntryDetailVar.productQuantityFree ne null 
+                                         or productEntryDetailVar.isSchemeDiscountInPercentage eq sysConstant.DISCOUNT_IN_PERCENTAGE or productEntryView.confirmed}"
+                             onfocus="this.select()" inputStyleClass="text-right" decimalPlaces="2" >
+                <p:ajax event="change" process="txt21" update="txt20 txt22"
+                        listener="#{productEntryView.productSchemeDiscValueBlurEvent(productEntryDetailVar)}"
+                        oncomplete="updateInvoiceSummery();"/>
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Scheme Discount % -->
+            <p:column id="col25" rendered="#{productEntryView.productEntry.quantityOrFree eq 1}" styleClass="w-60">
+              <f:facet name="header"><h:outputText id="lbl41" style="color: deepskyblue;" value="#{lang.s}.#{lang.discPerc}" title="#{lang.schemeDiscountPercentage}"/></f:facet>
+              <p:inputNumber id="txt22" value="#{productEntryDetailVar.schemeDiscountPercentage}" inputStyle="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}" 
+                             disabled="#{!productEntryView.openingStockEntry or productEntryDetailVar.productQuantityFree ne null
+                                         or productEntryDetailVar.isSchemeDiscountInPercentage eq sysConstant.DISCOUNT_IN_VALUE or productEntryView.confirmed}"
+                             onfocus="this.select()" inputStyleClass="text-right" decimalPlaces="2" >
+                <p:ajax event="change" process="txt22" update="txt20 txt21"
+                        listener="#{productEntryView.productSchemeDiscPercBlurEvent(productEntryDetailVar)}"
+                        oncomplete="updateInvoiceSummery();"/>
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Discount Value -->
+            <p:column id="col26" rendered="#{productEntryView.lineDiscountApplicable}" styleClass="w-80">
+              <f:facet name="header"><h:outputText id="lbl42" style="color: cornflowerblue;" value="#{lang.p}.#{lang.disc}" title="#{lang.productDiscountValue}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p29">-->
+              <p:inputNumber id="txt23" value="#{productEntryDetailVar.discountValue}" readonly="#{productEntryView.confirmed}"
+                             inputStyle="color:#{productEntryDetailVar.isLineDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="3" minValue="0.0" disabled="#{productEntryDetailVar.isProductDiscountInPercentage eq 1}">
+                <p:ajax event="change" process="@this" listener="#{productEntryView.productDiscountValueChangeEvent(productEntryDetailVar)}"
+                        update="txt24 txt32 txt33 txt7 txt2 txt29 txt6 txt5 txt25 txt26" oncomplete="updateInvoiceSummery();" />
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Discount %  -->
+            <p:column id="col27" rendered="#{productEntryView.lineDiscountApplicable}" styleClass="w-60">
+              <f:facet name="header"><h:outputText id="lbl43" style="color: cornflowerblue;" value="#{lang.p}.#{lang.discPerc}" title="#{lang.productDiscountPercentage}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p30">-->
+              <p:inputNumber id="txt24" value="#{productEntryDetailVar.discountPercentage}" readonly="#{productEntryView.confirmed}"
+                             inputStyle="color:#{productEntryDetailVar.isLineDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" decimalPlaces="3" minValue="0.00" disabled="#{productEntryDetailVar.isProductDiscountInPercentage eq 2}">
+                <p:ajax event="change" process="@this" listener="#{productEntryView.productDiscountPercChangeEvent(productEntryDetailVar)}"
+                        update="txt23 txt32 txt33 txt7 txt2 txt29 txt6 txt5 txt25 txt26" oncomplete="updateInvoiceSummery();" />
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Special Discount Value -->
+            <p:column id="col28" rendered="#{productEntryView.specialDiscountApplicable}" styleClass="w-80">
+              <f:facet name="header">
+                <h:outputText id="lbl44" style="color: coral;" value="#{lang.i}.#{lang.disc}" title="#{lang.specialDiscountValue}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p31">-->
+              <p:inputNumber id="txt25" value="#{productEntryDetailVar.invoiceDiscountValue}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.0" disabled="true">
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Special Discount % -->
+            <p:column id="col29" rendered="#{productEntryView.specialDiscountApplicable}">
+              <f:facet name="header"><h:outputText id="lbl45" style="color: coral;" value="#{lang.i}.#{lang.discPerc}" title="#{lang.specialDiscountPercentage}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p32">-->
+              <p:inputNumber id="txt26" value="#{productEntryDetailVar.invoiceDiscountPercDerived}" disabled="true" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" decimalPlaces="2" minValue="0.00">
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Box Rate -->
+            <p:column id="col30" styleClass="w-100" >
+              <f:facet name="header"><h:outputText id="lbl46" value="#{lang.boxRate}" title="#{lang.boxRate}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p33" >-->
+              <p:inputNumber id="txt27" disabled="#{productEntryDetailVar.packSecondary ne null ? false : true}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" decimalPlaces="3" minValue="0.0"
+                             value="#{productEntryDetailVar.valueBoxRate}" >
+                <p:ajax event="change" process="@this" update="invoiceEntrydt1 txt7 txt2 txt29" listener="#{productEntryView.boxRateBlurEvent(productEntryDetailVar)}"
+                        oncomplete="updateInvoiceSummery();" />
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Rate -->
+            <p:column id="col31" styleClass="w-100" >
+              <f:facet name="header"><h:outputText id="lbl47" value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p34" >-->
+              <p:inputNumber id="txt28" value="#{productEntryDetailVar.valueRate}" onfocus="this.select()" 
+                             inputStyleClass="#{productEntryView.inputClss(rowIndex)}" maxValue="999999" 
+                             decimalPlaces="#{sysConstant.ENTRY_RATE_PRECISION}" minValue="0.0"
+                             styleClass="fw t-r" disabled="#{productEntryView.confirmed}" >
+                <p:ajax event="change" process="@this" update="invoiceEntrydt1 txt6 txt5 txt7 txt2 txt29 discountForService" listener="#{productEntryView.valueRateBlurEvent(productEntryDetailVar)}"
+                        oncomplete="updateInvoiceSummery();" />
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- PTS -->
+            <p:column id="col32" rendered="#{productEntryView.renderPts}" styleClass="w-80">
+              <f:facet name="header"><h:outputText id="lbl48" value="#{lang.pts}" title="#{lang.priceToStockist}"/></f:facet>
+              <p:inputNumber id="txt29" value="#{productEntryDetailVar.valuePts}" disabled="#{productEntryView.confirmed}"
+                             styleClass="submit_item fw t-r" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex}_1 text-right" maxValue="999999" 
+                             decimalPlaces="#{productEntryView.productEntry.decimalPrecision}" minValue="0.00">
+              </p:inputNumber>
+            </p:column>
+
+            <!-- PTR -->
+            <p:column id="col33" rendered="#{productEntryView.renderPtr and productEntryView.ptsDerivedFromMrpPtr}" styleClass="w-80 t-r">
+              <f:facet name="header"><h:outputText id="lbl49" value="#{lang.ptr}" title="#{lang.priceToRetailer}"/></f:facet>
+              <p:inputNumber id="txt30" value="#{productEntryDetailVar.valuePtr}" disabled="false"
+                             inputStyleClass="text-right" maxValue="999999" 
+                             decimalPlaces="#{productEntryView.productEntry.decimalPrecision}" minValue="0.00">
+              </p:inputNumber>              
+            </p:column>
+
+            <!-- MRP -->
+            <p:column id="col34" styleClass="w-60 t-r">
+              <f:facet name="header"><h:outputText id="lbl50" value="#{lang.mrp}" title="#{lang.maximumRetailPrice}"/></f:facet>
+              <h:outputText id="txt31" value="#{productEntryDetailVar.valueMrp}" />
+            </p:column>
+
+            <!-- Net Value -->
+            <p:column id="col35" styleClass="t-r">
+              <f:facet name="header"><h:outputText id="lbl51" value="#{lang.value}" title="#{lang.goodsValue}"/></f:facet>
+              <h:outputText id="txt32" value="#{appView.decimal(productEntryDetailVar.valueGoods)}" />
+            </p:column>
+
+            <!-- Net Value -->
+            <p:column id="col36" styleClass="t-r">
+              <f:facet name="header"><h:outputText id="lbl52" value="#{lang.total}" title="#{lang.total}"/></f:facet>
+              <h:outputText value="#{appView.decimal(productEntryDetailVar.valueNet)}" id="txt33"  />
+            </p:column>
+            <!-- Action Icons -->
+
+            <p:column headerText="" id="col37" style="text-align: right" exportable="false">   
+              <f:facet name="header">
+                <p:commandButton id="b6" process="@this"  update="invoiceEntrydt1 txt7 txt2" icon="fa fa-trash" tabindex="-1"  styleClass="btn"
+                                 rendered="#{productEntryView.draft}" style="color: mediumvioletred;" oncomplete="refreshDatatable();"
+                                 actionListener="#{productEntryView.deleteProductEntryDetails(main)}" title="Delete Product Items"
+                                 >
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>  
+              </f:facet>
+              <p:commandButton id="cart5" process="@this"  icon="fa fa-shopping-cart" tabindex="-1"                               
+                               styleClass="btn">
+                <f:setPropertyActionListener target="#{productEntryView.productEntryDetailId}" value="#{productEntryDetailVar}" />
+              </p:commandButton>
+              <p:commandButton id="b5" process="@this"  update="tagsDlg" icon="fa fa-tags" tabindex="-1" 
+                               style="#{productEntryView.isTagged(productEntryDetailVar) ? 'color:darkgreen;' : ''}"
+                               oncomplete="PF('tagsDlg').show()" styleClass="btn">
+                <f:setPropertyActionListener target="#{productEntryView.productEntryDetailId}" value="#{productEntryDetailVar}" />
+              </p:commandButton>
+
+              <h:panelGroup layout="block" id="toolTipContent">
+                <p:tooltip for="cart5" position="bottom">
+                  <p:panelGrid>
+                    <f:facet name="header">
+                      <p:row>
+                        <p:column colspan="6">Last 5 purchases</p:column>
+                      </p:row>
+                      <p:row>
+                        <p:column>Invoice No</p:column>
+                        <p:column>Invoice Date</p:column>
+                        <p:column>Rate</p:column>
+                        <p:column>PTS</p:column>
+                        <p:column>PTR</p:column>
+                        <p:column>MRP</p:column>
+                      </p:row>
+                    </f:facet>
+
+                    <ui:repeat value="#{productEntryDetailVar.productInvoiceDetailList}" var="invoiceDetail">
+                      <p:row>
+                        <p:column>#{invoiceDetail.invoiceNo}</p:column>
+                        <p:column>#{appView.date(invoiceDetail.invoiceDate)}</p:column>
+                        <p:column>#{invoiceDetail.valueRate}</p:column>
+                        <p:column>#{invoiceDetail.valuePts}</p:column>
+                        <p:column>#{invoiceDetail.valuePtr}</p:column>
+                        <p:column>#{invoiceDetail.valueMrp}</p:column>
+                      </p:row>
+                    </ui:repeat>
+                  </p:panelGrid>
+                </p:tooltip>
+              </h:panelGroup>
+            </p:column>
+            <p:column id="col38" selectionMode="multiple" exportable="false" rendered="#{productEntryView.draft}" />
+          </p:dataTable>
+
+          <p:dataTable id="dt2" var="serviceEntryDetailVar" widgetVar="serviceEntryDetailWidget" rowIndexVar="rowIndex" reflow="true"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{productEntryView.serviceEntryDetailList}"
+                       rows="50" 
+                       paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="50,100,150">
+
+            <p:column id="col14" styleClass="w-40" style="text-align: center;">
+              <f:facet name="header"><h:outputText value="#{lang.sno}" title="#{lang.serialNumber}"/></f:facet>
+              <h:outputText value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!-- Service -->
+            <p:column styleClass="w-300">
+              <f:facet name="header">
+                <p:commandLink id="cl2" actionListener="#{productEntryView.openServices()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                  #{lang.services}
+                </p:commandLink>
+              </f:facet>
+              <h:outputText id="serv1" value="#{serviceEntryDetailVar.serviceCommodityId.title}" rendered="#{!productEntryView.draft}"  />
+
+              <p:autoComplete id="serv2" styleClass="fw" value="#{serviceEntryDetailVar.serviceCommodityId}"
+                              completeMethod="#{productEntryView.completeServiceDetail}" minQueryLength="0"
+                              converter="wawo.LookupIntConverter"
+                              disabled="#{productEntryView.confirmed}"
+                              autocomplete="off" style="position: relative"
+                              panelStyle="width:700px !important;"
+                              cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" scrollHeight="600" title="#{serviceEntryDetailVar.serviceCommodityId.title}"
+                              var="comdty" itemLabel="#{comdty.title}" itemValue="#{comdty}" forceSelection="true" rendered="#{productEntryView.draft}">
+                <p:column style="width:275px;">
+                  <f:facet name="header"><label>#{lang.name}</label></f:facet>
+                      #{comdty.title}
+                </p:column>
+                <p:column style="width: 130px;">
+                  <f:facet name="header"><label>#{lang.sacCode}</label></f:facet>
+                      #{comdty.hsnSacCode}
+                </p:column>
+                <p:column rendered="#{productEntryView.igstTransaction}">
+                  <f:facet name="header">#{lang.igst}</f:facet>
+                    #{comdty.salesTaxCodeId.ratePercentage}
+                </p:column>
+                <p:column rendered="#{!productEntryView.igstTransaction}">
+                  <f:facet name="header">#{lang.cgst}</f:facet>
+                    #{comdty.salesTaxCodeId.ratePercentage/2}
+                </p:column>
+                <p:column rendered="#{!productEntryView.igstTransaction}">
+                  <f:facet name="header">#{lang.sgst}</f:facet>
+                    #{comdty.salesTaxCodeId.ratePercentage/2}
+                </p:column>
+                <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+                <f:attribute name="serviceEntryItem" value="#{serviceEntryDetailVar}"/>
+
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true"
+                        update="sacCode servTaxCode txtServQty txtSRate txtSGoodsValue txtStotal actionId"
+                        listener="#{productEntryView.serviceSelectEvent(serviceEntryDetailVar, rowIndex)}" />
+
+              </p:autoComplete>
+            </p:column>
+
+            <p:column styleClass="w-200" style="text-align:left;">
+              <f:facet name="header">                
+                #{lang.sacCode}               
+              </f:facet>
+              <h:outputText id="sacCode" value="#{serviceEntryDetailVar.serviceCommodityId.hsnSacCode}" />
+            </p:column>            
+
+            <p:column styleClass="w-80" style="text-align:right;">
+              <f:facet name="header">                
+                #{lang.tax}
+              </f:facet>
+              <h:outputText id="servTaxCode" value="#{serviceEntryDetailVar.taxCodeId.ratePercentage}" />
+            </p:column>
+
+            <!--            <p:column styleClass="w-80">
+                          <f:facet name="header">                
+                          </f:facet>
+                          <h:outputText value="" />
+                        </p:column>-->
+
+            <p:column styleClass="w-80" style="text-align:right;">
+              <f:facet name="header">                
+                #{lang.qty}
+              </f:facet>
+              <p:inputNumber id="txtServQty" value="#{serviceEntryDetailVar.productQuantity}" disabled="#{productEntryView.confirmed}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0">               
+              </p:inputNumber>
+            </p:column>
+            <!--            <p:column styleClass="w-100">
+                          <f:facet name="header">                
+                          </f:facet>
+                          <h:outputText value="" />
+                        </p:column>
+                        <p:column styleClass="w-60">
+                          <f:facet name="header">                
+                          </f:facet>
+                          <h:outputText value="" />
+                        </p:column>
+                        <p:column styleClass="w-280">
+                          <f:facet name="header">                
+                          </f:facet>
+                          <h:outputText value="" />
+                        </p:column>-->
+            <!-- Special Discount Value -->
+            <p:column id="col28" rendered="#{productEntryView.specialDiscountApplicable and productEntryView.discountsApplicableForServices}" styleClass="w-100" style="text-align:right;">
+              <f:facet name="header">
+                <h:outputText  style="color: coral;" value="#{lang.i}.#{lang.disc}" title="#{lang.specialDiscountValue}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p31">-->
+              <p:inputNumber id="txt25" value="#{serviceEntryDetailVar.invoiceDiscountValue}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.0" disabled="true">
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+
+            <!-- Special Discount % -->
+            <p:column id="col29" rendered="#{productEntryView.specialDiscountApplicable and productEntryView.discountsApplicableForServices}" styleClass="w-100" style="text-align:right;">
+              <f:facet name="header"><h:outputText  style="color: coral;" value="#{lang.i}.#{lang.discPerc}" title="#{lang.specialDiscountPercentage}"/></f:facet>
+              <!--<h:panelGroup layout="block" id="p32">-->
+              <p:inputNumber id="txt26" value="#{serviceEntryDetailVar.invoiceDiscountPercDerived}" disabled="true" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" decimalPlaces="2" minValue="0.00">
+              </p:inputNumber>
+              <!--</h:panelGroup>-->
+            </p:column>
+            <p:column styleClass="w-100" style="text-align:right;">
+              <f:facet name="header">  
+                #{lang.rate}
+              </f:facet>
+              <h:panelGroup layout="block" id="srateDiv" >
+                <p:inputNumber id="txtSRate" value="#{serviceEntryDetailVar.valueRate}" 
+                               maxValue="999999" decimalPlaces="3" minValue="0.0"
+                               disabled="#{productEntryView.confirmed}" 
+                               styleClass="submit_item fw t-r" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex}_2 text-right"> 
+                  <p:ajax event="change" process="txtSRate" update="txtSGoodsValue txtStotal" 
+                          listener="#{productEntryView.serviceRateChangeEvent(serviceEntryDetailVar)}" 
+                          oncomplete="updateInvoiceSummery();"/>
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!--            <p:column styleClass="w-120">
+                          <f:facet name="header">                
+                          </f:facet>
+                          <h:outputText value="" />
+                        </p:column>-->
+            <!--            <p:column styleClass="w-80">
+                          <f:facet name="header">                
+                          </f:facet>
+                          <h:outputText value="" />
+                        </p:column>-->
+
+            <p:column styleClass="w-100" style="text-align:right;">
+              <f:facet name="header">                
+                #{lang.value}
+              </f:facet>
+              <h:outputText id="txtSGoodsValue" value="#{appView.decimal(serviceEntryDetailVar.valueGoods)}" />
+            </p:column>
+
+            <p:column styleClass="w-80" style="text-align:right;">
+              <f:facet name="header">                
+                #{lang.total}
+              </f:facet>
+              <h:outputText  value="#{appView.decimal(serviceEntryDetailVar.valueNet)}" id="txtStotal"  />
+            </p:column>
+
+            <!-- Action Icons -->
+            <p:column styleClass="w-80" headerText="" id="col37" style="text-align:right;">
+              <p:fragment id="actionId">                
+                <p:commandButton id="d6" process="@this"  update="dt2 txt7 txt2" icon="fa fa-trash" tabindex="-1"  styleClass="btn"
+                                 rendered="#{productEntryView.draft and serviceEntryDetailVar.serviceCommodityId.id ne null}" style="color: mediumvioletred;" 
+                                 oncomplete="refreshDatatable();updateInvoiceSummery();"
+                                 actionListener="#{productEntryView.actionDeleteServiceEntryDetail(main, serviceEntryDetailVar)}">
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>             
+              </p:fragment>
+            </p:column>
+
+            <f:facet name="footer">
+              <h:panelGroup layout="block" id="invoiceSummarydiv">
+                <p:panelGrid styleClass="noHover noBorder" >
+                  <p:row>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Items :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{productEntryView.productEntryDetailList.size()}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Box Qty :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{appView.decimal(productEntryView.productEntry.productSecondaryPackQuantity)}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Qty :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{appView.decimal(productEntryView.productEntry.totalQty)}</p:column>
+                    <p:column ></p:column>
+                    <p:column ></p:column>
+                  </p:row>
+                </p:panelGrid>
+
+                <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >
+                  <h:panelGroup layout="block">
+                    <p:panelGrid styleClass="bordered">
+                      <p:row>
+                        <p:column style="font-weight: bold;">GST %</p:column>
+                        <p:column style="font-weight: bold;">Item Count</p:column>
+                        <p:column style="font-weight: bold;">Goods Value</p:column>
+                        <p:column style="font-weight: bold;">Purchase Value</p:column>
+                        <p:column style="font-weight: bold;color: coral;">Special Disc.</p:column>
+                        <p:column style="font-weight: bold;color: hotpink;" rendered="#{productEntryView.cashDiscountApplicable}">Cash Disc.</p:column>
+                        <p:column style="font-weight: bold;">Taxable</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">CGST %</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">Value</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">SGST %</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">Value</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{productEntryView.igstTransaction}">GST Value</p:column>
+                      </p:row>
+                      <p:row>
+                        <ui:repeat value="#{productEntryView.productEntry.invoiceGroup}" var="group">
+                          <p:row>
+                            <p:column style="font-weight: bold;">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                            <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                            <p:column style="font-weight: bold;">#{group.invoiceGoodsAmount eq null ? '0.00' : appView.decimal(group.invoiceGoodsAmount)}</p:column>
+                            <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                            <p:column style="font-weight: bold;">#{group.invoiceDiscount eq null ? '0.00' : appView.decimal(group.invoiceDiscount)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{productEntryView.cashDiscountApplicable}">
+                              #{group.cashDiscount eq null ? '0.00' : appView.decimal(group.cashDiscount)}</p:column>
+                            <p:column style="font-weight: bold;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">
+                              #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">
+                              #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">
+                              #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{!productEntryView.igstTransaction}">
+                              #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{productEntryView.igstTransaction}">
+                              #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                            </p:column>
+                          </p:row>
+                        </ui:repeat>
+                      </p:row>
+
+                    </p:panelGrid>
+                  </h:panelGroup>
+                  <h:panelGroup layout="block" styleClass="text-right">
+                    <p:panelGrid columns="2" layout="grid">
+                      <!-- Goods Value -->
+                      <h:panelGroup>Purchase Value :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{productEntryView.productEntry.invoiceAmountNet eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceAmountNet)}" />
+                      </h:panelGroup>
+
+                      <!-- Invoice Discount -->
+                      <h:panelGroup>
+                        <h:outputText value="Special Disc. :" style="color: coral;" />
+                      </h:panelGroup>
+                      <h:panelGroup layout="block">
+                        <h:outputText value="#{productEntryView.productEntry.invoiceDiscountValue eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceDiscountValue)}" />
+                      </h:panelGroup>
+
+                      <!-- Cash Discount -->
+                      <h:panelGroup rendered="#{productEntryView.cashDiscountApplicable and productEntryView.taxableCashDiscount}">
+                        <h:outputText value="Cash Disc. :" style="color: hotpink;" />
+                      </h:panelGroup>
+                      <h:panelGroup layout="block" id="cashDiscValDiv1"
+                                    rendered="#{productEntryView.cashDiscountApplicable and productEntryView.taxableCashDiscount}">
+                        <p:inputNumber inputStyle="text-align: right; width: 135px; font-weight: bold;" value="#{productEntryView.productEntry.cashDiscountValue}"
+                                       placeholder="0.00" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" decimalPlaces="2" minValue="0.00" >
+                          <p:ajax event="change" process="cashDiscValDiv1" listener="#{productEntryView.actionApplyCashDiscount}"
+                                  update="txt7" oncomplete="updateInvoiceSummery();"/>
+                        </p:inputNumber>
+                      </h:panelGroup>
+
+                      <!-- Taxable Value -->
+                      <h:panelGroup>Taxable :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{productEntryView.productEntry.assessableValue eq null ? '0.00' : appView.decimal(productEntryView.productEntry.assessableValue)}" />
+                      </h:panelGroup>
+
+                      <!-- GST Value -->
+                      <h:panelGroup>GST Value :</h:panelGroup>
+                      <h:panelGroup style="border-bottom:1px solid;" layout="block">
+                        <h:outputText value="#{productEntryView.productEntry.invoiceAmountIgst eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceAmountIgst)}" />
+                      </h:panelGroup>
+
+                      <!-- Grand Total -->
+                      <h:panelGroup>Total :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{productEntryView.productEntry.grandTotal eq null ? '0.00' : appView.decimal(productEntryView.productEntry.grandTotal)}" />
+                      </h:panelGroup>
+
+                      <!-- Cash Discount -->
+                      <h:panelGroup rendered="#{productEntryView.cashDiscountApplicable and !productEntryView.taxableCashDiscount}">
+                        <h:outputText value="Cash Disc. :" style="color: hotpink;" /></h:panelGroup>
+                      <h:panelGroup layout="block" id="cashDiscValDiv2"
+                                    rendered="#{productEntryView.cashDiscountApplicable and !productEntryView.taxableCashDiscount}">
+                        <p:inputNumber inputStyle="text-align: right; width: 135px; font-weight: bold;" value="#{productEntryView.productEntry.cashDiscountValue}"
+                                       placeholder="0.00" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" decimalPlaces="2" minValue="0.00" >
+                          <p:ajax event="change" listener="#{productEntryView.actionApplyCashDiscount}" process="cashDiscValDiv2" 
+                                  update="txt7" oncomplete="updateInvoiceSummery();" />
+                        </p:inputNumber>
+
+                      </h:panelGroup>
+                      <!-- TCS  -->
+                      <h:panelGroup rendered="#{productEntryView.productEntry.companyId.tcsEnabled eq 1}">#{lang.tcs} #{lang.value} :</h:panelGroup>
+                      <h:panelGroup layout="block" style="border-bottom:1px solid;" rendered="#{productEntryView.productEntry.companyId.tcsEnabled eq 1}">
+                        <h:outputText id="tcsValue" value="#{productEntryView.productEntry.tcsNetValue eq null ? '0.00' : appView.decimal(productEntryView.productEntry.tcsNetValue)}" />
+                      </h:panelGroup>
+                       <!-- Invoice Variation -->
+                      <h:panelGroup>Invoice Difference :</h:panelGroup>
+                      <h:panelGroup layout="block" >
+                        <h:outputText value="#{productEntryView.productEntry.invoiceAmountVariation eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceAmountVariation)}" />
+                      </h:panelGroup>
+                      <!-- Round Off -->
+                      <h:panelGroup>Round Off :</h:panelGroup>
+                      <h:panelGroup layout="block" style="border-bottom:1px solid;">
+                        <h:outputText value="#{productEntryView.productEntry.invoiceRoundOff eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceRoundOff)}" />
+                      </h:panelGroup>
+                   
+                      <!-- Net Amount -->
+                      <h:panelGroup>Net Amount :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{productEntryView.productEntry.invoiceValue eq null ? '0.00' : appView.decimal(productEntryView.productEntry.invoiceValue)}" />
+                      </h:panelGroup>
+
+                    </p:panelGrid>
+                    <p:commandButton styleClass="btn btn-info" icon="fa fa-bar-chart"
+                                     rendered="#{productEntryView.confirmed and !productEntryView.openingStockEntry and accountUtilView.isSuperStockiest(productEntryView.productEntry.accountId)}" process="@this" update="@this" immediate="true"
+                                     actionListener="#{productEntryView.productMarginListPopup}" />
+                  </h:panelGroup>
+                </p:panelGrid>
+              </h:panelGroup>
+            </f:facet>
+
+          </p:dataTable>
+
+          <h:inputHidden value="#{productEntryView.rowIndex}" id="currentRow" />
+
+          <h:inputHidden value="#{productEntryView.productEntry.quantityOrFree}" id="schemeApplicable" />
+
+          <p:remoteCommand name="updateInvoiceSummery" process="@this" update="dt2:invoiceSummarydiv" />
+
+          <p:remoteCommand name="insertOrUpdateProductEntryDetail" actionListener="#{productEntryView.actionInsertOrUpdatePurchaseEntryDetail(main)}"
+                           process="f1" update="invoiceEntrydt1 txt7 txt2" oncomplete="refreshAfterRowUpdate();" />
+
+          <p:remoteCommand name="insertOrUpdateServiceEntryDetail" actionListener="#{productEntryView.actionInsertOrUpdateServiceEntryDetail(main)}"
+                           process="f1" update="dt2 txt7 txt2" oncomplete="refreshServiceTable();" />
+
+          <p:remoteCommand name="openProductFreeQtySchemePopup" actionListener="#{productEntryView.actionOpenProductFreeQtySchemePopup()}"
+                           process="@this" update="invoiceEntrydt1 currentRow" />
+
+          <p:remoteCommand name="openProductSchemeDiscValuePopup" actionListener="#{productEntryView.actionOpenProductSchemeDiscValuePopup()}"
+                           process="@this" update="invoiceEntrydt1 currentRow" />
+
+          <p:remoteCommand name="openProductSchemeDiscPercPopup" actionListener="#{productEntryView.actionOpenProductSchemeDiscPercentagePopup()}"
+                           process="@this" update="invoiceEntrydt1 currentRow" />
+
+          <p:remoteCommand name="openProductPopup" actionListener="#{productEntryView.openProductPopup}" update="@this" process="@this" immediate="true" />
+
+          <p:remoteCommand name="productPopupReturned" actionListener="#{productEntryView.productPopupReturned(main)}" update="invoiceEntrydt1"
+                           process="@this" immediate="true" oncomplete="focusProductQty();" />
+
+          <p:remoteCommand name="productFreeQtySchemePopupReturned" actionListener="#{productEntryView.productFreeQtySchemePopupReturned(main)}" update="invoiceEntrydt1"
+                           process="@this" immediate="true" oncomplete="focusToRate();" />
+
+          <p:remoteCommand name="openInvoiceDiscountBeneficiaryPopup" actionListener="#{productEntryView.updateInvoiceDiscountBeneficiaryType}"
+                           process="@this" immediate="true" update="discountDlg" oncomplete="PF('discountDlgVar').show();" />
+
+          <p:remoteCommand name="openLineDiscountBeneficiaryPopup" actionListener="#{productEntryView.updateLineDiscountBeneficiaryType}"
+                           process="@this" immediate="true" update="lineDiscountDlg" oncomplete="PF('lineDiscountDlgVar').show();" />
+
+          <p:remoteCommand name="openSchemeDiscountBeneficiaryPopup" actionListener="#{productEntryView.updateSchemeDiscountBeneficiaryType}"
+                           process="@this" immediate="true" update="schemDlg" oncomplete="PF('schemeDlgVar').show();" />
+
+          <script>
+            //<![CDATA[
+            function submitForm(params) {
+              var isService = params[3];
+              if (isService === '1') {
+                insertOrUpdateProductEntryDetail([{name: 'rownumber', value: params[2]}]);
+                $('#invoiceEntrydt1\\:0\\:ac1_input').focus();
+                PF('purchaseHistoryVar').hide();
+              } else if (isService === '2') {
+                insertOrUpdateServiceEntryDetail([{name: 'rownumber', value: params[2]}]);
+                $('#dt2\\:0\\:serv2_input').focus();
+              }
+
+              return false;
+            }
+
+            function focusToBatch(rnum) {
+              $('#invoiceEntrydt1\\:' + rnum + '\\:ac4_input').focus();
+            }
+            function focusToQty(rnum) {
+              $('#invoiceEntrydt1\\:' + rnum + '\\:txt19_input').focus();
+            }
+
+            function focusToRate() {
+              var r = $('#currentRow').val();
+              $('#invoiceEntrydt1\\:' + r + '\\:txt28_input').focus();
+            }
+
+            function focusToNext() {
+              var r = $('#currentRow').val();
+              if ($('#cb3_input').is(':checked')) {
+                $('#invoiceEntrydt1\\:' + r + '\\:txt23_input').focus();
+              } else {
+                $('#invoiceEntrydt1\\:' + r + '\\:txt28_input').focus();
+              }
+            }
+
+            function refreshDatatable() {
+              page.refresh();
+            }
+
+            function refreshAfterRowUpdate() {
+              page.refresh();
+              $('#invoiceEntrydt1\\:0\\:ac1_input').focus();
+            }
+
+            function refreshServiceTable() {
+              page.refresh();
+              $('#dt2\\:0\\:serv2_input').focus();
+            }
+
+            $(document).ready(function (e) {
+              refreshDatatable();
+            });
+
+            function confirmProductEntry(typ) {
+              var dif = 0;
+              if (typ === 0) {
+                dif = $('#txt7_hinput').val();
+              } else if (typ === 1) {
+                dif = $('#txt2_hinput').val();
+              }
+              dif = Math.round(dif);
+              if (dif !== 0) {
+                PF('ieConfirmDlgVar').show();
+              } else {
+                PF('peConfirmDlgVar').show();
+              }
+              return true;
+            }
+
+            $(document).off('fastInputTargeting').on('fastInputTargeting', function (e, tgt, ob) {
+              var tgtId = $(ob).attr('id');
+              var ctrlNames = tgtId.split(':');
+              if (ctrlNames[0] === 'invoiceEntrydt1') {
+                if (ctrlNames[2] === 'txt20_input') {
+                  var scheme = $('#schemeApplicable').val();
+                  var v = $('#invoiceEntrydt1\\:' + ctrlNames[1] + '\\:txt20_hinput').val();
+                  if (scheme === '2') {
+                    $('#currentRow').val(ctrlNames[1]);
+                    openProductFreeQtySchemePopup([{name: 'rownumber', value: ctrlNames[1]}, {name: 'freeQty', value: $(ob).val()}]);
+                  } else {
+                    if (v !== '' && v > 0) {
+                      $('#currentRow').val(ctrlNames[1]);
+                      openSchemeDiscountBeneficiaryPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+                    }
+                  }
+                } else if (ctrlNames[2] === 'txt21_input') {
+                  var scheme = $('#schemeApplicable').val();
+                  var v = $('#invoiceEntrydt1\\:' + ctrlNames[1] + '\\:txt21_input').val();
+                  if (v !== '' && v > 0) {
+                    $('#currentRow').val(ctrlNames[1]);
+                    openSchemeDiscountBeneficiaryPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+                  }
+                } else if (ctrlNames[2] === 'txt22_input') {
+                  var scheme = $('#schemeApplicable').val();
+                  var v = $('#invoiceEntrydt1\\:' + ctrlNames[1] + '\\:txt22_input').val();
+                  if (v !== '' && v > 0) {
+                    $('#currentRow').val(ctrlNames[1]);
+                    openSchemeDiscountBeneficiaryPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+                  }
+                } else if (ctrlNames[2] === 'txt23_input') {
+                  var id = '#' + ctrlNames[0] + '\\:' + ctrlNames[1] + '\\:txt23_hinput';
+                  var v = $(id).val();
+                  if (v !== '' && v > 0) {
+                    $('#currentRow').val(ctrlNames[1]);
+                    openLineDiscountBeneficiaryPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+                  }
+                } else if (ctrlNames[2] === 'txt24_input') {
+                  var id = '#' + ctrlNames[0] + '\\:' + ctrlNames[1] + '\\:txt24_hinput';
+                  var v = $(id).val();
+                  if (v !== '' && v > 0) {
+                    $('#currentRow').val(ctrlNames[1]);
+                    openLineDiscountBeneficiaryPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+                  }
+                } else if (ctrlNames[2] === 'ac1_input') {
+                  $('#currentRow').val(ctrlNames[1]);
+                  openProductPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+                }
+              }
+            });
+
+            function lineDiscountPopupClose() {
+              var r = $('#currentRow').val();
+              if (r !== '') {
+                $('#invoiceEntrydt1\\:' + r + '\\:txt28_input').focus();
+              }
+            }
+
+            function focusProductQty() {
+              var r = $('#currentRow').val();
+              if (r !== '') {
+                $('#invoiceEntrydt1\\:' + r + '\\:txt19_input').focus();
+              }
+            }
+
+            function openPurchaseHistoryOverlayPanel(xhr, status, args) {
+              if (args.purchaseCount > 0) {
+                PF('purchaseHistoryVar').show();
+              }
+            }
+
+            //]]>
+          </script>
+        </h:panelGroup>
+        <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+        <!-- Product entry confirm dialog -->
+        <p:dialog id="peConfirmDlg" widgetVar="peConfirmDlgVar" header="Confirm Invoice Entry" resizable="false" showEffect="clip"
+                  hideEffect="clip" closeOnEscape="true" modal="true" style="width: 5000">
+          <h:panelGroup  layout="block" rendered="#{main.isForm()}">
+            <p:panelGrid  columns="4" layout="grid" >
+              <h:outputText value ="#{lang.totalItems}" />
+              <p:outputLabel value =": #{productEntryView.productEntryDetailList.size()}" />
+              <h:outputText value ="#{lang.totalQty} " />
+              <p:outputLabel value =": #{productEntryView.totalQty}" />
+
+              <h:outputText value ="#{lang.schemeDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalSchemeDiscount)}" />
+              <h:outputText value ="#{lang.productDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalProductDiscount)}" />
+
+              <h:outputText value ="#{lang.invDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalInvoiceDiscount)}" />
+              <h:outputText value ="#{lang.cashDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.productEntry.cashDiscountValue eq null?0.0:productEntryView.productEntry.cashDiscountValue)}" />
+
+              <h:outputText value ="#{lang.cgst}" rendered="#{!productEntryView.igstTransaction}"/>
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalCgst)}" rendered="#{!productEntryView.igstTransaction}"/>
+              <h:outputText value ="#{lang.sgst}" rendered="#{!productEntryView.igstTransaction}"/>
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalSgst)}" rendered="#{!productEntryView.igstTransaction}"/>
+
+              <h:outputText value ="#{lang.igst}" rendered="#{productEntryView.igstTransaction}"/>
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalIgst)}" rendered="#{productEntryView.igstTransaction}"/>
+              <h:outputText value =" " rendered="#{productEntryView.igstTransaction}"/>
+              <p:outputLabel value =" " rendered="#{productEntryView.igstTransaction}"/>
+
+            </p:panelGrid>
+            <p:panelGrid  columns="2" layout="grid" >
+              <h:outputText value ="#{lang.invoiceAmount}" />
+              <p:outputLabel value =": #{productEntryView.productEntry.invoiceValue}" />
+            </p:panelGrid>
+          </h:panelGroup>
+          <br/>
+          <div style="padding-left: 80px;padding-right: 80px">
+            <h:outputText value="#{lang.productEntryConfirm}"  />
+          </div>
+          <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+            <p:commandButton action="#{productEntryView.saveProductEntry(main, sysConstant.CONFIRMED)}" process="f1" update="f1" 
+                             onstart="PF('wdgBlock').show();" oncomplete="PF('wdgBlock').hide();"
+                             value="#{lang.yes}" styleClass="btn btn-info" />
+            <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('peConfirmDlgVar').hide();" />
+          </div>
+        </p:dialog>
+        <p:dialog id="ieConfirmDlgVar" widgetVar="ieConfirmDlgVar" header="Confirm Invoice Entry" resizable="false" showEffect="clip"
+                  hideEffect="clip" closeOnEscape="true" modal="true" style="width: 300">
+          <h:panelGroup  layout="block" rendered="#{main.isForm()}">
+            <p:panelGrid  columns="4" layout="grid" >
+              <h:outputText value ="#{lang.totalItems}" />
+              <p:outputLabel value =": #{productEntryView.productEntryDetailList.size()}" />
+              <h:outputText value ="#{lang.totalQty} " />
+              <p:outputLabel value =": #{productEntryView.totalQty}" />
+
+              <h:outputText value ="#{lang.schemeDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalSchemeDiscount)}" />
+              <h:outputText value ="#{lang.productDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalProductDiscount)}" />
+
+              <h:outputText value ="#{lang.invDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalInvoiceDiscount)}" />
+              <h:outputText value ="#{lang.cashDisc}" />
+              <p:outputLabel value =": #{appView.decimal(productEntryView.productEntry.cashDiscountValue eq null?0.0:productEntryView.productEntry.cashDiscountValue)}" />
+
+              <h:outputText value ="#{lang.cgst}" rendered="#{!productEntryView.igstTransaction}"/>
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalCgst)}" rendered="#{!productEntryView.igstTransaction}"/>
+              <h:outputText value ="#{lang.sgst}" rendered="#{!productEntryView.igstTransaction}"/>
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalSgst)}" rendered="#{!productEntryView.igstTransaction}"/>
+
+              <h:outputText value ="#{lang.igst}" rendered="#{productEntryView.igstTransaction}"/>
+              <p:outputLabel value =": #{appView.decimal(productEntryView.totalIgst)}" rendered="#{productEntryView.igstTransaction}"/>
+              <h:outputText value =" " rendered="#{productEntryView.igstTransaction}"/>
+              <p:outputLabel value =" " rendered="#{productEntryView.igstTransaction}"/>
+
+            </p:panelGrid>
+            <p:panelGrid  columns="2" layout="grid" >
+              <h:outputText value ="#{lang.invoiceAmount}" />
+              <p:outputLabel value =": #{productEntryView.productEntry.invoiceValue}" />
+            </p:panelGrid>
+          </h:panelGroup>
+          <br/>
+          <h:outputText value="#{lang.productEntryConfirmDiff}" style="color: #F6390F" />
+          <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+            <p:commandButton action="#{productEntryView.saveProductEntry(main, sysConstant.CONFIRMED)}" process="f1" update="f1" 
+                             value="#{lang.yes}" styleClass="btn btn-info" onstart="PF('wdgBlock').show();" oncomplete="PF('wdgBlock').hide();" />
+            <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('ieConfirmDlgVar').hide();" />
+          </div>
+        </p:dialog>
+
+        <!-- Shortage/Excess/Damage quantity dialog -->
+        <p:dialog id="tagsDlg" widgetVar="tagsDlg" onShow="page.refresh();"
+                  header="#{productEntryView.productEntryDetailId.product ne null ? productEntryView.productEntryDetailId.product.productName : 'Product'}"
+                  modal="true" resizable="false" showEffect="clip" hideEffect="clip" closable="true" closeOnEscape="true" >
+          <h:panelGroup id="tagsDiv" layout="block" pt:data-fast-input="true">
+            <p:panelGrid columns="2" id="tagsTable" >
+              <h:outputText value="#{lang.damaged} #{lang.qty}" />
+              <p:inputNumber id="productQtyDamaged" value="#{productEntryView.productEntryDetailId.productQuantityDamaged}" onfocus="this.select()" 
+                             inputStyleClass="text-right" maxValue="999999" minValue="0" 
+                             decimalPlaces="#{productEntryView.productEntry.openingStockEntry eq 1 ? 2:0}">
+              </p:inputNumber>
+
+              <h:outputText value="#{lang.shortage} #{lang.qty}" />
+              <h:panelGroup layout="block" id="productQtyShortageDiv">
+                <p:inputNumber id="productQtyShortage" value="#{productEntryView.productEntryDetailId.productQuantityShortage}"
+                               disabled="#{productEntryView.productEntryDetailId.productQuantityExcess ne null}" decimalPlaces="0"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" minValue="0">
+                  <p:ajax event="blur" process="productQtyShortageDiv" update="productQtyExcess edescription enote" listener="#{productEntryView.productQuantityShortageBlurEvent}" />
+                </p:inputNumber>
+              </h:panelGroup>
+
+
+              <h:outputText value="#{lang.excess} #{lang.qty}" />
+              <p:inputNumber id="productQtyExcess" value="#{productEntryView.productEntryDetailId.productQuantityExcess}"
+                             disabled="#{productEntryView.productEntryDetailId.productQuantityShortage ne null}" decimalPlaces="0"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" minValue="0">
+                <p:ajax event="blur" immediate="true" update="productQtyShortage" />
+              </p:inputNumber>
+
+
+              <h:outputText value="#{lang.excess} #{lang.description}" />
+              <h:panelGroup>
+                <p:selectOneMenu value="#{productEntryView.productEntryDetailId.excessQuantityDescription}"
+                                 disabled="#{productEntryView.productEntryDetailId.productQuantityShortage ne null}"
+                                 id="edescription" styleClass="fw">
+                  <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+                  <f:selectItem itemValue="1" itemLabel="Replacement" />
+                  <f:selectItem itemValue="2" itemLabel="Vendor Reserve" />
+                  <f:selectItem itemValue="3" itemLabel="Other" />
+                </p:selectOneMenu>
+              </h:panelGroup>
+
+              <h:outputText value="#{lang.excess} #{lang.note}" />
+              <h:panelGroup>
+                <p:inputTextarea placeholder="Note" disabled="#{productEntryView.productEntryDetailId.productQuantityShortage ne null}"
+                                 value="#{productEntryView.productEntryDetailId.excessQuantityNote}" cols="50" rows="3" maxlength="2000" id="enote"
+                                 autoResize="false" styleClass="fw" />
+              </h:panelGroup>
+            </p:panelGrid>
+            <p:commandButton style="float: right;" value="#{lang.save}" process="tagsDlg" rendered="#{productEntryView.draft}"
+                             action="#{productEntryView.actionUpdateProductEntryProductQuantity(main)}"
+                             update="invoiceEntrydt1"  styleClass="btn btn-info" oncomplete="PF('tagsDlg').hide();" />
+          </h:panelGroup>
+        </p:dialog>
+        <!-- Invoice Amount Discount Dialog -->
+        <p:dialog id="discountDlg" widgetVar="discountDlgVar" header="Invoice Discount Beneficiary" resizable="false" showEffect="clip"  focus="discSave"
+                  hideEffect="clip" closeOnEscape="true" modal="true">
+          <div data-fast-input="true">
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+              <p:outputLabel for="purchaseBenefitDiscountId" value="Purchase Discount Benefit For " />
+              <p:selectOneRadio id="purchaseBenefitDiscountId" value="#{productEntryView.productEntry.isInvoiceDiscountToCustomer}" tabindex="0" >
+                <f:selectItems value="#{productEntryView.purchaseDiscountBeneficiaries()}" var="e" itemLabel="#{e.itemLabel}"  itemValue="#{e.intValue}" />
+              </p:selectOneRadio>
+            </h:panelGrid>
+            <p:commandButton id="discSave" style="float: right;" value="#{lang.save} &amp; #{lang.close}" styleClass="btn btn-info"
+                             rendered="#{productEntryView.draft}" process="discountDlg"
+                             actionListener="#{productEntryView.actionUpdateInvoiceDiscountBeneficiary(main)}" oncomplete="PF('discountDlgVar').hide();" />
+          </div>
+        </p:dialog>
+
+        <!-- Line Item Discount dialog -->
+        <p:dialog id="lineDiscountDlg" widgetVar="lineDiscountDlgVar" header="Product Discount Beneficiary" resizable="false" showEffect="clip"  focus="linediscSave"
+                  hideEffect="clip" closeOnEscape="true" modal="true" onHide="lineDiscountPopupClose();" >
+          <div data-fast-input="true">
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+              <p:outputLabel for="linePurchaseBenefitDiscountId" value="Purchase Discount Benefit For " styleClass="m-r-30" />
+              <p:selectOneRadio id="linePurchaseBenefitDiscountId" value="#{productEntryView.lineDiscountBeneficiary}" tabindex="0" >
+                <f:selectItems value="#{productEntryView.purchaseDiscountBeneficiaries()}" var="e" itemLabel="#{e.itemLabel}"  itemValue="#{e.intValue}" />
+                <p:ajax event="change" process="lineDiscountDlg" update="discForLabelDiv discForDiv lblReplacementProdDisc productReplacementDiv" listener="#{productEntryView.companyBeneficiarySelection(false)}"/>
+              </p:selectOneRadio>
+
+              <h:panelGroup layout="block" id="discForLabelDiv"  >
+                <p:outputLabel value="Discount For " id="discForLabel" rendered="#{productEntryView.lineDiscountBeneficiary eq 1}" />
+              </h:panelGroup>
+              <h:panelGroup layout="block" id="discForDiv"  >
+                <p:selectOneMenu value="#{productEntryView.productDiscountPackUnit}"  id="discfor" styleClass="fw" rendered="#{productEntryView.lineDiscountBeneficiary eq 1}"
+                                 converter="omnifaces.SelectItemsConverter">
+                  <f:selectItems value="#{productEntryView.lookUpProductPackingUnits(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                </p:selectOneMenu>
+              </h:panelGroup>
+              <h:panelGroup layout="block" id="lblReplacementProdDisc">
+                <p:outputLabel value="Replacement " id="productReplacementLbl" rendered="#{productEntryView.lineDiscountBeneficiary eq 0}"  />
+              </h:panelGroup>
+              <h:panelGroup layout="block" id="productReplacementDiv"  >
+                <p:selectOneRadio id="productReplacement" value="#{productEntryView.productDiscountReplacement}" layout="grid" columns="2" 
+                                  rendered="#{productEntryView.lineDiscountBeneficiary eq 0 and productEntryView.renderReplacement}">
+                  <f:selectItem itemLabel="Yes" itemValue="1" />                
+                  <f:selectItem itemLabel="No" itemValue="0" />                
+                </p:selectOneRadio>
+                <p:selectOneRadio id="productReplacementForCSI" value="#{productEntryView.productDiscountReplacement}" layout="grid" columns="2" 
+                                  rendered="#{productEntryView.lineDiscountBeneficiary eq 0 and !productEntryView.renderReplacement}">
+                  <f:selectItem itemLabel="Yes" itemValue="1" itemDisabled="true"/>                
+                  <f:selectItem itemLabel="No" itemValue="0" itemDisabled="true"/>                
+                </p:selectOneRadio>
+              </h:panelGroup>
+            </h:panelGrid>
+
+            <p:commandButton id="linediscSave" process="lineDiscountDlg" style="float: right;" value="#{lang.save} &amp; #{lang.close}"
+                             actionListener="#{productEntryView.actionUpdateProductPurchaseBeneficiary(main)}"
+                             styleClass="btn btn-info" oncomplete="PF('lineDiscountDlgVar').hide();" update="invoiceEntrydt1"  />
+          </div>
+        </p:dialog>
+
+        <!-- Scheme Discount Beneficiary Pop-up -->
+        <p:dialog id="schemDlg" widgetVar="schemeDlgVar" header="Scheme Discount Beneficiary" resizable="false" showEffect="clip"  focus="discSaveBtn"
+                  hideEffect="clip" closeOnEscape="true" modal="true">
+          <div data-fast-input="true">
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+              <p:outputLabel for="schemeBenefitDiscountId" value="Scheme Discount Benefit For " />
+              <p:selectOneRadio id="schemeBenefitDiscountId" value="#{productEntryView.schemeDiscountToCustomer}" tabindex="0" >
+                <f:selectItems value="#{productEntryView.purchaseDiscountBeneficiaries()}" var="e" itemLabel="#{e.itemLabel}"  itemValue="#{e.intValue}" />
+                <p:ajax event="change" process="@this" update="lblReplacement schemeReplacementDiv schemeDiscForLabelDiv schemeDiscForDiv" listener="#{productEntryView.companyBeneficiarySelection(true)}"/>
+              </p:selectOneRadio>
+
+              <h:panelGroup layout="block" id="schemeDiscForLabelDiv"  >
+                <p:outputLabel value="Discount For " id="schemeDiscForLabel" rendered="#{productEntryView.schemeDiscountToCustomer eq 1}" />
+              </h:panelGroup>
+              <h:panelGroup layout="block" id="schemeDiscForDiv"  >
+                <p:selectOneMenu value="#{productEntryView.schemeDiscountPackUnit}"  id="schemeDiscfor" styleClass="fw" rendered="#{productEntryView.schemeDiscountToCustomer eq 1}"
+                                 converter="omnifaces.SelectItemsConverter">
+                  <f:selectItems value="#{productEntryView.lookUpProductPackingUnits(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                </p:selectOneMenu>
+              </h:panelGroup>
+
+              <h:panelGroup layout="block" id="lblReplacement">
+                <p:outputLabel value="Replacement " id="schemeReplacementLbl" rendered="#{productEntryView.schemeDiscountToCustomer eq 0}"  />
+              </h:panelGroup>
+              <h:panelGroup layout="block" id="schemeReplacementDiv"  >
+                <p:selectOneRadio id="schemeReplacement" value="#{productEntryView.schemeDiscountReplacement}" layout="grid" columns="2" rendered="#{productEntryView.schemeDiscountToCustomer eq 0 and productEntryView.renderReplacement}">
+                  <f:selectItem itemLabel="Yes" itemValue="1" />                
+                  <f:selectItem itemLabel="No" itemValue="0" />                
+                </p:selectOneRadio>
+                <p:selectOneRadio id="schemeReplacementForCSI" value="#{productEntryView.schemeDiscountReplacement}" layout="grid" columns="2" rendered="#{productEntryView.schemeDiscountToCustomer eq 0 and !productEntryView.renderReplacement}">
+                  <f:selectItem itemLabel="Yes" itemValue="1" itemDisabled="true"/>                
+                  <f:selectItem itemLabel="No" itemValue="0" itemDisabled="true"/>                
+                </p:selectOneRadio>
+              </h:panelGroup>
+
+            </h:panelGrid>
+            <p:commandButton id="discSaveBtn" style="float: right;" value="#{lang.save} &amp; #{lang.close}" styleClass="btn btn-info"
+                             rendered="#{productEntryView.draft}" process="schemDlg" update="invoiceEntrydt1"
+                             actionListener="#{productEntryView.actionUpdateSchemeDiscountBeneficiary(main)}" oncomplete="PF('schemeDlgVar').hide(); focusToNext();" />
+          </div>
+        </p:dialog>
+
+
+      </h:panelGroup>
+
+
+    </ui:define>
+
+  </ui:decorate>
+</ui:composition>

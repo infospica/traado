@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+  <ui:include src="com/deleteDialog.xhtml" />
+  <ui:include src="com/navDialog.xhtml" />
+  <h:panelGroup id="#{ids}F" rendered="#{main.isForm()}" styleClass="card"  layout="block">
+    <ui:include src="com/toolForm.xhtml" />
+      <p:panelGrid columns="#{cols eq null ? 2 : cols}" layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+        <ui:insert name="form" />
+      </p:panelGrid> 
+    <ui:insert name="afterForm"/>
+    </h:panelGroup>
+  <h:panelGroup id="#{ids}L" rendered="#{main.isList()}" styleClass="card p-a-0" layout="block">
+    <ui:include src="com/toolList.xhtml" />
+      <ui:insert name="list" />
+    </h:panelGroup>
+    <ui:insert name="after"/>
+
+  <p:commandButton id="noSubmitF" process="@none" type="button" style="display:none"/>
+  <p:defaultCommand target="noSubmitF"/>
+    <ui:include src="com/toolFooter.xhtml"/>
+</ui:composition>
+
+

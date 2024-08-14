@@ -1,0 +1,442 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{stockAdjustmentView.reset()}
+  #{stockAdjustmentView.switchStockAdjustment(main, viewType)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.stockAdjustment}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? stockAdjustmentView.stockAdjustment.referenceNo : null}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? stockAdjustmentView.statusTitle : null}" />
+    <ui:param name="ids" value="stockAdjustment" />
+    <ui:param name="deleteFormMenu" value="true" />
+    <ui:param name="reset" value="false" />    
+    <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{stockAdjustmentView.deleteStockAdjustment(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('stockAdjustmentWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >      
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{stockAdjustmentView.deleteStockAdjustment(main)}" value="#{lang.delete}" onclick="wdgOff('stockAdjustmentWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" /> 
+      <!-- Draft Button -->
+      <h:commandButton action="#{stockAdjustmentView.saveStockAdjustment(main, sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-success"
+                       rendered="#{main.isNew()}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <!-- Confirm Button -->      
+      <p:commandButton action="#{stockAdjustmentView.saveStockAdjustment(main, sysConstant.CONFIRMED)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-success"
+                       rendered="#{stockAdjustmentView.draft}" process="f1" update="f1" onstart="block()" oncomplete="unblock()">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Reset To Draft -->
+<!--      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{stockAdjustmentView.actionResetStockAdjustment(main)}"
+                       rendered="#{!stockAdjustmentView.draft and userRole.isRoot() and main.edit and !stockAdjustmentView.reverseEntry and stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE
+                                   and userRuntimeView.privilege.resetToDraft==true}" 
+                       >-->
+<!--        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>-->
+      <!-- Up Coming Documet No -->
+      <h:panelGroup id="nextDocNoDiv">
+        <h:outputText  value="#{lang.next} #{lang.documentNo} #{lang.colon} " id="nextDocNoLabel"
+                       rendered="#{stockAdjustmentView.draft and stockAdjustmentView.nextInvoiceNumber ne null}" /> 
+        <p:outputLabel styleClass="m-r-10" value="#{stockAdjustmentView.nextInvoiceNumber}" style="color:#900;" id="nextDocNo"
+                       rendered="#{stockAdjustmentView.draft and stockAdjustmentView.nextInvoiceNumber ne null}" />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >      
+      <p:selectBooleanCheckbox value="#{stockAdjustmentView.showExcessAdjustment}" itemLabel="#{lang.show} #{lang.excess} #{lang.stockAdjustment}" style="width:250px;" >
+        <p:ajax update="stockAdjustmentTable" listener="#{stockAdjustmentView.adjustmentFilterSelectEvent(main)}" onstart="block();" oncomplete="unblock();" />
+      </p:selectBooleanCheckbox>      
+    </ui:define>
+
+    <ui:define name="formRight" >
+      <h:panelGroup rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}" >
+
+        <!--Value Difference-->
+        <h:outputText rendered="#{stockAdjustmentView.confirmed}" value="#{lang.value} #{lang.difference} #{lang.colon} "> </h:outputText>
+        <p:outputLabel styleClass="m-r-10" value="#{appView.decimal(stockAdjustmentView.valueExcess -stockAdjustmentView.valueShortage)}" style="color:#{sysRuntimeView.statusColor(stockAdjustmentView.valueExcess>0?2:0)}"
+                       rendered="#{stockAdjustmentView.confirmed}"  />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <h:panelGroup id="p1" layout="block" rendered="#{main.isForm()}">
+        <p:panelGrid id="pg1"  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                     columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+          <!--Account Group-->
+          <p:outputLabel value="#{lang.accountGroup}" />
+          <h:panelGroup id="accountGroupDiv" rendered="true">
+            <p:autoComplete id="accountGroup"  value="#{stockAdjustmentView.stockAdjustment.accountGroupId}" completeMethod="#{stockAdjustmentView.accountGroupList}" converter="wawo.LookupIntConverter" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                            converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" 
+                            disabled="#{(stockAdjustmentView.stockAdjustment.accountId ne null) or (stockAdjustmentView.disabled) or (stockAdjustmentView.confirmed)}"
+                            title="#{lang.accountGroup}" >
+              <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+              <p:column style="width:250px;">
+                <h:outputText value="#{e.groupName}" />
+              </p:column>
+              <p:column style="width: 40px;">
+                <h:outputText value="#{e.groupCode}" />
+              </p:column>
+              <p:column style="width: 50px;">
+                <p:fragment rendered="#{e.isDefault eq 0}">
+                  <i class="fa fa-users" style="color:#000;"></i>
+                </p:fragment>
+                <p:fragment rendered="#{e.isDefault eq 1}">
+                  <i class="fa fa-users" style="color:#CCC;" ></i>
+                </p:fragment>
+              </p:column>
+              <p:ajax event="itemSelect" process="accountGroupDiv" update="accountDiv dt1 txt1 nextDocNoLabel nextDocNo" onstart="block()" oncomplete="unblock()"
+                      listener="#{stockAdjustmentView.updateReferenceNo(main)}" />
+            </p:autoComplete> 
+
+          </h:panelGroup> 
+          <!--Account -->
+          <p:outputLabel value="#{lang.account}"/>
+          <h:panelGroup id="accountDiv">
+            <p:autoComplete id='account'  value="#{stockAdjustmentView.stockAdjustment.accountId}" completeMethod="#{stockAdjustmentView.accountList}" converter="wawo.LookupIntConverter" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                            converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true"
+                            disabled="#{(stockAdjustmentView.stockAdjustment.accountGroupId ne null) or (stockAdjustmentView.disabled) or (stockAdjustmentView.confirmed)}"
+                            title="#{lang.accountNumber}" scrollHeight="400">
+              <f:attribute name="account" value="#{stockAdjustmentView.stockAdjustment.accountId}"/>
+              <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+              <p:column style="width: 200px;">
+                <h:outputText value="#{e.vendorId.vendorName}" />
+              </p:column>
+              <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                <h:outputText value="#{e.accountCode}" />
+              </p:column>
+              <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                <h:outputText value="#{e.companyTradeProfileId.title}" />
+              </p:column>
+              <p:ajax event="itemSelect" process="accountDiv" update="accountGroupDiv dt1 txt1 nextDocNoLabel nextDocNo" onstart="block()" oncomplete="unblock()" 
+                      listener="#{stockAdjustmentView.updateReferenceNo(main)}" />
+
+            </p:autoComplete>   
+          </h:panelGroup>
+          <!-- Invoice No -->
+          <p:outputLabel id="lbl1" value="#{lang.referenceNo}" for="txt1" />
+          <h:panelGroup>
+            <p:inputText value="#{stockAdjustmentView.stockAdjustment.referenceNo}" maxlength="100" id="txt1" autocomplete="off"
+                         required="true" requiredMessage="#{lang.referenceNo} #{lang.isRequired}" styleClass="fw"/>
+            <p:message for="txt1" display="text" />
+          </h:panelGroup>
+
+          <!-- Excess Qty -->
+          <h:panelGroup rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+            <h:outputText rendered="#{stockAdjustmentView.confirmed}" value="#{lang.excess} #{lang.qty} #{lang.colon} "> </h:outputText>
+            <p:outputLabel styleClass="m-r-10" value="#{stockAdjustmentView.totalQuantityExcess}" rendered="#{stockAdjustmentView.confirmed}"  />        
+          </h:panelGroup>
+
+
+          <!-- Excess Value -->
+          <h:panelGroup rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+            <h:outputText rendered="#{stockAdjustmentView.confirmed}" value="#{lang.excess} #{lang.amount} #{lang.colon} "> </h:outputText>
+            <p:outputLabel styleClass="m-r-10" value="#{appView.decimal(stockAdjustmentView.valueExcess)}" rendered="#{stockAdjustmentView.confirmed}"  />
+          </h:panelGroup>
+
+          <!-- Entry Date -->
+          <p:outputLabel id="lbl2" value="#{lang.entryDate}" for="cal1" />
+          <h:panelGroup>
+            <p:calendar value="#{stockAdjustmentView.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}"
+                        required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"  mindate="#{userRuntimeView.minEntryDate}"
+                        maxdate="#{userRuntimeView.maxEntryDate}" maxlength="29" id="cal1" showButtonPanel="true" navigator="true" mask="true"
+                        disabled="true" />
+            <p:message for="cal1" display="text"/>
+          </h:panelGroup>
+
+          <!-- Shortage Qty -->
+          <h:panelGroup rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+            <h:outputText rendered="#{stockAdjustmentView.confirmed}" value="#{lang.shortage} #{lang.qty} #{lang.colon} "> </h:outputText>
+            <p:outputLabel styleClass="m-r-10" value="#{stockAdjustmentView.totalQuantityShortage}" rendered="#{stockAdjustmentView.confirmed}"  />
+          </h:panelGroup>
+
+          <!-- Shortage Value -->
+          <h:panelGroup rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+            <h:outputText rendered="#{stockAdjustmentView.confirmed}" value="#{lang.shortage} #{lang.amount} #{lang.colon} "> </h:outputText>
+            <p:outputLabel styleClass="m-r-10" value="#{appView.decimal(stockAdjustmentView.valueShortage)}" rendered="#{stockAdjustmentView.confirmed}"  />
+          </h:panelGroup>
+
+          <!-- note -->
+          <p:outputLabel value="#{lang.note}" for="note2" />
+          <h:panelGroup>
+            <p:inputTextarea  styleClass="fw" tabindex="12" value="#{stockAdjustmentView.stockAdjustment.description}"
+                              cols="100" rows="3" maxlength="500" id="note2" autoResize="false" required="true" />
+            <p:message for="note2" display="text"/>
+          </h:panelGroup>
+        </p:panelGrid>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after" >
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+
+        .bg-danger {
+          color: #fff;
+          background: #ef565a !important;
+        }
+      </style>
+      <h:panelGroup id="p2" layout="block" styleClass="card" rendered="#{main.isForm() and main.edit}">
+        <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+
+        <h:panelGroup layout="block" id="p3" styleClass="table-responsive" pt:data-fast-input="true">
+
+          <p:dataTable var="stock" id="dt1" widgetVar="stockTableVar" value="#{stockAdjustmentView.stockAdjustmentItemList}" rowIndexVar="rowIndex"
+                       rows="50" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="50,100,150" rowKey="#{stock.id ne null? stock.id: rowIndex}"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases"
+                       selection="#{stockAdjustmentView.stockAdjustmentItemSelected}" rowSelectMode="checkbox"  >
+            <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+            <p:ajax event="rowSelectCheckbox"  />
+            <p:ajax event="rowUnselectCheckbox" />
+            <p:ajax event="toggleSelect" />
+            <p:column id="col1" headerText="Sno" width="45" style="text-align: center;" >
+              <h:outputText id="lbl3" value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!--Product-->
+            <p:column id="col2" width="200">
+              <f:facet name="header"><h:outputText id="lbl4" value="#{lang.product}" title="#{lang.productName}"/></f:facet>
+              <h:outputText value="#{stock.productId.productName}" title="#{stock.productId.productName}" rendered="#{stockAdjustmentView.confirmed}" />
+              <p:autoComplete id="ac1" value="#{stock.productId}" completeMethod="#{stockAdjustmentView.completeProduct}"
+                              converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative" title="#{stock.productId.productName}"
+                              cache="true" queryDelay="500" maxResults="100" scrollHeight="600" rendered="#{!stockAdjustmentView.confirmed}"
+                              var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+                <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                <f:attribute name="stockAdjustmentItem" value="#{stock}"/>
+                <!-- Product Name -->
+                <p:column style="width:275px;">
+                  <f:facet name="header"><h:outputText style="font-weight: bold;" value="#{lang.product}" /></f:facet>
+                  <h:outputText value="#{prod.productName}" />
+                </p:column>
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true" update="expiry lbl12 lbl15 packSize mrp txt2 txt3 adjustlbl2 adjustlbl4 accountDiv accountGroupDiv batchAuto cal1"
+                        listener="#{stockAdjustmentView.productSelectEventHandler(stock, rowIndex)}"/>
+              </p:autoComplete>
+            </p:column>
+
+            <!--Batch-->
+            <p:column id="col3">
+              <f:facet name="header"><h:outputText id="lbl5" value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+              <h:panelGroup layout="block" id="batchNo"> 
+                <h:outputText value="#{stock.stockAdjustmentDetail.batchNo}" rendered="#{stockAdjustmentView.confirmed}" />
+                <p:autoComplete value="#{stock.stockAdjustmentDetail}" autocomplete="off" dropdown="true" 
+                                styleClass="fw" id="batchAuto" panelStyle="width:650px" var="batchVar" completeMethod="#{stockAdjustmentView.stockAdjustmentBatchAuto}"
+                                itemLabel="#{batchVar.batchNo}" itemValue="#{batchVar}" converter="spica.scm.converter.StockAdjustmentBatchConverter" 
+                                scrollHeight="400" style="position: relative" forceSelection="true" cache="true" cacheTimeout="30000"
+                                rendered="#{stockAdjustmentView.draft}">
+
+                  <f:attribute name="selectItem" value="#{stock}" />
+                  <p:column headerText="#{lang.batch}">
+                    <h:outputText value="#{batchVar.batchNo}" />
+                  </p:column>
+                  <p:column headerText="#{lang.expDate}">
+                    <h:outputText value="#{appView.date(batchVar.expiryDateActual)}" />
+                  </p:column>
+                  <p:column headerText="#{lang.pack}">
+                    <h:outputText value="#{batchVar.packSize}"/>
+                  </p:column>
+                  <p:column headerText="#{lang.saleableQty}">
+                    <h:outputText value="#{batchVar.quantitySaleable}" />
+                  </p:column>
+                  <p:column headerText="#{lang.damagedQty}">
+                    <h:outputText value="#{batchVar.quantityDamaged}" />
+                  </p:column>
+                  <p:column headerText="#{lang.mrp}">
+                    <h:outputText value="#{batchVar.mrpValue}" />
+                  </p:column>
+                  <p:ajax event="itemSelect" process="@this" listener="#{stockAdjustmentView.batchSelectEventHandler(main, stock)}" 
+                          oncomplete="focusToSaleableQty(#{rowIndex});refreshDatatable()"  update="expiry packSize mrp lbl12 lbl15" >
+                  </p:ajax>
+                </p:autoComplete>
+              </h:panelGroup>      
+            </p:column>
+
+            <!--Expiry Date-->
+            <p:column id="col4">
+              <f:facet name="header"><h:outputText id="lbl7" value="#{lang.expDate}" title="#{lang.expiryDate}"/></f:facet>
+              <h:outputText id="expiry" value="#{sysRuntimeView.dateToMMYY(stock.stockAdjustmentDetail.expiryDateActual)}" />
+            </p:column>
+
+            <!--Pack Size-->
+            <p:column id="col11">
+              <f:facet name="header"><h:outputText value="#{lang.packSize}" title="#{lang.packSize}"/></f:facet>
+              <h:outputText id="packSize" value="#{appView.display(stock.stockAdjustmentDetail.packSize)}" />
+            </p:column>
+
+            <!--Value Mrp-->
+            <p:column id="col12" style="text-align: right">
+              <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+              <h:outputText id="mrp" value="#{appView.decimal(stock.stockAdjustmentDetail.mrpValue)}" />
+            </p:column>
+
+            <!--Excess Qty-->
+            <p:column id="excessQty" style="text-align: right" rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType ne sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}" >
+              <f:facet name="header"><h:outputText id="excessQtyLabel" value="#{lang.excess} #{lang.qty}" title="#{lang.excess} #{lang.qty}" style="color: cornflowerblue;"  /></f:facet>
+              <h:outputText id="excessQtyTxt" value="#{appView.number(stock.quantityExcess)}" style="color: cornflowerblue;"/>
+            </p:column>
+
+            <!--Saleable Qty-->
+            <p:column id="col6" style="text-align: right" >
+              <f:facet name="header"><h:outputText id="lbl11" value="#{lang.saleableQty}" title="#{lang.saleableQty}" style="color: cornflowerblue;"  /></f:facet>
+              <h:outputText id="lbl12" value="#{appView.number(stock.quantityAvailable)}" style="color: cornflowerblue;" 
+                            rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}" />
+              <h:outputText id="saleableQty" value="#{appView.number(stock.quantityExcessActual)}" style="color: cornflowerblue;" 
+                            rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType ne sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}" />
+            </p:column>
+
+            <!--Saleable Qty Actual-->
+            <p:column id="col7" style="text-align: right" rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+              <f:facet name="header"><h:outputText id="lbl13" value="#{lang.saleable} #{lang.actualQty}" title="#{lang.saleableQuantity}" style="color: cornflowerblue;" /></f:facet>
+              <h:outputText id="lbl17" value="#{stock.quantitySaleableActual}" rendered="#{stockAdjustmentView.confirmed}" style="color: cornflowerblue;" />
+              <p:inputNumber id="txt2" value="#{stock.quantitySaleableActual}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="0"
+                             decimalPlaces="0" rendered="#{!stockAdjustmentView.confirmed}" autocomplete="off" style="color: cornflowerblue;"
+                             styleClass="submit_item fw" title="#{lang.current} #{lang.saleableQty} #{lang.in} #{lang.stock}">
+                <p:ajax event="change" process="txt2" update="txt3 adjustlbl2" listener="#{stockAdjustmentView.saleableQtyChangeEvent(stock)}" />
+              </p:inputNumber>
+            </p:column>
+
+            <!--Adjusted Qty-->
+            <p:column id="adjustCol1" style="text-align: right" rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+              <f:facet name="header"><h:outputText id="adjustlbl1" value="#{lang.adjustedQty}" title="#{lang.adjustedqty}" style="color: cornflowerblue;"/></f:facet>
+              <h:outputText id="adjustlbl2" value="#{stock.quantitySaleableActual ne null?(stock.quantitySaleableActual-stock.quantityAvailable):null}" style="color: cornflowerblue;" />
+            </p:column>
+
+            <!-- Damaged Qty -->
+            <p:column id="col8" style="text-align: right" rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+              <f:facet name="header"><h:outputText id="lbl14" value="#{lang.damagedQty}" title="#{lang.damagedQuantity}" style="color: coral;"/></f:facet>
+              <h:outputText id="lbl15" value="#{stock.quantityDamaged}" style="color: coral;" />
+            </p:column>
+
+            <!--Damaged Qty Actual-->
+            <p:column id="col9" style="text-align: right" rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+              <f:facet name="header"><h:outputText id="lbl16" value="#{lang.damagedActualQty}" title="#{lang.damagedActualQty}" style="color: coral;"/></f:facet>
+              <h:outputText id="lbl18" value="#{stock.quantityDamagedActual}" rendered="#{stockAdjustmentView.confirmed}" style="color: coral;" />
+              <p:inputNumber id="txt3" value="#{stock.quantityDamagedActual}" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="999999999" minValue="0"
+                             rendered="#{!stockAdjustmentView.confirmed}" title="#{lang.current} #{lang.damagedQty} #{lang.in} #{lang.stock}"
+                             decimalPlaces="0" styleClass="fw" autocomplete="off" style="color: coral;" >
+                <p:ajax event="change" process="txt3" update="txt2 adjustlbl4" listener="#{stockAdjustmentView.damagedQtyChangeEvent(stock)}" />
+              </p:inputNumber>
+            </p:column>
+
+            <!--Adjusted Qty-->
+            <p:column id="adjustCol2" style="text-align: right" rendered="#{stockAdjustmentView.stockAdjustment.stockAdjustmentType eq sysConstant.STOCK_ADJUSTMENT_TYPE_SALEABLE}">
+              <f:facet name="header"><h:outputText id="adjustlbl3" value="#{lang.adjustedQty}" title="#{lang.adjustedqty}" style="color: coral;"/></f:facet>
+              <h:outputText id="adjustlbl4" value="#{stock.quantityDamagedActual ne null?stock.quantityDamagedActual-stock.quantityDamaged:null}" style="color: coral;" />
+            </p:column>
+
+            <p:column style="text-align: right" rendered="#{stockAdjustmentView.draft}">
+              <f:facet name="header">
+                <p:commandButton  process="@this" value="" update="f1" tabindex="-1" icon="fa fa-trash" style="color: mediumvioletred;"
+                                  actionListener="#{stockAdjustmentView.deleteStockAdjustmentItem(main,true)}" >
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </f:facet> 
+            </p:column>
+            <p:column id="col35" selectionMode="multiple" exportable="false" rendered="#{stockAdjustmentView.draft}" />
+          </p:dataTable>
+        </h:panelGroup>
+
+        <p:remoteCommand name="insertOrUpdateStockAdjustmentItem" actionListener="#{stockAdjustmentView.actionInsertOrUpdateStockAdjustmentItem(main)}"
+                         process="f1" update="dt1 txt1 cal1" />
+
+        <script>
+          //<![CDATA[
+          function submitForm(params) {
+            insertOrUpdateStockAdjustmentItem([{name: 'rownumber', value: params[2]}]);
+            $('#dt1\\:0\\:ac1_input').focus();
+            return false;
+          }
+          //]]>
+        </script>
+
+
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="stockAdjustmentTable" var="stockAdjustmentVar" widgetVar="stockAdjustmentWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{stockAdjustmentView.stockAdjustmentLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{stockAdjustmentVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true"
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{stockAdjustmentView.stockAdjustmentSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true"
+                   paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Invoice No -->
+        <p:column sortBy="#{stockAdjustmentVar.referenceNo}" field="scm_stock_adjustment.reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(stockAdjustmentVar.referenceNo)}"
+                         process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{stockAdjustmentView.stockAdjustment}" value="#{stockAdjustmentVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Entry Date -->
+        <p:column sortBy="#{stockAdjustmentVar.entryDate}" field="scm_stock_adjustment.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(stockAdjustmentVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{stockAdjustmentVar.statusId}" field="scm_stock_adjustment.status_id" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{stockAdjustmentVar.statusId eq 2 ? 'Confirmed' : 'Draft'}" title="#{stockAdjustmentVar.statusId eq 2 ? 'Confirmed' : 'Draft'}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(stockAdjustmentVar.statusId)}" 
+                        style="background-color: #{sysRuntimeView.statusColor(stockAdjustmentVar.statusId)}"/>          
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(stockAdjustmentVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(stockAdjustmentVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(stockAdjustmentVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(stockAdjustmentVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(stockAdjustmentVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+      <script>
+        function focusToSaleableQty(rnum) {
+          $('#dt1\\:' + rnum + '\\:txt2_input').focus();
+        }
+        function refreshDatatable() {
+          page.refresh();
+        }
+      </script>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

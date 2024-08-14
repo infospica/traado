@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{calendarReportView.reset()}  
+
+  <p:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.calendar} "/>
+    <ui:param name="ids" value="calendarReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+    <ui:define name="more"/>
+
+    <ui:define name="navRight" >
+      <p:importConstants type="spica.constant.ReportConstant" var="REPORT_CONSTANT" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{calendarReportView.filterParameters.filterType}" autoWidth="true" >
+          <p:ajax event="itemSelect"  update="reportView" onstart="block();" oncomplete="unblock();" />
+          <f:selectItem itemLabel="#{lang.salesInvoice}" itemValue="#{REPORT_CONSTANT.SALES}" />
+          <f:selectItem itemLabel="#{lang.salesOrder}" itemValue="#{REPORT_CONSTANT.SALES_ORDER}" />
+          <f:selectItem itemLabel="#{lang.salesReturn}" itemValue="#{REPORT_CONSTANT.SALES_RETURN}" />
+          <f:selectItem itemLabel="#{lang.purchaseEntry}" itemValue="#{REPORT_CONSTANT.PURCHASE_ENTRY}" />
+          <f:selectItem itemLabel="#{lang.purchaseOrder}" itemValue="#{REPORT_CONSTANT.PURCHASE_ORDER}" />
+          <f:selectItem itemLabel="#{lang.purchaseReturn}" itemValue="#{REPORT_CONSTANT.PURCHASE_RETURN}" />
+          <f:selectItem itemLabel="#{lang.salesServicesInvoice}" itemValue="#{REPORT_CONSTANT.SALES_SERVICE}" />
+          
+          
+        </p:selectOneMenu>
+      </h:panelGroup>
+
+      <!--       From Date 
+            <p:calendar value="#{calendarReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="13" 
+                        id="fromDate" pages="3" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.fromDate}" maxdate="#{calendarReportView.filterParameters.today}">
+              <p:ajax event="dateSelect" process="@this toDate" update="toDate" immediate="true" onstart="block()" oncomplete="unblock()" />
+            </p:calendar>
+      
+             To Date 
+            <p:calendar value="#{calendarReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="13" 
+                        id="toDate" pages="3" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.toDate}" mindate="#{calendarReportView.filterParameters.fromDate}" maxdate="#{calendarReportView.filterParameters.today}" >
+              <p:ajax event="dateSelect" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+            </p:calendar>-->
+
+<!--      <p:commandButton value="#{lang.ok}" actionListener="#{calendarReportView.submitForm}" styleClass="btn btn-info" onclick="block();" oncomplete="unblock();" 
+                       process="reportType accountGroupDiv accountDiv customerDiv toDate fromDate" update="f1"  style="margin-left: 3px; margin-bottom: 4px;"  >
+      </p:commandButton>-->
+
+    </ui:define>
+
+
+
+    <ui:define name="list">
+      <style>
+        .draft .fc-content {
+          background: yellow !important;
+          color:black !important;
+        }
+        .confirm .fc-content {
+          background: #00b093 !important;
+          color: black !important;
+        }
+      </style>
+      <h:panelGroup id="reportView" >
+        <div style="padding:10px;">
+          <p:schedule id="schedule" value="#{calendarReportView.lazyEventModel}" widgetVar="calendarWidget" clientTimeZone="local"
+                         draggable="false" tooltip="true" >
+             
+            <p:ajax event="eventSelect" listener="#{calendarReportView.onEventSelect}" onstart="block();" oncomplete="unblock();"  />              
+          </p:schedule>
+        </div>
+      </h:panelGroup>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

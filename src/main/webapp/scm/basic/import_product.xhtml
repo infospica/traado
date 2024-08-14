@@ -1,0 +1,280 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{importProductView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+    i:hover{
+      color:#444;
+    }
+    .download{
+      border: none;
+      color: #CCC;            
+      font-size: 16px;     
+      transition: 0.3s;
+    }
+
+    .download:hover {color: black;}    
+  </style>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="ids" value="importProduct" />
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="more" />
+    <ui:define name="newList"/>
+    <ui:define name="rightList">
+      <h:panelGroup id="validateUploadDiv">
+        <p:commandButton id="validateUpload" ajax="true" value="Validate and Upload" actionListener="#{importProductView.actionProductImport(main)}" immediate="true" partialSubmit="true" 
+                         rendered="#{importProductView.activeIndex eq 1}" styleClass="btn btn-primary" onstart="block()" oncomplete="unblock()" update="tabFragmentId">
+        </p:commandButton>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:fragment id="tabFragmentId">
+        <p:tabView  id="importProductTabs" dynamic="true" styleClass="materialTabs" activeIndex="#{importProductView.activeIndex}" >
+          <p:ajax event="tabChange" update="validateUploadDiv" />
+          <p:tab  title="#{lang.upload}"  id="newTab"  >
+            <h:panelGroup layout="block" styleClass="row">
+              <h:panelGroup layout="block" styleClass="col-md-6">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">                
+                  <ui:param name="label" value=" Download Excel Template " />
+                  <ui:define name="menuleft">
+
+                  </ui:define>
+                  <div style="text-align: center;padding: 40px;"> 
+                    <p:commandLink id="downLoad" class="download" ajax="false" actionListener="#{importProductView.downloadExcelFormat(main)}" immediate="true" partialSubmit="true" >
+                      <i class="fa fa-download" style="font-size: 45px;color:#CCC;" />
+                    </p:commandLink>
+                  </div>
+                </ui:decorate>
+              </h:panelGroup>
+
+              <h:panelGroup layout="block" styleClass="col-md-6" id="uploadDiv">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">                
+                  <ui:param name="label" value=" Upload Products" />
+                  <ui:define name="menuleft">
+
+                  </ui:define>
+                  <div style="text-align: center;padding: 40px;"> 
+                    <p:fileUpload styleClass="myUpload"  fileUploadListener="#{importProductView.handleFileUpload}" id="dragDropUpload" mode="advanced"  auto="true" sizeLimit="10000000"
+                                  allowTypes="/(\.|\/)(xls|xlsx)$/" dragDropSupport="true" chooseIcon="fa fa-upload" uploadIcon="fa fa-upload" style="display:none;" >
+
+                    </p:fileUpload> 
+                    <p:commandLink  onclick="document.querySelector('.myUpload input').click()" onstart="block();" oncomplete="unblock()" >
+                      <i class="fa fa-upload" style="font-size: 45px;color:#CCC;" />
+                    </p:commandLink>
+                    <p:remoteCommand name="uploadCommand" update="importProductTabs validateUploadDiv" />
+                  </div>
+                </ui:decorate>
+              </h:panelGroup>
+
+            </h:panelGroup>
+
+          </p:tab>
+          <p:tab title="#{lang.errors} ( #{importProductView.errorLogNum gt 0?importProductView.errorLogNum:''} )" id="errorTab" disabled="#{importProductView.errorLogNum eq 0}" >            
+            <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0"  >
+              <p:dataTable id="productImportTable" var="row" widgetVar="productImportWidget" rowIndexVar="rowIndex"
+                           tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{importProductView.getProductLogErrorList(main)}"
+                           rows="10" editable="true" editMode="cell" 
+                           paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"  
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="50,100,150" rowKey="#{row.id eq null?importProductView.getRowKey():row.id}"
+                           rowSelectMode="checkbox" selection="#{importProductView.selectedProduct}">                
+                <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+                <p:ajax event="rowSelectCheckbox"  />
+                <p:ajax event="rowUnselectCheckbox" />
+                <p:ajax event="toggleSelect" />
+
+                <p:column selectionMode="multiple" exportable="false"/>
+                <p:column style="width:30px">
+                  <f:facet name="header">
+                    <p:commandButton process="@this" value="" update="tabFragmentId" icon="fa fa-trash" tabindex="-1"
+                                     rendered="true" style="color: mediumvioletred;" 
+                                     actionListener="#{importProductView.deleteProductLogErrorList(main)}" title="Delete Error Log Items" >
+                      <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                    </p:commandButton>
+                  </f:facet>
+                </p:column>
+                <p:column sortBy="#{row.lineNo}" field="id" filterBy="#{row.lineNo}" filterStyleClass="hidden">
+                  <f:facet name="header"><h:outputText value="#{lang.lineNo}" title="#{lang.lineNo}"/></f:facet>
+                  <h:outputText value="#{appView.number(row.lineNo)}" title="#{appView.title(row.lineNo)}" escape="false" /></p:column>
+
+                <p:column sortBy="#{row.error}" filterBy="#{row.error}" filterStyleClass="hidden" width="400" style="width:400;">
+                  <f:facet name="header"><h:outputText value="#{lang.errors} " title="#{lang.errors}"/></f:facet>
+                  <h:outputText value="#{appView.display(row.error)}" title="#{appView.title(row.error)}" styleClass="fw" /></p:column>
+
+                <p:column width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.supplierName} "/></f:facet>
+                  <h:panelGroup id="supplierDiv">
+                    <p:autoComplete  value="#{row.supplierId}"  completeMethod="#{importProductView.supplierAuto}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                     id="supplierId" var="e" itemValue="#{e}" itemLabel="#{e.vendorName}" style="position: relative;width:200px"  panelStyle="width:400px !important;"
+                                     cache="true" queryDelay="500" maxResults="80" scrollHeight="500" 
+                                     emptyMessage="#{lang.noResult}"  converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                     autocomplete="off" forceSelection="true"  >     
+                      <f:attribute name="param" value="#{row.supplierId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()"/>
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column sortBy="#{row.productName}" filterBy="#{row.productName}" filterStyleClass="hidden" width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+                  <p:inputText value="#{row.productName}" title="#{appView.title(row.productName)}" styleClass="fw" >
+                    <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductView.updateLineItem(main,row)}" />
+                  </p:inputText>
+                </p:column>
+
+                <p:column width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.commodity} "/></f:facet>
+                  <h:panelGroup id="commodityDiv">
+                    <p:autoComplete  value="#{row.commodityId}"  completeMethod="#{importProductView.CommodityAuto(main, filter, row)}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                     id="commodityId" var="e" itemValue="#{e}" itemLabel="#{e.title}" style="position: relative;width:200px"  panelStyle="width:400px !important;"
+                                     cache="true" queryDelay="500" maxResults="80" scrollHeight="500" 
+                                     emptyMessage="#{lang.noResult}"  converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                     autocomplete="off" forceSelection="true"  >     
+                      <f:attribute name="param" value="#{row.commodityId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()"/>
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.productCategory}" /></f:facet>
+                  <h:panelGroup id="productCategoryDiv">
+                    <p:autoComplete value="#{row.productCategoryId}" completeMethod="#{importProductView.productCategoryByCommodityAuto(main, filter, row)}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                    id="productCategoryId" var="e" itemValue="#{e}" itemLabel="#{e.title}" style="position: relative;width:200px"  panelStyle="width:400px !important;"
+                                    emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                    autocomplete="off" forceSelection="true"  >   
+                      <f:attribute name="param" value="#{row.productCategoryId}"/>
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.productType}" /></f:facet>
+                  <h:panelGroup id="productTypeDiv">
+                    <p:autoComplete value="#{row.productTypeId}" completeMethod="#{importProductView.productTypeAuto(main, filter, row)}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                    id="productTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" style="position: relative;width:200px"  panelStyle="width:400px !important;"
+                                    emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                    autocomplete="off" forceSelection="true"  > 
+                      <f:attribute name="param" value="#{row.productTypeId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.productClassification}" /></f:facet>
+                  <h:panelGroup id="productClassificationDiv">
+                    <p:autoComplete value="#{row.productClassificationId}" completeMethod="#{importProductView.productClassificationAuto(main, filter, row) }"
+                                    id="productClassificationId" tabindex="5" dropdown="true" converter="spica.scm.converter.LineItemConverter"
+                                    var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="25"
+                                    converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" style="position: relative;width:200px" 
+                                    panelStyle="width:400px !important;" >
+                      <f:attribute name="param" value="#{row.productClassificationId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column sortBy="#{row.packSize}" filterBy="#{row.packSize}" filterStyleClass="hidden">
+                  <f:facet name="header"><h:outputText value="#{lang.packSize} " title="#{lang.packSize}"/></f:facet>
+                  <p:inputText value="#{row.packSize}" title="#{appView.title(row.packSize)}" styleClass="fw" >
+                    <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductView.updateLineItem(main,row)}" />
+                  </p:inputText></p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.product} #{lang.unit}" /></f:facet>
+                  <h:panelGroup id="productUnitDiv">
+                    <p:autoComplete value="#{row.productUnitId}" completeMethod="#{scmLookupView.productUnitAuto}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                    id="productUnitId" var="e" itemValue="#{e}" itemLabel="#{e.title}" style="position: relative;width:200px"  panelStyle="width:200px !important;"
+                                    emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                    autocomplete="off" forceSelection="true"  styleClass="fw" >
+                      <f:attribute name="param" value="#{row.productUnitId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column sortBy="#{row.hsnCode}" filterBy="#{row.hsnCode}" filterStyleClass="hidden">
+                  <f:facet name="header"><h:outputText value="#{lang.hsnCode} " title="#{lang.hsnCode}"/></f:facet>
+                  <p:inputText value="#{row.hsnCode}" title="#{appView.title(row.hsnCode)}" styleClass="fw" >
+                    <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductView.updateLineItem(main,row)}" />
+                  </p:inputText></p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.brand}" /></f:facet>
+                  <h:panelGroup id="brandDiv">
+                    <p:autoComplete value="#{row.brandId}" completeMethod="#{importProductView.brandAuto(main, filter, row)}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                    id="brandId" var="e" itemValue="#{e}" itemLabel="#{e.code}" style="position: relative;width:100px"  panelStyle="width:100px !important;"
+                                    emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                    autocomplete="off" forceSelection="true" >
+                      <f:attribute name="param" value="#{row.brandId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column sortBy="#{row.expirySalesDays}" filterBy="#{row.expirySalesDays}" filterStyleClass="hidden">
+                  <f:facet name="header"><h:outputText value="#{lang.expirySalesdays} " title="#{lang.expirySalesdays}"/></f:facet>
+                  <p:inputText value="#{row.expirySalesDays}" title="#{appView.title(row.expirySalesDays)}" styleClass="fw" >
+                    <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductView.updateLineItem(main,row)}" />
+                  </p:inputText></p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.productPacking} #{lang.detail}" /></f:facet>
+                  <h:panelGroup id="packingDetailDiv">
+                    <p:autoComplete value="#{row.productPackingDetailId}" completeMethod="#{importProductView.productPackingDetailAuto}" converter="spica.scm.converter.LineItemConverter" tabindex="3"
+                                    id="packingDetailId" var="e" itemValue="#{e}" itemLabel="#{e.title}" scrollHeight="600" style="position: relative;width:200px"  panelStyle="width:200px !important;"
+                                    emptyMessage="#{lang.noResult}" cache="true" queryDelay="500"  converterMessage="#{lang.invalidSelection}" dropdown="true"
+                                    autocomplete="off" forceSelection="true"  styleClass="fw" >
+                      <f:attribute name="param" value="#{row.productPackingDetailId}" />
+                      <p:ajax event="itemSelect" process="@this" update="productImportTable" listener="#{importProductView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                  </h:panelGroup>
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.manufacture}" /></f:facet>
+                  <h:panelGroup id="manufactureListDiv">
+                    <p:autoComplete  value="#{row.manufactureId}" completeMethod="#{importProductView.manufactureByCompanyAuto}"
+                                     converter="spica.scm.converter.LineItemConverter" cache="true" required="true" requiredMessage="#{lang.manufacture} #{lang.isRequired}" tabindex="12"
+                                     id="manufactureId" var="manf" itemValue="#{manf}" itemLabel="#{manf.code}" emptyMessage="#{lang.noResult}" 
+                                     queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                                     style="position: relative;width:200px" styleClass="fw" >
+                      <f:attribute name="param" value="#{row.manufactureId}" />
+                      <p:column style="width:10%">
+                        <h:outputText value="#{manf.code}" />
+                      </p:column>
+                      <p:column>
+                        <h:outputText value="#{manf.name}" />
+                      </p:column>
+                      <p:ajax event="itemSelect" update="@this" process="manufactureListDiv"/>
+                      <p:ajax event="itemUnselect" process="manufactureListDiv" immediate="true" update="@this" />
+                    </p:autoComplete><p:message for="manufactureId" display="text" />
+                  </h:panelGroup>
+                </p:column>
+              </p:dataTable>
+            </h:panelGroup>
+          </p:tab>
+
+        </p:tabView>
+      </p:fragment>
+      <script>
+//        $(document).ready(function (e) {
+//          $('#dragDropUpload').fileupload({
+//            dropZone: $('#uploadDiv')
+//          });
+//        });
+
+      </script>
+
+    </ui:define>
+
+  </ui:decorate>
+
+</ui:composition>

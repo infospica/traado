@@ -1,0 +1,155 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" 
+                >
+  #{manufactureView.switchManufacture(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.manufacture}" />
+    <ui:param name="ids" value="manufacture" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  onclick="closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{manufactureView.deleteManufacture(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('manufactureWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{manufactureView.cloneManufacture(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{manufactureView.deleteManufacture(main)}" value="#{lang.delete}" onclick="wdgOff('manufactureWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{manufactureView.saveManufacture(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Name -->
+      <p:outputLabel value="#{lang.name}" for="name" />
+      <h:panelGroup>
+        <p:inputText value="#{manufactureView.manufacture.name}" maxlength="200" id="name" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" styleClass="fw"/>
+        <p:message for="name" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Code -->
+      <p:outputLabel value="#{lang.code}" for="code" />
+      <h:panelGroup>
+        <p:inputText value="#{manufactureView.manufacture.code}" maxlength="3" id="code" required="true" styleClass="fw text-uppercase"/>
+        <p:message for="code" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Address -->
+      <p:outputLabel value="#{lang.address}" for="address" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{manufactureView.manufacture.address}" maxlength="500" id="address" />
+        <p:message for="address" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!--Country -->
+      <p:outputLabel value="#{lang.country}" for="companyCountryId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{manufactureView.manufacture.countryId}" completeMethod="#{manufactureView.countryAuto}" converter="wawo.LookupIntConverter" required="true"
+                         requiredMessage="#{lang.country} #{lang.isRequired}" id="companyCountryId" var="c" itemValue="#{c}" itemLabel="#{c.countryName}"
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                         autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" immediate="true" process="@this" update="stateDiv districtDiv" listener="#{manufactureView.countrySelectEvent}"/>
+        </p:autoComplete>
+        <p:message for="companyCountryId" display="text" />
+      </h:panelGroup>
+
+      <!-- State -->
+      <p:outputLabel value="#{lang.state}" for="manufactureStateId"/>
+      <h:panelGroup id="stateDiv">
+        <p:autoComplete value="#{manufactureView.manufacture.stateId}" completeMethod="#{manufactureView.stateAuto}" converter="wawo.LookupIntConverter"   id="manufactureStateId"
+                        var="e" itemValue="#{e}" itemLabel="#{e.stateName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" required="true"
+                        requiredMessage="#{lang.state} #{lang.isRequired}">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+          <p:ajax event="itemSelect" immediate="true" process="@this" update="districtDiv" listener="#{manufactureView.stateSelectEvent}"/>
+        </p:autoComplete><p:message for="manufactureStateId" display="text" />
+      </h:panelGroup>
+
+      <!-- District -->
+      <p:outputLabel value="#{lang.district}" for="manufactureDistrictId"/>
+      <h:panelGroup id="districtDiv">
+        <p:autoComplete value="#{manufactureView.manufacture.districtId}" completeMethod="#{manufactureView.districtAuto}" converter="wawo.LookupIntConverter"   id="manufactureDistrictId"
+                        var="e" itemValue="#{e}" itemLabel="#{e.districtName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" required="true"
+                        requiredMessage="#{lang.district} #{lang.isRequired}">
+          <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+          <p:ajax event="itemSelect" immediate="true" process="@this" listener="#{manufactureView.districtSelectEvent}"/>
+        </p:autoComplete><p:message for="manufactureDistrictId" display="text" />
+      </h:panelGroup>
+
+      <!-- Pin Code -->
+      <p:outputLabel value="#{lang.pincode}" for="pin" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{manufactureView.manufacture.pin}" maxlength="6" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="0"  thousandSeparator="" validatorMessage="#{lang.pincode} #{lang.requiredLength} is 6 "  id="pin" >
+          <f:validateLength minimum="6" />
+        </p:inputNumber>
+        <p:message for="pin" display="text"/>
+      </h:panelGroup>
+
+      <!-- Description -->
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{manufactureView.manufacture.description}" maxlength="500" id="description" />
+        <p:message for="description" display="text" styleClass="fw" />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(manufactureView.manufacture.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(manufactureView.manufacture.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(manufactureView.manufacture.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(manufactureView.manufacture.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(manufactureView.manufacture.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="manufactureTable" var="manufactureVar" widgetVar="manufactureWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{manufactureView.manufactureLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{manufactureVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{manufactureView.manufactureSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Name -->
+        <p:column sortBy="#{manufactureVar.name}" field="scm_manufacture.name" >
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{manufactureVar.name}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{manufactureView.manufacture}" value="#{manufactureVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Code -->
+        <p:column sortBy="#{manufactureVar.code}" field="scm_manufacture.code">
+          <f:facet name="header"><h:outputText value="#{lang.code}" title="#{lang.code}"/></f:facet>
+          <h:outputText value="#{appView.display(manufactureVar.code)}" title="#{appView.title(manufactureVar.code)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.log}">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(manufactureVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(manufactureVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(manufactureVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(manufactureVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(manufactureVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

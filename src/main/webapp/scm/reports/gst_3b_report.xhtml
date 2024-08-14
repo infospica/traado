@@ -1,0 +1,540 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{gst3bReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="gst3bReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="more" />
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="gst3bReportST" onkeyup="return callDtFilter(this.value, 'gst3bReport');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="rightList" >
+      <!--      <h:panelGroup styleClass="L">
+              <p:selectOneMenu var="e" value="#{gst3bReportView.filterParameters.accountGroup}"  
+                               converter="omnifaces.SelectItemsConverter" height="450">
+                <f:selectItem itemLabel="#{lang.all} #{lang.accountGroup}" itemValue="#{null}" />
+                <f:selectItems  var="accGroup" value="#{userRuntimeView.accountGroupList}" itemLabel="#{accGroup.groupName}" itemValue="#{accGroup}" />
+                <p:ajax event="itemSelect" update="f1" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+                <p:column style="width: 350px;">
+                  <h:outputText value="#{e.groupName}"  />
+                </p:column>
+                <p:column style="width: 50px;">
+                  <h:outputText value="#{e.groupCode}"  />                          
+                </p:column>
+                <p:column style="width: 50px;">
+                  <p:fragment rendered="#{e.isDefault eq 0}">
+                    <i class="fa fa-th" title="#{lang.custom} #{lang.accountGroup}" ></i>
+                  </p:fragment>
+                  <p:fragment rendered="#{e.isDefault eq 1}">
+                    <i class="fa fa-square-o" style="color:#CCC;" ></i>
+                  </p:fragment>
+                </p:column>
+              </p:selectOneMenu>
+            </h:panelGroup>-->
+
+      <h:panelGroup styleClass="L" >          
+        <p:selectOneButton value="#{gst3bReportView.type}" >
+          <f:selectItem itemLabel="PURCHASE" itemValue="#{SYSCONSTANT.PURCHASE_REPORT}" />
+          <f:selectItem itemLabel="PURCHASE RETURN" itemValue="#{SYSCONSTANT.PURCHASE_RETURN_REPORT}" />
+          <f:selectItem itemLabel="SALES" itemValue="#{SYSCONSTANT.SALES_REPORT}" />
+          <f:selectItem itemLabel="SALES RETURN" itemValue="#{SYSCONSTANT.SALES_RETURN_REPORT}" />
+          <f:selectItem itemLabel="CDNR C" itemValue="#{SYSCONSTANT.CDNR_C}" />
+          <f:selectItem itemLabel="CDNR D" itemValue="#{SYSCONSTANT.CDNR_D}" />
+          <p:ajax event="change" immediate="true" process="@this" update="f1" onstart="block()" oncomplete="unblock()"/>
+        </p:selectOneButton>
+      </h:panelGroup>
+
+      <h:panelGroup styleClass="L" >   
+        <p:commandButton actionListener="#{gst3bReportView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate f1"  styleClass="btn" />
+        <p:commandButton actionListener="#{gst3bReportView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate f1" styleClass="btn" />
+        <!--From Date-->
+        <p:calendar id="fromDate" value="#{gst3bReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1"  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true" 
+                    maxdate="#{gst3bReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: gst3bReportView.filterParameters.today}" >
+          <p:ajax event="dateSelect" process="@this" listener="#{gst3bReportView.reset()}" onstart="block();" oncomplete="unblock();"  update="toDateDiv gst3bPurchaseReportTable gst3bSalesReportTable gst3bSalesReturnReportTable gst3bPurchaseReturnReportTable gst3bCdnrCReportTable gst3bCdnrDReportTable"/>
+          <p:ajax event="change" process="@this" listener="#{gst3bReportView.reset()}" onstart="block();" oncomplete="unblock();"  update="toDateDiv gst3bPurchaseReportTable gst3bSalesReportTable gst3bSalesReturnReportTable gst3bPurchaseReturnReportTable gst3bCdnrCReportTable gst3bCdnrDReportTable"/>
+        </p:calendar>
+        <p:message for="fromDate" display="text" id="fmess"/>
+      </h:panelGroup>
+      <!--To date-->
+      <h:panelGroup styleClass="L" id="toDateDiv" >
+        <p:calendar id="toDate" value="#{gst3bReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{gst3bReportView.filterParameters.fromDate}"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  
+                    maxdate="#{gst3bReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: gst3bReportView.filterParameters.today}" >
+          <p:ajax event="dateSelect" process="@this" listener="#{gst3bReportView.reset()}" onstart="block();" oncomplete="unblock();" update="gst3bPurchaseReportTable gst3bSalesReportTable gst3bSalesReturnReportTable gst3bPurchaseReturnReportTable gst3bCdnrCReportTable gst3bCdnrDReportTable"/>
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>
+      </h:panelGroup>
+      <p:commandButton value="#{lang.export}" actionListener="#{gst3bReportView.export(main,false)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false">
+      </p:commandButton>
+      <p:commandButton value="#{lang.export} #{lang.all}" actionListener="#{gst3bReportView.export(main,true)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false">
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+
+      <!--Purchase Report-->
+
+      <p:dataTable id="gst3bPurchaseReportTable" var="row" widgetVar="gst3bPurchaseReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gst3bReportView.getGst3bPurchaseReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{gst3bReportView.type eq SYSCONSTANT.PURCHASE_REPORT}" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gst3bPurchaseReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{gst3bReportView.openPopup(row.id,1)}" immediate="true">
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.supplierName}" field="supplier_name" filterBy="#{row.supplierName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.supplierName}" title="#{lang.supplierName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.placeOfSupply}" field="place_of_supply"  filterBy="#{row.placeOfSupply}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.placeofSupply}" title="#{lang.placeofSupply}"/></f:facet>
+          <h:outputText value="#{appView.display(row.placeOfSupply)}" title="#{appView.title(row.placeOfSupply)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.billAmount}" title="#{lang.billAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxPercentage}" field="tax_percentage" style="text-align: right" filterBy="#{row.taxPercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxPercentage)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxableValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxData}" field="tax_data" style="text-align: right" filterBy="#{row.taxData}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxData}" title="#{lang.taxData}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxData)}" escape="false" /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="#{appView.decimal(gst3bReportView.billAmount)}" style="text-align:right; font-weight: bold"/>
+            <p:column footerText="" />
+            <p:column footerText="#{appView.number(gst3bReportView.taxableValue)}" style="text-align:right; font-weight: bold" /> 
+            <p:column footerText="#{appView.number(gst3bReportView.taxData)}" style="text-align:right; font-weight: bold" /> 
+          </p:row>
+        </p:columnGroup>
+
+      </p:dataTable>
+
+      <!--Sales Report-->
+
+      <p:dataTable id="gst3bSalesReportTable" var="row" widgetVar="gst3bSalesReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gst3bReportView.getGst3bSalesReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{gst3bReportView.type eq SYSCONSTANT.SALES_REPORT}" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gst3bSalesReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{gst3bReportView.openPopup(row.id,2)}" immediate="true">
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.documentNo}" field="document_no" filterBy="#{row.documentNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.customerName}" field="supplier_name" filterBy="#{row.customerName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.placeOfSupply}" field="place_of_supply" filterBy="#{row.placeOfSupply}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.placeofSupply}" title="#{lang.placeofSupply}"/></f:facet>
+          <h:outputText value="#{appView.display(row.placeOfSupply)}" title="#{appView.title(row.placeOfSupply)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.billAmount}" title="#{lang.billAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxPercentage}" field="tax_percentage" style="text-align: right" filterBy="#{row.taxPercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxPercentage)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxableValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxData}" field="tax_data" style="text-align: right" filterBy="#{row.taxData}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxData}" title="#{lang.taxData}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxData)}" escape="false" /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText=""/>
+            <p:column footerText="" />
+            <p:column footerText="#{appView.number(gst3bReportView.taxableValue)}" style="text-align:right; font-weight: bold" /> 
+            <p:column footerText="#{appView.number(gst3bReportView.taxData)}" style="text-align:right; font-weight: bold" /> 
+          </p:row>
+        </p:columnGroup>
+
+      </p:dataTable>
+
+      <!--Sales Return Report-->
+
+      <p:dataTable id="gst3bSalesReturnReportTable" var="row" widgetVar="gst3bSalesReturnReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gst3bReportView.getGst3bSalesReturnReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{gst3bReportView.type eq SYSCONSTANT.SALES_RETURN_REPORT}" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gst3bSalesReturnReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{gst3bReportView.openPopup(row.id,3)}" immediate="true">
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.customerName}" field="customer_name" filterBy="#{row.customerName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.placeOfSupply}" field="place_of_supply" filterBy="#{row.placeOfSupply}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.placeofSupply}" title="#{lang.placeofSupply}"/></f:facet>
+          <h:outputText value="#{appView.display(row.placeOfSupply)}" title="#{appView.title(row.placeOfSupply)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.returnType}" field="return_type" filterBy="#{row.returnType}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.returnType}" title="#{lang.returnType}"/></f:facet>
+          <h:outputText value="#{row.returnType}" title="#{row.returnType}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.billAmount}" title="#{lang.billAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxPercentage}" field="tax_percentage" style="text-align: right" filterBy="#{row.taxPercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxPercentage)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxableValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxData}" field="tax_data" style="text-align: right" filterBy="#{row.taxData}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxData}" title="#{lang.taxData}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxData)}" escape="false" /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="#{appView.decimal(gst3bReportView.billAmount)}" style="text-align:right; font-weight: bold"/>
+            <p:column footerText="" />
+            <p:column footerText="#{appView.number(gst3bReportView.taxableValue)}" style="text-align:right; font-weight: bold" /> 
+            <p:column footerText="#{appView.number(gst3bReportView.taxData)}" style="text-align:right; font-weight: bold" /> 
+          </p:row>
+        </p:columnGroup>
+
+      </p:dataTable>
+
+      <!--Purchase Return Report-->
+
+      <p:dataTable id="gst3bPurchaseReturnReportTable" var="row" widgetVar="gst3bPurchaseReturnReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gst3bReportView.getGst3bPurchaseReturnReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{gst3bReportView.type eq SYSCONSTANT.PURCHASE_RETURN_REPORT}" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gst3bPurchaseReturnReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{gst3bReportView.openPopup(row.id,4)}" immediate="true">
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.supplierName}" field="supplier_name" filterBy="#{row.supplierName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.supplierName}" title="#{lang.supplierName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.placeOfSupply}" field="place_of_supply" filterBy="#{row.placeOfSupply}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.placeofSupply}" title="#{lang.placeofSupply}"/></f:facet>
+          <h:outputText value="#{appView.display(row.placeOfSupply)}" title="#{appView.title(row.placeOfSupply)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.billAmount}" title="#{lang.billAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxPercentage}" field="tax_percentage" style="text-align: right" filterBy="#{row.taxPercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxPercentage)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxableValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxData}" field="tax_data" style="text-align: right" filterBy="#{row.taxData}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxData}" title="#{lang.taxData}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxData)}" escape="false" /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="#{appView.decimal(gst3bReportView.billAmount)}" style="text-align:right; font-weight: bold"/>
+            <p:column footerText="" />
+            <p:column footerText="#{appView.number(gst3bReportView.taxableValue)}" style="text-align:right; font-weight: bold" /> 
+            <p:column footerText="#{appView.number(gst3bReportView.taxData)}" style="text-align:right; font-weight: bold" /> 
+          </p:row>
+        </p:columnGroup>
+
+      </p:dataTable>
+
+      <!--CDNR C Report-->
+
+      <p:dataTable id="gst3bCdnrCReportTable" var="row" widgetVar="gst3bCdnrCReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gst3bReportView.getGst3bCdnrCReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{gst3bReportView.type eq SYSCONSTANT.CDNR_C}" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gst3bCdnrCReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{gst3bReportView.openPopup(row.id,5)}" immediate="true">
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.receiverName}" field="receiver_name" filterBy="#{row.receiverName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.party} #{lang.name}" title="#{lang.party} #{lang.name}"/></f:facet>
+          <h:outputText value="#{appView.display(row.receiverName)}" title="#{appView.title(row.receiverName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.placeOfSupply}" field="place_of_supply" filterBy="#{row.placeOfSupply}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.placeofSupply}" title="#{lang.placeofSupply}"/></f:facet>
+          <h:outputText value="#{appView.display(row.placeOfSupply)}" title="#{appView.title(row.placeOfSupply)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.billAmount}" title="#{lang.billAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxPercentage}" field="tax_percentage" style="text-align: right" filterBy="#{row.taxPercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxPercentage)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxableValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxData}" field="tax_data" style="text-align: right" filterBy="#{row.taxData}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxData}" title="#{lang.taxData}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxData)}" escape="false" /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="#{appView.decimal(gst3bReportView.billAmount)}" style="text-align:right; font-weight: bold"/>
+            <p:column footerText="" />
+            <p:column footerText="#{appView.number(gst3bReportView.taxableValue)}" style="text-align:right; font-weight: bold" /> 
+            <p:column footerText="#{appView.number(gst3bReportView.taxData)}" style="text-align:right; font-weight: bold" /> 
+          </p:row>
+        </p:columnGroup>
+
+      </p:dataTable>
+
+      <!--CDNR D Report--> 
+
+      <p:dataTable id="gst3bCdnrDReportTable" var="row" widgetVar="gst3bCdnrDReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{gst3bReportView.getGst3bCdnrDReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                   rendered="#{gst3bReportView.type eq SYSCONSTANT.CDNR_D}" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('gst3bCdnrDReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{gst3bReportView.openPopup(row.id,5)}" immediate="true">
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.entryDate}" field="entry_date" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.entryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.receiverName}" field="receiver_name" filterBy="#{row.receiverName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.party} #{lang.name}" title="#{lang.party} #{lang.name}"/></f:facet>
+          <h:outputText value="#{appView.display(row.receiverName)}" title="#{appView.title(row.receiverName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.gstNo}" field="gst_no" filterBy="#{row.gstNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo}" title="#{lang.gstNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.placeOfSupply}" field="place_of_supply" filterBy="#{row.placeOfSupply}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.placeofSupply}" title="#{lang.placeofSupply}"/></f:facet>
+          <h:outputText value="#{appView.display(row.placeOfSupply)}" title="#{appView.title(row.placeOfSupply)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.billAmount}" title="#{lang.billAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxPercentage}" field="tax_percentage" style="text-align: right" filterBy="#{row.taxPercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxPercentage)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxableValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.taxData}" field="tax_data" style="text-align: right" filterBy="#{row.taxData}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxData}" title="#{lang.taxData}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxData)}" escape="false" /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="" />
+            <p:column footerText="#{appView.decimal(gst3bReportView.billAmount)}" style="text-align:right; font-weight: bold"/>
+            <p:column footerText="" />
+            <p:column footerText="#{appView.number(gst3bReportView.taxableValue)}" style="text-align:right; font-weight: bold" /> 
+            <p:column footerText="#{appView.number(gst3bReportView.taxData)}" style="text-align:right; font-weight: bold" /> 
+          </p:row>
+        </p:columnGroup>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

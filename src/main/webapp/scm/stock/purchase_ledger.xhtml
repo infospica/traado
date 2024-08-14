@@ -1,0 +1,413 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{purchaseLedgerView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <o:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseLedger}"/>
+    <ui:param name="ids" value="purchaseLedger"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <p:panelGrid columns="5" >
+        <h:panelGroup>
+          <p:panelGrid columns="4">
+            <p:outputLabel value="#{lang.purchaseReturn}" for="srSwitch" />
+            <p:inputSwitch  value="#{purchaseLedgerView.returnIncluded}" onLabel="#{lang.on}" offLabel="#{lang.off}" id="srSwitch" >
+              <p:ajax listener="#{purchaseLedgerView.setPurchaseLedgerList(null)}" process="@this" update="damgeExpiryDiv purchaseLedgerTable" onstart="block();" oncomplete="unblock();" />
+            </p:inputSwitch >
+            <h:panelGroup id="damgeExpiryDiv" >
+              <p:panelGrid columns="2" rendered="#{purchaseLedgerView.returnIncluded}">
+                <p:outputLabel value="#{lang.damaged}/#{lang.expiry}" for="deSwitch" style="color: #{purchaseLedgerView.returnIncluded ? ReportConstant.COLOR_RED:''}" />
+                <p:inputSwitch  value="#{purchaseLedgerView.damageExpiry}" onLabel="#{lang.on}" offLabel="#{lang.off}" id="deSwitch" >
+                  <p:ajax listener="#{purchaseLedgerView.setPurchaseLedgerList(null)}" process="@this" update="purchaseLedgerTable" onstart="block();" oncomplete="unblock();" />
+                </p:inputSwitch >
+              </p:panelGrid>
+            </h:panelGroup>
+          </p:panelGrid>
+        </h:panelGroup>
+        <p:selectOneMenu id="reportType" value="#{purchaseLedgerView.filterParameters.reportType}"  styleClass="l-p-10" valueChangeListener="#{companyCustomerSalesView.applyFilter}" required="true" >
+          <f:selectItem itemLabel="#{lang.invoiceWise}" itemValue="1"  />
+          <f:selectItem itemLabel="#{lang.invoiceProductWise}" itemValue="2" />
+          <p:ajax event="itemSelect" process="@this" update="purchaseLedgerTable" onstart="block()" oncomplete="unblock()"
+                  listener="#{purchaseLedgerView.updateReportType()}"/>
+        </p:selectOneMenu>
+        <h:panelGroup id="filterDiv"> 
+          <h:panelGroup id="accountGroupDiv" rendered="true">
+            <p:autoComplete id='accountGroup'  value="#{purchaseLedgerView.filterParameters.accountGroup}" completeMethod="#{purchaseLedgerView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                            converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" 
+                            title="#{lang.accountGroup}" scrollHeight="400" >
+              <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+              <p:column style="width:250px;">
+                <h:outputText value="#{e.groupName}" />
+              </p:column>
+              <p:column style="width: 40px;">
+                <h:outputText value="#{e.groupCode}" />
+              </p:column>
+              <p:column style="width: 50px;">
+                <p:fragment rendered="#{e.isDefault eq 0}">
+                  <i class="fa fa-users" style="color:#000;"></i>
+                </p:fragment>
+                <p:fragment rendered="#{e.isDefault eq 1}">
+                  <i class="fa fa-users" style="color:#CCC;" ></i>
+                </p:fragment>
+              </p:column>
+              <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" immediate="true" process="accountGroupDiv" update="accountDiv purchaseLedgerTable" listener="#{purchaseLedgerView.accountGroupSelectEvent}"/>
+            </p:autoComplete>    
+          </h:panelGroup>
+          <h:panelGroup id="accountDiv" styleClass="w-200 ib-m">
+            <p:autoComplete id='account'  value="#{purchaseLedgerView.filterParameters.account}" completeMethod="#{purchaseLedgerView.accountAuto}" converter="wawo.LookupIntConverter" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                            converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                            title="#{lang.accountNumber}">
+              <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+              <p:column style="width: 200px;">
+                <h:outputText value="#{e.vendorId.vendorName}" />
+              </p:column>
+              <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                <h:outputText value="#{e.accountCode}" />
+              </p:column>
+              <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                <h:outputText value="#{e.companyTradeProfileId.title}" />
+              </p:column>
+              <p:ajax event="itemSelect" onstart="block();" 
+                      oncomplete="unblock();" immediate="true" process="accountDiv" update="purchaseLedgerTable" listener="#{purchaseLedgerView.accountSelectEvent}"/>
+            </p:autoComplete>
+            <p:message for="account" />
+          </h:panelGroup>
+            <p:commandButton actionListener="#{purchaseLedgerView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate purchaseLedgerTable"  styleClass="btn" onclick="block();" oncomplete="unblock();"/>
+          <p:commandButton actionListener="#{purchaseLedgerView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate purchaseLedgerTable" styleClass="btn" onclick="block();" oncomplete="unblock();" />
+
+          <p:calendar value="#{purchaseLedgerView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="13" size="10"
+                      id="fromDate" showButtonPanel="true" navigator="true" mask="true"  >
+            <p:ajax event="dateSelect" process="@this" update="purchaseLedgerTable" listener="#{purchaseLedgerView.setPurchaseLedgerList(null)}"   />
+          </p:calendar>
+          <p:calendar value="#{purchaseLedgerView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="13" size="10" 
+                      id="selectedToDate" showButtonPanel="true" navigator="true" mask="true"  >
+            <p:ajax event="dateSelect" process="@this"  update="purchaseLedgerTable" listener="#{purchaseLedgerView.setPurchaseLedgerList(null)}"  />
+          </p:calendar>
+        </h:panelGroup>
+        <p:commandButton value="#{lang.ok}" styleClass="btn btn-info" process="filterDiv" update="purchaseLedgerTable filterDiv" style="margin-left: 3px; margin-bottom: 4px;" actionListener="#{purchaseLedgerView.setPurchaseLedgerList(null)}" 
+                         >
+        </p:commandButton>
+      </p:panelGrid>
+    </ui:define>
+
+
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseLedgerTable" var="row" widgetVar="purchaseLedgerWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{purchaseLedgerView.getPurchaseLedgerList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}" 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('purchaseLedgerWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden"><f:facet name="header">
+            <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink actionListener="#{popUpView.showPurchase(row.id)}" immediate="true" rendered="#{row.purchaseOrReturn eq 1}" >
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showPurchaseReturn(row.id)}" immediate="true" rendered="#{row.purchaseOrReturn eq 2}" >
+            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>     
+
+        <p:column sortBy="#{row.supplierName}" field="supplier_name" filterBy="#{row.supplierName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.supplier}" title="#{lang.supplier}"/></f:facet>
+          <h:outputText value="#{appView.display(row.supplierName)}" title="#{appView.title(row.supplierName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.invoiceDate}" field="invoice_date" filterBy="#{row.invoiceDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.invoiceDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.hsnCode}" field="hsn_code" filterBy="#{row.hsnCode}" filterStyleClass="hidden" 
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.hsnCode}" title="#{lang.hsnCode}"/></f:facet>
+          <h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.packType}" field="pack_type" filterBy="#{row.packType}" filterStyleClass="hidden" 
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.packType}" title="#{lang.packType}"/></f:facet>
+          <h:outputText value="#{appView.display(row.packType)}" title="#{appView.title(row.packType)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.batchNo}" field="batch_no" filterBy="#{row.batchNo}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.expiryDate}" field="expiry_date" styleClass="text-left" filterBy="#{row.expiryDate}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.expiryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.valueMrp}" field="value_mrp" styleClass="text-right" filterBy="#{row.valueMrp}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.valueMrp}" title="#{lang.valueMrp}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueMrp)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.purchaseQty}" field="purchase_qty" styleClass="text-right" filterBy="#{row.purchaseQty}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.purchasedQty}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.purchaseQty)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}"/>
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.totalQty)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.purchaseRate}" field="purchase_rate" styleClass="text-right" filterBy="#{row.purchaseRate}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.purchaseRate}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.purchaseRate)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.goodsValue}" field="goods_value" styleClass="text-right" filterBy="#{row.goodsValue}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.goodsValue}" title="#{lang.goodsValue}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.goodsValue)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.purchaseValue)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.schemeDiscount}" field="scheme_discount" styleClass="text-right" filterBy="#{row.schemeDiscount}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.schemeDisc}" title="#{lang.schemeDisc}"/></f:facet>
+          <h:outputText value="#{appView.display(row.schemeDiscount)}" title="#{appView.title(row.schemeDiscount)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}"/>
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.schemeDiscount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.productDiscount}" field="product_discount" styleClass="text-right" filterBy="#{row.productDiscount}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.prod} #{lang.disc}" title="#{lang.prod} #{lang.disc}"/></f:facet>
+          <h:outputText value="#{appView.display(row.productDiscount)}" title="#{appView.title(row.productDiscount)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}"/>
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.productDiscount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDiscount}" field="invoice_discount" styleClass="text-right" filterBy="#{row.invoiceDiscount}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.invDisc}" title="#{lang.invDisc}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceDiscount)}" title="#{appView.title(row.invoiceDiscount)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.invoiceDiscount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.taxableValue}" field="taxable_value" styleClass="text-right" filterBy="#{row.taxableValue}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+          <h:outputText value="#{appView.display(row.taxableValue)}" title="#{appView.title(row.taxableValue)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.taxableValue)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.valueCgst}" field="vaue_cgst" styleClass="text-right" filterBy="#{row.valueCgst}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.cgst}" title="#{lang.cgst}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueCgst)}" title="#{appView.title(row.valueCgst)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.cgst)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.valueSgst}" field="vaue_sgst" styleClass="text-right" filterBy="#{row.valueSgst}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.sgst}" title="#{lang.sgst}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueSgst)}" title="#{appView.title(row.valueSgst)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.sgst)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.valueIgst}" field="vaue_cgst" styleClass="text-right" filterBy="#{row.valueIgst}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.igst}" title="#{lang.igst}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueIgst)}" title="#{appView.title(row.valueIgst)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.igst)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.taxValue}" field="tax_value" styleClass="text-right" filterBy="#{row.taxValue}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="GST #{lang.amount}" title="GST #{lang.amount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxValue)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.totalTaxValue)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.billAmount}" field="bill_amount" styleClass="text-right" filterBy="#{row.billAmount}" filterStyleClass="hidden"
+                  rendered="#{purchaseLedgerView.filterParameters.reportType ne ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.bill}" title="#{lang.bill} #{lang.amount}"/></f:facet>
+          <h:outputText value="#{appView.number(row.billAmount)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.invoiceAmount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.accountInvoiceNo}" field="account_invoice_no" 
+                  rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.accountInvoiceNo)}" escape="false">
+          </h:outputText>
+        </p:column>
+          
+        <p:column sortBy="#{row.referenceNo}" field="reference_no" 
+                  rendered="#{purchaseLedgerView.showReference}" >
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.referenceNo)}" escape="false">
+          </h:outputText>
+        </p:column>
+
+        <p:column  sortBy="#{row.invoiceDate}" field="invoice_date" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.invoiceDate)}" escape="false" />
+        </p:column>
+
+        <p:column  sortBy="#{row.entryDate}" field="product_entry_date" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(row.entryDate)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{row.goodsValue}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.goodsValue}" title="#{lang.goodsValue}"/></f:facet>          
+          <h:outputText value="#{row.goodsValue eq null ? '0.00' : appView.decimal(row.goodsValue)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.purchaseValue)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.schemeDiscount}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.schemeDisc}" title="#{lang.schemeDisc}"/></f:facet>          
+          <h:outputText value="#{row.schemeDiscount eq null ? '0.00' : appView.decimal(row.schemeDiscount)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.schemeDiscount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.productDiscount}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.prod} #{lang.disc}" title="##{lang.prod} #{lang.disc}"/></f:facet>          
+          <h:outputText value="#{row.productDiscount eq null ? '0.00' : appView.decimal(row.productDiscount)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.productDiscount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.invoiceDiscount}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.invDisc}" title="#{lang.invDisc}"/></f:facet>          
+          <h:outputText value="#{row.invoiceDiscount eq null ? '0.00' : appView.decimal(row.invoiceDiscount)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.invoiceDiscount)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.taxableValue}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.taxable} #{lang.value}" title="#{lang.taxable} #{lang.value}"/></f:facet>          
+          <h:outputText value="#{row.taxableValue eq null ? '0.00' : appView.decimal(row.taxableValue)}" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.taxableValue)}" />
+          </f:facet>
+        </p:column>
+        <p:column  sortBy="#{row.valueCgst}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.cgst}" title="#{lang.cgst}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueCgst)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.cgst)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column  sortBy="#{row.valueSgst}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.sgst}" title="#{lang.sgst}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueSgst)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.sgst)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column  sortBy="#{row.valueIgst}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.igst}" title="#{lang.igst}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.valueIgst)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.igst)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column  sortBy="#{row.taxValue}" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="GST #{lang.amount}" title="GST #{lang.amount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.taxValue)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.taxValue)}" />
+          </f:facet>
+        </p:column>
+
+        <p:column  sortBy="#{row.billAmount}" field="invoice_amount" style="text-align: right;" rendered="#{purchaseLedgerView.filterParameters.reportType eq ReportConstant.SUPPLIER_INVOICE_WISE}" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.billAmount)}" escape="false" style="color: #{row.purchaseOrReturn eq 2?ReportConstant.COLOR_RED:''}" />
+          <f:facet name="footer">
+            <h:outputText value="#{appView.decimal(purchaseLedgerView.invoiceAmount)}" />
+          </f:facet>
+        </p:column>
+        <p:column sortBy="#{row.returnType}" field="return_type" filterBy="#{row.returnType}" filterStyleClass="hidden" rendered="#{purchaseLedgerView.returnIncluded}" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.returnType}" title="#{lang.returnType}"/></f:facet>
+          <h:outputText value="#{appView.display(row.returnType)}" title="#{appView.title(row.returnType)}" escape="false" />
+        </p:column>
+
+        <p:column exportable="false" style="width:50px;"></p:column>
+
+
+<!--        <p:column  sortBy="#{row.productEntryStatusId.title}" field="product_entry_status.title" >
+  <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+  <h:outputText value="#{row.productEntryStatusId.title}" escape="false"  
+                styleClass="m-r-5 #{sysRuntimeView.statusStyle(row.productEntryStatusId.id)}" 
+                style="background-color: #{sysRuntimeView.statusColor(row.productEntryStatusId.id)}"/>          
+
+  <h:outputText value="Tax Variation" escape="false"  
+                styleClass="label"  rendered="#{row.isTaxCodeModified eq 1}"
+                style="background-color: #f10b0b;"/>
+
+
+</p:column>-->
+
+        <!--          <p:column exportable="false">
+                    <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                    <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                      <ui:define name="cby">#{appView.display(row.createdBy)}</ui:define>
+                      <ui:define name="cat">#{appView.dateTime(row.createdAt)}</ui:define>
+                      <ui:define name="uby">#{appView.display(row.modifiedBy)}</ui:define>
+                      <ui:define name="uat">#{appView.dateTime(row.modifiedAt)}</ui:define>
+                      <ui:define name="id">#{appView.display(row.id)}</ui:define>
+                    </ui:decorate>
+                  </p:column>-->
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

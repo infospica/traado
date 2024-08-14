@@ -1,0 +1,1119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+    <ui:param name="ids" value="salesReturnGst" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="clone" value="false" />
+    <ui:param name="more" value="#{salesReturnView.draft ? true : false}" />
+    <ui:param name="rendered" value="#{main.isForm()}" />
+    <ui:param name="deleteFormMenu" value="#{salesReturnView.draft}" />
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesReturnView.deleteSalesReturn(main)}" value="#{lang.delete}" onclick="wdgOff('salesReturnWidgetDel')" partialSubmit="true" 
+                       process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" rendered="#{!salesReturnView.tradeClosed}"/>
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <p:commandButton action="#{salesReturnView.saveSalesReturn(main,sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" rendered="#{salesReturnView.draft}"
+                       onclick="toTop()" styleClass="btn btn-primary" process="f1" update="f1">
+      </p:commandButton>
+
+      <!--Confirm-->
+      <p:commandButton value="#{lang.confirm}" rendered="#{salesReturnView.draft and main.edit}" styleClass="btn btn-primary" >
+        <p:ajax event="click" listener="#{salesReturnView.calculateTotalDiscounts()}" immediate="true" oncomplete="confirmSalesReturn();"
+                update="confirmDlgVar "/>
+      </p:commandButton>
+
+      <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{salesReturnView.actionResetSalesReturn(main)}" onstart="block();" oncomplete="unblock();"
+                       rendered="#{!salesReturnView.draft  and main.edit and userRuntimeView.privilege.resetToDraft==true and !salesReturnView.tradeClosed}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--      <p:commandButton id="rsiBtn" value="Related Items" styleClass="btn btn-info" process="@this" update="@this"
+                             type="button" rendered="#{!salesReturnView.draft and userRole.isRoot() and main.edit}" >
+            </p:commandButton>-->
+
+      <!-- Print -->
+      <p:commandButton value="#{lang.print}" actionListener="#{salesReturnView.printLandscape(main, sysConstant.PDF_ITEXT)}"
+                       rendered="#{main.edit}"
+                       immediate="true"  process="@this"  styleClass="btn btn-info">
+      </p:commandButton>  
+      <p:commandButton value="#{lang.print} A4" actionListener="#{salesReturnView.printPortrait(main, sysConstant.PDF_ITEXT)}"
+                       rendered="#{main.edit}"
+                       immediate="true"  process="@this"  styleClass="btn btn-info">
+      </p:commandButton>  
+
+      <h:panelGroup style="padding-left:10px;"  rendered="#{!main.isNew()}" >
+        <p:commandButton value="#{lang.export}" actionListener="#{salesReturnView.export(main)}" immediate="true" styleClass="btn btn-info" 
+                         ajax="false" icon="fa fa-file-excel-o" iconPos="left"   />
+      </h:panelGroup>
+
+      <h:panelGroup style="padding-left:10px;"  rendered="#{!main.isNew()}" >
+        <p:commandButton value="#{lang.showSplitReturn}"  rendered="#{main.edit and !salesReturnView.draft and salesReturnView.salesReturn.returnSplitForGstFiling eq 1}" 
+                         styleClass="btn btn-success" style="color: #DDD;background-color: #003399">
+          <p:ajax event="click" immediate="true" listener="#{salesReturnView.loadSalesReturnSplitList(main)}" update="splitSalesReturnTable" oncomplete="showSplitReturn();" />
+        </p:commandButton> 
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="formRight" >
+      <!-- Up Coming Documet No -->
+      <h:outputText  value="#{lang.next} #{lang.documentNo} #{lang.colon} " 
+                     rendered="#{salesReturnView.draft}" /> 
+      <p:outputLabel styleClass="m-r-10" value="#{salesReturnView.nextInvoiceNumber}" style="color:#900;" 
+                     rendered="#{salesReturnView.draft}" />
+
+      <h:panelGroup rendered="#{!main.isNew()}">
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-left"  disabled="#{!salesReturnView.isPreviousButton()}" title="Previous #{lang.salesInvoice}"
+                         actionListener="#{salesReturnView.nextOrPreviousInvoice(main,-1)}" immediate="true" update="f1" onclick="block();" oncomplete="unblock();" />
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-right" iconPos="right" disabled="#{!salesReturnView.isNextButton()}" title="#{lang.next} #{lang.salesInvoice}"
+                         actionListener="#{salesReturnView.nextOrPreviousInvoice(main,1)}" immediate="true" update="f1" onclick="block();" oncomplete="unblock();" />
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="after">
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <p:panelGrid  rendered="#{main.isForm()}" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                    columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+        <!-- Customer Account Group -->
+        <p:outputLabel value="#{lang.accountGroup}" for="lblCustomerAccountGroupId" />
+        <h:panelGroup id="accountGroupDiv" >
+          <p:inputText id="lblCustomerAccountGroupId" value="#{salesReturnView.salesReturn.accountGroupId.groupName}" readonly="true"  styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Sales Return Receipt -->
+        <p:commandLink actionListener="#{salesReturnView.openSalesReturnReceiptPopup()}" process="@this" immediate="true" onstart="block()" 
+                       oncomplete="unblock()" rendered="#{salesReturnView.draft}" >
+          <p:outputLabel value="#{lang.salesReturnReceipt}" for="productEntrySalesReturnReceiptId" />
+        </p:commandLink>
+        <p:outputLabel value="#{lang.salesReturnReceipt}" for="productEntrySalesReturnReceiptId" rendered="#{salesReturnView.confirmed}"/>
+        <h:panelGroup id="consignmentDiv">
+          <p:selectOneMenu value="#{salesReturnView.consignmentRate}"  id="productEntrySalesReturnReceiptId" styleClass="fw" disabled="#{salesReturnView.confirmed}"
+                           converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.consignment} #{lang.isRequired}" >
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+            <f:selectItems value="#{salesReturnView.lookUpConsignmentByCustomerAccountGroup(main)}" var="e" itemValue="#{e}" itemLabel="#{e.consignmentNo}" />
+            <p:ajax event="itemSelect" process="consignmentDiv" listener="#{salesReturnView.consignmentRateItemSelectEvent}"
+                    update="registerNoGst" />
+          </p:selectOneMenu>
+          <p:message for="productEntrySalesReturnReceiptId" display="text" />
+        </h:panelGroup>
+
+        <!-- Invoice No -->
+        <p:outputLabel value="#{lang.invoiceNo}" for="invoiceNo" />
+        <h:panelGroup>
+          <p:inputText value="#{salesReturnView.salesReturn.invoiceNo}" maxlength="50" id="invoiceNo" autocomplete="off"
+                       required="true" requiredMessage="#{lang.invoiceNo} #{lang.isRequired}" readonly="true"
+                       rendered="#{!(userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root) or salesReturnView.salesReturn.confirmedAt eq null}"/>
+          <p:inplace id="invoiceEdit"  event="dblclick" label="#{salesReturnView.salesReturn.invoiceNo}" styleClass="fw" rendered="#{(userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root) and salesReturnView.salesReturn.confirmedAt ne null}" >
+            <p:inputText value="#{salesReturnView.salesReturn.invoiceNo}"  maxlength="50" id="invoiceNoR" styleClass="form-control prNum" />
+          </p:inplace> 
+          <p:message for="invoiceNo" display="text" styleClass="fw" />
+        </h:panelGroup>        
+
+        <!-- Sales Return register number -->
+        <p:outputLabel value="#{lang.regno}" for="registerNoGst" />
+        <h:panelGroup>
+          <p:inputText value="#{salesReturnView.salesReturn.accountInvoiceNo}" maxlength="50" id="registerNoGst" autocomplete="off"
+                       required="true" requiredMessage="#{lang.regno} #{lang.isRequired}" rendered="#{salesReturnView.draft}"/>
+          <p:message for="registerNoGst" display="text" styleClass="fw" />
+          <h:outputText value="#{salesReturnView.salesReturn.accountInvoiceNo}" rendered="#{salesReturnView.confirmed}" />
+        </h:panelGroup> 
+
+        <!-- Customer -->
+        <p:outputLabel value="#{lang.customer}" for="salesReturnCustomerIdGst"/>
+        <h:panelGroup id="customerDivGst">
+          <p:autoComplete value="#{salesReturnView.salesReturn.customerId}" completeMethod="#{salesReturnView.customerAuto}" converter="wawo.LookupIntConverter"
+                          id="salesReturnCustomerIdGst" var="cust" itemValue="#{cust}" itemLabel="#{cust.customerName}" emptyMessage="#{lang.noResult}"
+                          required="true" requiredMessage="#{lang.customer} #{lang.isRequired}" rendered="#{salesReturnView.customerEditable}"
+                          cache="true" queryDelay="500" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                          style="position: relative" styleClass="fw" scrollHeight="300" >
+            <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+            <p:column>
+              #{cust.customerName}
+            </p:column>
+            <p:ajax event="itemSelect" process="@this" update="invoiceNo consignmentDiv salesAgentDiv" listener="#{salesReturnView.customerSelectEventHandler}" />
+          </p:autoComplete>
+          <h:outputText value="#{salesReturnView.salesReturn.customerId.customerName}" rendered="#{!salesReturnView.customerEditable}" />
+          <p:message for="salesReturnCustomerIdGst" display="text" />
+        </h:panelGroup>
+
+        <!-- Debit Note No -->
+        <p:outputLabel value="#{lang.debitNoteNo}" for="debitNoteNo" />
+        <h:panelGroup>
+          <p:inputText value="#{salesReturnView.salesReturn.debitNoteNo}" maxlength="20" id="debitNoteNo" autocomplete="off"
+                       required="true" requiredMessage="#{lang.debitNoteNo} #{lang.isRequired}" rendered="#{salesReturnView.draft}" />
+          <p:message for="debitNoteNo" display="text" styleClass="fw" />
+          <h:outputText value="#{salesReturnView.salesReturn.debitNoteNo}" rendered="#{salesReturnView.confirmed}" />
+        </h:panelGroup>        
+
+        <!--Sales Agent-->
+        <p:outputLabel value="#{lang.salesAgent}" for="salesAgent"/>
+        <h:panelGroup id="salesAgentDiv">
+          <p:autoComplete value="#{salesReturnView.salesReturn.salesAgentId}" completeMethod="#{salesReturnView.salesAgentAuto}" converter="wawo.LookupIntConverter"
+                          id="salesAgent" var="agent" itemValue="#{agent}" itemLabel="#{agent.name}" emptyMessage="#{lang.noResult}"                           
+                          cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                          style="position: relative" styleClass="fw" rendered="#{salesReturnView.draft}"
+                          required="#{salesReturnView.salesAgentCompulsory}" >
+            <f:attribute name="clazz" value="#{scmLookupView.salesAgentClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.salesAgentById()}"/>
+            <p:column>
+              #{agent.name}
+            </p:column>
+            <!--<p:ajax event="itemSelect" process="@this" update="invoiceNo consignmentDiv" listener="#{salesReturnView.customerSelectEventHandler}" />-->
+          </p:autoComplete>
+          <p:message for="salesAgent" display="text" styleClass="fw" />
+          <h:outputText value="#{salesReturnView.salesReturn.salesAgentId.name}" rendered="#{salesReturnView.confirmed}" />
+        </h:panelGroup>   
+
+        <!-- Reference No -->
+        <p:outputLabel value="#{lang.referenceNo}" for="referenceNo" rendered="#{salesReturnView.displayReference}" />
+        <h:panelGroup rendered="#{salesReturnView.displayReference}">
+          <p:autoComplete id="referenceNo" value="#{salesReturnView.salesReturn.referenceNo}" completeMethod="#{salesReturnView.getSalesInvoiceList(main)}" dropdown="true"
+                          autoHighlight="false" immediate="false" disabled="#{salesReturnView.confirmed}" >
+            <p:ajax event="itemSelect" update="refInvDate referenceNoConfirm"  process="@this" listener="#{salesReturnView.updateReferenceDateFromRefNo(main)}" />
+          </p:autoComplete>
+          <p:message for="referenceNo" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Entry Date -->
+        <p:outputLabel value="#{lang.entryDate}" for="productEntryDate" />
+        <h:panelGroup>
+          <p:calendar value="#{salesReturnView.salesReturn.entryDate}" pattern="#{lang.datePattern}" placeholder="dd-mm-yy"
+                      required="true" requiredMessage="#{lang.productEntryDate} #{lang.isRequired}" mindate="#{salesReturnView.minEntryDate}"
+                      converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}" validator="#{sysRuntimeView.dateLteToday}"
+                      maxlength="29" id="productEntryDate" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.maxEntryDate}" 
+                      disabled="#{salesReturnView.confirmed}"/>
+          <p:message for="productEntryDate" display="text"/>
+        </h:panelGroup>
+
+        <!-- Sales Return Ledger -->
+        <p:outputLabel value="#{lang.salesReturnLedger}" for="salesReturnLedgerId" rendered="false" />
+        <h:panelGroup rendered="false">
+          <p:inputText value="#{salesReturnView.salesReturn.accountingLedgerId.title}" maxlength="50" id="salesReturnLedgerId" autocomplete="off"
+                       required="true" requiredMessage="#{lang.salesReturnLedger} #{lang.isRequired}" readonly="true" />
+          <p:message for="salesReturnLedgerId" display="text" />
+        </h:panelGroup>
+
+        <!-- Reference Invoice Date -->
+        <p:outputLabel value="#{lang.reference} #{lang.invoiceDate}" for="refInvDate" rendered="#{salesReturnView.displayReference}" />
+        <h:panelGroup rendered="#{salesReturnView.displayReference}" >
+          <p:calendar value="#{salesReturnView.salesReturn.referenceInvoiceDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.reference} #{lang.invoiceDate} #{lang.invalidDate}"
+                      placeholder="dd-mm-yy" disabled="#{salesReturnView.confirmed}"
+                      validator="#{sysRuntimeView.dateLteToday}" mindate="#{userRuntimeView.minDate}"
+                      maxlength="29" id="refInvDate" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}">
+            <p:ajax event="dateSelect" update="refInvDateConfirm"  process="@this"/>
+            <p:ajax event="change" update="refInvDateConfirm"  process="@this"/>
+          </p:calendar>
+          <p:message for="refInvDate" display="text"/>
+        </h:panelGroup>
+
+        <!-- Debit Note Date -->
+        <p:outputLabel value="#{lang.debitNoteDate}" for="debitNoteDateGst" />
+        <h:panelGroup>
+          <p:calendar value="#{salesReturnView.salesReturn.invoiceDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.debitNoteDate} #{lang.invalidDate}"
+                      placeholder="dd-mm-yy" required="true" requiredMessage="#{lang.debitNoteDate} #{lang.isRequired}"
+                      validator="#{sysRuntimeView.dateLteToday}" mindate="#{userRuntimeView.minDate}" disabled="#{salesReturnView.confirmed}"
+                      maxlength="29" id="debitNoteDateGst" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.maxEntryDate}"/>
+          <p:message for="debitNoteDateGst" display="text"/>
+        </h:panelGroup>
+
+
+
+        <p:outputLabel value="#{lang.taxable}" for="taxable" />
+        <h:panelGroup id="taxableDiv" >
+          <p:selectOneRadio value="#{salesReturnView.salesReturn.isTaxable}" id="taxable" disabled="#{salesReturnView.confirmed}"
+                            required="true" requiredMessage="#{lang.taxable} #{lang.isRequired}">
+            <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+            <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+          </p:selectOneRadio>
+          <p:message for="taxable" display="text"/>
+        </h:panelGroup>
+
+        <h:outputLabel rendered="#{main.edit and (userRole.isRoot() or userRuntimeView.privilege.modifyTax eq true) and salesReturnView.draft}"  style="color: cornflowerblue;" value="Modify Tax Code"></h:outputLabel>
+        <h:panelGroup rendered="#{main.edit and (userRole.isRoot() or userRuntimeView.privilege.modifyTax eq true) and salesReturnView.draft}">
+          <p:selectBooleanCheckbox value="#{salesReturnView.taxEditable}" id="cb33" >                
+            <p:ajax event="change" update="salesReturnItemTable"/>
+          </p:selectBooleanCheckbox>
+        </h:panelGroup>
+        <!-- Note For Customer -->
+        <p:outputLabel value="#{lang.note}" for="remarks" >
+         <i class="fa fa-print"></i>
+        </p:outputLabel>
+        <h:panelGroup>
+          <p:inputTextarea disabled="#{salesReturnView.confirmed}" value="#{salesReturnView.salesReturn.noteForCustomerOrSupplier}" placeholder="#{lang.note} (#{lang.print})" 
+                           cols="50" rows="1" maxlength="255" id="note" autoResize="false" styleClass="fw" />
+        </h:panelGroup>
+        <!-- Remarks -->
+        <p:outputLabel value="#{lang.remarks}" for="remarks" />
+        <h:panelGroup>
+          <p:inputTextarea disabled="#{salesReturnView.confirmed}" value="#{salesReturnView.salesReturn.note}" placeholder="#{lang.remarks}" cols="50" rows="1" maxlength="255" id="remarks" autoResize="false" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Sales return from Purchase return-->
+        <p:commandButton action="#{popUpView.salesReturnfromPurchaseReturnPopup(main, salesReturnView.salesReturn)}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus"
+                         iconPos="left" styleClass="btn btn-info" rendered="#{salesReturnView.isDraft() and salesReturnView.salesReturn.id ne null and salesReturnView.salesReturn.customerId.isCompany eq 1}" 
+                         value="#{lang.add} #{lang.salesReturn}">
+        </p:commandButton>
+
+        <p:remoteCommand name="salesReturnfromPurchaseReturnPopupReturned" actionListener="#{salesReturnView.salesReturnFromPurRetPopupReturned(main)}"
+                         update="salesReturnTableDivGst"  process="@this" immediate="true" oncomplete="refreshDatatable();" />
+
+        <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+        <p:remoteCommand name="consignmentReturned" process="@this" actionListener="#{salesReturnView.consignmentPopupReturned(main)}" update="consignmentDiv" />
+      </p:panelGrid>
+      <p:dialog id="confirmDlgVar" widgetVar="confirmDlgVar" header="#{lang.confirm} #{lang.salesReturn}" resizable="true" closeOnEscape="true" style="width: 300" blockScroll="true" modal="false" >
+        <h:panelGroup  layout="block" rendered="#{main.isForm()}"> 
+          <p:panelGrid  columns="2" layout="grid"  rendered="#{salesReturnView.displayReferenceInDialog}">
+            <p:outputLabel value="#{lang.referenceNo}" for="referenceNo" />
+            <h:panelGroup>
+              <p:autoComplete  id="referenceNoConfirm" value="#{salesReturnView.salesReturn.referenceNo}" completeMethod="#{salesReturnView.getSalesInvoiceList(main)}" 
+                               styleClass="fw" dynamic="true" cache="true" cacheTimeout="1000" selectLimit="200" scrollHeight="280" appendTo="confirmDlgVar" minQueryLength="0">
+                <p:ajax event="itemSelect" update="referenceNo refInvDate refInvDateConfirm"  process="@this" listener="#{salesReturnView.updateReferenceDateFromRefNo(main)}" />
+              </p:autoComplete>
+              <p:message for="referenceNo" display="text" styleClass="fw" />
+            </h:panelGroup>
+            <p:outputLabel value="#{lang.reference} #{lang.invoiceDate}" for="refInvDate" />
+            <h:panelGroup>
+              <p:calendar value="#{salesReturnView.salesReturn.referenceInvoiceDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.reference} #{lang.invoiceDate} #{lang.invalidDate}"
+                          placeholder="dd-mm-yy" 
+                          validator="#{sysRuntimeView.dateLteToday}" mindate="#{userRuntimeView.minDate}"
+                          maxlength="10" size="10" id="refInvDateConfirm" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}"/>
+              <p:message for="refInvDate" display="text"/>
+            </h:panelGroup>
+          </p:panelGrid>
+
+          <p:panelGrid  columns="4" layout="grid" >
+            <h:outputText value ="#{lang.totalItems}" />
+            <p:outputLabel value =": #{salesReturnView.salesReturnItemList.size()}" />
+            <h:outputText value ="#{lang.totalQty} " />
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalQty)}" />
+
+            <h:outputText value ="#{lang.schemeDisc}" />
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalSchemeDiscount)}" />
+            <h:outputText value ="#{lang.productDisc}" />
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalProductDiscount)}" />
+
+            <h:outputText value ="Spl. #{lang.disc}" rendered="#{salesReturnView.totalInvoiceDiscount ne 0}" />
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalInvoiceDiscount)}" rendered="#{salesReturnView.totalInvoiceDiscount ne 0}" />
+
+            <h:outputText value ="#{lang.cgst}" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}"/>
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalCgst)}" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}"/>
+            <h:outputText value ="#{lang.sgst}" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}"/>
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalSgst)}" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}"/>
+
+            <h:outputText value ="#{lang.igst}" rendered="#{salesReturnView.interStateSales and salesReturnView.taxable}"/>
+            <p:outputLabel value =": #{appView.decimal(salesReturnView.totalIgst)}" rendered="#{salesReturnView.interStateSales and salesReturnView.taxable}"/>
+
+          </p:panelGrid>
+          <p:panelGrid  columns="2" layout="grid" >
+            <h:outputText value ="#{lang.invoiceAmount}" />
+            <p:outputLabel value =": #{salesReturnView.salesReturn.invoiceAmount}" />
+          </p:panelGrid>
+        </h:panelGroup>
+        <br/>
+        <div style="padding-left: 80px;padding-right: 80px">
+          <h:outputText value="#{lang.productEntryConfirm}"  />
+        </div>
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <p:commandButton action="#{salesReturnView.saveSalesReturn(main,sysConstant.CONFIRMED)}" 
+                           process="f1" update="f1"  
+                           value="#{lang.yes}" styleClass="btn btn-info" onstart="PF('wdgBlock').show();" oncomplete="PF('wdgBlock').hide();"/>
+          <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('confirmDlgVar').hide();" />
+        </div>
+      </p:dialog>
+      <p:dialog id="splitSalesReturnDialogVar" widgetVar="splitSalesReturnDialogVar" header="#{lang.salesReturn} #{lang.list}" resizable="true" closeOnEscape="true" style="width: 300" blockScroll="true" modal="false" >
+        <p:dataTable id="splitSalesReturnTable" var="salesReturnVar" widgetVar="splitSalesReturnWidget" rowIndexVar="rowIndex" reflow="true"
+                     rows="10" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="10,50,100,150" 
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{salesReturnView.salesReturnSplitList}" 
+                     rowKey="#{salesReturnItemVar.id eq null?salesReturnView.getRowKey():salesReturnItemVar.id}">
+          <p:column sortBy="#{salesReturnVar.invoiceNo}" >
+            <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+            <p:commandLink actionListener="#{popUpView.showSalesReturnSplit(salesReturnVar)}" immediate="false" value="#{salesReturnVar.invoiceNo}">
+            </p:commandLink>
+          </p:column>
+
+          <p:column sortBy="#{salesReturnVar.accountInvoiceNo}"  >
+            <f:facet name="header"><h:outputText value="#{lang.regno}" title="#{lang.regno}"/></f:facet>
+            <h:outputText value="#{appView.display(salesReturnVar.accountInvoiceNo)}" title="#{appView.title(salesReturnVar.accountInvoiceNo)}" escape="false" />          
+          </p:column>        
+
+          <p:column sortBy="#{salesReturnVar.customerId.customerName}" >
+            <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+            <h:outputText value="#{appView.display(salesReturnVar.customerId.customerName)}" title="#{appView.title(salesReturnVar.customerId.customerName)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{salesReturnVar.entryDate}" >
+            <f:facet name="header"><h:outputText value="#{lang.invoice} / #{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+            <h:outputText value="#{appView.date(salesReturnVar.entryDate)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{salesReturnVar.invoiceAmount}">
+            <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}"/></f:facet>
+            <h:outputText value="#{appView.decimal(salesReturnVar.invoiceAmount)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{salesReturnVar.referenceNo}">
+            <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>
+            <h:outputText value="#{salesReturnVar.referenceNo}" escape="false" />
+          </p:column>
+
+          <p:column exportable="false">
+            <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+            <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+              <ui:define name="cby">#{appView.display(salesReturnVar.createdBy)}</ui:define>
+              <ui:define name="cat">#{appView.dateTime(salesReturnVar.createdAt)}</ui:define>
+              <ui:define name="uby">#{appView.display(salesReturnVar.modifiedBy)}</ui:define>
+              <ui:define name="uat">#{appView.dateTime(salesReturnVar.modifiedAt)}</ui:define>
+              <ui:define name="id">#{appView.display(salesReturnVar.id)}</ui:define>
+            </ui:decorate>
+          </p:column>
+        </p:dataTable>
+      </p:dialog>
+    </ui:define>
+
+    <ui:define name="afterForm" >     
+      <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
+      <h:panelGroup layout="block" styleClass="card" rendered="#{main.isForm() and main.edit}" >
+        <!--        <p:overlayPanel  id="relatedItemPanel" for="rsiBtn" widgetVar="srPanel" modal="true" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true"
+                                 dynamic="false" style="width: 500px;" >
+                  <h:panelGroup layout="block">
+                    <h:panelGroup id="relatedItemDiv">
+                      <p:dataTable id="relatedItemTable" var="relatedItemVar" value="#{salesReturnView.relatedItemsList}" tableStyleClass="mDataTable mDataTable-center editLinks"
+                                   rows="10"
+                                   paginator="true" paginatorAlwaysVisible="false"
+                                   paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                   rowsPerPageTemplate="5,10,15">
+                        <p:column headerText="#{lang.invoiceNo}">
+                          <h:outputText value="#{relatedItemVar.invoiceNo}" />
+                        </p:column>
+                        <p:column headerText="#{lang.invoice} #{lang.type}">
+                          <h:outputText value="#{relatedItemVar.title}" />
+                        </p:column>
+                      </p:dataTable>
+                    </h:panelGroup>
+                  </h:panelGroup>
+                </p:overlayPanel>-->
+        <h:panelGroup layout="block" id="salesReturnTableDivGst" styleClass="table-responsive" pt:data-fast-input="true">
+
+          <p:dataTable id="salesReturnItemTable" var="salesReturnItemVar" widgetVar="salesReturnItemWidget" rowIndexVar="rowIndex" reflow="true"
+                       rows="50" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="50,100,150" rowStyleClass="#{salesReturnItemVar.creditExist eq 1 ? 'highlight warning' : 'highlight'}"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{salesReturnView.salesReturnItemList}" 
+                       rowKey="#{salesReturnItemVar.id eq null?salesReturnView.getRowKey():salesReturnItemVar.id}"
+                       rowSelectMode="checkbox" selection="#{salesReturnView.selectedSalesReturnItems}">
+            <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+            <p:ajax event="rowSelectCheckbox"  />
+            <p:ajax event="rowUnselectCheckbox" />
+            <p:ajax event="toggleSelect" />
+            <p:column  style="text-align: center;width:4%;">
+              <f:facet name="header"><h:outputText value="Sno" title="Serial Number"/></f:facet>
+              <h:outputText value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!-- Product -->
+            <p:column   style="width:15%;">
+              <f:facet name="header">
+                <h:outputText id="lbl32" value="#{lang.product}" />
+              </f:facet>
+              <h:panelGroup layout="block" id="productDiv" >
+                <h:outputText value="#{salesReturnItemVar.productBatchId.productId.productName}" rendered="#{!salesReturnView.draft}" />
+                <p:autoComplete id="productId" styleClass="fw" value="#{salesReturnItemVar.productSummary}"
+                                completeMethod="#{salesReturnView.lookupProduct}" 
+                                converter="spica.scm.converter.ProductSummaryConverter"
+                                rendered="#{salesReturnView.draft}" scrollHeight="400" autocomplete="off" 
+                                panelStyle="width:860px !important;"
+                                cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" title="#{salesReturnItemVar.productSummary.productName}"
+                                var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+                  <p:column style="width:275px;">
+                    <h:outputText value="#{prod.productName}" />
+                  </p:column>
+                  <f:attribute name="salesReturnItem" value="#{salesReturnItemVar}"/>
+                  <p:ajax event="itemSelect" process="@this" partialSubmit="true" listener="#{salesReturnView.productSelectEvent(salesReturnItemVar, rowIndex)}"
+                          update="batchNo productEntryDate productDetailList customerDivGst" />
+                </p:autoComplete>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Batch -->
+            <p:column style="width:10%;" id="batchDiv">
+              <f:facet name="header"><h:outputText value="Batch" title="Batch"/></f:facet>
+              <h:panelGroup layout="block" id="batchNo">
+                <h:outputText value="#{salesReturnItemVar.productBatchId.batchNo}" rendered="#{!salesReturnView.draft}" />
+                <p:selectOneMenu value="#{salesReturnItemVar.productBatchSummary}" styleClass="fw"  id="productDetailList" var="batchVar"
+                                 title="#{salesReturnItemVar.productBatchSummary.batch}"
+                                 converter="omnifaces.SelectItemsConverter" rendered="#{salesReturnView.draft}" >
+                  <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" noSelectionOption="true" />
+                  <f:selectItems value="#{salesReturnView.completeProductDetail(salesReturnItemVar)}" var="e"
+                                 itemValue="#{e}" itemLabel="#{e.batch}" rendered="#{salesReturnView.draft}" />                      
+                  <p:column style="width: 120px;">
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Batch" /></f:facet>
+                    <h:outputText value="#{batchVar.batch}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Expiry" /></f:facet>
+                    <h:outputText value="#{batchVar.expiryDate}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Pack" /></f:facet>
+                    <h:outputText value="#{batchVar.packSize}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="MRP" /></f:facet>
+                    <h:outputText value="#{batchVar.mrpValue}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="PTS" /></f:facet>
+                    <h:outputText value="#{batchVar.valuePts}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="PTR" /></f:facet>
+                    <h:outputText value="#{batchVar.valuePtr}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Qty" /></f:facet>
+                    <h:outputText value="#{batchVar.productQty}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold; color: coral;" value="Returned Qty" /></f:facet>
+                    <h:outputText value="#{appView.decimal(batchVar.returnedQty)}" style="color: #C62828" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Rate" /></f:facet>
+                    <h:outputText value="#{batchVar.prodPieceSellingForced}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;color: deepskyblue; " value="Sch. Disc" /></f:facet>
+                    <h:outputText value="#{appView.decimal(batchVar.schemeDiscountDerived)}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold; color: cornflowerblue;" value="Disc." /></f:facet>
+                    <h:outputText value="#{appView.decimal(batchVar.productDiscountDerived)}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold; color: coral;" value="Spl Disc" /></f:facet>
+                    <h:outputText value="#{appView.decimal(batchVar.invoiceDiscountDerived)}" />
+                  </p:column>
+
+                  <p:column>
+                    <f:facet name="header">
+                      <h:outputText style="font-weight: bold;" value="GST" /></f:facet>
+                    <h:outputText value="#{batchVar.gstPercentage}" />
+                  </p:column>
+
+                  <p:column rendered="#{salesReturnView.intraStateSales}">
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="CGST" /></f:facet>
+                    <h:outputText value="#{batchVar.gstPercentage/2}" />
+                  </p:column>
+
+                  <p:column rendered="#{salesReturnView.intraStateSales}">
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="SGST" /></f:facet>
+                    <h:outputText value="#{batchVar.gstPercentage/2}" />
+                  </p:column>
+
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Invoice" /></f:facet>
+                    <h:outputText value="#{batchVar.invoiceNo}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Invoice Date" /></f:facet>
+                    <h:outputText value="#{appView.date(batchVar.invoiceDate)}" />
+                  </p:column>
+                  <p:column>
+                    <f:facet name="header"><h:outputText style="font-weight: bold;" value="Account" /></f:facet>
+                    <h:outputText value="#{batchVar.accountCode}" /><h:outputText value="#{batchVar.accountStatusId ne 1 ? ' INACTIVE':''}" style="color:#C62828" 
+                                                                                  rendered="#{batchVar.accountStatusId ne 1}"/>
+                  </p:column>
+                  <p:ajax event="itemSelect" process="@this" update="expiryDateId productMrpValueId taxId productPtrValueId invoiceNoId invoiceDate 
+                          productPtsValueId productQuantityId productDmgQuantityId schemeDiscValueId schemeDiscPercId productDiscValueId specailDiscValueId 
+                          productRateId purchaseRateDiv schemeDiscPercId productDiscPercentageId purchaseRateId packDescId creditSettlementTag actionIcon"
+                          listener="#{salesReturnView.productBatchSelectEvent(salesReturnItemVar, rowIndex)}"  oncomplete="refreshDatatable();focusToQty(#{rowIndex})"
+                          />
+                </p:selectOneMenu>
+              </h:panelGroup>
+            </p:column>
+            <p:messages id="inactiveAccountMessage" for="batchDiv"/>  
+            <!-- Expiry Date -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Expiry" title="Expiry Date"/></f:facet>
+              <h:outputText id="expiryDateId" value="#{sysRuntimeView.dateToMMYY(salesReturnItemVar.productBatchId.expiryDateActual)}" />
+            </p:column>
+            <!--
+                         Pack Unit 
+                        <p:column style="width:5%;">
+                          <f:facet name="header"><h:outputText value="Pack" title="Product Packing"/></f:facet>
+                          <h:outputText id="packUnitId" value="#{salesReturnView.productPackSize(salesReturnItemVar.product)}" />
+                        </p:column>-->
+
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Pack Desc." title="Packing Description"/></f:facet>
+              <h:outputText id="packDescId" value="#{salesReturnItemVar.packDescription}" />
+            </p:column>
+
+            <!-- Tax Rate -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Tax %" title="Product Tax Percentage"/></f:facet>
+              <h:outputText id="taxId" value="#{salesReturnItemVar.taxCodeId.ratePercentage}" rendered="#{!salesReturnView.taxEditable}" />
+
+              <p:selectOneMenu value="#{salesReturnItemVar.taxCodeId}" converter="omnifaces.SelectItemsConverter"                                
+                               id="tx12" rendered="#{salesReturnView.taxEditable}">
+                <f:selectItems value="#{salesReturnView.taxCodeList}" var="tx" itemValue="#{tx}" itemLabel="#{tx.code}" />
+                <p:ajax event="itemSelect" update="expiryDateId productMrpValueId taxId productPtrValueId invoiceNoId invoiceDate
+                        productPtsValueId productQuantityId productDmgQuantityId schemeDiscValueId schemeDiscPercId productDiscValueId specailDiscValueId productRateId purchaseRateDiv"
+                        listener="#{salesReturnView.taxCodeSelectEvent(main, salesReturnItemVar)}"  
+                        />
+              </p:selectOneMenu>
+            </p:column>
+
+            <!-- Invoice No -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Ref. Invoice" title="Sales Invoice"/></f:facet>
+              <h:panelGroup id="invoiceNoId">
+                <p:commandLink actionListener="#{salesReturnView.openSalesInvoicePopUp(salesReturnItemVar.salesInvoiceId.id)}" rendered="#{salesReturnItemVar.salesInvoiceId ne null }" >
+                  <h:outputText value="#{salesReturnItemVar.salesInvoiceId.invoiceNo}" rendered="#{salesReturnItemVar.salesInvoiceId ne null }"  />
+                </p:commandLink>
+                <p:inputText value="#{salesReturnItemVar.refInvoiceNo}" styleClass="fw" autocomplete="off" rendered="#{salesReturnItemVar.salesInvoiceId eq null and salesReturnItemVar.productBatchId ne null}" >
+                  <p:ajax event="blur" update="invoiceDate"/> 
+                </p:inputText>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Invoice Date -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Ref. Date" title="Invoice Date"/></f:facet>
+              <h:panelGroup id="invoiceDate">
+                <h:outputText value="#{appView.date(salesReturnItemVar.salesInvoiceId.invoiceEntryDate)}" rendered="#{salesReturnItemVar.salesInvoiceId ne null }"  />
+                <p:calendar value="#{salesReturnItemVar.refInvoiceDate}" pattern="#{lang.datePattern}" placeholder="dd-mm-yy"  required="#{salesReturnView.refInvoiceDateRequired(salesReturnItemVar)}"                    
+                            converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}" mindate="#{userRuntimeView.minDate}"
+                            rendered="#{salesReturnItemVar.salesInvoiceId eq null and salesReturnItemVar.productBatchId ne null}" 
+                            maxlength="29" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}"/>
+              </h:panelGroup>
+            </p:column>            
+
+            <!-- Primary Qty -->
+            <p:column style="width:13%;" rendered="#{!salesReturnView.damagedSalesReturn}">
+              <f:facet name="header"><h:outputText value="Qty" title="Product Primary Quantity"/></f:facet>
+              <h:panelGroup layout="block" id="primaryQuantityDiv" >
+                <h:outputText value="#{salesReturnItemVar.productQuantity}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="productQuantityId" value="#{salesReturnItemVar.productQuantity}" disabled="#{salesReturnView.confirmed}"
+                               rendered="#{salesReturnView.draft}" title="#{lang.packSize} - #{salesReturnItemVar.packSize}"
+                               styleClass="submit_item" inputStyleClass="text-right #{salesReturnItemVar.salesInvoiceId ne null ? 'submit_b_'.concat(rowIndex) : ''}"
+                               onfocus="this.select()"  maxValue="#{salesReturnItemVar.maxReturnableQty eq null? 9999999:salesReturnItemVar.maxReturnableQty}" decimalPlaces="0" minValue="0" autocomplete="off" >
+                  <p:ajax event="change" process="primaryQuantityDiv" oncomplete="updateInvoiceSummery();"
+                          update="goodsValueId productNetValueId productDiscValueId schemeDiscValueId specailDiscValueId schemeDiscPercId"
+                          listener="#{salesReturnView.primaryQtyBlurEvent(salesReturnItemVar)}" />
+                  <p:tooltip id="packSizeTooolTip" for="productQuantityId" showEvent="focus" hideEvent="blur" />
+                </p:inputNumber>               
+
+              </h:panelGroup>
+            </p:column>
+
+            <p:column style="width:5%;" rendered="#{salesReturnView.damagedSalesReturn}">
+              <f:facet name="header"><h:outputText value="Qty" title="Product Primary Quantity"/></f:facet>
+              <h:panelGroup layout="block" id="primaryDmgQuantityDiv" >
+                <h:outputText value="#{salesReturnItemVar.productQuantityDamaged}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="productDmgQuantityId" value="#{salesReturnItemVar.productQuantityDamaged}" disabled="#{salesReturnView.confirmed}"
+                               rendered="#{salesReturnView.draft}"
+                               styleClass="submit_item" inputStyleClass="text-right #{salesReturnItemVar.salesInvoiceId ne null ? 'submit_b_'.concat(rowIndex) : ''}"
+                               onfocus="this.select()" maxValue="#{salesReturnItemVar.maxReturnableQty eq null? 9999999:salesReturnItemVar.maxReturnableQty}" minValue="0.0" decimalPlaces="2" autocomplete="off" >
+                  <p:ajax event="change" process="primaryDmgQuantityDiv" oncomplete="updateInvoiceSummery();"
+                          update="goodsValueId productNetValueId productDiscValueId schemeDiscValueId specailDiscValueId schemeDiscPercId"
+                          listener="#{salesReturnView.primaryQtyBlurEvent(salesReturnItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>            
+
+            <!-- Scheme Discount Value -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText style="color: deepskyblue;" value="#{lang.s}.#{lang.disc}." title="Scheme Discount Value"/></f:facet>
+              <h:panelGroup layout="block" id="schemeDiscValueDiv">
+                <h:outputText value="#{appView.decimal(salesReturnItemVar.schemeDiscountValue)}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="schemeDiscValueId" value="#{salesReturnItemVar.schemeDiscountValue}" autocomplete="off"
+                               rendered="#{salesReturnView.draft}"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.0"
+                               readonly="#{salesReturnItemVar.isSchemeDiscountInValue eq 0}"
+                               disabled="#{salesReturnItemVar.salesInvoiceId ne null or salesReturnItemVar.productBatchId eq null}">
+                  <p:ajax event="change" process="schemeDiscValueDiv" listener="#{salesReturnView.schemeDiscountValueChangeEvent(salesReturnItemVar)}"
+                          update="productNetValueId schemeDiscPercId" oncomplete="updateInvoiceSummery();" />
+                </p:inputNumber>
+              </h:panelGroup>              
+            </p:column>
+
+            <!-- Scheme Discount Percentage -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText style="color: deepskyblue;" value="#{lang.s}.#{lang.discPerc}." title="Scheme Discount in percentage"/></f:facet>
+              <h:panelGroup layout="block" id="schemeDiscPercDiv">
+                <h:outputText value="#{appView.decimal(salesReturnItemVar.schemeDiscountPercentage)}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="schemeDiscPercId" value="#{salesReturnItemVar.schemeDiscountPercentage}" autocomplete="off"
+                               rendered="#{salesReturnView.draft}"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="100" decimalPlaces="2" minValue="0.0"  
+                               readonly="#{salesReturnItemVar.isSchemeDiscountInValue eq 1}"
+                               disabled="#{salesReturnItemVar.salesInvoiceId ne null or salesReturnItemVar.productBatchId eq null}">
+                  <p:ajax event="change" process="schemeDiscPercDiv" listener="#{salesReturnView.schemeDiscountPercentageChangeEvent(salesReturnItemVar)}"
+                          update="productNetValueId schemeDiscValueId" oncomplete="updateInvoiceSummery();" />
+                </p:inputNumber>
+              </h:panelGroup>              
+            </p:column>
+
+            <!-- Discount Value -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText style="color: cornflowerblue;" value="#{lang.p}.#{lang.disc}" title="Product Discount Value"/></f:facet>
+              <h:panelGroup layout="block" id="productDiscValueDiv">
+                <h:outputText value="#{appView.decimal(salesReturnItemVar.productDiscountValue)}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="productDiscValueId" value="#{salesReturnItemVar.productDiscountValue}" autocomplete="off"
+                               rendered="#{salesReturnView.draft}" readonly="#{salesReturnItemVar.isProductDiscountInValue eq 0}"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.0"                                
+                               disabled="#{salesReturnItemVar.salesInvoiceId ne null or salesReturnItemVar.productBatchId eq null}">
+                  <p:ajax event="change" process="productDiscValueDiv" listener="#{salesReturnView.productDiscountValueChangeEvent(salesReturnItemVar)}"
+                          update="productNetValueId productDiscPercentageId" oncomplete="updateInvoiceSummery();" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Discount Percentage -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText style="color: cornflowerblue;" value="#{lang.p}.#{lang.discPerc}" title="Product Discount Value"/></f:facet>
+              <h:panelGroup layout="block" id="productDiscPercentageDiv">
+                <h:outputText value="#{appView.decimal(salesReturnItemVar.productDiscountPercentage)}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="productDiscPercentageId" value="#{salesReturnItemVar.productDiscountPercentage}" autocomplete="off"
+                               rendered="#{salesReturnView.draft}" readonly="#{salesReturnItemVar.isProductDiscountInValue eq 1}"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.0"                                
+                               disabled="#{salesReturnItemVar.salesInvoiceId ne null or salesReturnItemVar.productBatchId eq null}">
+                  <p:ajax event="change" process="productDiscPercentageDiv" listener="#{salesReturnView.productDiscountPercentageChangeEvent(salesReturnItemVar)}"
+                          update="productNetValueId productDiscValueId" oncomplete="updateInvoiceSummery();" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Special Discount Value -->
+            <p:column style="width:5%;">
+              <f:facet name="header">
+                <h:outputText style="color: coral;" value="Spl. Disc." title="Special Discount Value"/></f:facet>
+              <h:panelGroup layout="block" id="specailDiscValueDiv">
+                <h:outputText value="#{appView.decimal(salesReturnItemVar.invoiceDiscountValue)}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="specailDiscValueId" value="#{salesReturnItemVar.invoiceDiscountValue}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999"
+                               rendered="#{salesReturnView.draft}"
+                               autocomplete="off" decimalPlaces="2" minValue="0.0" disabled="true" >
+                  <p:ajax event="change" process="specailDiscValueDiv" listener="#{salesReturnView.productDiscountValueChangeEvent(salesReturnItemVar)}"
+                          update="goodsValueId productNetValueId" oncomplete="updateInvoiceSummery();" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Box Rate -->
+            <p:column rendered="false">
+              <f:facet name="header"><h:outputText value="Box Rate" title="Product Box Rate"/></f:facet>
+              <h:panelGroup layout="block" id="productBoxRateDiv" >
+                <p:inputNumber id="productBoxRateId" disabled="#{salesReturnItemVar.packSecondaryId ne null ? false : true}"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" decimalPlaces="3" minValue="0.0" autocomplete="off"
+                               value="#{salesReturnItemVar.valueBoxRate}" >
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>                       
+
+            <!-- Rate -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Rate" title="Product Rate"/></f:facet>
+              <h:panelGroup layout="block" id="productRateIdDiv" >
+                <h:outputText value="#{salesReturnItemVar.valueRate}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="productRateId" value="#{salesReturnItemVar.valueRate}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" 
+                               decimalPlaces="#{salesReturnView.salesReturn.decimalPrecision}" minValue="0.0"
+                               rendered="#{salesReturnView.draft}"
+                               disabled="#{salesReturnItemVar.salesInvoiceId ne null or salesReturnItemVar.productBatchId eq null}"
+                               autocomplete="off">
+                  <p:ajax event="change" process="productRateIdDiv" update="productPtsValueId purchaseRateId goodsValueId productNetValueId schemeDiscPercId schemeDiscValueId productDiscValueId productDiscPercentageId" 
+                          oncomplete="updateInvoiceSummery();"
+                          listener="#{salesReturnView.valueRateBlurEvent(salesReturnItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+            <!--
+                         Landing Rate                    (landing rate is calculated based on purchase rate entered)
+                        <p:column style="width:5%;">
+                          <f:facet name="header"><h:outputText value="Land. Rate" title="Product Landing Rate"/></f:facet>
+                          <h:panelGroup layout="block" id="purchaseRateDiv" >
+                            <h:outputText value="#{salesReturnItemVar.landingRate}" rendered="#{!salesReturnView.draft}" />
+                            <p:inputNumber id="purchaseRateId" value="#{salesReturnItemVar.landingRate}" onfocus="this.select()"  maxValue="999999" 
+                                           decimalPlaces="#{salesReturnView.salesReturn.decimalPrecision}" minValue="0.0"
+                                           rendered="#{salesReturnView.draft}"
+                                           styleClass="submit_item" inputStyleClass="text-right #{salesReturnItemVar.salesInvoiceId eq null ? 'submit_b_'.concat(rowIndex) : ''}"
+                                           readonly="#{salesReturnItemVar.productBatchId ne null and salesReturnItemVar.salesInvoiceId eq null ? false : true}" autocomplete="off" >
+                              <p:ajax event="change" process="purchaseRateDiv" update="productPtsValueId" listener="#{salesReturnView.landingRateBlurEvent(salesReturnItemVar)}" />
+                            </p:inputNumber>
+                          </h:panelGroup>
+                        </p:column>-->
+
+            <!-- Purchase Rate -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="#{lang.purRate}" title="#{lang.product} #{lang.purchaseRate}"/></f:facet>
+              <h:panelGroup layout="block" id="purchaseRateDiv" >
+                <h:outputText value="#{salesReturnItemVar.purchaseRate}" rendered="#{!salesReturnView.draft}" />
+                <p:inputNumber id="purchaseRateId" value="#{salesReturnItemVar.purchaseRate}" onfocus="this.select()"  maxValue="999999" 
+                               decimalPlaces="#{salesReturnView.salesReturn.decimalPrecision}" minValue="0.0"
+                               rendered="#{salesReturnView.draft}" required="#{salesReturnItemVar.salesInvoiceId eq null}"
+                               styleClass="submit_item" inputStyleClass="text-right #{salesReturnItemVar.salesInvoiceId eq null ? 'submit_b_'.concat(rowIndex) : ''}"
+                               readonly="#{salesReturnItemVar.productBatchId ne null and salesReturnItemVar.salesInvoiceId eq null ? false : true}" autocomplete="off" >
+                  <p:ajax event="change" process="purchaseRateDiv" update="productPtsValueId" listener="#{salesReturnView.purchaseRateBlurEvent(salesReturnItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- PTS -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="PTS" title="PTS"/></f:facet>
+              <h:outputText id="productPtsValueId" value="#{appView.formatDecimal(salesReturnItemVar.valuePts,salesReturnView.salesReturn.decimalPrecision)}" />
+            </p:column>
+
+            <!-- PTR -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="PTR" title="PTR"/></f:facet>
+              <h:outputText id="productPtrValueId" value="#{appView.formatDecimal(salesReturnItemVar.valuePtr, salesReturnView.salesReturn.decimalPrecision)}" />
+            </p:column>
+
+            <!-- MRP -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="MRP" title="Product MRP"/></f:facet>
+              <h:outputText id="productMrpValueId" value="#{appView.decimal(salesReturnItemVar.valueMrp)}" />
+            </p:column>
+
+            <!-- Goods Value -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Goods Value" title="Goods Value"/></f:facet>
+              <h:panelGroup layout="block" id="goodsValueDiv" >
+                <h:outputText id="goodsValueId" value="#{appView.decimal(salesReturnItemVar.valueGoods)}" />
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Net Value -->
+            <p:column style="width:5%;">
+              <f:facet name="header"><h:outputText value="Value" title="Value Rate"/></f:facet>
+              <h:panelGroup layout="block" id="productNetValueIdDiv" >
+                <h:outputText id="productNetValueId" value="#{appView.decimal(salesReturnItemVar.valueNet)}" />
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Action Icons -->
+            <p:column headerText="" style="width:3%;"  id="actionIcon">
+              <f:facet name="header">
+                <p:commandButton process="@this" value="" update="salesReturnItemTable productEntryDate customerDivGst" icon="fa fa-trash" tabindex="-1"
+                                 rendered="#{salesReturnView.draft}" style="color: mediumvioletred;" oncomplete="updateInvoiceSummery();refreshDatatable();"
+                                 actionListener="#{salesReturnView.deleteSalesReturnItems(main)}" title="Delete Sales Return Items" >
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </f:facet>
+              <p:fragment id="creditSettlementTag">
+                <p:commandButton process="@this" value="" update="tagsDlg" icon="fa fa-tags" tabindex="-1" 
+                                 actionListener="#{salesReturnView.loadCreditSettlementList(main, salesReturnItemVar)}"
+                                 style="#{salesReturnView.isTagged(salesReturnItemVar) ? 'color:darkgreen;' : ''}"
+                                 oncomplete="PF('tagsDlg').show()" rendered="#{salesReturnItemVar.creditExist eq 1}" >
+                  <f:setPropertyActionListener target="#{salesReturnView.salesReturnItemId}" value="#{salesReturnItemVar}" />
+                  <f:setPropertyActionListener target="#{salesReturnView.rowNumber}" value="#{rowIndex}" />
+                </p:commandButton>
+              </p:fragment>
+            </p:column>
+            <p:column selectionMode="multiple" exportable="false" rendered="#{salesReturnView.draft}" />
+
+            <f:facet name="footer">
+              <h:panelGroup  layout="block" id="invoiceSummarydiv">
+                <p:panelGrid styleClass="noHover noBorder">
+                  <p:row>
+                    <p:column style="font-weight: bold; text-align: right; width:100px !important;">Total Items :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{salesReturnView.salesReturnItemList.size()}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Qty :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{appView.decimal(salesReturnView.salesReturn.productNetQuantity)}</p:column>
+                    <p:column style="font-weight: bold;text-align: right; width:150px !important;">Credit Adjustment :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px;color:#C62828 !important; " >#{salesReturnView.salesReturn.netCreditSettlementAmount}</p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                    <p:column style="font-weight: bold;">
+
+                    </p:column>
+                  </p:row>
+                </p:panelGrid>
+
+                <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >
+                  <h:panelGroup layout="block">
+                    <p:panelGrid styleClass="bordered">
+                      <p:row>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.taxable}">GST %</p:column>
+                        <p:column style="font-weight: bold;">Item Count</p:column>
+                        <p:column style="font-weight: bold;">Goods Value</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.taxable}">Taxable</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">CGST %</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">Value</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">SGST %</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">Value</p:column>
+                        <p:column style="font-weight: bold;" rendered="#{salesReturnView.interStateSales and salesReturnView.taxable}">GST Value</p:column>
+                      </p:row>
+                      <p:row>
+                        <ui:repeat value="#{salesReturnView.salesReturn.invoiceGroup}" var="group">
+                          <p:row>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.taxable}">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                            <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                            <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.taxable}">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">
+                              #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">
+                              #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">
+                              #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.intraStateSales and salesReturnView.taxable}">
+                              #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                            </p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesReturnView.interStateSales and salesReturnView.taxable}">
+                              #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                            </p:column>
+                          </p:row>
+                        </ui:repeat>
+                      </p:row>
+
+                    </p:panelGrid>
+                  </h:panelGroup>
+                  <h:panelGroup layout="block" styleClass="text-right">
+                    <p:panelGrid columns="2" layout="grid">
+                      <!-- Goods Value -->
+                      <h:panelGroup>Goods Value :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{salesReturnView.salesReturn.invoiceAmountGoods eq null ? '0.00' : appView.decimal(salesReturnView.salesReturn.invoiceAmountGoods)}" />
+                      </h:panelGroup>
+
+                      <!-- Taxable Value -->
+                      <h:panelGroup rendered="#{salesReturnView.taxable}">Taxable :</h:panelGroup>
+                      <h:panelGroup rendered="#{salesReturnView.taxable}">
+                        <h:outputText value="#{salesReturnView.salesReturn.assessableValue eq null ? '0.00' : appView.decimal(salesReturnView.salesReturn.assessableValue)}" />
+                      </h:panelGroup>
+
+                      <!-- GST Value -->
+                      <h:panelGroup rendered="#{salesReturnView.taxable}">GST Value :</h:panelGroup>
+                      <h:panelGroup style="border-bottom:1px solid;" layout="block" rendered="#{salesReturnView.taxable}">
+                        <h:outputText value="#{salesReturnView.salesReturn.invoiceAmountIgst eq null ? '0.00' : appView.decimal(salesReturnView.salesReturn.invoiceAmountIgst)}" />
+                      </h:panelGroup>
+
+                      <!-- Grand Total -->
+                      <h:panelGroup>Total :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{salesReturnView.salesReturn.grandTotal eq null ? '0.00' : appView.decimal(salesReturnView.salesReturn.grandTotal)}" />
+                      </h:panelGroup>
+
+                      <!-- Round Off -->
+                      <h:panelGroup>Round Off :</h:panelGroup>
+                      <h:panelGroup layout="block" style="border-bottom:1px solid;">
+                        <h:outputText value="#{salesReturnView.salesReturn.invoiceRoundOff eq null ? '0.00' : appView.decimal(salesReturnView.salesReturn.invoiceRoundOff)}" />
+                      </h:panelGroup>
+
+                      <!-- Net Amount -->
+                      <h:panelGroup>Net Amount :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{salesReturnView.salesReturn.invoiceValue eq null ? '0.00' : appView.decimal(salesReturnView.salesReturn.invoiceValue)}" />
+                      </h:panelGroup>
+                    </p:panelGrid>
+                  </h:panelGroup>
+                </p:panelGrid>
+              </h:panelGroup>
+            </f:facet>
+
+          </p:dataTable>
+
+          <h:inputHidden value="#{salesReturnView.rowIndex}" id="currentRow" />
+
+          <p:remoteCommand name="updateInvoiceSummery" process="@this" update="salesReturnItemTable:invoiceSummarydiv" />
+
+          <p:remoteCommand name="insertOrUpdateSalesReturnItem" actionListener="#{salesReturnView.actionInsertOrUpdateSalesReturnItem(main)}"
+                           process="f1" update="salesReturnItemTable" oncomplete="refreshAfterRowUpdate();" />
+
+          <p:remoteCommand name="openAccountPopup" actionListener="#{salesReturnView.openAccountPopup}" update="@this" process="@this" immediate="true" />
+
+          <p:remoteCommand name="productPopupReturned" actionListener="#{salesReturnView.productPopupReturned(main)}" update="salesReturnItemTable"
+                           process="@this" immediate="true"  />
+
+        </h:panelGroup>
+      </h:panelGroup>
+      <style>
+        .vtop{vertical-align: top;}
+      </style>
+
+      <script>
+        //<![CDATA[
+        function focusToQty(rnum) {
+          page.refresh();
+          $('#salesReturnItemTable\\:' + rnum + '\\:productQuantityId_input').focus();
+        }
+
+        function refreshDatatable() {
+          page.refresh();
+        }
+
+        function refreshAfterRowUpdate() {
+          page.refresh();
+          $('#salesReturnItemTable\\:0\\:productId_input').focus();
+        }
+
+        function confirmSalesReturn() {
+          PF('confirmDlgVar').show();
+        }
+
+        function showSplitReturn() {
+          PF('splitSalesReturnDialogVar').show();
+        }
+
+        $(document).off('fastInputTargeting').on('fastInputTargeting', function (e, tgt, ob) {
+          var tgtId = $(ob).attr('id');
+          var ctrlNames = tgtId.split(':');
+          if (ctrlNames[0] === 'salesReturnItemTable') {
+            if (ctrlNames[2] === 'productId_input') {
+              $('#currentRow').val(ctrlNames[1]);
+              openAccountPopup([{name: 'rownumber', value: ctrlNames[1]}]);
+            }
+          }
+        });
+
+        $(document).ready(function (e) {
+          refreshDatatable();
+        });
+
+        //]]>
+      </script>
+
+      <h:panelGroup layout="block" id="popupContainerGst" rendered="#{main.form}">
+
+        <!-- Credit Settlement dialog -->
+        <p:dialog id="tagsDlg" widgetVar="tagsDlg" 
+                  header="#{salesReturnView.salesReturnItemId.product ne null ? salesReturnView.salesReturnItemId.product.productName : 'Product'}"
+                  modal="true" resizable="false" showEffect="clip" hideEffect="clip" closeOnEscape="true" >
+          <p:messages id="dialogMessage" />         
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+<!--            <ui:param name="styleClass" value="#{sysRuntimeView.getGrid2Medium()}" />-->
+            <ui:param name="label" value=" " />
+            <ui:param name="id" value="tagsDivGst" />
+
+            <ui:define name="menuleft">
+              <p:commandButton value="#{lang.clear}" process="tagsDlg" id="clearCreditBtn"
+                               rendered="#{salesReturnView.draft}"                           
+                               actionListener="#{salesReturnView.clearCreditSettlement(main, salesReturnView.salesReturnItemId)}" 
+                               update="salesReturnItemTable ratePerPiece gridId dialogMessage"  styleClass="btn btn-default" oncomplete="refreshDatatable();" >
+              </p:commandButton>
+              <p:commandButton  value="#{lang.save}" process="tagsDlg" id="saveCreditBtn"
+                                rendered="#{salesReturnView.draft}" 
+                                actionListener="#{salesReturnView.saveCreditSettlement(main, salesReturnView.salesReturnItemId)}" 
+                                update="salesReturnItemTable ratePerPiece gridId dialogMessage"  styleClass="btn btn-primary" oncomplete="insertOrUpdateSalesReturnItem();" >
+              </p:commandButton>
+
+
+            </ui:define><ui:define name="menuright">  
+              <p:commandButton  value="#{lang.close}" process="@this" id="closeCreditBtn" immediate="true" styleClass="btn btn-danger" 
+                                oncomplete="PF('tagsDlg').hide();refreshDatatable();" >
+              </p:commandButton>
+            </ui:define>
+            <!--<h:panelGroup id="tagsDivGst" layout="block" pt:data-fast-input="true">-->
+            <!--<h:panelGroup   >-->
+
+            <!--</h:panelGroup>-->
+            <p:dataTable id="creditSettlement" var="creditSettlementVar" widgetVar="creditSettlementWidget" rowIndexVar="rowIndex" reflow="true"
+                         rows="10" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,50,100,150" 
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{salesReturnView.creditSettlementList}" 
+                         rowKey="#{creditSettlementVar.debitCreditNoteItemId}"  selection="#{salesReturnView.selectedCreditSettlement}">  
+              <!--                            <p:ajax event="rowSelect" update="saveCreditBtn" />
+                                          <p:ajax event="rowUnselect" update="saveCreditBtn" />
+                                          <p:ajax event="toggleSelect" update="saveCreditBtn" />-->
+              <p:column selectionMode="single" exportable="false" />
+              <p:column sortBy="#{creditSettlementVar.documentNo}" >
+                <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+                <h:outputText  value="#{creditSettlementVar.documentNo}" />
+
+                                <!--<p:commandLink actionListener="#{popUpView.showDebitCreditNote(creditSettlementVar.debitCreditId)}" immediate="false" value="#{creditSettlementVar.documentNo}">-->
+                <!--</p:commandLink>-->
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.entryDate}" >
+                <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+                <h:outputText  value="#{appView.date(creditSettlementVar.entryDate)}" />
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.refInvoice}" >
+                <f:facet name="header"><h:outputText value="#{lang.refInvoiceNo}" title="#{lang.refInvoiceNo}"/></f:facet>
+                <h:outputText  value="#{creditSettlementVar.refInvoice}" />
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.refInvoiceDate}" >
+                <f:facet name="header"><h:outputText value="#{lang.refInvoiceDate}" title="#{lang.refInvoiceDate}"/></f:facet>
+                <h:outputText  value="#{appView.date(creditSettlementVar.refInvoiceDate)}" />
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.taxableValue}" >
+                <f:facet name="header"><h:outputText value="#{lang.taxableValue}" title="#{lang.taxableValue}"/></f:facet>
+                <h:outputText  value="#{appView.decimal(creditSettlementVar.taxableValue)}" />
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.taxValue}" >
+                <f:facet name="header"><h:outputText value="#{lang.taxAmount}" title="#{lang.taxAmount}"/></f:facet>
+                <h:outputText  value="#{appView.decimal(creditSettlementVar.taxValue)}" />
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.netAmount}" >
+                <f:facet name="header"><h:outputText value="#{lang.netAmount}" title="#{lang.netAmount}"/></f:facet>
+                <h:outputText  value="#{appView.decimal(creditSettlementVar.netAmount)}" />
+              </p:column>
+              <p:column sortBy="#{creditSettlementVar.adjRemarks}" >
+                <f:facet name="header"><h:outputText value="#{lang.remarks}" title="#{lang.remarks}"/></f:facet>
+                <h:outputText  value="#{creditSettlementVar.adjRemarks}" />
+              </p:column>
+            </p:dataTable>
+            <p:panelGrid id="gridId" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.getGrid2Medium()}" >
+              <p:outputLabel value="#{lang.product} #{lang.qty}: " />
+              <p:outputLabel value=" #{appView.decimal(salesReturnView.qtyInSettlement)}" />
+              <p:outputLabel value="#{lang.product} #{lang.rate}: " />
+              <p:outputLabel id="ratePerPiece" value=" #{appView.decimal(salesReturnView.ratePerProd)}" />
+
+              <p:outputLabel  for="creditSettlementAmount" value="#{lang.creditSettlementAmount}"><b style="color: #B92D00">*</b></p:outputLabel>
+              <p:inputNumber id="creditSettlementAmount" value="#{salesReturnView.salesReturnItemId.creditSettlementAmount}" onfocus="this.select()"  maxValue="#{salesReturnView.salesReturnItemId.valueTaxableBeforeSettlement eq null ? 0:salesReturnView.salesReturnItemId.valueTaxableBeforeSettlement }" 
+                             decimalPlaces="#{salesReturnView.salesReturn.decimalPrecision}" minValue="0.0"                       
+                             readonly="#{!salesReturnView.draft}" autocomplete="off" >
+                <p:ajax event="change" process="@this" update="@this ratePerPiece" listener="#{salesReturnView.creditSettlementChangeEvent(salesReturnView.salesReturnItemId)}" />
+              </p:inputNumber>                
+              <p:outputLabel for="creditSettlementAmount" value="#{lang.remarks}" ><b style="color: #B92D00">*</b></p:outputLabel>
+              <p:inputTextarea id="creditSettlementNoteId" value="#{salesReturnView.salesReturnItemId.remarks}" onfocus="this.select()" readonly="#{!salesReturnView.draft}" styleClass="fw" >
+              </p:inputTextarea>
+            </p:panelGrid>
+          </ui:decorate>
+        </p:dialog>
+
+      </h:panelGroup>
+
+      <script>
+        //<![CDATA[
+        function popupQtyTags() {
+          PF('qtyDlg').show();
+        }
+
+        function submitForm(params) {
+          insertOrUpdateSalesReturnItem([{name: 'rownumber', value: params[2]}]);
+          $('#salesReturnItemTable\\:0\\:productId_input').focus();
+          return false;
+        }
+        function submitFormSettlement(params) {
+          insertOrUpdateSalesReturnItem([{name: 'rownumber', value: params}]);
+          $('#salesReturnItemTable\\:0\\:productId_input').focus();
+          return false;
+        }
+        //]]>
+      </script>
+
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+      </style>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

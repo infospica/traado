@@ -1,0 +1,383 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui">
+  #{salesOrderView.switchSalesOrder(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesOrder}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? salesOrderView.salesOrder.salesOrderNo : null}" />
+    <ui:param name="ids" value="salesOrder" />    
+    <ui:param name="navLabel" value="#{main.isEdit() ? salesOrderView.salesOrder.salesOrderStatusId.title : null}" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="pageBasic" value="false" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="deleteFormMenu" value="true" />
+    <ui:param name="more" value="#{salesOrderView.draft}" />
+    <ui:define name="navRight" >
+            <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesOrderView.deleteSalesOrder(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesOrderWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesOrderView.deleteSalesOrder(main)}" value="#{lang.delete}" onclick="wdgOff('salesOrderWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesOrderView.cloneSalesOrder(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <h:commandButton id="saveBtnDraft" value="#{lang.saveAsDraft}" action="#{salesOrderView.saveSalesOrder(main,sysConstant.DRAFT)}"
+                       styleClass="btn btn-primary" rendered="#{main.isNew() or salesOrderView.draft}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <h:commandButton id="saveBtnConfirm" value="#{lang.confirm}" action="#{salesOrderView.saveSalesOrder(main,sysConstant.CONFIRMED)}"
+                       styleClass="btn btn-primary" rendered="#{main.isEdit() and salesOrderView.draft}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <p:commandButton id="saveBtnMerge" value="Create Invoice" action="#{salesOrderView.actionMergeSalesOrderToSalesInvoice(main)}" update="f1" process="f1"
+                       styleClass="btn btn-primary" rendered="#{main.isEdit() and salesOrderView.mergeable}">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                    columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+
+        <!-- Account Group Vendor -->
+        <p:outputLabel value="#{lang.accountGroup}" for="txtSalesOrderAccountGroupId" />
+        <h:panelGroup id="accountGroupDiv" >
+          <p:inputText id="txtSalesOrderAccountGroupId" value="#{salesOrderView.salesOrder.accountGroupId.groupName}" readonly="true"  styleClass="fw" />
+        </h:panelGroup>
+
+        <!--Empty-->
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+        <!-- Customer -->
+        <p:outputLabel value="#{lang.customer}" for="salesOrderCustomerId"/>
+        <h:panelGroup id="customerDiv">
+          <p:inputText id="txtSalesOrderCustomerId" value="#{salesOrderView.salesOrder.customerId.customerName}" readonly="true" styleClass="fw" rendered="#{main.edit}" />
+          <p:autoComplete value="#{salesOrderView.salesOrder.customerId}" completeMethod="#{salesOrderView.customerAuto}" converter="wawo.LookupIntConverter"
+                          id="salesOrderCustomerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                          required="true" requiredMessage="#{lang.customer} #{lang.isRequired}" rendered="#{!main.edit}"
+                          cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                          style="position: relative" styleClass="fw"  >
+            <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+            <p:column>
+              #{e.customerName}
+            </p:column>
+            <p:ajax event="itemSelect" update="priceListDiv" listener="#{salesOrderView.customerSelectEvent}" />
+          </p:autoComplete>
+          <p:message for="salesOrderCustomerId" display="text" />
+        </h:panelGroup>
+
+        <!--Empty-->
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+        <!-- Account group price list -->
+        <p:outputLabel value="#{lang.priceList}" for="salesOrderAccountGroupPriceListId" />
+        <h:panelGroup id="priceListDiv">
+          <p:selectOneMenu value="#{salesOrderView.salesOrder.accountGroupPriceListId}"  id="salesOrderAccountGroupPriceListId"
+                           required="true" requiredMessage="#{lang.priceList} #{lang.isRequired}" disabled="#{main.edit}"
+                           styleClass="fw" converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+            <f:selectItems value="#{salesOrderView.accountGroupPriceListByAccountGroup()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          </p:selectOneMenu>
+          <p:message for="salesOrderAccountGroupPriceListId" display="text" />
+        </h:panelGroup>
+
+        <!--Empty-->
+        <p:outputLabel value=""/>
+        <h:panelGroup>
+        </h:panelGroup>
+
+      </p:panelGrid>
+
+    </ui:define>
+    <ui:define name="after" >
+      <h:panelGroup layout="block" styleClass="card" rendered="#{main.isForm() and (main.edit or salesOrderView.salesReqAvailable) }">
+        <h:panelGroup layout="block" styleClass="table-responsive">
+          <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="orderDetailsDiv" columnClasses="#{sysRuntimeView.grid2}">
+            <f:facet name="header">
+              <p:row>
+                <p:column><p:outputLabel value="#{lang.salesOrderNo}" for="orderNo" /></p:column>
+                <p:column><p:outputLabel value="#{lang.salesOrderDate}" for="salesOrderDate" /></p:column>
+                <p:column><p:outputLabel value="#{lang.discountValue}" for="discountValueFixed" /></p:column>
+                <p:column><p:outputLabel value="#{lang.discountPerc}" for="discountValuePerc" /></p:column>
+              </p:row>
+            </f:facet>
+
+            <p:row>
+              <!-- Invoice No -->
+              <p:column>
+                <p:inputText value="#{salesOrderView.salesOrder.salesOrderNo}" readonly="true" maxlength="50" id="orderNo" styleClass="form-control prNum" />
+              </p:column>
+
+              <!-- Invoice Date -->
+              <p:column>
+                <p:calendar value="#{salesOrderView.salesOrder.salesOrderDate}" pattern="#{lang.datePattern}"
+                            validator="#{sysRuntimeView.dateLteToday}" required="true" requiredMessage="#{lang.salesOrderDate} #{lang.isRequired}"
+                            converterMessage="#{lang.salesOrderDate} #{lang.salesOrderDate}" maxdate="#{userRuntimeView.getToday()}"
+                            maxlength="29" id="salesOrderDate" showButtonPanel="true" navigator="true" mask="true"   style="text-align: right"/>
+                <p:message for="salesOrderDate" display="text"/>
+              </p:column>
+
+              <!-- Invoice Discount value -->
+              <p:column>
+                <p:inputNumber value="#{salesOrderView.salesOrder.discountValueFixed}" converterMessage="#{lang.discountValue} #{lang.invalidNumber}"
+                               disabled="#{salesOrderView.salesOrder.discountValuePerc ne null}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="discountValueFixed"
+                               >
+                  <p:ajax event="blur" update="discountValuePerc"  process="@this"></p:ajax>
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Invoice Discount % -->
+              <p:column>
+                <p:inputNumber value="#{salesOrderView.salesOrder.discountValuePerc}" converterMessage="#{lang.discountPerc} #{lang.invalidNumber}"
+                               disabled="#{salesOrderView.salesOrder.discountValueFixed ne null}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="discountValuePerc" >
+                  <p:ajax event="blur"  update="discountValueFixed"  process="@this" />
+                </p:inputNumber>
+              </p:column>
+            </p:row>
+          </p:panelGrid>
+        </h:panelGroup>
+      </h:panelGroup>
+
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+      </style>
+
+      <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and (main.edit or salesOrderView.salesRequisitionSelected)}" pt:data-fast-input="true">
+        <h:panelGroup layout="block" id="salesProductTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
+          <p:remoteCommand name="insertOrUpdateSalesOrderItem" actionListener="#{salesOrderView.actionInsertOrUpdateSalesInvoiceItem(main)}"
+                           process="f1" update="salesProductTableDiv" />
+          <p:dataTable var="salesItemVar" id="salesItemTable" widgetVar="salesItemTableVar" value="#{salesOrderView.salesOrderItemList}" rowIndexVar="rowIndex"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
+
+            <p:column headerText="Sno" width="61" style="text-align: center;">
+              <h:outputText value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!-- Product -->
+            <p:column headerText="#{lang.product}">
+              <p:autoComplete id="productId" value="#{salesItemVar.productId}" completeMethod="#{salesOrderView.completeProduct}"
+                              converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative; z-index: 0 !important;" styleClass="fw"
+                              cache="true" queryDelay="200" maxResults="30" disabled="#{!salesOrderView.draft}" 
+                              var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+                <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                <f:attribute name="productId" value="#{salesItemVar.productId.id}"/>
+                <p:ajax event="itemSelect" listener="#{salesOrderView.updateProductPrice(salesItemVar)}" update="productQty valuePts" oncomplete="refreshDatatable();" >
+                </p:ajax>
+                <p:column >
+                  <f:facet name="header"><span style="font-weight: bold;">Product</span></f:facet>
+                  <h:outputText value="#{prod.productName}" />
+                </p:column>
+                <p:column >
+                  <f:facet name="header"><span style="font-weight: bold;">Qty</span></f:facet>
+                  <h:outputText value="#{prod.productQuantity}" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header"><span style="font-weight: bold;">Free Qty</span></f:facet>
+                  <h:outputText value="#{prod.productFreeQuantity}" />
+                </p:column>
+              </p:autoComplete>
+            </p:column>
+
+            <!-- Qty -->
+            <p:column width="150">
+              <f:facet name="header">
+                <h:outputText value="#{lang.qty}" />
+                <h:outputText styleClass="fa fa-info-circle p-l-5" title="Quantity" />
+              </f:facet>
+              <p:inputNumber id="productQty" value="#{salesItemVar.qtyRequired}" size="10" minValue="0" maxlength="9" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999"
+                             decimalPlaces="0" styleClass="fw"
+                             autocomplete="off" required="true" disabled="#{!salesOrderView.draft}" >
+                <p:ajax event="change" process="@this" oncomplete="updateInvoiceSummery();" listener="#{salesOrderView.qtyChangeEventHandler}" />
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Free Qty -->
+            <p:column headerText="#{lang.Free} #{lang.qty}" width="150">
+              <p:inputNumber id="productFreeQty" value="#{salesItemVar.qtyFreeSuggested}" size="10" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" maxlength="9"
+                             autocomplete="off"  decimalPlaces="0" styleClass="fw" disabled="#{!salesOrderView.draft}" >
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Disc. Value -->
+            <p:column headerText="Disc. Value" width="150">
+              <p:inputNumber id="productDiscValue" value="#{salesItemVar.discountValueFixed}" autocomplete="off" decimalPlaces="2" disabled="#{!salesOrderView.draft}"
+                             styleClass="fw" readonly="#{salesItemVar.discountValuePercentage ne null}" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999999" minValue="0.0" maxlength="8" >
+              </p:inputNumber>
+            </p:column>
+
+            <!-- PTS -->
+            <p:column width="150">
+              <f:facet name="header">
+                <h:outputText value="Rate" />
+              </f:facet>
+              <h:panelGroup layout="block" id="valuePts">
+                <p:inputText id="valuePts_input" disabled="true" styleClass="fw" value="#{salesItemVar.valueProdPieceSelling}"  />
+              </h:panelGroup>
+            </p:column>
+
+            <!-- PTS Suggested -->
+            <p:column headerText="Rate Requested" width="150">
+              <h:panelGroup id="valuePtsSuggested">
+                <p:inputNumber id="valuePtsSuggested_input" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="999999" minValue="0.0" maxlength="8" autocomplete="off" decimalPlaces="2" styleClass="fw" 
+                               value="#{salesItemVar.valueProdPieceSellingForced}" disabled="#{!salesOrderView.draft}" />
+              </h:panelGroup>
+            </p:column>
+
+            <p:column headerText="" rendered="#{main.edit and salesOrderView.draft}">
+              <p:commandButton process="@this" value="" update="salesProductTableDiv" icon="fa fa-trash" tabindex="-1"
+                               actionListener="#{salesOrderView.deleteSalesOrderItem(main, salesItemVar)}">
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </p:column>
+
+            <f:facet name="footer">
+              <h:panelGroup layout="block" id="invoiceSummarydiv">
+                <p:panelGrid>
+                  <p:row>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Items :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{salesOrderView.salesOrderItemList.size()}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Qty :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{salesOrderView.productQuantityCount}</p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                    <p:column style="font-weight: bold;"></p:column>
+                  </p:row>
+                </p:panelGrid>
+              </h:panelGroup>
+            </f:facet>
+          </p:dataTable>
+        </h:panelGroup>
+      </h:panelGroup>
+
+      <p:remoteCommand name="updateInvoiceSummery" process="@this" update="salesItemTable:invoiceSummarydiv" />
+      <script>
+        //<![CDATA[
+        function submitForm(params) {
+          insertOrUpdateSalesOrderItem([{name: 'rownumber', value: params[2]}]);
+          $('#salesItemTable\\:0\\:productId_input').focus();
+          return false;
+        }
+
+        $(document).ready(function (e) {
+          refreshDatatable();
+        });
+
+        function refreshDatatable() {
+          page.refresh();
+        }
+        //]]>
+      </script>
+
+    </ui:define>
+
+    <ui:define name="newList" >
+      <p:commandButton  id="newFormBtn" value="#{lang.newform}" type="button" immediate="true" styleClass="btn btn-info" >
+      </p:commandButton>
+      <p:overlayPanel  id="salesReqPanel" for="newFormBtn" widgetVar="srPanel" modal="true" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true"
+                       dynamic="false" style="width: 500px;" >
+        <h:panelGroup layout="block">
+
+          <p:outputLabel value="#{lang.accountGroup}" />
+          <h:panelGroup id="accountGroupListDiv" >
+            <p:inputText value="#{salesOrderView.accountGroup.groupName}"  id="cbAccountGroupList" styleClass="fw" readonly="true">              
+            </p:inputText>
+          </h:panelGroup>
+
+          <!-- Customer -->
+          <p:outputLabel value="#{lang.customer}" />
+          <h:panelGroup id="customerListDiv">
+            <p:selectOneMenu value="#{salesOrderView.salesOrder.customerId}"  id="cbCustomerList" styleClass="fw"
+                             converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+              <f:selectItems value="#{salesOrderView.customerByAccountGroup()}" var="cust" itemValue="#{cust}" itemLabel="#{cust.customerName}" />
+              <p:ajax listener="#{salesOrderView.customerSelectedEvent}" update="salesReqListDiv" event="itemSelect" />
+            </p:selectOneMenu>
+          </h:panelGroup>
+
+          <h:panelGroup id="salesReqListDiv">
+            <p:dataTable id="salesRegTable" var="salesReq" value="#{salesOrderView.salesReqList}" rowKey="#{salesReq.id}" rendered="#{salesOrderView.salesReqAvailable}"
+                         selection="#{salesOrderView.salesReqSelected}"
+                         tableStyleClass="mDataTable mDataTable-center editLinks">
+              <p:column selectionMode="multiple" style="text-align:center"/>
+              <p:column headerText="#{lang.salesReq} #{lang.no}">
+                <h:outputText value="#{salesReq.requisitionNo}" />
+              </p:column>
+
+              <p:column headerText="#{lang.salesReq} #{lang.date}">
+                <h:outputText value="#{appView.date(salesReq.requisitionDate)}" />
+              </p:column>
+            </p:dataTable>
+          </h:panelGroup>
+          <h:commandButton action="#{salesOrderView.actionNewForm(main)}" onclick="PF('srPanel').hide();" value="#{lang.create}" styleClass="btn btn-info m-t-15">
+            <f:ajax render="f1" execute="salesReqPanel" />
+          </h:commandButton>
+        </h:panelGroup>
+      </p:overlayPanel>
+      <style>
+        .ui-datatable-tablewrapper{
+          overflow: hidden;
+        }
+      </style>
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <p:selectOneMenu value="#{salesOrderView.salesOrderFilter}" >
+        <f:selectItem itemValue="#{null}" itemLabel="#{lang.all}" />
+        <f:selectItem itemValue="2" itemLabel="#{lang.draft}" />
+        <f:selectItem itemValue="1" itemLabel="#{lang.confirmed}"   />
+        <f:selectItem itemValue="3" itemLabel="#{lang.invoiced}" />
+        <f:selectItem itemValue="4" itemLabel="#{lang.partPending}" />
+        <p:ajax update="salesOrderTable" />
+      </p:selectOneMenu>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="salesOrderTable" var="salesOrderVar" widgetVar="salesOrderWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesOrderView.salesOrderLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesOrderVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesOrderView.salesOrderSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.salesOrderNo}" sortBy="#{salesOrderVar.salesOrderNo}" field="order_no">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesOrderVar.salesOrderNo)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesOrderView.salesOrder}" value="#{salesOrderVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.salesOrderDate}" sortBy="#{salesOrderVar.salesOrderDate}" field="order_date" >
+          <h:outputText value="#{appView.date(salesOrderVar.salesOrderDate)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.status}" sortBy="#{salesOrderVar.salesOrderStatusId.title}" field="sales_order_stat_id.title">
+          <h:outputText value="#{appView.display(salesOrderVar.salesOrderStatusId.title)}" title="#{appView.title(salesOrderVar.salesOrderStatusId.title)}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(salesOrderVar.salesOrderStatusId.id)}" style="background-color: #{sysRuntimeView.statusColor(salesOrderVar.salesOrderStatusId.id)}"/>          
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

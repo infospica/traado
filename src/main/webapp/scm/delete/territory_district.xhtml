@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{territoryDistrictView.switchTerritoryDistrict(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.territoryDistrict}" />
+    <ui:param name="ids" value="territoryDistrict" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{territoryDistrictView.deleteTerritoryDistrict(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('territoryDistrictWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{territoryDistrictView.cloneTerritoryDistrict(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{territoryDistrictView.deleteTerritoryDistrict(main)}" value="#{lang.delete}" onclick="wdgOff('territoryDistrictWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{territoryDistrictView.saveTerritoryDistrict(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.territoryDistrictTerritoryId}" for="territoryDistrictTerritoryId" /><h:panelGroup>
+         <p:selectOneMenu value="#{territoryDistrictView.territoryDistrict.territoryId}"  required="true" requiredMessage="#{lang.territoryDistrictTerritoryId} #{lang.isRequired}" id="territoryDistrictTerritoryId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.territory(main)}" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}" />
+        </p:selectOneMenu><p:message for="territoryDistrictTerritoryId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.territoryDistrictTerritoryId}" for="territoryDistrictTerritoryId" /><h:panelGroup>
+          <p:autoComplete value="#{territoryDistrictView.territoryDistrict.territoryId}" completeMethod="#{scmLookupView.territoryAuto}"  required="true" requiredMessage="#{lang.territoryDistrictTerritoryId} #{lang.isRequired}" id="territoryDistrictTerritoryId" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <o:converter list="#{scmLookupView.territory(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="territoryDistrictTerritoryId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.territoryDistrictTerritoryId}" for="territoryDistrictTerritoryId"/><h:panelGroup>
+          <p:autoComplete value="#{territoryDistrictView.territoryDistrict.territoryId}" completeMethod="#{territoryDistrictView.territoryAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.territoryDistrictTerritoryId} #{lang.isRequired}" id="territoryDistrictTerritoryId" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.territoryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.territoryById()}"/>
+        </p:autoComplete><p:message for="territoryDistrictTerritoryId" display="text" /></h:panelGroup>
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.territoryDistrictDistrictId}" for="territoryDistrictDistrictId" /><h:panelGroup>
+         <p:selectOneMenu value="#{territoryDistrictView.territoryDistrict.districtId}"  required="true" requiredMessage="#{lang.territoryDistrictDistrictId} #{lang.isRequired}" id="territoryDistrictDistrictId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.district(main)}" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" />
+        </p:selectOneMenu><p:message for="territoryDistrictDistrictId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.territoryDistrictDistrictId}" for="territoryDistrictDistrictId" /><h:panelGroup>
+          <p:autoComplete value="#{territoryDistrictView.territoryDistrict.districtId}" completeMethod="#{scmLookupView.districtAuto}"  required="true" requiredMessage="#{lang.territoryDistrictDistrictId} #{lang.isRequired}" id="territoryDistrictDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <o:converter list="#{scmLookupView.district(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="territoryDistrictDistrictId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.territoryDistrictDistrictId}" for="territoryDistrictDistrictId"/><h:panelGroup>
+          <p:autoComplete value="#{territoryDistrictView.territoryDistrict.districtId}" completeMethod="#{territoryDistrictView.districtAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.territoryDistrictDistrictId} #{lang.isRequired}" id="territoryDistrictDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+        </p:autoComplete><p:message for="territoryDistrictDistrictId" display="text" /></h:panelGroup>
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="territoryDistrictTable" var="territoryDistrictVar" widgetVar="territoryDistrictWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+        lazy="true" value="#{territoryDistrictView.territoryDistrictLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{territoryDistrictVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+        selection="#{territoryDistrictView.territoryDistrictSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{territoryDistrictVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{territoryDistrictVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{territoryDistrictView.territoryDistrict}" value="#{territoryDistrictVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.territoryName}" sortBy="#{territoryDistrictVar.territoryId.territoryName}" field="territory_id.territory_name"><h:outputText value="#{appView.display(territoryDistrictVar.territoryId.territoryName)}" title="#{appView.title(territoryDistrictVar.territoryId.territoryName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.districtName}" sortBy="#{territoryDistrictVar.districtId.districtName}" field="district_id.district_name"><h:outputText value="#{appView.display(territoryDistrictVar.districtId.districtName)}" title="#{appView.title(territoryDistrictVar.districtId.districtName)}" escape="false" /></p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

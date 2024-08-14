@@ -1,0 +1,1849 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui">
+  #{salesInvoiceGstIndiaView.switchSalesInvoice(main, viewType)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+    .card, .dispBoard, .cards > li, .cards > article {      
+      padding: 0px;
+    }
+    .card .header, .dispBoard .header, .cards > li .header, .cards > article .header {
+      margin: 0px;
+    }
+    .ui-treetable .mDataTable thead td:first-of-type, .ui-treetable .mDataTable thead th:first-of-type, .ui-treetable .mDataTable tbody td:first-of-type, .ui-treetable .mDataTable tbody th:first-of-type, .ui-treetable .mDataTable tfoot td:first-of-type, .ui-treetable .mDataTable tfoot th:first-of-type, .ui-datatable .mDataTable thead td:first-of-type, .ui-datatable .mDataTable thead th:first-of-type, .ui-datatable .mDataTable tbody td:first-of-type, .ui-datatable .mDataTable tbody th:first-of-type, .ui-datatable .mDataTable tfoot td:first-of-type, .ui-datatable .mDataTable tfoot th:first-of-type {
+      padding-left: 0px;
+    }
+    .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+    .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+    .ui-treetable .mDataTable thead td:last-of-type, .ui-treetable .mDataTable thead th:last-of-type, .ui-treetable .mDataTable tbody td:last-of-type, .ui-treetable .mDataTable tbody th:last-of-type, .ui-treetable .mDataTable tfoot td:last-of-type, .ui-treetable .mDataTable tfoot th:last-of-type, .ui-datatable .mDataTable thead td:last-of-type, .ui-datatable .mDataTable thead th:last-of-type, .ui-datatable .mDataTable tbody td:last-of-type, .ui-datatable .mDataTable tbody th:last-of-type, .ui-datatable .mDataTable tfoot td:last-of-type, .ui-datatable .mDataTable tfoot th:last-of-type {
+      padding-right: 0px;
+    }
+    .ui-treetable .ui-paginator, .ui-datatable .ui-paginator {
+      text-align: left;
+      margin-top: 0px;
+      border: 0px none transparent;
+    }
+  </style>
+  <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">    
+    <ui:param name="label" value="#{salesInvoiceGstIndiaView.pageTitle}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? salesInvoiceGstIndiaView.salesInvoice.invoiceNo : null}" />
+    <ui:param name="ids" value="salesInvoice" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? salesInvoiceGstIndiaView.salesInvoice.salesInvoiceStatusId.title : null}" />
+    <ui:param name="deleteListMenu" value="true" />
+    <ui:param name="pageBasic" value="false" />
+    <ui:param name="reset" value="true" />
+    <ui:param name="clone" value="false" />
+    <ui:param name="deleteFormMenu" value="true" />
+    <ui:param name="newForm" value="true" />
+    <!--<ui:param name="more" value="#{salesInvoiceGstIndiaView.draft ? true : false}" />-->
+    <ui:param name="reset" value="false" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{salesInvoiceGstIndiaView.deleteSalesInvoice(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesInvoiceWidgetDelConf')" process="f1" update="f1" 
+                       rendered="#{!salesInvoiceGstIndiaView.tradeClosed}">
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{salesInvoiceGstIndiaView.deleteSalesInvoice(main)}" value="#{lang.delete}" onclick="wdgOff('salesInvoiceWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete"
+                       rendered="#{!salesInvoiceGstIndiaView.tradeClosed}"/>
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="menu1" >
+
+      <p:menuitem value="Notify #{lang.customer}" onclick="rcMenuItem([{name:'customer',value:true}])"  icon="fa fa-bell" iconPos="left"                   
+                  rendered="#{salesInvoiceGstIndiaView.isMenuItemRendered(true)}" process="@this" >
+        <f:param name="customer" value="true" />
+      </p:menuitem>
+
+      <p:menuitem value="Notify #{lang.salesAgent}" onclick="rcMenuItem([{name:'customer',value:false}])"  icon="fa fa-bell" iconPos="left"                  
+                  rendered="#{salesInvoiceGstIndiaView.isMenuItemRendered(false)}" process="@this" />
+    </ui:define>
+    <ui:define name="formRight" >      
+      <!--Next/Previous--> 
+
+      <h:panelGroup rendered="#{!main.isNew()}">              
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-left"  disabled="#{!salesInvoiceGstIndiaView.isPreviousButton()}" title="Previous #{lang.salesInvoice}"
+                         actionListener="#{salesInvoiceGstIndiaView.nextOrPreviousSalesInvoice(main,-1)}" immediate="true" update="f1" onclick="block();" oncomplete="unblock();" />
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-right" iconPos="right" disabled="#{!salesInvoiceGstIndiaView.isNextButton()}" title="#{lang.next} #{lang.salesInvoice}"
+                         actionListener="#{salesInvoiceGstIndiaView.nextOrPreviousSalesInvoice(main,1)}" immediate="true" update="f1" onclick="block();" oncomplete="unblock();" />
+      </h:panelGroup>
+
+
+    </ui:define>
+    <ui:define name="rightList">
+      <!--<p:panelGrid columns="3">-->
+      <h:panelGroup styleClass="L">
+        <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoiceFilter}" >
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.all}" />
+          <f:selectItem itemValue="2" itemLabel="#{lang.confirmed}"   />
+          <f:selectItem itemValue="1" itemLabel="#{lang.draft}" />
+          <f:selectItem itemValue="3" itemLabel="#{lang.proforma}" />        
+          <f:selectItem itemValue="0" itemLabel="#{lang.cancelled}" />        
+          <p:ajax update="salesInvoiceTable" />
+        </p:selectOneMenu>
+      </h:panelGroup>
+      <h:panelGroup styleClass="L">
+        <p:autoComplete value="#{salesInvoiceGstIndiaView.salesInvoice.customerId}" completeMethod="#{salesInvoiceGstIndiaView.customerFilterAuto}" 
+                        converter="wawo.LookupIntConverter" placeholder="#{lang.select} #{lang.customer}"
+                        id="customerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true"                      
+                        cache="true" queryDelay="500" maxResults="50" scrollHeight="500" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                        style="position: relative" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+          <p:ajax event="itemSelect" listener="#{salesInvoiceGstIndiaView.customerFilterSelectedEvent}" update="f1 salesInvoiceTable" onstart="block();" oncomplete="unblock();"  />
+          <p:column>
+            #{e.customerName}
+          </p:column>
+        </p:autoComplete>
+      </h:panelGroup>
+
+      <!--</p:panelGrid>--> 
+    </ui:define>
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+
+      <!-- Cancel Invoice -->
+      <p:commandButton value="#{lang.cancelInvoice}" process="f1" update="f1" immediate="true"
+                       rendered="#{main.edit and  !salesInvoiceGstIndiaView.cancelled and !salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.tradeClosed}" action="#{salesInvoiceGstIndiaView.actionCancelSalesInvoice(main)}" styleClass="btn btn-danger">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Draft Button -->
+      <p:commandButton action="#{salesInvoiceGstIndiaView.saveSalesInvoice(main,sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
+                       process="f1" update="f1" onstart="block()" oncomplete="unblock()"
+                       rendered="#{(main.isNew() or salesInvoiceGstIndiaView.draft) and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}">        
+      </p:commandButton>
+
+<!--       Pro-forma 
+      <p:commandButton value="#{lang.proFormaInvoice}" process="@this" type="button"  
+                       rendered="#{main.edit and salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}"
+                       styleClass="btn btn-primary" onclick="PF('confirmPerformaDlgVar').show();">
+      </p:commandButton>-->
+
+      <!-- Cancel Pro-forma -->
+      <p:commandButton value="#{lang.cancelProforma}" process="f1" update="f1" 
+                       rendered="#{salesInvoiceGstIndiaView.proformaEditable and salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.taxCodeModified}"
+                       action="#{salesInvoiceGstIndiaView.actionCancelProforma(main)}"
+                       styleClass="btn btn-danger">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Extend Pro-Forma -->
+      <p:commandButton value="#{lang.extendProForma}" onclick="PF('confirmPerformaDlgVar').show();" type="button"
+                       rendered="#{salesInvoiceGstIndiaView.proformaEditable and salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.taxCodeModified}" 
+                       styleClass="btn btn-info">
+      </p:commandButton>
+
+      <!-- Create Invoice -->
+      <p:commandButton value="#{lang.createInvoice}" process="f1" update="f1" styleClass="btn btn-info" action="#{salesInvoiceGstIndiaView.actionProformaToInvoice(main)}"
+                       rendered="#{salesInvoiceGstIndiaView.proformaEditable and salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.taxCodeModified}">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Pro-Forma Edit -->
+      <p:commandButton value="#{lang.confirm}" process="f1" update="f1" styleClass="btn btn-info" 
+                       action="#{salesInvoiceGstIndiaView.saveSalesInvoice(main,sysConstant.CONFIRMED)}" 
+                       rendered="#{salesInvoiceGstIndiaView.proformaToInvoice and !salesInvoiceGstIndiaView.taxCodeModified}">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Confirm -->
+      <p:commandButton value="#{lang.confirm}" rendered="#{main.edit and (salesInvoiceGstIndiaView.draft or salesInvoiceGstIndiaView.proformaToInvoice) and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}"
+                       styleClass="btn btn-warning">
+        <p:ajax event="click" listener="#{salesInvoiceGstIndiaView.calculateTotalDiscounts(main)}" immediate="true" oncomplete="confirmSalesInvoice();"
+                update="confirmDlgVar"/>
+      </p:commandButton>
+
+
+
+      <!-- Reset To Draft -->
+      <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{salesInvoiceGstIndiaView.actionResetInvoiceEntry(main)}" onstart="block();" oncomplete="unblock();"
+                       rendered="#{!salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.tradeClosed and main.edit and !salesInvoiceGstIndiaView.taxCodeModified and !salesInvoiceGstIndiaView.cancelled and userRuntimeView.privilege.resetToDraft==true}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:commandButton id="rsiBtn" value="Related Items" styleClass="btn btn-info" process="@this" update="@this"
+                       type="button" rendered="#{!salesInvoiceGstIndiaView.draft and userRole.isRoot() and main.edit and !salesInvoiceGstIndiaView.taxCodeModified}" > 
+      </p:commandButton>
+
+      <!-- Confirmed And Packed -->
+      <p:commandButton id="btnPack" value="#{lang.confirmedAndPacked}" styleClass="btn btn-info" process="f1" update="f1"
+                       action="#{salesInvoiceGstIndiaView.actionUpdatePacking(main)}"
+                       rendered="#{salesInvoiceGstIndiaView.confirmed and !salesInvoiceGstIndiaView.taxCodeModified}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Consignment -->
+      <p:commandButton value="#{lang.create +=' '+= lang.consignment}" id="btnConsignment" type="button"
+                       styleClass="btn btn-primary" 
+                       rendered="#{salesInvoiceGstIndiaView.confirmedAndPacked and salesInvoiceGstIndiaView.consignment eq null and !salesInvoiceGstIndiaView.taxCodeModified}" 
+                       process="@this" immediate="true">
+      </p:commandButton>
+
+      <p:commandButton action="#{salesInvoiceGstIndiaView.viewConsignment(main)}" value="#{lang.view +=' '+= lang.consignment}"
+                       styleClass="btn btn-primary" 
+                       rendered="#{salesInvoiceGstIndiaView.confirmedAndPacked and salesInvoiceGstIndiaView.consignment ne null and !salesInvoiceGstIndiaView.taxCodeModified}" 
+                       process="@this" immediate="true">
+      </p:commandButton>
+
+
+      <h:panelGroup style="padding-left:10px;">
+        <p:commandButton id="newClaimBtn" type="button" icon="fa fa-angle-down" value="#{lang.print}" iconPos="down" styleClass="btn btn-primary" 
+                         rendered="#{main.edit and ((!salesInvoiceGstIndiaView.taxCodeModified) or (salesInvoiceGstIndiaView.proformaEditable) or salesInvoiceGstIndiaView.draft )}" />
+        <p:menu overlay="true" trigger="newClaimBtn" my="left top" at="left bottom" styleClass="w-240" >
+          <p:menuitem  value="#{lang.print} ( #{lang.landscpeFormat} )" actionListener="#{salesInvoiceGstIndiaView.print(main, sysConstant.PDF_ITEXT,sysConstant.PRINT_LANDSCAPE,null)}" 
+                       rendered="#{main.edit and ((!salesInvoiceGstIndiaView.taxCodeModified) or (salesInvoiceGstIndiaView.proformaEditable) or salesInvoiceGstIndiaView.draft ) }" immediate="true"  process="@this"
+                       styleClass="btn" />
+          <p:menuitem  value="#{lang.print} WITH FREE" actionListener="#{salesInvoiceGstIndiaView.print(main, sysConstant.PDF_ITEXT,sysConstant.PRINT_PORTRAIT, sysConstant.TYPE_I)}"
+                       rendered="#{main.edit and ((!salesInvoiceGstIndiaView.taxCodeModified) or(salesInvoiceGstIndiaView.proformaEditable) or salesInvoiceGstIndiaView.draft)}" immediate="true"  process="@this"
+                       styleClass="btn" />
+          <p:menuitem  value="#{lang.print} WITH SCHEME" actionListener="#{salesInvoiceGstIndiaView.print(main, sysConstant.PDF_ITEXT,sysConstant.PRINT_PORTRAIT, sysConstant.TYPE_II)}"
+                       rendered="#{main.edit and ((!salesInvoiceGstIndiaView.taxCodeModified) or(salesInvoiceGstIndiaView.proformaEditable) or salesInvoiceGstIndiaView.draft)}" immediate="true"  process="@this"
+                       styleClass="btn" />
+<!--          <p:menuitem  value="#{lang.print} SAMPLE" actionListener="#{salesInvoiceGstIndiaView.print(main, sysConstant.PDF_ITEXT,sysConstant.PRINT_PORTRAIT, sysConstant.SAMPLE)}"
+                       rendered="#{main.edit and ((!salesInvoiceGstIndiaView.taxCodeModified) or (salesInvoiceGstIndiaView.proformaEditable) or salesInvoiceGstIndiaView.draft)}" immediate="true"  process="@this"
+                       styleClass="btn" />-->
+        </p:menu>
+      </h:panelGroup>
+
+      <h:panelGroup style="padding-left:10px;" rendered="#{salesInvoiceGstIndiaView.confirmedAndPacked and (salesInvoiceGstIndiaView.salesInvoice.invoiceAmount gt sysConstant.E_WAY_BILL_AMOUNT)}">        
+        <p:commandButton value="#{lang.ewaybill}" styleClass="btn btn-info" title="#{lang.ewaybill}" onclick="window.open('#{sysConstant.EWAY_BILL}')" />        
+      </h:panelGroup>
+
+      <p:commandButton id="butTx" value="Confirm Tax Variation" styleClass="btn btn-warning"
+                       action="#{salesInvoiceGstIndiaView.actionUpdateTaxVariation(main, sysConstant.DRAFT)}"
+                       rendered="#{salesInvoiceGstIndiaView.taxCodeModified}"
+                       process="@this" update="f1">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+      <h:panelGroup style="padding-left:10px;">
+        <p:commandButton id="exportBtn" type="button" icon="fa fa-angle-down" value="#{lang.export}" iconPos="down" styleClass="btn btn-info" />
+        <p:menu overlay="true" trigger="exportBtn" my="left top" at="left bottom" >
+          <p:menuitem  value="Normal" actionListener="#{salesInvoiceGstIndiaView.export(main,'')}"
+                       styleClass="btn" immediate="true" ajax="false" partialSubmit="true"/>
+          <p:menuitem  value="For Import" actionListener="#{salesInvoiceGstIndiaView.export(main,'IMPORT')}"
+                       styleClass="btn" immediate="true" ajax="false" partialSubmit="true" />
+        </p:menu>
+      </h:panelGroup>
+
+
+
+      <!-- Up Coming Document No -->
+      <h:outputText  value="#{lang.next} #{lang.documentNo} #{lang.colon} " 
+                     rendered="#{main.edit and (salesInvoiceGstIndiaView.draft or salesInvoiceGstIndiaView.proformaToInvoice) and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}" /> 
+      <p:outputLabel styleClass="m-r-10" value="#{salesInvoiceGstIndiaView.nextInvoiceNumber}" style="color:#900;" 
+                     rendered="#{main.edit and (salesInvoiceGstIndiaView.draft or salesInvoiceGstIndiaView.proformaToInvoice) and !salesInvoiceGstIndiaView.proforma and !salesInvoiceGstIndiaView.taxCodeModified}" />
+
+
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <style>
+        .notProcess{}
+      </style>
+      <h:panelGroup id="salesAccountDetailDiv" layout="block" rendered="#{main.isForm()}" pt:data-watermark="#{salesInvoiceGstIndiaView.confirmed ? 'block' : 'true'}">
+
+        <p:overlayPanel  id="relatedItemPanel" for="rsiBtn" widgetVar="srPanel" modal="true" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true"
+                         dynamic="false" style="width: 500px;" >
+          <h:panelGroup layout="block">
+            <h:panelGroup id="relatedItemDiv">
+              <p:dataTable id="relatedItemTable" var="relatedItemVar" value="#{salesInvoiceGstIndiaView.relatedItemsList}" tableStyleClass="mDataTable mDataTable-center editLinks"
+                           rows="10"
+                           paginator="true" paginatorAlwaysVisible="false"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="5,10,15">
+                <p:column headerText="#{lang.invoiceNo}">
+                  <h:outputText value="#{relatedItemVar.invoiceNo}" />
+                </p:column>
+                <p:column headerText="#{lang.invoice} #{lang.type}">
+                  <h:outputText value="#{relatedItemVar.title}" />
+                </p:column>
+              </p:dataTable>
+            </h:panelGroup>
+          </h:panelGroup>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="consignmentPanel" widgetVar="panel" for="btnConsignment" hideEffect="fade" showEvent="click" hideEvent="click" 
+                        showCloseIcon="true" dynamic="true" style="width:auto" >
+          <h:panelGroup layout="block" style="width:auto">            
+            <!-- consignment list -->            
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.consignment}" styleClass="fw notProcess" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="Select Existing Consignment " itemValue="#{null}" />
+              <f:selectItems value="#{salesInvoiceGstIndiaView.customerConsignmentList}" var="c" itemValue="#{c}" itemLabel="#{c.consignmentNo}" />
+            </p:selectOneMenu>
+          </h:panelGroup>
+
+          <!-- Action Buttons -->
+          <h:panelGroup layout="block" style="width:auto">
+            <br />
+            <p:commandButton action="#{salesInvoiceGstIndiaView.addToExistingConsignment(main)}" value="#{lang.add} #{lang.to} #{lang.consignment}" styleClass="btn btn-primary"
+                             process="consignmentPanel" >
+            </p:commandButton>
+            <br />
+            OR
+            <br />
+            <p:commandButton action="#{salesInvoiceGstIndiaView.createConsignment(main)}" value="#{lang.create} #{lang.consignment}" styleClass="btn btn-primary"
+                             process="@this" immediate="true" >            
+            </p:commandButton>
+          </h:panelGroup>
+
+        </p:overlayPanel>
+
+
+        <h:panelGroup layout="block" id="productRateHistoryPanel">
+          <p:overlayPanel widgetVar="productHistoryVar" dynamic="true" showEffect="fade" hideEffect="fade"  showCloseIcon="true" dismissable="false" >
+            <p:outputPanel id="salesDetail" style="text-align:center;">
+              <p:panelGrid>
+                <f:facet name="header">
+                  <p:row>
+                    <p:column colspan="6">#{appView.display(salesInvoiceGstIndiaView.productName)}</p:column>
+                  </p:row>
+                  <p:row>
+                    <p:column>#{lang.invoiceNo}</p:column>
+                    <p:column>#{lang.invoiceDate}</p:column>
+                    <p:column>#{lang.batchNo}</p:column>
+                    <p:column>#{lang.qty}</p:column>
+                    <p:column>#{lang.freeQty}</p:column>
+                    <p:column>#{lang.s}.#{lang.disc}</p:column>
+                    <p:column>#{lang.s}.#{lang.discPerc}</p:column>
+                    <p:column>#{lang.p}.#{lang.disc}</p:column>
+                    <p:column>#{lang.p}.#{lang.discPerc}</p:column>
+                    <p:column>#{lang.i}.#{lang.disc}</p:column>
+                    <p:column>#{lang.rate}</p:column>
+                    <p:column>#{lang.pts}</p:column>
+                    <p:column>#{lang.ptr}</p:column>
+                    <p:column>#{lang.mrp}</p:column>
+                  </p:row>
+                </f:facet>
+
+                <ui:repeat value="#{salesInvoiceGstIndiaView.productInvoiceDetailList}" var="invoiceDetail">
+                  <p:row>
+                    <p:column>#{invoiceDetail.invoiceNo}</p:column>
+                    <p:column>#{appView.date(invoiceDetail.invoiceDate)}</p:column>
+                    <p:column>#{invoiceDetail.batchNo}</p:column>
+                    <p:column>#{invoiceDetail.qty}</p:column>
+                    <p:column>#{invoiceDetail.qtyFree}</p:column>
+                    <p:column>#{appView.decimal(invoiceDetail.schemeDiscount)}</p:column>
+                    <p:column>#{appView.decimal(invoiceDetail.schemeDiscountPercentage)}</p:column>
+                    <p:column>#{appView.decimal(invoiceDetail.productDiscount)}</p:column>
+                    <p:column>#{appView.decimal(invoiceDetail.productDiscountPercentage)}</p:column>
+                    <p:column>#{appView.decimal(invoiceDetail.invoiceDiscount)}</p:column>
+                    <p:column>#{invoiceDetail.valueRate}</p:column>
+                    <p:column>#{invoiceDetail.valuePts}</p:column>
+                    <p:column>#{invoiceDetail.valuePtr}</p:column>
+                    <p:column>#{invoiceDetail.valueMrp}</p:column>
+                  </p:row>
+                </ui:repeat>
+              </p:panelGrid>
+            </p:outputPanel>
+          </p:overlayPanel>
+        </h:panelGroup>
+
+        <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                      columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+
+          <!-- Sales Order -->
+          <p:outputLabel value="#{lang.salesOrder}" for="salesInvoiceSalesOrderId" rendered="#{salesInvoiceGstIndiaView.salesOrderReference}" />
+          <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesOrderReference}">
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.salesOrderId}" styleClass="fw"
+                             required="true" requiredMessage="#{lang.salesOrder} #{lang.isRequired}"
+                             id="salesInvoiceSalesOrderId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.salesOrder(main)}" var="e" itemValue="#{e}" itemLabel="#{e.orderNo}" />
+            </p:selectOneMenu>
+            <p:message for="salesInvoiceSalesOrderId" display="text" />
+          </h:panelGroup>
+
+          <!--Empty-->
+          <p:outputLabel value="" rendered="#{salesInvoiceGstIndiaView.salesOrderReference}"/>
+          <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesOrderReference}">
+          </h:panelGroup>
+
+          <!-- Account Group Vendor -->
+          <p:outputLabel value="#{lang.accountGroup}" for="txtSalesInvoiceAccountGroupId" />
+          <h:panelGroup id="accountGroupDiv" >
+            <p:inputText id="txtSalesInvoiceAccountGroupId" value="#{salesInvoiceGstIndiaView.salesInvoice.accountGroupId.groupName}" readonly="true"  styleClass="fw" />
+          </h:panelGroup>
+
+          <!--Customer Outstanding-->
+          <p:outputLabel value="#{lang.customerOutstanding}" rendered="#{salesInvoiceGstIndiaView.salesInvoice.customerId.id eq null}"/>
+          <p:commandLink id="otsBtn" actionListener="#{salesInvoiceGstIndiaView.showCustomerHealth()}" immediate="true"
+                         title="#{lang.customer} #{lang.health}" onclick="block()" oncomplete="unblock();" rendered="#{salesInvoiceGstIndiaView.salesInvoice.customerId.id ne null}" >
+            <p:outputLabel value="#{lang.customerOutstanding}" for="customerOutstanding" />
+          </p:commandLink>
+
+          <p:inputNumber value="#{salesInvoiceGstIndiaView.customerOutstandingValue}" converterMessage="#{lang.customerOutstanding} #{lang.invalidNumber}"
+                         decimalPlaces="2" readonly="true" styleClass="fw"  inputStyleClass="text-right" maxValue="9999999999"
+                         symbol="#{appView.currencySymbol} "
+                         minValue="0.0" maxlength="10" id="customerOutstanding" />
+
+          <!-- Customer -->
+          <p:commandLink actionListener="#{popUpView.showCustomerPopUpForm(null)}" immediate="true" >
+            <p:outputLabel value="#{lang.customer}" for="salesInvoiceCustomerId"/>
+          </p:commandLink>
+          <h:panelGroup id="customerDiv">                   
+            <p:inputText id="txtSalesInvoiceCustomerId" value="#{salesInvoiceGstIndiaView.salesInvoice.customerId.customerName}" readonly="true" styleClass="fw" 
+                         rendered="#{!(main.isNew() or (salesInvoiceGstIndiaView.draft and (userRuntimeView.privilege.editField or userRole.isRoot())))}" />
+            <p:autoComplete value="#{salesInvoiceGstIndiaView.salesInvoice.customerId}" completeMethod="#{salesInvoiceGstIndiaView.customerAuto}" 
+                            converter="wawo.LookupIntConverter"
+                            id="salesInvoiceCustomerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                            required="true" requiredMessage="#{lang.customer} #{lang.isRequired}"  dropdown="true"
+                            rendered="#{main.isNew() or (salesInvoiceGstIndiaView.draft and (userRuntimeView.privilege.editField or userRole.isRoot()))}"
+                            cache="true" queryDelay="500" maxResults="50" scrollHeight="450" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                            style="position: relative" styleClass="fw" >
+              <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+              <p:ajax event="itemSelect" listener="#{salesInvoiceGstIndiaView.customerSelectedEvent}" update="salesCreditDays companySalesAgentDiv customerAddressId shippingAddressId priceListDiv customerOutstanding"  />
+              <p:column>
+                #{e.customerName}
+              </p:column>
+              <p:column>
+                #{e.customerAddress}
+              </p:column>
+            </p:autoComplete>
+            <p:message for="salesInvoiceCustomerId" display="text" />
+          </h:panelGroup>
+
+          <!--Customer Address-->
+          <p:outputLabel value="#{lang.customer} #{lang.address}" for="customerAddressId"  />
+          <h:panelGroup >
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId}"  id="customerAddressId" var="c" 
+                             autoWidth="false" style="width:95%;" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.customer} #{lang.address} #{lang.isRequired}">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}"/>
+              <f:selectItems value="#{salesInvoiceGstIndiaView.lookUpCustomerAddress(false)}" var="e" itemValue="#{e}" itemLabel="#{e.address}  #{e.stateId.stateName}  #{e.districtId.districtName}  #{e.pin}" />
+              <p:column>
+                <h:outputText value="#{c.address}" />
+              </p:column>
+              <p:column>
+                <h:outputText value="#{c.addressTypeId.title}" rendered="#{c.addressTypeId.id==sysConstant.REGISTERED_ADDRESS}" styleClass="label" style="background-color: #007d68;" />
+                <h:outputText value="#{c.addressTypeId.title}" rendered="#{c.addressTypeId.id!=sysConstant.REGISTERED_ADDRESS}"  />
+              </p:column>
+              <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.customerAddresschangeEvenet()}"/>
+            </p:selectOneMenu>
+            <p:message for="customerAddressId" display="text"/>
+          </h:panelGroup>
+
+          <!-- Account group price list -->
+          <p:outputLabel value="#{lang.priceList}" for="salesInvoiceAccountGroupPriceListId" />
+          <h:panelGroup id="priceListDiv">
+            <p:inputText id="txtSalesInvoiceAccountGroupPriceListId" value="#{salesInvoiceGstIndiaView.salesInvoice.accountGroupPriceListId.title}"  readonly="true" styleClass="fw" rendered="#{main.edit}" />
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.accountGroupPriceListId}"  id="salesInvoiceAccountGroupPriceListId"
+                             required="true" requiredMessage="#{lang.priceList} #{lang.isRequired}" rendered="#{!main.edit}"
+                             styleClass="fw" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{salesInvoiceGstIndiaView.accountGroupPriceListByAccountGroup()}" var="e" itemValue="#{e}" itemLabel="#{e.title} #{e.isDefault == 0? '(Custom)':''}" />
+
+            </p:selectOneMenu>
+            <p:message for="salesInvoiceAccountGroupPriceListId" display="text" />
+          </h:panelGroup>
+
+          <!-- COMPANY ADDRESS -->
+          <p:outputLabel value="#{lang.company} #{lang.address}" for="companyAddressId"  />
+          <h:panelGroup  >
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.companyAddressId}" var="com"  id="companyAddressId"
+                             autoWidth="false" style="width:95%;" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.company} #{lang.address} #{lang.isRequired}" >
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{salesInvoiceGstIndiaView.lookUpCompanyAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.address}  #{e.stateId.stateName}  #{e.districtId.districtName}  #{e.pin}" />
+              <p:column>
+                <h:outputText value="#{com.address}" />
+              </p:column>
+              <p:column>
+                <h:outputText value="#{com.addressTypeId.title}" rendered="#{com.addressTypeId.id==sysConstant.REGISTERED_ADDRESS}" styleClass="label" style="background-color: #007d68;" />
+                <h:outputText value="#{com.addressTypeId.title}" rendered="#{com.addressTypeId.id!=sysConstant.REGISTERED_ADDRESS}"  />
+              </p:column>
+            </p:selectOneMenu>
+            <p:message for="companyAddressId" display="text"/>
+          </h:panelGroup>
+
+          <!--Shipping Address-->
+          <p:outputLabel value="#{lang.shipping} #{lang.address}" for="shippingAddressId"  />
+          <h:panelGroup  >
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.shippingAddressId}"  id="shippingAddressId" var="s"
+                             autoWidth="false" style="width:95%;" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}"/>
+              <f:selectItems value="#{salesInvoiceGstIndiaView.lookUpShippingAddress()}" var="e" itemValue="#{e}" itemLabel="#{e.address} " />
+              <p:column>
+                <h:outputText value="#{s.address}" />
+              </p:column>
+              <p:column>
+                <h:outputText value="#{s.addressTypeId.title}" rendered="#{s.addressTypeId.id==sysConstant.SHIPPING_ADDRESS}" styleClass="label" style="background-color: #007d68;" />
+                <h:outputText value="#{s.addressTypeId.title}" rendered="#{s.addressTypeId.id!=sysConstant.SHIPPING_ADDRESS}"  />
+              </p:column>
+            </p:selectOneMenu>
+            <p:message for="customerAddressId" display="text"/>
+          </h:panelGroup>
+
+          <!-- Sales Credit Days -->
+          <p:outputLabel value="#{lang.salesCreditDays}" for="salesCreditDays" />
+          <h:panelGroup>
+            <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.salesCreditDays}" converterMessage="#{lang.salesCreditDays} #{lang.invalidNumber}"
+                           decimalPlaces="0" required="true" requiredMessage="#{lang.salesCreditDays} #{lang.isRequired}"
+                           styleClass="fw" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="salesCreditDays" />
+            <p:message for="salesCreditDays" display="text"/>
+          </h:panelGroup>
+
+          <!-- Cash Discount | Cash Discount Taxable Applicable -->
+          <p:outputLabel style="color: hotpink;" value="#{lang.cashDiscount}"  />
+          <h:panelGroup layout="block" id="cashDiscountCbDiv" >
+            <h:panelGroup>
+              <p:selectBooleanCheckbox value="#{salesInvoiceGstIndiaView.cashDiscountApplicable}" id="cashDiscountChkBoxId" >
+                <p:ajax process="cashDiscountCbDiv" update="cashDiscountCbDiv salesProductTableDiv" 
+                        listener="#{salesInvoiceGstIndiaView.actionApplyCashDiscount}"  onstart="block();" oncomplete="unblock();" />
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup id="taxableCashDiscDiv" rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable}">
+              <p:outputLabel value="#{lang.cashDiscountTaxable}"  />
+              <p:selectBooleanCheckbox value="#{salesInvoiceGstIndiaView.cashDiscountTaxable}" >
+                <p:ajax process="cashDiscountCbDiv" update="cashDiscountCbDiv salesProductTableDiv" 
+                        listener="#{salesInvoiceGstIndiaView.actionApplyCashDiscount}" onstart="block();" oncomplete="unblock();"/>
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <h:panelGroup>
+            <h:outputLabel   style="color: cornflowerblue;" value="Modify Tax Code"></h:outputLabel>
+          </h:panelGroup>
+          <h:panelGroup>
+            <h:panelGroup >
+              <p:selectBooleanCheckbox value="#{salesInvoiceGstIndiaView.taxEditable}" id="cb33" >                
+                <p:ajax event="change" update="salesProductTableDiv"/>
+              </p:selectBooleanCheckbox>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Vendor Sales Agent -->
+          <p:outputLabel value="#{lang.vendor} #{lang.salesAgent}" for="vendorSalesAgentPersonProfileId" />
+          <h:panelGroup>
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.vendorSalesAgentPersonProfileId}"  id="vendorSalesAgentPersonProfileId"
+                             styleClass="fw" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{salesInvoiceGstIndiaView.lookupVendorSalesAgentPersonProfile()}" var="vc" itemValue="#{vc}" itemLabel="#{vc.userProfileId.name}" />
+            </p:selectOneMenu>
+            <p:message for="vendorSalesAgentPersonProfileId" display="text"/>
+          </h:panelGroup>         
+
+          <!-- Company Sales Agent -->
+          <p:commandLink immediate="true" actionListener="#{popUpView.showSalesAgent(null)}">
+            <p:outputLabel value="#{lang.salesAgent}" for="cmpSalesAgentPersonProfileId" />
+          </p:commandLink>
+          <h:panelGroup id="companySalesAgentDiv">
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId}"  id="cmpSalesAgentPersonProfileId"
+                             styleClass="fw" converter="omnifaces.SelectItemsConverter" required="#{salesInvoiceGstIndiaView.salesAgentCompulsory}">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{salesInvoiceGstIndiaView.lookupSalesAgent(filter)}" var="ag" itemValue="#{ag}" itemLabel="#{ag.name}" />
+              <p:ajax event="itemSelect" process="companySalesAgentDiv" />
+            </p:selectOneMenu>
+            <p:message for="cmpSalesAgentPersonProfileId" display="text"/>
+          </h:panelGroup>
+
+          <p:outputLabel value="#{lang.productType}" for="productProductTypeId" />
+          <h:panelGroup id="productTypeDiv">
+            <p:selectOneMenu styleClass="fw" value="#{salesInvoiceGstIndiaView.salesInvoice.productType}" id="productProductTypeId"
+                             converter="omnifaces.SelectItemsConverter"
+                             disabled="#{!salesInvoiceGstIndiaView.productTypeEditable}">
+              <f:selectItem itemValue="#{null}" itemLabel="#{lang.all}"/>
+              <f:selectItems value="#{productTypeView.productTypeList}" var="si" itemLabel="#{si.itemLabel}" itemValue="#{si}" />
+            </p:selectOneMenu>            
+          </h:panelGroup>  
+          <!-- Note For Customer -->
+          <p:outputLabel value="#{lang.note}" for="remarks" >
+            <i class="fa fa-print"></i>
+          </p:outputLabel>
+          <h:panelGroup>
+            <p:inputTextarea disabled="#{salesInvoiceGstIndiaView.confirmed}" value="#{salesInvoiceGstIndiaView.salesInvoice.noteForCustomerOrSupplier}" placeholder="#{lang.note} (#{lang.print})" 
+                             cols="50" rows="1" maxlength="255" id="noteForCustomer" autoResize="false" styleClass="fw" />
+          </h:panelGroup>
+          <!--Remarks-->
+          <p:outputLabel value="#{lang.remarks}" for="remarksId" />
+          <h:panelGroup id="remarksId">
+            <p:inputTextarea value="#{salesInvoiceGstIndiaView.salesInvoice.note}"
+                             cols="50" rows="2" maxlength="500" id="remarks" autoResize="false" styleClass="fw" />
+          </h:panelGroup>
+
+        </p:panelGrid>
+      </h:panelGroup>
+      <p:dialog id="confirmDlgVar" widgetVar="confirmDlgVar" header="Confirm Sales Invoice" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true" style="width: 300">
+        <h:panelGroup  layout="block" rendered="#{main.isForm()}"> 
+          <p:panelGrid  columns="2" layout="grid" rendered="#{salesInvoiceGstIndiaView.nearExpiredProducts gt 0}" styleClass="ui-panelgrid-blank form-horizontal">
+            <h:outputText value ="#{lang.noOfNearExpiryProducts}" />
+            <h:panelGroup>
+              <p:outputLabel value =": "/>
+              <p:outputLabel value =" #{salesInvoiceGstIndiaView.nearExpiredProducts}" style="color: #F6390F;font-size: 18px;"/>
+            </h:panelGroup>
+          </p:panelGrid>
+          <p:panelGrid  columns="4" layout="grid" >
+            <h:outputText value ="#{lang.totalItems}" />
+            <p:outputLabel value =": #{salesInvoiceGstIndiaView.salesInvoiceItemList.size()}" />
+            <h:outputText value ="#{lang.totalQty} " />
+            <p:outputLabel value =": #{salesInvoiceGstIndiaView.totalQty}" />
+
+            <h:outputText value ="#{lang.schemeDisc}" />
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.totalSchemeDiscount)}" />
+            <h:outputText value ="#{lang.productDisc}" />
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.totalProductDiscount)}" />
+
+            <h:outputText value ="#{lang.invDisc}" />
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.totalInvoiceDiscount)}" />
+            <h:outputText value ="#{lang.cashDisc}" />
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.salesInvoice.cashDiscountValue eq null?0.0:salesInvoiceGstIndiaView.salesInvoice.cashDiscountValue)}" />
+
+            <h:outputText value ="#{lang.cgst}" rendered="#{salesInvoiceGstIndiaView.intrastateSales}"/>
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.totalCgst)}" rendered="#{salesInvoiceGstIndiaView.intrastateSales}"/>
+            <h:outputText value ="#{lang.sgst}" rendered="#{salesInvoiceGstIndiaView.intrastateSales}"/>
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.totalSgst)}" rendered="#{salesInvoiceGstIndiaView.intrastateSales}"/>
+
+            <h:outputText value ="#{lang.igst}" rendered="#{!salesInvoiceGstIndiaView.intrastateSales}"/>
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.totalIgst)}" rendered="#{!salesInvoiceGstIndiaView.intrastateSales}"/>
+            <h:outputText value =" " rendered="#{!salesInvoiceGstIndiaView.intrastateSales}"/>
+            <p:outputLabel value =" " rendered="#{!salesInvoiceGstIndiaView.intrastateSales}"/>
+
+          </p:panelGrid>
+          <p:panelGrid  columns="2" layout="grid" >
+            <h:outputText value ="#{lang.tcsApplicableOn}" rendered="#{salesInvoiceGstIndiaView.salesInvoice.tcsTaxCodeId ne null}"/>
+            <p:outputLabel value =": #{salesInvoiceGstIndiaView.salesInvoice.tcsApplicableAmount}" rendered="#{salesInvoiceGstIndiaView.salesInvoice.tcsTaxCodeId ne null}"/>
+            <h:outputText value ="#{lang.tcs} #{lang.value}" rendered="#{salesInvoiceGstIndiaView.salesInvoice.tcsTaxCodeId ne null}"/>
+            <p:outputLabel value =": #{appView.decimal(salesInvoiceGstIndiaView.salesInvoice.tcsNetValue)}" rendered="#{salesInvoiceGstIndiaView.salesInvoice.tcsTaxCodeId ne null}"/>
+            <h:outputText value ="#{lang.invoiceAmount}" />
+            <p:outputLabel value =": #{salesInvoiceGstIndiaView.salesInvoice.invoiceAmount}" />
+          </p:panelGrid>
+        </h:panelGroup>
+        <br/>
+        <div style="padding-left: 80px;padding-right: 80px">
+          <h:outputText value="#{lang.productEntryConfirm}"  />
+        </div>
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <p:commandButton action="#{salesInvoiceGstIndiaView.saveSalesInvoice(main,sysConstant.CONFIRMED)}" 
+                           process="f1" update="f1"  
+                           value="#{lang.yes}" styleClass="btn btn-info" onstart="PF('wdgBlock').show();" oncomplete="PF('wdgBlock').hide();" />
+          <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('confirmDlgVar').hide();" />
+        </div>
+      </p:dialog>
+    </ui:define>
+
+
+    <ui:define name="after" >      
+      <h:panelGroup id="invoiceDetailDiv" layout="block" styleClass="card" rendered="#{main.isForm() and main.edit}" pt:data-watermark="#{salesInvoiceGstIndiaView.confirmed ? 'block' : 'true'}">
+        <h:panelGroup layout="block" styleClass="table-responsive">
+          <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="invoiceDetailsDiv" columnClasses="#{sysRuntimeView.grid2}">
+            <f:facet name="header">
+              <p:row>
+                <p:column><p:outputLabel value="#{lang.invoiceNo}" for="invoiceNo" /></p:column>
+                <p:column><p:outputLabel value="#{lang.invoiceDate}" for="invoiceEntryDate" /></p:column>
+                <!--<p:column><p:outputLabel value="#{lang.invoiceDate}" for="invoiceDate" /></p:column>-->                
+                <p:column><p:outputLabel value="#{lang.discountValue}" for="invoiceAmountDiscountValue" /></p:column>
+                <p:column><p:outputLabel value="#{lang.discountPerc}" for="invoiceAmountDiscountPerc" /></p:column>
+                <p:column rendered="false"><p:outputLabel value="#{lang.netAmount}" for="invoiceAmountNet" /></p:column>
+                <p:column><p:outputLabel value="#{lang.roundOff}" for="roundOff" /></p:column>
+                <p:column><p:outputLabel value="#{lang.invoiceAmount}" for="invoiceAmount" /></p:column>
+              </p:row>
+            </f:facet>
+
+            <p:row>
+              <!-- Invoice No -->
+              <p:column>
+                <h:panelGroup layout="block" id="invoiceNoDiv">
+                  <p:inputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceNo}" readonly="true" maxlength="50" id="invoiceNoR" styleClass="form-control prNum" rendered="#{!(userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root) or salesInvoiceGstIndiaView.salesInvoice.confirmedAt eq null}" />
+
+                  <p:inplace id="invoiceEdit"  event="dblclick" label="#{salesInvoiceGstIndiaView.salesInvoice.invoiceNo}" styleClass="fw" rendered="#{(userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root) and salesInvoiceGstIndiaView.salesInvoice.confirmedAt ne null}" >
+                    <p:inputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceNo}"  maxlength="50" id="invoiceNo" styleClass="form-control prNum" />
+                  </p:inplace>  
+
+                </h:panelGroup>
+              </p:column>
+
+              <!-- Entry Date -->
+              <p:column>
+                <p:calendar value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceEntryDate}" pattern="#{lang.datePattern}" maxdate="#{userRuntimeView.maxEntryDate}" 
+                            converterMessage="#{lang.entryDate} #{lang.invalidDate}" required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"
+                            validator="#{sysRuntimeView.dateLteToday}" mindate="#{salesInvoiceGstIndiaView.setMinDateforInvoice(main)}"
+                            disabled="#{salesInvoiceGstIndiaView.confirmed}"
+                            maxlength="29" id="invoiceEntryDate" showButtonPanel="true" navigator="true" mask="true" styleClass="test" >
+                  <p:ajax event="blur" process="@this"/>
+                  <p:ajax event="dateSelect" process="@this"/>
+                </p:calendar>
+                <p:message for="invoiceEntryDate" display="text"/>
+              </p:column>
+
+              <!--
+              
+              Entry date and Invoice Date should be same
+              
+              -->
+              <!-- Invoice Date -->
+              <!--              <p:column>
+                              <p:calendar value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceDate}" pattern="#{lang.datePattern}"
+                                          converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" maxdate="#{userRuntimeView.getToday()}" 
+                                          validator="#{sysRuntimeView.dateLteToday}"
+                                          maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true" styleClass="test">
+                              </p:calendar>
+                              <p:message for="invoiceDate" display="text"/>
+                            </p:column>              -->
+
+              <!-- Invoice Discount value -->
+              <p:column>
+                <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmountDiscount}" converterMessage="#{lang.invoiceAmountDiscount} #{lang.invalidNumber}"
+                               readonly="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmtDiscPercent ne null}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountDiscountValue" >
+                  <p:ajax event="change" oncomplete="updateInvoiceSummery();" listener="#{salesInvoiceGstIndiaView.updateSalesInvoiceAmount}" update="salesProductTableDiv invoiceRoundOffDiv invoiceAmountDiv invoiceAmountDiscountPerc" process="@this" />
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Invoice Discount % -->
+              <p:column>
+                <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmtDiscPercent}" converterMessage="#{lang.invoiceAmtDiscPercent} #{lang.invalidNumber}"
+                               readonly="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmountDiscount ne null}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.percentageSymbol} " maxlength="15" id="invoiceAmountDiscountPerc" >
+                  <p:ajax event="change" oncomplete="updateInvoiceSummery();" listener="#{salesInvoiceGstIndiaView.updateSalesInvoiceAmount}" update="salesProductTableDiv invoiceRoundOffDiv invoiceAmountDiv invoiceAmountDiscountValue" process="@this" />
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Invoice Goods Value -->
+              <p:column rendered="false">
+                <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmountGoods}" converterMessage="#{lang.invoiceAmountNet} #{lang.invalidNumber}" decimalPlaces="2"
+                               readonly="true"
+                               onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="invoiceAmountNet" />
+                <p:message for="invoiceAmountNet" display="text"/>
+              </p:column>
+
+              <!-- roundOff -->
+              <p:column>
+                <h:panelGroup layout="block" id="invoiceRoundOffDiv">
+                  <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.roundOff}" converterMessage="#{lang.roundOff} #{lang.invalidNumber}" decimalPlaces="2"
+                                 readonly="true"
+                                 onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="0.99" minValue="-0.99" symbol="#{appView.currencySymbol} " maxlength="15" id="roundOff" >
+                    <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.updateSalesInvoiceAmount}" update="invoiceAmount" process="@this" />
+                  </p:inputNumber>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- Invoice Amount -->
+              <p:column>
+                <h:panelGroup layout="block" id="invoiceAmountDiv">
+                  <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmount}" converterMessage="#{lang.invoiceAmount} #{lang.invalidNumber}" 
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " readonly="true" maxlength="15" id="invoiceAmount" />
+                  <p:message for="invoiceAmount" display="text"/>
+                </h:panelGroup>
+              </p:column>
+            </p:row>
+          </p:panelGrid>
+        </h:panelGroup>
+      </h:panelGroup>
+
+      <h:panelGroup layout="block" rendered="#{main.isForm() and main.edit and !salesInvoiceGstIndiaView.draft}">
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+          <ui:param name="ids" value="packInfo" />
+          <ui:param name="label" value="#{lang.packingInfo}" />
+          <ui:param name="grid" value="false" />          
+          <ui:param name="rendered" value="#{!salesInvoiceGstIndiaView.draft and !salesInvoiceGstIndiaView.proforma}"/>
+
+          <ui:define name="subAfter">
+
+            <h:panelGroup layout="block" styleClass="table-responsive">
+              <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="ds" columnClasses="#{sysRuntimeView.grid2}">
+                <f:facet name="header">
+                  <p:row>
+                    <p:column>
+                      <p:panelGrid columns="2">
+                        <p:outputLabel value="#{lang.noOfBoxes}" for="noOfBoxes" />
+                        <h:panelGroup layout="block" >
+                          <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.noOfBoxes}" converterMessage="#{lang.noOfBoxes} #{lang.invalidNumber}" decimalPlaces="0"
+                                         styleClass="fw" inputStyle="text-align: center;"
+                                         required="true" requiredMessage="#{lang.noOfBoxes} #{lang.isRequired}" title="#{lang.noOfBoxes}" id="noOfBoxes"
+                                         onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999" minValue="0.0" maxlength="10" readonly="#{salesInvoiceGstIndiaView.confirmedAndPacked}">
+                          </p:inputNumber>
+                          <p:message for="noOfBoxes" display="text" />
+                        </h:panelGroup>
+                      </p:panelGrid>
+                    </p:column>
+                    <p:column>
+                      <p:panelGrid columns="3">
+                        <p:outputLabel styleClass="col-md-3 control-label" value="#{lang.weight}" for="weightInfo" />
+                        <h:panelGroup>
+                          <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.weight}" converterMessage="#{lang.weight} #{lang.invalidNumber}" decimalPlaces="3"
+                                         inputStyle="text-align: center;"
+                                         required="true" requiredMessage="#{lang.weight} #{lang.isRequired}" title="#{lang.weight}"
+                                         onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999" minValue="0.00" maxlength="10" id="weightInfo" readonly="#{salesInvoiceGstIndiaView.confirmedAndPacked}">
+                          </p:inputNumber>
+                          <p:message for="weightInfo" display="text" />
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="cell-0 w-80">
+                          <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.weightUnit}" styleClass="p-t-5"
+                                           disabled="#{salesInvoiceGstIndiaView.confirmedAndPacked}">
+                            <f:selectItem itemLabel="gram" itemValue="gm" />
+                            <f:selectItem itemLabel="kilogram" itemValue="kg" />
+                            <f:selectItem itemLabel="metric ton" itemValue="mt" />
+                          </p:selectOneMenu>
+                        </h:panelGroup>
+                      </p:panelGrid>
+                    </p:column>
+
+                  </p:row>
+                </f:facet>
+              </p:panelGrid>
+            </h:panelGroup>
+
+            <!--            <h:panelGroup layout="block" styleClass="form-horizontal">
+                           Primary Packing 
+                          <h:panelGrid columns="2" >
+                            <h:panelGroup layout="block" styleClass="form-group">
+                              <p:outputLabel  value="#{lang.noOfBoxes}" for="noOfBoxes" />
+                              <h:panelGroup layout="block" styleClass="col-md-9 ">
+                                <h:panelGroup layout="block" styleClass="flex">
+                                  <h:panelGroup layout="block" styleClass="cell-0 w-100">
+                                    <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.noOfBoxes}" converterMessage="#{lang.noOfBoxes} #{lang.invalidNumber}" decimalPlaces="0"
+                                                   styleClass="fw" inputStyle="text-align: center;"
+                                                   required="true" requiredMessage="#{lang.noOfBoxes} #{lang.isRequired}" title="#{lang.noOfBoxes}"
+                                                   onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999" minValue="0.0" maxlength="10" id="noOfBoxes" readonly="#{salesInvoiceGstIndiaView.confirmedAndPacked}">
+                                    </p:inputNumber>
+                                    <p:message for="noOfBoxes" display="text" />
+                                  </h:panelGroup>
+                                </h:panelGroup>
+                              </h:panelGroup>
+                            </h:panelGroup>
+            
+                            <h:panelGroup layout="block" styleClass="form-group">
+                              <p:outputLabel styleClass="col-md-3 control-label" value="#{lang.weight}" for="weight" />
+                              <h:panelGroup layout="block" styleClass="col-md-9 ">
+                                <h:panelGroup layout="block" styleClass="flex">
+                                  <h:panelGroup layout="block" styleClass="cell-0 w-100">
+                                    <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.weight}" converterMessage="#{lang.weight} #{lang.invalidNumber}" decimalPlaces="3"
+                                                   inputStyle="text-align: center;"
+                                                   required="true" requiredMessage="#{lang.weight} #{lang.isRequired}" title="#{lang.weight}"
+                                                   onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999" minValue="0.00" maxlength="10" id="weight" readonly="#{salesInvoiceGstIndiaView.confirmedAndPacked}">
+                                    </p:inputNumber>
+                                    <p:message for="weight" display="text" />
+                                  </h:panelGroup>
+                                  <h:panelGroup layout="block" styleClass="cell-0 w-80">
+                                    <p:selectOneMenu value="#{salesInvoiceGstIndiaView.salesInvoice.weightUnit}" styleClass="p-t-5"
+                                                     disabled="#{salesInvoiceGstIndiaView.confirmedAndPacked}">
+                                      <f:selectItem itemLabel="gram" itemValue="gm" />
+                                      <f:selectItem itemLabel="kilogram" itemValue="kg" />
+                                      <f:selectItem itemLabel="metric ton" itemValue="mt" />
+                                    </p:selectOneMenu>
+                                  </h:panelGroup>
+                                </h:panelGroup>
+                              </h:panelGroup>
+                            </h:panelGroup>
+                          </h:panelGrid>
+                        </h:panelGroup>-->
+          </ui:define>
+        </ui:decorate>
+      </h:panelGroup>
+
+      <style>
+
+        .bg-danger {
+          color: #fff;
+          background: #ef565a !important;
+        }        
+      </style>
+
+      <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and main.edit}">
+
+        <p:remoteCommand name="purchaseReturnConsignmentPopupReturned" process="@this" update="@this" />
+        <p:remoteCommand name="updateInvoiceSummery" process="@this" update="salesItemTable:invoiceSummarydiv" />
+        <p:remoteCommand actionListener="#{salesInvoiceGstIndiaView.actionInsertOrUpdateSalesInvoiceItem(main)}" process="f1" update="salesProductTableDiv"
+                         oncomplete="refreshAferRowUpdate();"  name="saveSalesInvoiceItem" />
+        <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+        <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
+        <h:panelGroup layout="block" id="salesProductTableDiv" styleClass="table-responsive" pt:data-fast-input="true">          
+          <p:dataTable var="salesItemVar" id="salesItemTable" widgetVar="salesItemTableVar" value="#{salesInvoiceGstIndiaView.salesInvoiceItemList}"
+                       rows="#{salesInvoiceGstIndiaView.draft?5:50}" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="#{salesInvoiceGstIndiaView.draft}"
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="5, 15, 30, 50,100,150"  rowKey="#{salesItemVar.salesInvoiceItemHashCode eq null? 0:salesItemVar.salesInvoiceItemHashCode}"
+                       rowIndexVar="rowIndex" rowStyleClass="#{salesItemVar.isNearExpiry le 0 or salesItemVar.isTaxCodeModified eq 1 ? 'highlight warning' : 'highlight'}"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases"  
+                       selection="#{salesInvoiceGstIndiaView.salesInvoiceItemSelected}" rowSelectMode="checkbox"  >
+            <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+            <p:ajax event="rowSelectCheckbox"  />
+            <p:ajax event="rowUnselectCheckbox" />
+            <p:ajax event="toggleSelect" />
+            <p:column headerText="#{lang.sno}" width="36" style="text-align: center;" >
+              <h:outputText value="#{rowIndex + 1}" />
+              <h:outputText rendered="false" styleClass="fa fa-exclamation-triangle" style="color: #f00;" title="Insufficient quantity." value="" />
+            </p:column>
+
+            <!-- Product -->
+            <p:column width="200">
+              <f:facet name="header"><h:outputText value="#{lang.product}" title="Product Name"/></f:facet>
+              <h:outputText value="#{salesItemVar.product.productName}" rendered="#{!salesInvoiceGstIndiaView.draft}" title="#{salesItemVar.product.productName}" />
+              <p:autoComplete id="productId" value="#{salesItemVar.product}" completeMethod="#{salesInvoiceGstIndiaView.completeProduct}"  
+                              converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative"  panelStyle="width:400px !important;"
+                              cache="true" cacheTimeout="30000" queryDelay="500" maxResults="100" scrollHeight="500" title="#{salesItemVar.product.productName}"
+                              var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true" 
+                              readonly="#{!salesInvoiceGstIndiaView.salesInvoiceEditable}" rendered="#{salesInvoiceGstIndiaView.draft}" >
+                <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                <p:ajax event="itemSelect" update="batchNo,taxRate,expiryDate,valueMrp,ptsRate,valuePts,valuePtr,caseQty,peiceQty,boxQty,discValue,freeQty,totalRate,netRate,
+                        invoiceRoundOffDiv invoiceAmountDiv productTypeDiv schemeDiscValueId,schemeDiscPercId productDiscValDiv productDiscPercDiv invoiceEntryDate productRateHistoryPanel invoiceEntryDate"
+                        listener="#{salesInvoiceGstIndiaView.updateCurrentRow(main,salesItemVar)}" onstart="block();" oncomplete="unblock(); focusToBatch(#{rowIndex});
+                        showProductRateHistoryOverlayPanel(xhr, status, args);" />
+              </p:autoComplete>
+            </p:column>
+
+            <p:column rendered="#{salesInvoiceGstIndiaView.draft ? false : salesInvoiceGstIndiaView.proforma ? false : true}">
+              <f:facet name="header"><h:outputText value="#{lang.batch}" title="#{lang.batchNumber}"/></f:facet>
+              <h:panelGroup layout="block" id="batchNos">
+                <h:outputText value="#{salesItemVar.batchNo}" title ="#{lang.packSize} - #{salesItemVar.productDetailSales.packSize}" />
+              </h:panelGroup>
+            </p:column>
+            <!--Batch--> 
+            <p:column rendered="#{salesInvoiceGstIndiaView.draft ? true : salesInvoiceGstIndiaView.proforma ? true : false}">
+              <f:facet name="header"><h:outputText value="#{lang.batch}" title="#{lang.batchNumber}"/></f:facet>              
+              <h:panelGroup layout="block" id="batchNo"> 
+                <p:autoComplete value="#{salesItemVar.productDetailSales}" autocomplete="off" dropdown="true" emptyMessage="#{lang.noSaleableQty}"
+                                styleClass="fw" id="productDetailList" panelStyle="width:650px" var="batchVar" completeMethod="#{salesInvoiceGstIndiaView.salesBatchAuto}"
+                                itemLabel="#{batchVar.batchNo}" itemValue="#{batchVar}" converter="spica.scm.converter.ProductBatchConverter" 
+                                scrollHeight="400" style="position: relative" forceSelection="true" cache="true" cacheTimeout="30000" >
+
+                  <f:attribute name="selectItem" value="#{salesItemVar}" />
+                  <p:column headerText="#{lang.batch}">
+                    <h:outputText value="#{batchVar.batchNo}" />
+                  </p:column>
+                  <p:column headerText="#{lang.expDate}">
+                    <h:outputText value="#{batchVar.expiryDate}" />
+                  </p:column>
+                  <p:column headerText="#{lang.pack} #{lang.description}">
+                    <h:outputText value="#{batchVar.packDescription}"/>
+                  </p:column>
+                  <p:column headerText="#{lang.qty}">
+                    <h:outputText value="#{batchVar.quantityAvailable}" />
+                  </p:column>
+                  <p:column headerText="#{lang.schemeDisc}">
+                    <h:outputText value="#{batchVar.schemeDiscountPer ne 0 ? batchVar.schemeDiscountPer : ''}" />
+                  </p:column>
+                  <p:column headerText="#{lang.productDisc}">
+                    <h:outputText value="#{batchVar.productDiscountPer ne 0 ? batchVar.productDiscountPer : ''}" />
+                  </p:column>
+                  <p:column headerText="#{lang.pts}">
+                    <h:outputText value="#{batchVar.pricelistPts}" />
+                  </p:column>
+                  <p:column headerText="#{lang.mrp}">
+                    <h:outputText value="#{batchVar.mrpValue}" />
+                  </p:column>
+                  <p:ajax event="itemSelect" process="@this"
+                          update="expiryDate,taxRate,valueMrp,ptsRate,valuePts,valuePtr,caseQty,peiceQty,boxQty,schemeDiscValueId,schemeDiscPercId,discValue,discPerc,freeQtyDiv,freeQty,totalRate,netRate,invoiceRoundOffDiv invoiceAmountDiv"
+                          listener="#{salesInvoiceGstIndiaView.updateProductDetails(main, salesItemVar)}" oncomplete="focusToQty(#{rowIndex}); refreshDatatable();"  >
+                  </p:ajax>
+                </p:autoComplete>
+              </h:panelGroup>              
+            </p:column>
+
+            <!-- Expiry Date -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.expDate}" title="#{lang.expiryDate}"/></f:facet>
+              <h:panelGroup layout="block" id="expiryDate" >                
+                <h:outputText value="#{sysRuntimeView.dateToMMYY(salesItemVar.expiryDate)}" />
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Tax Percentage -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.taxPercentage}" title="#{lang.taxRatePercentage}"/></f:facet>
+              <h:panelGroup layout="block" id="taxRate" >
+                <h:outputText value="#{appView.decimal(salesItemVar.taxCodeId.ratePercentage)}" rendered="#{!salesInvoiceGstIndiaView.taxEditable}"  />
+              </h:panelGroup>
+              <p:selectOneMenu value="#{salesItemVar.taxCodeId}" converter="omnifaces.SelectItemsConverter"                                
+                               id="tx12" rendered="#{salesInvoiceGstIndiaView.taxEditable}">                
+                <f:selectItems value="#{salesInvoiceGstIndiaView.taxCodeList}" var="tx" itemValue="#{tx}" itemLabel="#{tx.code}" />
+                <p:ajax event="itemSelect" listener="#{salesInvoiceGstIndiaView.taxCodeSelectEvent(salesItemVar)}" oncomplete="updateInvoiceSummery();" />                            
+              </p:selectOneMenu>
+            </p:column>
+
+            <!-- Tertiary Quantity -->
+            <p:column headerText="">
+              <h:panelGroup layout="block" id="caseQtyCol">
+                <h:panelGroup layout="block">                  
+                  <p:inputNumber id="caseQty" value="#{salesItemVar.tertiaryQuantity}" autocomplete="off"
+                                 readonly="#{!salesInvoiceGstIndiaView.salesInvoiceEditable}" rendered="#{salesInvoiceGstIndiaView.draft}"
+                                 minValue="0.0" onfocus="checkBatchValue(#{rowIndex}, 'caseQty');" inputStyleClass="text-right" maxValue="999999.99" maxlength="6"
+                                 placeholder="#{salesItemVar.productDetailSales.tertiaryPackId eq null ? '' : salesItemVar.productDetailSales.tertiaryPacking.title}">
+                    <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.updateProductQuantity(main,salesItemVar,3)}" oncomplete="updateInvoiceSummery();"
+                            update="boxQty,peiceQty,freeQty,discValue,totalRate,netRate,invoiceRoundOffDiv invoiceAmountDiv" />
+                    <p:ajax event="focus" onstart="checkBatchValue(#{rowIndex},'caseQty')" />
+                  </p:inputNumber>
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Secondary Quantity -->
+            <p:column headerText="">
+              <h:panelGroup layout="block" id="boxQtyCol">
+                <h:panelGroup layout="block">
+                  <p:inputNumber id="boxQty" value="#{salesItemVar.secondaryQuantity}" minValue="0.0"
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="99999.99" maxlength="6" autocomplete="off"
+                                 readonly="#{!salesInvoiceGstIndiaView.salesInvoiceEditable}"                                 
+                                 placeholder="#{salesItemVar.productDetailSales.secondaryPackId eq null ? '' : salesItemVar.productDetailSales.secondaryPacking.title}" >
+                    <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.updateProductQuantity(main,salesItemVar,2)}" oncomplete="updateInvoiceSummery();"
+                            update="caseQty,peiceQty,freeQty,discValue,totalRate,netRate,invoiceRoundOffDiv invoiceAmountDiv" />
+                  </p:inputNumber>
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Primary Quantity -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.quantity}"/></f:facet>
+              <h:panelGroup layout="block" id="peiceQtyCol">
+                <h:panelGroup layout="block">                    
+                  <h:outputText value="#{salesItemVar.productQty}" rendered="#{!salesInvoiceGstIndiaView.draft}" title ="#{lang.packSize} - #{salesItemVar.productDetailSales.packSize}" />
+                  <p:inputNumber id="peiceQty" value="#{salesItemVar.productQty}" size="10" autocomplete="off" minValue="0"
+                                 decimalPlaces="0" rendered="#{salesInvoiceGstIndiaView.draft}"
+                                 onfocus="checkBatchValue(#{rowIndex}, 'peiceQty')" inputStyleClass="text-right" required="Product quantity is required"
+                                 maxValue="#{salesInvoiceGstIndiaView.salesInvoiceEditable ? (salesItemVar.currentAvailableQty eq null?0:salesItemVar.currentAvailableQty ) : salesItemVar.productQty eq null?0:salesItemVar.productQty }"
+                                 thousandSeparator="" readonly="#{!salesInvoiceGstIndiaView.salesInvoiceEditable}"
+                                 placeholder="#{salesItemVar.productDetailSales.primaryPackId eq null ? '' : salesItemVar.productDetailSales.primaryPacking.title}"
+                                 title ="#{lang.packSize} - #{salesItemVar.productDetailSales.packSize}" >
+                    <p:ajax event="change" update="caseQty,boxQty,freeQty,discValue,totalRate,netRate,schemeDiscValueId,schemeDiscPercId,productDiscPercDiv,invoiceRoundOffDiv invoiceAmountDiv"
+                            listener="#{salesInvoiceGstIndiaView.updateProductSalesValues(main,salesItemVar,1)}"
+                            oncomplete="updateInvoiceSummery();" />
+                    <p:ajax event="focus" onstart="checkBatchValue(#{rowIndex},'peiceQty')" />
+                  </p:inputNumber>
+                  <p:tooltip id="packSizeToolTip" for="peiceQty" showEvent="focus" hideEvent="blur"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Free Quantity -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText style="color: deepskyblue;" value="#{lang.freeQty}" title="#{lang.Free} #{lang.quantity}"/></f:facet>
+              <h:panelGroup layout="block" id="freeQtyDiv">
+                <h:outputText value="#{salesItemVar.productQtyFree}" rendered="#{!salesInvoiceGstIndiaView.draft}" />
+                <p:inputNumber id="freeQty" value="#{salesItemVar.productQtyFree}" size="10" autocomplete="off"
+                               readonly="#{!salesInvoiceGstIndiaView.salesInvoiceEditable}"
+                               disabled="#{salesInvoiceGstIndiaView.schemeDiscountApplied(salesItemVar)}"
+                               decimalPlaces="0" rendered="#{salesInvoiceGstIndiaView.draft}"
+                               onfocus="this.select()" inputStyleClass="text-right" maxValue="#{salesInvoiceGstIndiaView.salesInvoiceEditable  ? (salesItemVar.currentAvailableFreeQty eq null?0:salesItemVar.currentAvailableFreeQty ): (salesItemVar.productQtyFree eq null?0:salesItemVar.productQtyFree)}" minValue="0">
+                  <p:ajax event="blur" listener="#{salesInvoiceGstIndiaView.updateProductFreeQtyScheme(salesItemVar)}"
+                          update="caseQty boxQty peiceQty boxQtyCol freeQtyDiv schemeDiscValueId,schemeDiscPercId,totalRate,netRate"
+                          oncomplete="focusToDiscount(#{rowIndex});" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Scheme Discount Value -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText style="color: deepskyblue;" value="#{lang.s}.#{lang.disc}" title="#{lang.productSchemeDiscountValue}"/></f:facet>
+              <h:panelGroup layout="block" id="schemeDiscValDiv">
+                <h:outputText value="#{appView.decimal(salesItemVar.schemeDiscountValue)}" rendered="#{!salesInvoiceGstIndiaView.draft}" />
+                <p:inputNumber id="schemeDiscValueId" value="#{salesItemVar.schemeDiscountValue}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.0"
+                               readonly="#{salesItemVar.isSchemeDiscountInPercentage eq 1}" rendered="#{salesInvoiceGstIndiaView.draft}"
+                               disabled="#{salesItemVar.productQtyFree ne null or salesInvoiceGstIndiaView.schemeApplicable(salesItemVar)}">
+                  <p:ajax event="change" process="schemeDiscValDiv" update="schemeDiscPercDiv totalRate netRate freeQtyDiv" oncomplete="updateInvoiceSummery();"
+                          listener="#{salesInvoiceGstIndiaView.schemeDiscountValueChangeEventHandler(salesItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Scheme Discount Percentage -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText style="color: deepskyblue;" value="#{lang.s}.#{lang.discPerc}" title="#{lang.productSchemeDiscountValue}"/></f:facet>
+              <h:panelGroup layout="block" id="schemeDiscPercDiv">
+                <h:outputText value="#{appView.decimal(salesItemVar.schemeDiscountPercentage)}" rendered="#{!salesInvoiceGstIndiaView.draft}" />
+                <p:inputNumber id="schemeDiscPercId" value="#{salesItemVar.schemeDiscountPercentage}" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" decimalPlaces="3" minValue="0.0"
+                               readonly="#{salesItemVar.isSchemeDiscountInPercentage eq 2}" rendered="#{salesInvoiceGstIndiaView.draft}"
+                               disabled="#{salesItemVar.productQtyFree ne null or salesInvoiceGstIndiaView.schemeApplicable(salesItemVar)}">
+                  <p:ajax event="change" process="schemeDiscPercDiv" update="schemeDiscValDiv totalRate netRate freeQtyDiv" oncomplete="updateInvoiceSummery();"
+                          listener="#{salesInvoiceGstIndiaView.schemeDiscountPercChangeEventHandler(salesItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Product Discount Value -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.p}.#{lang.disc}" style="color: cornflowerblue;" title="#{lang.product} #{lang.discount}"/></f:facet>
+              <h:panelGroup layout="block" id="productDiscValDiv">
+                <h:outputText value="#{appView.decimal(salesItemVar.productDiscountValue)}" rendered="#{!salesInvoiceGstIndiaView.draft}" />
+                <p:inputNumber id="discValue" value="#{salesItemVar.productDiscountValue}" decimalPlaces="2" size="6" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" autocomplete="off"
+                               readonly="#{salesItemVar.isProductDiscountInPercentage eq 1}" rendered="#{salesInvoiceGstIndiaView.draft}">
+                  <p:ajax event="change" update="productDiscPercDiv totalRate netRate" process="productDiscValDiv" oncomplete="updateInvoiceSummery();"
+                          listener="#{salesInvoiceGstIndiaView.productDiscountValueChangeEventHandler(salesItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Product Discount Percentage -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.p}.#{lang.discPerc}" style="color: cornflowerblue;" title="#{lang.product} #{lang.discount}"/></f:facet>
+              <h:panelGroup layout="block" id="productDiscPercDiv">
+                <h:outputText value="#{appView.decimal(salesItemVar.productDiscountPercentage)}" rendered="#{!salesInvoiceGstIndiaView.draft}" />
+                <p:inputNumber id="discPerc" value="#{salesItemVar.productDiscountPercentage}" decimalPlaces="2" size="6" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" autocomplete="off"
+                               readonly="#{salesItemVar.isProductDiscountInPercentage eq 2}" rendered="#{salesInvoiceGstIndiaView.draft}">
+                  <p:ajax event="change" update="productDiscValDiv totalRate netRate" process="productDiscPercDiv" oncomplete="updateInvoiceSummery();"
+                          listener="#{salesInvoiceGstIndiaView.productDiscountPercChangeEventHandler(salesItemVar)}" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Product Selling Rate -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+              <h:panelGroup layout="block">
+                <h:outputText value="#{appView.decimal(salesItemVar.prodPieceSellingForced)}" rendered="#{!salesInvoiceGstIndiaView.draft}" />
+                <p:inputNumber id="ptsRate" value="#{salesItemVar.prodPieceSellingForced}" size="10" autocomplete="off" 
+                               onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" styleClass="submit_item fw" 
+                               decimalPlaces="#{salesInvoiceGstIndiaView.salesInvoice.decimalPrecision}"
+                               rendered="#{salesInvoiceGstIndiaView.draft}"
+                               readonly="#{!salesInvoiceGstIndiaView.salesInvoiceEditable}">
+                  <p:ajax event="change" update="productRateHistoryPanel peiceQtyCol freeQtyDiv valuePts valuePtr netRate totalRate invoiceRoundOffDiv invoiceAmountDiv"
+                          listener="#{salesInvoiceGstIndiaView.updateProductSalesValues(main,salesItemVar,0)}" oncomplete="updateInvoiceSummery();" />
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- PTS Value -->
+            <p:column style="text-align: right;" rendered="#{salesInvoiceGstIndiaView.renderPts}">
+              <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+              <h:panelGroup layout="block">                
+                <p:inputNumber id="valuePts" value="#{salesItemVar.valuePts}" size="10" autocomplete="off" 
+                               inputStyleClass="text-right" styleClass="fw" 
+                               decimalPlaces="#{salesInvoiceGstIndiaView.salesInvoice.decimalPrecision}"                               
+                               readonly="true">
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- PTR Value -->
+            <p:column style="text-align: right;" rendered="#{salesInvoiceGstIndiaView.renderPtr}">
+              <f:facet name="header"><h:outputText value="#{lang.ptr}" title="#{lang.ptr}"/></f:facet>
+              <h:panelGroup layout="block">
+                <p:inputNumber id="valuePtr" value="#{salesItemVar.valuePtr}" size="10" autocomplete="off" 
+                               inputStyleClass="text-right" styleClass="fw" 
+                               decimalPlaces="#{salesInvoiceGstIndiaView.salesInvoice.decimalPrecision}"                               
+                               >
+                </p:inputNumber>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- MRP Value -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+              <h:outputText id="valueMrp" value="#{appView.decimal(salesItemVar.valueMrp)}" style="#{salesItemVar.isMrpChanged eq 1 ? 'color:red;' : ''}" />
+            </p:column>
+
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.goodsValue}" title="#{lang.goodsValue}"/></f:facet>
+              <h:outputText id="netRate" value="#{appView.decimal(salesItemVar.valueGoods)}" />              
+            </p:column>
+
+            <!-- Product Net Amount -->
+            <p:column style="text-align: right;">
+              <f:facet name="header"><h:outputText value="#{lang.value}" title="#{lang.salesValue}"/></f:facet>
+              <h:outputText id="totalRate" value="#{appView.decimal(salesItemVar.valueSale)}" />              
+            </p:column>
+
+            <!--            <p:column width="5">
+                          <f:facet name="header">
+                            <p:commandButton  process="@this" value="" update="salesProductTableDiv,invoiceRoundOffDiv invoiceAmountDiv invoiceEntryDate" tabindex="-1" icon="fa fa-trash"
+                                              actionListener="#{salesInvoiceGstIndiaView.deleteSalesInvoiceItemSelected(main)}" oncomplete="refreshDatatable();" >
+                              <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                            </p:commandButton>
+                          </f:facet>              
+                        </p:column>-->
+
+<!--            <p:column style="width:30px" rendered="#{main.isForm() and main.edit and salesInvoiceGstIndiaView.draft}">              
+              <p:commandButton rendered="#{salesItemVar.product != null}"  process="@this" value="" update="salesProductTableDiv,invoiceRoundOffDiv invoiceAmountDiv invoiceEntryDate" tabindex="-1" icon="fa fa-trash"
+                               actionListener="#{salesInvoiceGstIndiaView.deleteSalesInvoiceItemSelected(main,salesItemVar)}" oncomplete="refreshDatatable();" >
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </p:column>-->
+            <p:column id="col35" selectionMode="multiple" exportable="false" rendered="#{salesInvoiceGstIndiaView.draft}" >
+              <f:facet name="footer">
+                <p:commandButton  process="@this" value="" update="salesProductTableDiv,invoiceRoundOffDiv invoiceAmountDiv invoiceEntryDate" tabindex="-1" icon="fa fa-trash"
+                                  actionListener="#{salesInvoiceGstIndiaView.deleteSalesInvoiceItemSelected(main)}" oncomplete="refreshDatatable();" >
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </f:facet> 
+            </p:column>
+            <p:column width="5" rendered="#{!salesInvoiceGstIndiaView.draft}" ></p:column>
+
+            <!--             Action Column 
+                                  <p:column headerText="" rendered="#{salesInvoiceGstIndiaView.salesInvoiceEditable}">
+                                    
+                       <p:commandButton process="@this" value="" update="salesProductTableDiv,invoiceRoundOffDiv invoiceAmountDiv" tabindex="-1" icon="fa fa-undo"
+                                        actionListener="#{salesInvoiceGstIndiaView.actionUndoDeleteSalesItem(salesItemVar)}" rendered="#{salesInvoiceGstIndiaView.isSalesInvoiceItemDeleted(salesItemVar)}">
+                         <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                       </p:commandButton>
+           </p:column>-->
+
+            <!-- Sales Invoice Summery -->
+            <f:facet name="footer">
+              <h:panelGroup layout="block" id="invoiceSummarydiv" >
+                <!--                <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >  
+                                  <h:panelGroup layout="block">-->
+                <p:panelGrid styleClass="noHover noBorder" >
+                  <p:row>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">#{lang.totalItems} :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{salesInvoiceGstIndiaView.salesInvoiceItemList.size()}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:95px !important;">#{lang.totalQty} </p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{salesInvoiceGstIndiaView.salesInvoice.productNetQuantity}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:100px !important;">#{lang.total} #{lang.goodsValue} :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{appView.decimal(salesInvoiceGstIndiaView.salesInvoice.invoiceAmountGoods)}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:100px !important;">#{lang.total} #{lang.schemeDisc} :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{appView.decimal(salesInvoiceGstIndiaView.totalSchemeDisc)}</p:column>
+                    <p:column style="font-weight: bold; text-align: right; width:100px !important;">#{lang.total} #{lang.productDisc} :</p:column>
+                    <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{appView.decimal(salesInvoiceGstIndiaView.totalProductDisc)}</p:column>
+                    <p:column  styleClass="w-320 text-right"></p:column>
+                  </p:row>
+                </p:panelGrid>
+                <!--                  </h:panelGroup>
+                                  <h:panelGroup layout="block" styleClass="text-right">
+                
+                                  </h:panelGroup>
+                                </p:panelGrid>-->
+                <p:panelGrid columns="2"  columnClasses="vtop,vtop w-320,vtop w-350" id="footerId">
+                  <h:panelGroup layout="block">
+                    <h:panelGroup layout="block">
+                      <p:panelGrid styleClass="bordered">
+                        <p:row>
+                          <p:column style="font-weight: bold;">#{lang.gstPerc}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.itemCount}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.goodsValue}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.salesValue}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.disc}</p:column>
+                          <p:column style="font-weight: bold;color: hotpink;" rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable}">#{lang.cashDisc}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.taxable}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.cgstPerc}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.value}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.sgstPerc}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.value}</p:column>
+                          <p:column style="font-weight: bold;" >#{lang.gstValue}</p:column>
+                        </p:row>
+                        <p:row>
+                          <ui:repeat value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceGroup}" var="group">
+                            <p:row>
+                              <p:column style="font-weight: bold;">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                              <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                              <p:column style="font-weight: bold;">#{group.invoiceGoodsAmount eq null ? '0.00' : appView.decimal(group.invoiceGoodsAmount)}</p:column>
+                              <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                              <p:column style="font-weight: bold;">#{group.invoiceDiscount eq null ? '0.00' : appView.decimal(group.invoiceDiscount)}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable}">
+                                #{group.cashDiscount eq null ? '0.00' : appView.decimal(group.cashDiscount)}
+                              </p:column>
+                              <p:column style="font-weight: bold;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">                              
+                                #{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                                #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">                              
+                                #{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                                #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;">
+                                #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                              </p:column>
+                            </p:row>
+                          </ui:repeat>
+                        </p:row>
+                      </p:panelGrid>
+                      <h:panelGroup layout="block" style="height: 25px;">
+
+                      </h:panelGroup>
+                      <p:panelGrid styleClass="bordered" rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId ne null or salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId ne null}">
+                        <p:row  >
+                          <p:column style="font-weight: bold;">#{lang.gstPerc}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.description}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.service} #{lang.value}</p:column>
+                          <p:column style="font-weight: bold;"></p:column>
+                          <p:column style="font-weight: bold;"></p:column>
+                          <p:column style="font-weight: bold;color: hotpink;" rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable}"></p:column>
+                          <p:column style="font-weight: bold;">#{lang.taxable}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.cgstPerc}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.value}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.sgstPerc}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.value}</p:column>
+                          <p:column style="font-weight: bold;" >#{lang.gstValue}</p:column>
+                        </p:row>
+                        <p:row rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId ne null}">
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId.ratePercentage eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId.ratePercentage)}</p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.serviceId.title}</p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.freightRate eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.freightRate)}</p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.freightRate eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.freightRate)}</p:column>
+                          <p:column style="font-weight: bold;"></p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable}">                          
+                          </p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.freightRate eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.freightRate)}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">                              
+                            #{salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId.ratePercentage eq null ? '0.00' : appView.decimal(userRuntimeView.getGstTaxCode(salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                          </p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            #{salesInvoiceGstIndiaView.salesInvoice.serviceValueCgst eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.serviceValueCgst)}                          
+                          </p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">                              
+                            #{salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId.ratePercentage eq null ? '0.00' : appView.decimal(userRuntimeView.getGstTaxCode(salesInvoiceGstIndiaView.salesInvoice.serviceTaxCodeId, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                          </p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            #{salesInvoiceGstIndiaView.salesInvoice.serviceValueSgst eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.serviceValueSgst)}
+                          </p:column>
+                          <p:column style="font-weight: bold;">
+                            #{salesInvoiceGstIndiaView.salesInvoice.serviceValueIgst eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.serviceValueIgst)}
+                          </p:column>
+                        </p:row>
+                        <p:row rendered="#{salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId ne null}">
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId.ratePercentage eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId.ratePercentage)}</p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.services2Id.title}</p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.service2Rate eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2Rate)}</p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.service2Rate eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2Rate)}</p:column>
+                          <p:column style="font-weight: bold;"></p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable}">                          
+                          </p:column>
+                          <p:column style="font-weight: bold;">#{salesInvoiceGstIndiaView.salesInvoice.service2Rate eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2Rate)}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">                              
+                            #{salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId.ratePercentage eq null ? '0.00' : appView.decimal(userRuntimeView.getGstTaxCode(salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                          </p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            #{salesInvoiceGstIndiaView.salesInvoice.service2Cgst eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2Cgst)}                          
+                          </p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">                              
+                            #{salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId.ratePercentage eq null ? '0.00' : appView.decimal(userRuntimeView.getGstTaxCode(salesInvoiceGstIndiaView.salesInvoice.service2TaxCodeId, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                          </p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            #{salesInvoiceGstIndiaView.salesInvoice.service2Sgst eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2Sgst)}
+                          </p:column>
+                          <p:column style="font-weight: bold;">
+                            #{salesInvoiceGstIndiaView.salesInvoice.service2Igst eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.service2Igst)}
+                          </p:column>
+                        </p:row>
+                      </p:panelGrid>
+                    </h:panelGroup>
+
+                    <h:panelGroup layout="block" style="height: 25px;">
+
+                    </h:panelGroup>
+
+                    <!--HSN Summary-->    
+                    <h:panelGroup layout="block">
+                      <p:panelGrid styleClass="bordered">
+                        <p:row >
+                          <p:column colspan="#{salesInvoiceGstIndiaView.intrastateSales?8:4}" >HSN SUMMARY</p:column>
+                        </p:row>
+                        <p:row>
+                          <p:column style="font-weight: bold;text-align: left" >#{lang.hsnSacCode}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.taxableValue}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.taxPercentage}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.cgstPerc}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.value}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.sgstPerc}</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{lang.value}</p:column>
+                          <p:column style="font-weight: bold;">#{lang.total} #{lang.taxAmount}</p:column>
+                        </p:row>
+                        <ui:repeat value="#{salesInvoiceGstIndiaView.getHsnList()}" var="hsn">
+                          <p:row>
+                            <p:column style="font-weight: bold;text-align: left" >#{hsn.value.hsnCode eq null ? '' : hsn.value.hsnCode}</p:column>
+                            <p:column style="font-weight: bold;">#{hsn.value.taxableValue eq null ? '' : appView.decimal(hsn.value.taxableValue)}</p:column>
+                            <p:column style="font-weight: bold;">#{hsn.value.taxRate eq null ? '' : appView.decimal(hsn.value.taxRate)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{hsn.value.cgstRate eq null ? '' : appView.decimal(hsn.value.cgstRate)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{hsn.value.cgstValue eq null ? '' : appView.decimal(hsn.value.cgstValue)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{hsn.value.sgstRate eq null ? '' : appView.decimal(hsn.value.sgstRate)}</p:column>
+                            <p:column style="font-weight: bold;" rendered="#{salesInvoiceGstIndiaView.intrastateSales}">#{hsn.value.sgstValue eq null ? '' : appView.decimal(hsn.value.sgstValue)}</p:column>
+                            <p:column style="font-weight: bold;">#{hsn.value.taxValue eq null ? '' : appView.decimal(hsn.value.taxValue)}</p:column>
+                          </p:row>
+                        </ui:repeat>
+                      </p:panelGrid>
+
+                    </h:panelGroup>
+                  </h:panelGroup>
+
+                  <h:panelGroup layout="block" styleClass="text-right" style="width:375px !important">
+                    <p:panelGrid columns="2" layout="grid" columnClasses="vtop w-350">
+                      <!-- Goods Value -->
+                      <h:panelGroup>#{lang.salesValue} :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmountNet eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.invoiceAmountNet)}" />
+                      </h:panelGroup>
+
+                      <!-- Invoice Discount -->
+                      <h:panelGroup>#{lang.disc} :</h:panelGroup>
+                      <h:panelGroup layout="block" id="reee" >
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceDiscountValue eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.invoiceDiscountValue)}" />
+                      </h:panelGroup>
+
+                      <!-- Cash Discount -->
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable and salesInvoiceGstIndiaView.cashDiscountTaxable}">
+                        <h:outputText value="#{lang.cashDisc} :" style="color: hotpink;" />
+                      </h:panelGroup>
+                      <h:panelGroup layout="block" id="cashDiscValDiv1"
+                                    rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable and salesInvoiceGstIndiaView.cashDiscountTaxable}">
+                        <p:inputNumber inputStyle="text-align: right; width: 135px; font-weight: bold;" value="#{salesInvoiceGstIndiaView.salesInvoice.cashDiscountValue}"
+                                       placeholder="0.00" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" decimalPlaces="2" minValue="0.00" >
+                          <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.actionApplyCashDiscount}" process="cashDiscValDiv1" oncomplete="updateInvoiceSummery();" />
+                        </p:inputNumber>
+                      </h:panelGroup>
+
+                      <!-- Freight Charges -->
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceAsExpense eq 1}">
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.serviceId.title}:"  
+                                      rendered="#{!salesInvoiceGstIndiaView.draft and salesInvoiceGstIndiaView.salesInvoice.freightRate ne null}"/>
+                        <p:autoComplete id="frieghtService" styleClass="fw" value="#{salesInvoiceGstIndiaView.salesInvoice.serviceId}"
+                                        completeMethod="#{salesInvoiceGstIndiaView.completeServiceDetail}" minQueryLength="1"
+                                        converter="wawo.LookupIntConverter" dropdown="true"                     
+                                        autocomplete="off" style="position: relative;font-weight: bold " 
+                                        panelStyle="width:200px !important;" placeholder="#{salesInvoiceGstIndiaView.salesInvoice.accountGroupId.expenseLedgerId.title}"
+                                        cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" scrollHeight="600"                                 
+                                        var="comdty" itemLabel="#{comdty.title}" itemValue="#{comdty}" forceSelection="true"
+                                        rendered="#{salesInvoiceGstIndiaView.draft}"
+                                        >
+                          <p:column style="width:275px;">
+                            <f:facet name="header"><label>#{lang.name}</label></f:facet>
+                                #{comdty.title}
+                          </p:column>
+                          <!--                          <p:column style="width: 130px;">
+                                                      <f:facet name="header"><label>#{lang.sacCode}</label></f:facet>
+                          #{comdty.hsnSacCode}
+                    </p:column>-->
+                          <p:column rendered="#{salesInvoiceGstIndiaView.interstateSales}">
+                            <f:facet name="header">#{lang.igst}</f:facet>
+                              #{comdty.salesTaxCodeId.ratePercentage}
+                          </p:column>
+                          <p:column rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            <f:facet name="header">#{lang.cgst}</f:facet>
+                              #{comdty.salesTaxCodeId.ratePercentage/2}
+                          </p:column>
+                          <p:column rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            <f:facet name="header">#{lang.sgst}</f:facet>
+                              #{comdty.salesTaxCodeId.ratePercentage/2}
+                          </p:column>
+                          <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+                          <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+
+                          <p:ajax event="itemSelect" process="@this" partialSubmit="true"  update="freightCharges freightChargesDiv"  />
+                        </p:autoComplete></h:panelGroup>
+                      <h:panelGroup layout="block" id="freightChargesDiv" rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceAsExpense eq 1}" >
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.freightRate}" 
+                                      rendered="#{!salesInvoiceGstIndiaView.draft and salesInvoiceGstIndiaView.salesInvoice.freightRate ne null}"/>
+                        <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.freightRate}" converterMessage="#{lang.freightRate} #{lang.invalidNumber}" decimalPlaces="2"
+                                       style="font-weight: bold" rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceId ne null and salesInvoiceGstIndiaView.draft}"
+                                       onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" minValue="0.0" 
+                                       symbol="#{appView.currencySymbol} " maxlength="15" id="freightCharges" >
+                          <p:ajax event="keyup" process="@this" partialSubmit="true" delay="500"
+                                  update="footerId" listener="#{salesInvoiceGstIndiaView.serviceSelectEvent()}" />
+                        </p:inputNumber>
+                      </h:panelGroup>
+
+                      <!-- Service 2 Charges -->
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceAsExpense eq 1 and salesInvoiceGstIndiaView.salesInvoice.accountGroupId.service2Enabled eq 1}">
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.services2Id.title}:"  
+                                      rendered="#{!salesInvoiceGstIndiaView.draft and salesInvoiceGstIndiaView.salesInvoice.service2Rate ne null}"/>
+                        <p:autoComplete id="service2" styleClass="fw" value="#{salesInvoiceGstIndiaView.salesInvoice.services2Id}"
+                                        completeMethod="#{salesInvoiceGstIndiaView.completeServiceDetail}" minQueryLength="1"
+                                        converter="wawo.LookupIntConverter"   dropdown="true"                              
+                                        autocomplete="off" style="position: relative" 
+                                        panelStyle="width:200px !important;" placeholder="#{salesInvoiceGstIndiaView.salesInvoice.accountGroupId.service2LedgerId.title}"                                             cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" scrollHeight="600"                                 
+                                        var="comdty" itemLabel="#{comdty.title}" itemValue="#{comdty}" forceSelection="true"
+                                        rendered="#{salesInvoiceGstIndiaView.draft}"
+                                        >
+                          <p:column style="width:275px;">
+                            <f:facet name="header"><label>#{lang.name}</label></f:facet>
+                                #{comdty.title}
+                          </p:column>
+                          <!--                          <p:column style="width: 130px;">
+                                                      <f:facet name="header"><label>#{lang.sacCode}</label></f:facet>
+                          #{comdty.hsnSacCode}
+                    </p:column>-->
+                          <p:column rendered="#{salesInvoiceGstIndiaView.interstateSales}">
+                            <f:facet name="header">#{lang.igst}</f:facet>
+                              #{comdty.salesTaxCodeId.ratePercentage}
+                          </p:column>
+                          <p:column rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            <f:facet name="header">#{lang.cgst}</f:facet>
+                              #{comdty.salesTaxCodeId.ratePercentage/2}
+                          </p:column>
+                          <p:column rendered="#{salesInvoiceGstIndiaView.intrastateSales}">
+                            <f:facet name="header">#{lang.sgst}</f:facet>
+                              #{comdty.salesTaxCodeId.ratePercentage/2}
+                          </p:column>
+                          <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+                          <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+
+                          <p:ajax event="itemSelect" process="@this" partialSubmit="true" update="service2Charges service2ChargesDiv"  />
+                        </p:autoComplete></h:panelGroup>
+                      <h:panelGroup layout="block" id="service2ChargesDiv" rendered="#{salesInvoiceGstIndiaView.salesInvoice.serviceAsExpense eq 1 and salesInvoiceGstIndiaView.salesInvoice.accountGroupId.service2Enabled eq 1}">
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.service2Rate}" 
+                                      rendered="#{!salesInvoiceGstIndiaView.draft and salesInvoiceGstIndiaView.salesInvoice.service2Rate ne null}"/>
+                        <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.service2Rate}" converterMessage="#{lang.freightRate} #{lang.invalidNumber}" decimalPlaces="2"
+                                       onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999999" 
+                                       rendered="#{salesInvoiceGstIndiaView.salesInvoice.services2Id ne null and salesInvoiceGstIndiaView.draft}"
+                                       minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="service2Charges" >
+                          <p:ajax event="keyup" process="@this" partialSubmit="true" delay="500"
+                                  update="footerId" listener="#{salesInvoiceGstIndiaView.serviceSelectEvent()}" />
+                        </p:inputNumber>
+                      </h:panelGroup>
+
+                      <!-- Taxable Value -->
+                      <h:panelGroup>#{lang.taxable} :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText rendered="#{!(salesInvoiceGstIndiaView.salesInvoice.freightRate eq null)}"  value="#{salesInvoiceGstIndiaView.salesInvoice.assessableValue eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.freightRate+salesInvoiceGstIndiaView.salesInvoice.assessableValue+(salesInvoiceGstIndiaView.salesInvoice.service2Rate ne null ? salesInvoiceGstIndiaView.salesInvoice.service2Rate:0.0))}" />
+                        <h:outputText rendered="#{salesInvoiceGstIndiaView.salesInvoice.freightRate eq null}" value="#{salesInvoiceGstIndiaView.salesInvoice.assessableValue eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.assessableValue)}" />
+                      </h:panelGroup>
+
+                      <!-- Kerala Flood Cess -->
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesInvoice.kfCessTotal ne null and salesInvoiceGstIndiaView.salesInvoice.kfCessTotal gt 0}">K.F. Cess :</h:panelGroup>
+                      <h:panelGroup layout="block" id="kfCss" rendered="#{salesInvoiceGstIndiaView.salesInvoice.kfCessTotal ne null and salesInvoiceGstIndiaView.salesInvoice.kfCessTotal gt 0}" >
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.kfCessTotal eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.kfCessTotal)}" />
+                      </h:panelGroup>
+
+                      <!-- GST Value -->
+                      <h:panelGroup>#{lang.gstValue} :</h:panelGroup>
+                      <h:panelGroup style="border-bottom:1px solid;" layout="block">
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceAmountIgstTotal eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.invoiceAmountIgstTotal)}" />
+                      </h:panelGroup>
+
+                      <!-- Grand Total -->
+                      <h:panelGroup>#{lang.total} :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.grandTotal eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.grandTotal)}" />
+                      </h:panelGroup>
+
+                      <!-- Cash Discount -->
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable and !salesInvoiceGstIndiaView.cashDiscountTaxable}">
+                        <h:outputText value="#{lang.cashDisc} :" style="color: hotpink;" /></h:panelGroup>
+                      <h:panelGroup layout="block" id="cashDiscValDiv2"
+                                    rendered="#{salesInvoiceGstIndiaView.cashDiscountApplicable and !salesInvoiceGstIndiaView.cashDiscountTaxable}">
+                        <p:inputNumber inputStyle="text-align: right; width: 135px; font-weight: bold;" value="#{salesInvoiceGstIndiaView.salesInvoice.cashDiscountValue}"
+                                       placeholder="0.00" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" decimalPlaces="2" minValue="0.00" >
+                          <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.actionApplyCashDiscount}" process="cashDiscValDiv2" 
+                                  update="invoiceRoundOffDiv invoiceAmountDiv" oncomplete="updateInvoiceSummery();" />
+                        </p:inputNumber>
+                      </h:panelGroup>
+                      <!--TCS Amount-->
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesInvoice.tcsTaxCodeId ne null}">#{lang.tcs} #{lang.value} :</h:panelGroup>
+                      <h:panelGroup rendered="#{salesInvoiceGstIndiaView.salesInvoice.tcsTaxCodeId ne null}">
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.tcsNetValue eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.tcsNetValue)}" />
+                      </h:panelGroup>
+                      <!-- Round Off -->
+                      <h:panelGroup>#{lang.roundOff} :</h:panelGroup>
+                      <h:panelGroup layout="block" style="border-bottom:1px solid;" id="roff">
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceRoundOff eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.invoiceRoundOff)}" />
+                        <p:inputNumber value="#{salesInvoiceGstIndiaView.salesInvoice.roundOffForced}"  placeholder="Round Off" onfocus="this.select()" inputStyleClass="text-right" maxValue="99" decimalPlaces="2" minValue="-10.00"
+                                       inputStyle="text-align: right; width: 135px; font-weight: bold;">
+                          <p:ajax event="change" listener="#{salesInvoiceGstIndiaView.actionApplyForcedRoundOffValue}" process="roff" oncomplete="updateInvoiceSummery();" />
+                        </p:inputNumber>
+                      </h:panelGroup>
+                      <h:panelGroup>#{lang.netAmount} :</h:panelGroup>
+                      <h:panelGroup>
+                        <h:outputText value="#{salesInvoiceGstIndiaView.salesInvoice.invoiceValue eq null ? '0.00' : appView.decimal(salesInvoiceGstIndiaView.salesInvoice.invoiceValue)}" />
+                      </h:panelGroup>
+                    </p:panelGrid>
+                  </h:panelGroup>
+                </p:panelGrid>
+              </h:panelGroup>
+            </f:facet>
+          </p:dataTable>
+        </h:panelGroup>
+      </h:panelGroup>
+
+
+
+      <p:dialog header="Info" widgetVar="infoDlg" modal="true" height="100" resizable="false">
+        <h:outputText value="Selected product already exist in sales invoice." />
+        <p:commandButton type="button" onclick="PF('infoDlg').hide();" value="#{lang.ok}" />
+      </p:dialog>
+
+      <p:dialog id="confirmPerformaDlg" widgetVar="confirmPerformaDlgVar" header="#{lang.proFormaInvoice}" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true" >
+        <h:panelGrid columns="2">
+          <p:outputLabel value="#{lang.confirmMessage}" rendered="#{!salesInvoiceGstIndiaView.proforma}" />
+          <p:outputLabel value="#{lang.proformaExtendConfirmMessage}" rendered="#{salesInvoiceGstIndiaView.proforma}" />
+          <h:panelGroup layout="block">
+          </h:panelGroup>
+          <p:outputLabel value="#{lang.ProFormaExpiresOn} - #{salesInvoiceGstIndiaView.salesInvoice.proformaExpiringAt}" rendered="#{salesInvoiceGstIndiaView.proforma}"  />
+          <h:panelGroup layout="block" rendered="#{salesInvoiceGstIndiaView.proforma}">
+          </h:panelGroup>
+
+          <p:outputLabel value="#{lang.extendProFormaFor}" for="expireDays" rendered="#{salesInvoiceGstIndiaView.proforma}" />
+          <p:outputLabel value="#{lang.keepProFormaFor}" for="expireDays" rendered="#{!salesInvoiceGstIndiaView.proforma}" />
+          <h:panelGroup layout="block">
+            <p:selectOneMenu value="#{salesInvoiceGstIndiaView.proformaExpireDays}" required="true" id="expireDays"
+                             converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemValue="#{1}" itemLabel="#{lang.oneDay}" />
+              <f:selectItem itemValue="#{2}" itemLabel="#{lang.twoDays}" />
+              <f:selectItem itemValue="#{3}" itemLabel="#{lang.threeDays}" />
+            </p:selectOneMenu>
+          </h:panelGroup>
+        </h:panelGrid>
+
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+          <p:commandButton value="#{lang.yes}" rendered="#{!salesInvoiceGstIndiaView.proforma}" styleClass="btn btn-info"  process="f1" update="f1" 
+                           action="#{salesInvoiceGstIndiaView.saveProFormaInvoice(main)}" onstart="block();" oncomplete="unblock();" />
+          <p:commandButton value="#{lang.yes}" rendered="#{salesInvoiceGstIndiaView.proforma}" styleClass="btn btn-info"  process="f1" update="f1" 
+                           action="#{salesInvoiceGstIndiaView.saveProformaExpiryDays(main)}" onstart="block();" oncomplete="unblock();" />
+          <p:commandButton type="button" value="#{lang.no}" styleClass="btn btn-info" onclick="PF('confirmPerformaDlgVar').hide();" onstart="block();" oncomplete="unblock();" />
+        </div>
+      </p:dialog>
+
+      <p:dialog widgetVar="messageServiceWidget" id="messageServiceWidgetId" position="center" 
+                positionType="absolute" 
+                draggable="false" modal="true" resizable="false" 
+                responsive="true" header=" Notification " >
+        <h:panelGroup layout="block" styleClass="card" style="padding:20px;" >
+          <h:outputLabel value="#{lang.chooseAnOption}" />
+
+          <p:selectOneRadio id="console" value="#{salesInvoiceGstIndiaView.chooseAnOption}" unselectable="true">
+            <f:selectItem itemLabel="#{lang.email}" itemValue="#{sysConstant.EMAIL_OPTION}" />
+            <f:selectItem itemLabel="#{lang.sms}" itemValue="#{sysConstant.SMS_OPTION}" />
+            <f:selectItem itemLabel="#{lang.smsAndEmail}" itemValue="#{sysConstant.SMS_EMAIL}" />
+            <p:ajax update="buttonGroupDiv notificationRcvrDtls" />
+          </p:selectOneRadio>
+
+          <br />
+          <p:fragment id="notificationRcvrDtls">
+          <h:panelGroup id="salesAgentPanelGroup" rendered="#{!salesInvoiceGstIndiaView.customer}" >
+            <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" > 
+              <i class="fa fa-envelope-o"></i>
+            </p:outputLabel>
+            <h:outputText value="&#160; #{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId.email}" 
+                          rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+            <h:outputText value=" , " rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+            <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" >
+              <i class="fa fa-phone"></i>
+            </p:outputLabel>
+            <h:outputText value="&#160; #{salesInvoiceGstIndiaView.salesInvoice.companySalesAgentPersonProfileId.phone1}" 
+                          rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+          </h:panelGroup>
+          <h:panelGroup id="customerPanelGroup" rendered="#{salesInvoiceGstIndiaView.customer}" >  
+            <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" > 
+              <i class="fa fa-envelope-o"></i>
+            </p:outputLabel>
+            <h:outputText value="&#160;#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId.email}" 
+                           rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.EMAIL_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+            <h:outputText value=" , " rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL}" />
+             <p:outputLabel rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL }" >
+              <i class="fa fa-phone"></i>
+            </p:outputLabel>
+            <h:outputText value="&#160;#{salesInvoiceGstIndiaView.salesInvoice.customerAddressId.phone1}" 
+                          rendered="#{salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_OPTION or salesInvoiceGstIndiaView.chooseAnOption eq sysConstant.SMS_EMAIL }" />
+          </h:panelGroup>
+            </p:fragment>
+        </h:panelGroup>
+        
+        <h:panelGroup layout="block" id="buttonGroupDiv" style="text-align: right;" >
+          <p:commandButton value="#{lang.cancel}" onclick="PF('messageServiceWidget').hide();" styleClass="btn-warning" />
+          <p:commandButton value="#{lang.send}" disabled="#{salesInvoiceGstIndiaView.chooseAnOption eq null}" immediate="true"
+                           actionListener="#{salesInvoiceGstIndiaView.sendSmsEmail(main)}" styleClass="btn-primary"
+                           oncomplete="PF('messageServiceWidget').hide();" />
+        </h:panelGroup>
+      </p:dialog>
+        <p:remoteCommand name="rcMenuItem" actionListener="#{salesInvoiceGstIndiaView.setRcCustomer}" immediate="true"
+                      oncomplete="PF('messageServiceWidget').show();" update="messageServiceWidgetId notificationRcvrDtls" async="true"  />
+      <style>
+        .vtop{vertical-align: top;}
+        .col_bottom_color{border-bottom-color: red !important;}
+      </style>
+
+      <script>
+        //<![CDATA[
+        function refreshAferRowUpdate() {
+          page.refresh();
+          $('#salesItemTable\\:0\\:productId_input').focus();
+        }
+        function refreshDatatable() {
+          page.refresh();
+        }
+        function submitForm(params) {
+          saveSalesInvoiceItem([{name: 'rownumber', value: params[2]}]);
+          $('#salesItemTable\\:0\\:productId_input').focus();
+          PF('productHistoryVar').hide();
+          return false;
+        }
+        function focusToQty(rnum) {
+          $('#salesItemTable\\:' + rnum + '\\:peiceQty_input').focus();
+        }
+        function focusToDiscount(rnum) {
+          $('#salesItemTable\\:' + rnum + '\\:discValue_input').focus();
+          updateInvoiceSummery();
+        }
+        function showProductRateHistoryOverlayPanel(xhr, status, args) {
+          if (args.productCount > 0) {
+            PF('productHistoryVar').show();
+          }
+        }
+        function focusToBatch(rnum) {
+          // $('#salesItemTable\\:'+ rnum +'\\:productDetailList_input').focus();
+        }
+
+        function checkBatchValue(rnum, id) {
+          if ($('#salesItemTable\\:' + rnum + '\\:productDetailList_input').val().length == '') {
+            $('#salesItemTable\\:' + rnum + '\\:productDetailList_input').focus();
+          } else {
+            $('#salesItemTable\\:' + rnum + '\\:' + id).focus();
+          }
+          //          console.log($('#salesItemTable\\:' + rnum + '\\:productDetailList_input').val())
+
+        }
+        function confirmSalesInvoice() {
+          PF('confirmDlgVar').show();
+        }
+        function focusToService1() {
+          $('#freightCharges').focus();
+        }
+
+        //        $('.dropdown').mouseenter(function (event) {
+        //          PF('pdsBatch').show();
+        //        });
+        //
+        //
+        //        $('.dropdown').mouseleave(function (event) {
+        //          var $target = $(event.toElement || event.relatedTarget);
+        //          if (!($target.hasClass("ui-selectonemenu-items") || $target.hasClass("ui-selectonemenu-panel"))) {
+        //            PF('pdsBatch').hide();
+        //          }
+        //
+        //        });
+        //
+        //        $('.ui-selectonemenu-items-wrapper').mouseleave(function (event) {
+        //          PF('pdsBatch').hide();
+        //        });
+
+        $(document).ready(function (e) {
+          refreshDatatable();
+        });
+        //]]>
+
+      </script>
+
+    </ui:define>
+
+    <ui:define name="newList">
+      <h:commandButton action="#{salesInvoiceGstIndiaView.newSalesInvoice(main, 2)}" immediate="true" rendered="false" value="Sales Invoice - By Sales Order" 
+                       styleClass="btn btn-info" >
+        <f:ajax execute="f1" render="f1"/>
+      </h:commandButton>
+
+      <h:commandButton action="#{salesInvoiceGstIndiaView.newSalesInvoice(main, 1)}" immediate="true" value="#{lang.newform}" styleClass="btn btn-info"
+                       rendered="#{!salesInvoiceGstIndiaView.tradeClosed}">
+        <f:ajax execute="f1" render="f1"/>
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <!--<p:panelGrid columns="3">-->
+      <p:commandButton id="r2" value="#{lang.resetToDraft}" styleClass="m-l-20 btn btn-default" process="@this" update="f1"
+                       action="#{salesInvoiceGstIndiaView.actionResetAllInvoiceEntry(main)}"
+                       rendered="#{!salesInvoiceGstIndiaView.tradeClosed}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+      <!--</p:panelGrid>-->     
+    </ui:define>
+
+    <ui:define name="list"> 
+      <p:dataTable id="salesInvoiceTable" var="salesInvoiceVar" widgetVar="salesInvoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesInvoiceGstIndiaView.salesInvoiceLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesInvoiceVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesInvoiceGstIndiaView.salesInvoiceSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <!-- Invoice No -->
+        <p:column sortBy="#{salesInvoiceVar.invoiceNo}" field="scm_sales_invoice.invoice_no">
+          <f:facet name="header">
+            <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}" escape="false" />
+          </f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesInvoiceVar.invoiceNo)}" process="@this" update="f1" immediate="true"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesInvoiceGstIndiaView.salesInvoice}" value="#{salesInvoiceVar}" />
+          </p:commandLink>
+          <h:outputText  title="#{appView.title(salesInvoiceVar.invoiceNo)}" escape="false" />
+        </p:column>
+
+        <!-- Customer -->
+        <p:column sortBy="#{salesInvoiceVar.customerId.customerName}" field="scm_customer.customer_name">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(salesInvoiceVar.customerId.customerName)}" title="#{appView.title(salesInvoiceVar.customerId.customerName)}" escape="false" />
+        </p:column>
+
+        <!-- Customer GST -->
+        <p:column sortBy="#{salesInvoiceVar.customerId.gstNo}" field="scm_customer.gst_no">
+          <f:facet name="header"><h:outputText value="#{lang.gstNo} #{lang.no}." title="#{lang.gstNo} #{lang.number}"/></f:facet>
+          <h:outputText value="#{appView.display(salesInvoiceVar.customerId.gstNo)}" title="#{appView.title(salesInvoiceVar.customerId.gstNo)}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Date -->
+        <p:column sortBy="#{salesInvoiceVar.invoiceDate}" field="invoice_date" >
+          <f:facet name="header">
+            <h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}" escape="false" />
+          </f:facet>
+          <h:outputText value="#{appView.date(salesInvoiceVar.invoiceDate)}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Amount Net -->
+        <p:column sortBy="#{salesInvoiceVar.invoiceAmountNet}" field="invoice_amount_net" style="text-align: right" rendered="false">
+          <f:facet name="header">
+            <h:outputText value="#{lang.invoiceAmountNet}" title="#{lang.invoiceAmountNet}" escape="false" />
+          </f:facet>
+          <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountNet)}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Amount GST-->
+        <p:column sortBy="#{salesInvoiceVar.invoiceAmountGst}" field="invoice_amount_gst" style="text-align: right">
+          <f:facet name="header">
+            <h:outputText value="#{lang.invoiceAmountGst}" title="#{lang.invoiceAmountGst}" escape="false" />
+          </f:facet>
+          <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountIgst)}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Amount -->
+        <p:column sortBy="#{salesInvoiceVar.invoiceAmount}" field="invoice_amount" style="text-align: right">
+          <f:facet name="header">
+            <h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}" escape="false" />
+          </f:facet>
+          <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmount)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{salesInvoiceVar.salesInvoiceStatusId.title}" field="scm_sales_invoice_status.title" style="text-align: right">
+          <f:facet name="header">
+            <h:outputText value="#{lang.status}" title="#{lang.status}" escape="false" />
+          </f:facet>
+          <h:outputText value="#{appView.display(salesInvoiceVar.salesInvoiceStatusId.title)}" title="#{appView.title(salesInvoiceVar.salesInvoiceStatusId.title)}" 
+                        escape="false" styleClass="m-r-5 #{sysRuntimeView.statusStyle(salesInvoiceVar.salesInvoiceStatusId.id)}" 
+                        style="background-color: #{sysRuntimeView.statusColor(salesInvoiceVar.salesInvoiceStatusId.id)}"/>
+
+          <h:outputText value="Tax Variation" escape="false"  
+                        styleClass="label"  rendered="#{salesInvoiceVar.isTaxCodeModified eq 1}"
+                        style="background-color: #f10b0b;"/>
+        </p:column>
+
+
+        <!-- Remarks -->
+        <p:column headerText="#{lang.remarks}" sortBy="#{salesInvoiceVar.note}" field="scm_sales_invoice.note"
+                  style="text-align:left;padding-left: 5px;white-space: normal;" width="300" styleClass="wrap">
+          <h:outputText value="#{appView.display(salesInvoiceVar.note)}" title="#{salesInvoiceVar.note}" />
+        </p:column>
+
+        <p:column headerText="#{lang.log}" exportable="false">
+          <f:facet name="header">
+            <h:outputText value="#{lang.log}" title="#{lang.log}" escape="false" />
+          </f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesInvoiceVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesInvoiceVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesInvoiceVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesInvoiceVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesInvoiceVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

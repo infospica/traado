@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <!--#{accountingMainView.init(main)}--> 
+  #{trialBalanceReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
+  <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="trialBalanceReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <!--<p:inputText styleClass="fw" id="trialBalanceReportST" onkeyup="return callDtFilter(this.value, 'trialBalanceReport');"  placeholder="#{lang.search}"/>-->
+    </ui:define>
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  > 
+      <p:panelGrid columns="2">
+        <h:panelGroup>
+          <p:selectOneButton value="#{trialBalanceReportView.type}" >
+            <f:selectItem itemLabel="#{lang.by} #{lang.ledger} " itemValue="#{SYSTEM_CONSTANT.ALL}" />
+            <f:selectItem itemLabel="#{lang.by} #{lang.group}" itemValue="#{SYSTEM_CONSTANT.BY_GROUP}" />          
+            <p:ajax event="change" listener="#{trialBalanceReportView.reset()}" process="@this" 
+                    update="trialBalanceReportTable" onstart="block()" oncomplete="unblock();accountingGroup();"/>
+          </p:selectOneButton> 
+        </h:panelGroup>
+        <h:panelGroup id="accountingGroupDiv">
+          <p:selectOneMenu value="#{trialBalanceReportView.selectedAccountingGroup}" converter="omnifaces.SelectItemsConverter"
+                           rendered="#{trialBalanceReportView.type eq SYSTEM_CONSTANT.ALL}" filter="true" filterMatchMode="startsWith" >
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.accountingGroup}" />
+            <f:selectItems value="#{trialBalanceReportView.accountingGroupList}" var="ag" itemLabel="#{ag.title}" itemValue="#{ag}" />
+            <p:ajax event="itemSelect" process="accountingGroupDiv" update="trialBalanceReportTable" listener="#{trialBalanceReportView.setTrialBalanceReportList(null)}" />
+          </p:selectOneMenu>
+        </h:panelGroup>
+      </p:panelGrid>
+      <p:remoteCommand name="accountingGroup" update="accountingGroupDiv" />
+    </ui:define>
+    <ui:define name="navRight" >
+      <h:panelGroup styleClass="L" >  
+        <p:commandButton value="#{lang.ledger} #{lang.outstanding}" actionListener="#{trialBalanceReportView.showLedgerOutstanding(main)}" styleClass="btn btn-primary" 
+                         process="@this" onclick="block();" oncomplete="unblock();" />
+      </h:panelGroup>
+
+      <h:panelGroup styleClass="L" >  
+      </h:panelGroup>
+      <h:panelGroup styleClass="L"  >        
+        <p:commandButton actionListener="#{trialBalanceReportView.backOrNext(-1,userRuntimeView.company,true)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="trialBalanceReportTable fmess fromDate1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+        <p:commandButton actionListener="#{trialBalanceReportView.backOrNext(1,userRuntimeView.company,true)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="trialBalanceReportTable fmess fromDate1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+        <p:calendar id="fromDate1" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}" onclick="this.select();" onfocus="this.select();"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" 
+                    mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}"
+                    maxlength="10" size="7" showButtonPanel="true" navigator="true" mask="true"  >
+          <p:ajax event="dateSelect" process="@this" listener="#{trialBalanceReportView.onFromDateSelect}" update="toDate1 trialBalanceReportTable" onstart="block();" oncomplete="unblock();" />          
+        </p:calendar> <p:message for="fromDate1" display="text" id="fmess"/>
+      </h:panelGroup> 
+      <h:panelGroup styleClass="L"  >
+        <p:calendar id="toDate1" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" 
+                    maxlength="10" size="7" showButtonPanel="true" navigator="true" mask="true" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}">
+          <p:ajax event="dateSelect" listener="#{trialBalanceReportView.onToDateSelect}" process="@this" update="trialBalanceReportTable" onstart="block();" oncomplete="unblock();" />
+        </p:calendar>
+        <p:message for="toDate1" display="text" id="tmess"/>        
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" >
+        <p:commandButton actionListener="#{trialBalanceReportView.backOrNext(-1,userRuntimeView.company,false)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="trialBalanceReportTable fmess toDate1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+        <p:commandButton actionListener="#{trialBalanceReportView.backOrNext(1,userRuntimeView.company,false)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="trialBalanceReportTable fmess toDate1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
+      <p:dataTable id="trialBalanceReportTable" widgetVar="trialBalanceReportWidget" var="trialBalanceReportVar" value="#{trialBalanceReportView.getTrialBalanceReportList(main)}"
+                   rows="#{main.pageData.pageSize}" rowKey="#{trialBalanceReportVar.ledgerGrpId}" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('trialBalanceReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column headerText="#{lang.ledger} " sortBy="#{trialBalanceReportVar.ledger}" filterBy="#{trialBalanceReportVar.ledger}" rendered="#{trialBalanceReportView.type eq SYSTEM_CONSTANT.ALL}" >
+          <p:commandLink  actionListener="#{popUpView.showLedgerBalance(trialBalanceReportVar.ledgerId)}" onclick="block();" oncomplete="unblock();" immediate="true">
+            <h:outputText value="#{trialBalanceReportVar.ledger}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.ledger} #{lang.group}" sortBy="#{trialBalanceReportVar.ledgerGroup}" filterBy="#{trialBalanceReportVar.ledgerGroup}" exportable="true" >
+          <p:commandLink actionListener="#{trialBalanceReportView.showGroupDetail(trialBalanceReportVar.ledgerGrpId,main)}" onclick="block();" oncomplete="unblock();" immediate="true" >
+            <h:outputText value="#{trialBalanceReportVar.ledgerGroup}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.opening} #{lang.balance}" sortBy="#{trialBalanceReportVar.openingBalance}" filterBy="#{trialBalanceReportVar.openingBalance}" style="text-align: right;" >
+          <h:outputText value="#{appView.decimal(trialBalanceReportVar.openingBalance)}" />
+          <f:facet name="footer">            
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.opBalance)}" />            
+          </f:facet>
+        </p:column>
+        <p:column  headerText="#{lang.debit}" sortBy="#{trialBalanceReportVar.debit}" filterBy="#{trialBalanceReportVar.debit}" style="text-align: right;" >
+          <h:outputText value="#{appView.decimal(trialBalanceReportVar.debit)}" />
+          <f:facet name="footer">         
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.debit)}" />           
+          </f:facet>
+        </p:column>
+        <p:column headerText="#{lang.credit}" sortBy="#{trialBalanceReportVar.credit}" filterBy="#{trialBalanceReportVar.credit}" style="text-align: right;" >
+          <h:outputText value="#{appView.decimal(trialBalanceReportVar.credit)}" />
+          <f:facet name="footer">            
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.credit)}" />           
+          </f:facet>
+        </p:column>
+        <p:column headerText="#{lang.closing} #{lang.balance}" sortBy="#{trialBalanceReportVar.balance}" filterBy="#{trialBalanceReportVar.balance}" style="text-align: right;">
+         <h:outputText value="#{appView.decimal(trialBalanceReportVar.balance)}" styleClass="label" style="background-color: #{trialBalanceReportVar.balance gt -1 ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}" escape="false" />
+          <f:facet name="footer">           
+            <h:outputText value="#{appView.decimal(trialBalanceReportView.totBalance)}" />            
+          </f:facet>
+        </p:column>
+        <p:column headerText="#{lang.status}" style="text-align: center;" >
+          <h:outputText value=" #{trialBalanceReportVar.balance gt -1 ? lang.dr: lang.cr}" />       
+        </p:column>
+      </p:dataTable>
+
+    </ui:define>
+
+
+  </ui:decorate>
+</ui:composition>

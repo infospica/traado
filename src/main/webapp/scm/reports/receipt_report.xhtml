@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"  >
+  #{receiptReportView.reset()}
+
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="ReceiptReportId"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="more" />
+    <ui:define name="newList">      
+      <!--<p:inputText styleClass="fw" id="customerOutstandingST" onkeyup="return callDtFilter(this.value, 'customerOutstanding');"  placeholder="#{lang.search}"/>-->
+    </ui:define>
+    <style>
+      #customerOutstandingTable_foot{
+        text-align: right;
+      }
+    </style>
+    <ui:define name="form"/>
+    <ui:define name="rightList" >
+      <h:panelGroup id="optionsDiv">
+        <p:selectOneButton value="#{receiptReportView.option}">
+          <f:selectItem itemLabel="#{lang.notadjusted}" itemValue="1" />
+          <f:selectItem itemLabel="#{lang.adjusted}" itemValue="2" />  
+          <p:ajax event="change" process="@this" update="partialAdjustedDiv reportList" listener="#{receiptReportView.chageChequeReceiptStatus()}" />
+        </p:selectOneButton>
+      </h:panelGroup>
+      <h:panelGroup id="partialAdjustedDiv">
+        <p:selectOneMenu value="#{receiptReportView.adjustedOption}" rendered="#{receiptReportView.option ne 1}" >
+          <f:selectItem itemValue="2" itemLabel="#{lang.fully} #{lang.adjusted}" />
+          <f:selectItem itemValue="3" itemLabel="#{lang.partially} #{lang.adjusted}" />
+          <p:ajax event="itemSelect" process="partialAdjustedDiv" update="reportList" listener="#{receiptReportView.chageChequeReceiptStatus()}" />
+        </p:selectOneMenu>
+      </h:panelGroup>
+      <h:panelGroup style="padding-left:10px;" id="accountGroupDiv" rendered="true">
+        <p:autoComplete id='accountGroup'  value="#{receiptReportView.filterParameters.accountGroup}" completeMethod="#{receiptReportView.accountGroupAuto}"
+                        converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                          
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-users" style="color:#000;"></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <i class="fa fa-users" style="color:#CCC;" ></i>
+            </p:fragment>
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="customerDIV reportList "  listener="#{receiptReportView.accountGroupSelectEvent}"
+                  onstart="block()" oncomplete="unblock()" />
+        </p:autoComplete>    
+      </h:panelGroup>
+      <h:panelGroup id="customerDIV">
+        <p:autoComplete completeMethod="#{receiptReportView.customerAuto}" value="#{receiptReportView.filterParameters.customer}" converter="wawo.LookupIntConverter" 
+                        var="c" itemLabel="#{c.customerName}" itemValue="#{c}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="100" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectCustomerCombo}" autocomplete="off" forceSelection="true" 
+                        title="#{lang.customer}" scrollHeight="400">
+          <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+          <p:column style="width: 300px;">
+            <h:outputText value="#{c.customerName}" />
+          </p:column>
+          <p:ajax event="itemSelect" process="customerDIV" update="reportList territoryDiv" listener="#{receiptReportView.customerSelectEvent}"
+                  onstart="block()" oncomplete="unblock()" />
+        </p:autoComplete>
+      </h:panelGroup>
+      <h:panelGroup id="territoryDiv" style="padding-left:10px;">
+        <p:selectOneMenu value="#{receiptReportView.territory}" dynamic="true" converter="omnifaces.SelectItemsConverter" style="width:150px;"   >
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.all} #{lang.territory}" />
+          <f:selectItems value="#{receiptReportView.customerTerritory(main)}" var="T" itemLabel="#{T.territoryName}" itemValue="#{T}"  />
+          <p:ajax event="change" process="territoryDiv" update="reportList" onstart="block()" oncomplete="unblock()" listener="#{receiptReportView.setReceiptReportList(null)}" />
+        </p:selectOneMenu>
+      </h:panelGroup>
+      <!--      <h:panelGroup style="padding-left:10px;" id="accountDiv" >
+              <p:autoComplete id='account'  value="#{customerOutstandingView.filterParameters.account}" completeMethod="#{customerOutstandingView.accountAuto}" converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" 
+                              title="#{lang.accountNumber}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+                <p:column style="width: 200px;">
+                  <h:outputText value="#{e.vendorId.vendorName}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountCode}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.companyTradeProfileId.title}" />
+                </p:column>
+                <p:ajax event="itemSelect" immediate="true" process="accountDiv" update="reportList" listener="#{customerOutstandingView.accountSelectEvent}" onstart="block()" oncomplete="unblock()" />
+              </p:autoComplete>
+            </h:panelGroup>-->
+      <h:panelGroup id="dateDiv">
+        <!--From date-->
+        <p:calendar value="#{receiptReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}" maxlength="13" 
+                    id="fromDate" pages="1" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.fromDate}" 
+                    maxdate="#{receiptReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: receiptReportView.filterParameters.today}"
+                    onclick="this.select();" onfocus="this.select();" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" >
+          <p:ajax event="dateSelect" process="fromDate" listener="#{receiptReportView.setReceiptReportList(null)}" onstart="block();" oncomplete="unblock();" 
+                  update="toDate reportList customerDIV territoryDiv" />
+          <p:ajax event="change" process="fromDate" listener="#{receiptReportView.setReceiptReportList(null)}" onstart="block();" oncomplete="unblock();" 
+                  update="toDate reportList customerDIV territoryDiv"  />
+        </p:calendar>
+
+        <!-- To Date -->
+        <p:calendar value="#{receiptReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}" maxlength="13" 
+                    id="toDate"  pages="1" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.toDate}" mindate="#{receiptReportView.filterParameters.fromDate}"
+                    maxdate="#{receiptReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: receiptReportView.filterParameters.today}"
+                    onclick="this.select();" onfocus="this.select();" >
+          <p:ajax event="dateSelect" process="toDate" listener="#{receiptReportView.setReceiptReportList(null)}" update="reportList fromDate territoryDiv" onstart="block();" oncomplete="unblock();"  />
+
+        </p:calendar>
+      </h:panelGroup>
+      <h:panelGroup style="padding-left:10px;">
+        <p:commandButton id="newClaimBtn"  icon="fa fa-file-excel-o" value="#{lang.export}" iconPos="down"  ajax="false"
+                         styleClass="btn btn-primary" actionListener="#{receiptReportView.excel(main)}" />
+        <!--        <p:menu overlay="true" trigger="newClaimBtn" my="left top" at="left bottom" styleClass="w-80" >
+                  <p:menuitem  value="#{lang.export} " actionListener="#{receiptReportView.excel(main)}" ajax="false" styleClass="btn" />          
+                </p:menu>-->
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="reportList" >
+        <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+
+        <p:dataTable value="#{receiptReportView.getReceiptReport(main)}" widgetVar="receiptReportWidget" id="receiptWidget" var="row"
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom">
+          <!--          <f:facet name="header">
+                      <p:outputPanel styleClass="hidden" >
+                        <p:inputText id="globalFilter"  onkeyup="return PF('receiptReportWidget').filter()" />
+                      </p:outputPanel>
+                    </f:facet>-->
+
+          <p:column groupRow="true" headerText="#{lang.customerName}" sortBy="#{row.customer}"  filterBy="#{row.customer}" >
+            <!--<p:commandLink actionListener="#{popUpView.showLedgerBalance(row.id)}" >-->
+            <h:outputText value="#{appView.display(row.customer)}" title="#{appView.title(row.customer)}" escape="false" />
+            <!--</p:commandLink>-->
+          </p:column>
+          <p:column headerText="#{lang.chequeNO}" sortBy="#{row.chequeNo}" filterBy="#{row.chequeNo}">
+            <h:outputText value="#{row.chequeNo}" title="#{row.chequeNo}" />
+          </p:column>
+          <p:column headerText="#{lang.chequeDate}" sortBy="#{row.chequeDate}"  filterBy="#{row.chequeDate}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.date(row.chequeDate)}" escape="false" />
+          </p:column>  
+          <p:column headerText="#{lang.documentNo}" sortBy="#{row.documentNumber}"  filterBy="#{row.documentNumber}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.title(row.finDocNo)}" title="#{appView.title(row.finDocNo)}" rendered="#{row.tranId eq null}" />
+            <p:commandLink value="#{row.finDocNo}" actionListener="#{popUpView.showAccountingTransaction(row.tranId)}" rendered="#{row.tranId ne null}"  />
+          </p:column>
+          <p:column headerText="#{lang.entryDate}" sortBy="#{row.entryDate}"  filterBy="#{row.entryDate}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.date(row.entryDate)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.clearing} #{lang.date}" sortBy="#{row.entryDate}"  filterBy="#{row.processedAt}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.date(row.processedAt)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.billAmount}" sortBy="#{row.amount}"  style="text-align: right" filterBy="#{row.aount}" filterStyleClass="hidden">            
+            <span class="label" style="background-color: #{(row.bankStatus eq 9 or row.bankStatus eq 6)?AccountingConstant.COLOR_YLLOW:(row.bankStatus eq 7)?AccountingConstant.COLOR_GREEN:(row.bankStatus eq 4)?AccountingConstant.COLOR_RED:AccountingConstant.COLOR_GREEN}"><h:outputText id="bankStatusId" value="#{appView.decimal(row.amount)}" /></span>    
+            <p:tooltip for="bankStatusId" position="right" value="#{(row.bankStatus eq 9 or row.bankStatus eq 6)?'Cheque Issued':(row.bankStatus eq 7)?' Reconciled':(row.bankStatus eq 4)?'Cheque Bounce':'Cheque Issued'}" />
+            <f:facet name="footer">
+              <div style="text-align: right;">
+                <h:outputText style="text-align: right;" value="#{appView.decimal(receiptReportView.billAmount)}" />
+              </div>
+            </f:facet>
+          </p:column>
+          <p:column headerText="Cumulative" sortBy="#{row.cumulativeSum}"  style="text-align: right;padding-right: 5px;" filterBy="#{row.cumulativeSum}" filterStyleClass="hidden">          
+            <h:outputText value="#{appView.decimal(row.cumulativeSum)}"  />  
+          </p:column>
+
+          <p:column headerText="#{lang.narration}" sortBy="#{row.narration}"  style="text-align: left;width:450px;" filterBy="#{row.narration}" 
+                    filterStyleClass="hidden" styleClass="wrap">                   
+            <h:outputText value="#{row.narration}" title="#{row.narration}"  />  
+          </p:column>
+
+        </p:dataTable>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

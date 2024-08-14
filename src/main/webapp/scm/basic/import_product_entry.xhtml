@@ -1,0 +1,363 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"    >      
+  #{importProductEntryView.switchImportProductEntry(main, viewType, openingStock)} 
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    } 
+  </style>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{importProductEntryView.openingStockEntry ? lang.importOpeningStock : lang.importPurchase}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? importProductEntryView.importProductEntry.referenceNo : lang.list}" />
+    <ui:param name="navLabel" value="" />
+    <ui:param name="ids" value="importProductEntry" />
+    <ui:param name="deleteFormMenu" value="#{true}" />
+    <ui:param name="reset" value="false" />    
+
+    <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+    <ui:define name="save" >
+      <p:commandButton id="downLoad" ajax="false" actionListener="#{importProductEntryView.downloadExcelFormat(main)}" immediate="true" partialSubmit="true" 
+                       styleClass="btn btn-info" rendered="#{main.isNew() or importProductEntryView.importProductEntry.id eq null}" value="#{lang.downloadExcelFormat}" />
+
+      <h:panelGroup id="importBtnDiv" >
+        <p:fileUpload styleClass="myUpload"  fileUploadListener="#{importProductEntryView.handleFileUpload}" id="dragDropUpload" mode="advanced"  auto="true" sizeLimit="10000000"
+                      allowTypes="/(\.|\/)(xls|xlsx)$/" dragDropSupport="true" chooseIcon="fa fa-upload" uploadIcon="fa fa-upload" style="display:none;" 
+                      onstart="block();" oncomplete="unblock();"  >
+        </p:fileUpload> 
+        <p:commandButton id="importBtn" onclick="document.querySelector('.myUpload input').click()" onstart="block();" oncomplete="unblock()" styleClass="btn btn-info" 
+                         rendered="#{(main.isNew() or importProductEntryView.importProductEntry.id eq null)}" value="#{lang.importPurchase}" disabled="#{!importProductEntryView.importable}" />
+      </h:panelGroup>
+
+      <p:commandButton id="validateUpload" ajax="true" value="#{lang.validateAndImport}" immediate="true" partialSubmit="true"  styleClass="btn btn-info" 
+                       actionListener="#{importProductEntryView.actionProductEntryImport1(main)}" update="f1" rendered="#{main.edit}" onstart="block()" oncomplete="unblock()" />
+
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{importProductEntryView.deleteImportProductEntryList(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('importProductEntryWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >      
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{importProductEntryView.deleteImportProductEntryList(main)}" value="#{lang.delete}" onclick="wdgOff('importProductEntryWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="formRight" >
+      <h:panelGroup id="errorNumDiv" rendered="#{importProductEntryView.importProductEntry.status ne SYSCONSTANT.IMPORT_SUCCESS and importProductEntryView.errorLogNum gt 0}" style="padding-right:10px">
+        <h:outputText value="#{lang.errors}#{lang.colon} "> </h:outputText>
+        <p:outputLabel value="#{importProductEntryView.errorLogNum}" style="color:#C62828"/>
+      </h:panelGroup>
+      <h:outputText value="#{lang.referenceNo}#{lang.colon} "> </h:outputText>
+      <p:outputLabel value="#{importProductEntryView.importProductEntry.referenceNo}" style="color:#{sysRuntimeView.statusColor(0)}"/>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <h:panelGroup>
+        <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                      columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+
+          <!-- Invoice No -->
+          <p:outputLabel id="lbl1" value="#{lang.invoiceNo}" for="invoiceNo" />
+          <p:inputText id="invoiceNo" styleClass="prNum w-200" required="true" requiredMessage="#{lang.invoiceNo} #{lang.isRequired}" autocomplete="off"
+                       value="#{importProductEntryView.importProductEntry.referenceNo}" maxlength="20" title="#{lang.invoiceNo}" >
+            <p:ajax event="keyup" process="@this" delay="500" update="invoiceNo importBtnDiv" immediate="true"/>
+            <p:message for="invoiceNo" display="text" />
+          </p:inputText>
+
+          <!-- Invoice Discount value -->
+          <p:outputLabel id="lbl3" value="#{lang.invoiceDiscount}" for="invoiceDiscount" />
+          <h:panelGroup>
+            <p:inputNumber value="#{importProductEntryView.importProductEntry.invoiceDiscount}" converterMessage="#{lang.invoiceDiscount} #{lang.invalidNumber}" decimalPlaces="3"
+                           title="#{lang.invoiceDiscount}" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                           symbol="#{appView.currencySymbol} " maxlength="10" id="invoiceDiscount" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" update="invoiceDiscount" immediate="true"/>
+            </p:inputNumber>
+          </h:panelGroup>
+
+          <!-- Invoice Date -->
+          <p:outputLabel id="lbl2" value="#{lang.invoiceDate}" for="invoiceDate" />
+          <h:panelGroup>
+            <p:calendar value="#{importProductEntryView.importProductEntry.entryDate}" pattern="#{lang.datePattern}" inputStyleClass="w-100"
+                        required="true" requiredMessage="#{lang.invoiceDate} #{lang.isRequired}"
+                        validator="#{sysRuntimeView.dateLteToday}" autocomplete="off" 
+                        converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                        maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}">
+              <p:ajax event="dateSelect" process="@this" update="validateUpload " immediate="true"/>
+              <p:ajax event="change" process="@this" delay="500" update="importBtnDiv" immediate="true"/>
+            </p:calendar>
+            <p:message for="invoiceDate" display="text"/>
+          </h:panelGroup>
+
+          <!--Cash Discount-->
+          <p:outputLabel id="lbl5" value="#{lang.cashDiscount}"  for="cashDiscount" />
+          <h:panelGroup>
+            <p:inputNumber value="#{importProductEntryView.importProductEntry.cashDiscount}" converterMessage="#{lang.cashDiscount} #{lang.invalidNumber}" decimalPlaces="3"
+                           title="#{lang.cashDiscount}" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                           symbol="#{appView.currencySymbol} " maxlength="10" id="cashDiscount" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" update="cashDiscount" immediate="true"/>
+            </p:inputNumber>
+          </h:panelGroup>
+
+          <!--Invoice Amopunt-->
+          <p:outputLabel id="lbl4"  value="#{lang.invoiceAmount}"  for="invoiceAmount" />
+          <h:panelGroup>
+            <p:inputNumber value="#{importProductEntryView.importProductEntry.invoiceAmount}" converterMessage="#{lang.invoiceAmount} #{lang.invalidNumber}" decimalPlaces="3"
+                           required="true" requiredMessage="#{lang.amount} #{lang.isRequired}" title="#{lang.invoiceAmount}"
+                           onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " 
+                           maxlength="10" id="invoiceAmount" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" update="invoiceAmount importBtnDiv" immediate="true"/>
+            </p:inputNumber>
+            <p:message for="invoiceAmount" display="text" id="invoiceAmountMsg"/>
+          </h:panelGroup>
+
+          <!--Cash Discount Taxable-->
+          <p:outputLabel id="lbl6" value="#{lang.cashDiscountTaxable}" for="cashDiscountTaxable" />
+          <h:panelGroup>
+            <p:selectBooleanCheckbox value="#{importProductEntryView.taxableCashDiscount}" id="cashDiscountTaxable" >
+              <p:ajax process="@this" update="cashDiscountTaxable" />
+            </p:selectBooleanCheckbox>
+          </h:panelGroup>
+
+        </p:panelGrid>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="after" >
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+
+        .bg-danger {
+          color: #fff;
+          background: #ef565a !important;
+        }
+      </style>
+      <h:panelGroup id="p2" layout="block" styleClass="card" rendered="#{!main.list and importProductEntryView.importProductEntryItemList ne null and importProductEntryView.importProductEntryItemList.size() gt 0}" >
+        <p:dataTable id="productEntryImportTable" var="row" widgetVar="productEntryImportWidget" rowIndexVar="rowIndex"
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{importProductEntryView.importProductEntryItemList}"
+                     rows="10" editable="true" editMode="cell" 
+                     paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"  
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="10,50,100,150" rowKey="#{row.id eq null?importProductEntryView.getRowKey():row.id}"
+                     rowSelectMode="checkbox" selection="#{importProductEntryView.selectedProductEntryItemList}">                
+          <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+          <p:ajax event="rowSelectCheckbox"  />
+          <p:ajax event="rowUnselectCheckbox" />
+          <p:ajax event="toggleSelect" />
+
+          <p:column selectionMode="multiple" exportable="false"/>
+          <p:column style="width:30px">
+            <f:facet name="header">
+              <p:commandButton process="@this" value="" update="" icon="fa fa-trash" tabindex="-1"
+                               rendered="true" style="color: mediumvioletred;" 
+                               actionListener="#{importProductEntryView.deleteProductEntryDetail(main)}" title="Delete Error Log Items" >
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </f:facet>
+          </p:column>
+
+          <p:column sortBy="#{row.lineNo}" field="id" filterBy="#{row.lineNo}" filterStyleClass="hidden">
+            <f:facet name="header"><h:outputText value="#{lang.lineNo}" title="#{lang.lineNo}"/></f:facet>
+            <h:outputText value="#{appView.number(row.lineNo)}" title="#{appView.title(row.lineNo)}" escape="false" /></p:column>
+
+          <!--Error-->
+          <p:column sortBy="#{row.error}" filterBy="#{row.error}" filterStyleClass="hidden" width="400" style="width:400;">
+            <f:facet name="header"><h:outputText value="#{lang.errors} " title="#{lang.errors}"/></f:facet>
+            <h:outputText value="#{appView.display(row.error)}" title="#{appView.title(row.error)}" styleClass="fw" /></p:column>
+
+          <!--Product Name-->
+          <p:column width="400">
+            <f:facet name="header"><h:outputText value="#{lang.product}" title="Product Name"/></f:facet>
+            <p:autoComplete id="ac1" styleClass="fw" value="#{row.productSummary}" completeMethod="#{importProductEntryView.completeProductDetail}"
+                            converter="spica.scm.converter.ProductSummaryConverter" autocomplete="off" style="position: relative" panelStyle="width:4 00px !important;"
+                            cache="true" cacheTimeout="50000" queryDelay="500" maxResults="100" scrollHeight="600" title="#{row.productSummary.productName}"
+                            var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true" >
+              <f:attribute name="productEntryItem" value="#{row}"/>
+              <p:column style="width:275px;">
+                <f:facet name="header"><label>#{lang.name}</label></f:facet>
+                    #{prod.productName}
+              </p:column>
+              <p:column style="width: 130px;">
+                <f:facet name="header"><label>#{lang.batch}</label></f:facet>
+                    #{prod.batch}
+              </p:column>
+              <p:column style="width: 100px;">
+                <f:facet name="header"><label>#{lang.packSize}</label></f:facet>
+                    #{prod.packSize}
+              </p:column>
+              <p:column>
+                <f:facet name="header"><label>#{lang.expiry}</label></f:facet>
+                    #{prod.expiryDate}
+              </p:column>
+              <p:column>
+                <f:facet name="header">#{lang.mrp}</f:facet>
+                  #{prod.mrpValue}
+              </p:column>
+              <p:column rendered="#{accountUtilView.isInterStatePurchase(importProductEntryView.account)}">
+                <f:facet name="header">#{lang.igst}</f:facet>
+                  #{prod.gstPercentage}
+              </p:column>
+              <p:column rendered="#{accountUtilView.isIntraStatePurchase(importProductEntryView.account)}">
+                <f:facet name="header">#{lang.cgst}</f:facet>
+                  #{prod.gstPercentage/2}
+              </p:column>
+              <p:column rendered="#{accountUtilView.isIntraStatePurchase(importProductEntryView.account)}">
+                <f:facet name="header">#{lang.sgst}</f:facet>
+                  #{prod.gstPercentage/2}
+              </p:column>
+              <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" listener="#{importProductEntryView.productSelectEvent(main,row)}" 
+                      update="productBatchId mrp expiry" /> 
+            </p:autoComplete>
+          </p:column>
+
+          <!--Batch No-->
+          <p:column sortBy="#{row.batchNo}" filterBy="#{row.batchNo}" filterStyleClass="hidden" width="200">
+            <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+            <p:inputText id="productBatchId" value="#{row.batchNo}" title="#{appView.title(row.batchNo)}" styleClass="fw" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputText>
+          </p:column>
+
+          <!--Expiry date-->
+          <p:column>
+            <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+            <p:inputMask mask="99-99" value="#{row.date}" title="#{row.date}" styleClass="fw" autocomplete="off" id="expiry">
+              <p:ajax event="blur" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputMask>
+          </p:column>
+
+          <!--Value Mrp-->
+          <p:column sortBy="#{row.valueMrp}" filterBy="#{row.valueMrp}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.valueMrp}" title="#{lang.valueMrp}"/></f:facet>
+            <p:inputNumber id="mrp" value="#{row.valueMrp}" title="#{appView.decimal(row.valueMrp)}" styleClass="fw" autocomplete="off" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Qty-->
+          <p:column sortBy="#{row.qty}" filterBy="#{row.qty}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.qty}"/></f:facet>
+            <p:inputNumber value="#{row.qty}" title="#{appView.number(text)}" styleClass="fw" autocomplete="off" decimalPlaces="2" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Free Qty-->
+          <p:column sortBy="#{row.freeQty}" filterBy="#{row.freeQty}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.freeQty}" title="#{lang.freeQty}"/></f:facet>
+            <p:inputNumber value="#{row.freeQty}" title="#{appView.number(row.freeQty)}" styleClass="fw" autocomplete="off" decimalPlaces="0" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Scheme Discount Beneficiary-->
+          <p:column sortBy="#{row.schemeDiscountBeneficiary}" filterBy="#{row.schemeDiscountBeneficiary}" filterStyleClass="hidden" width="200" >
+            <f:facet name="header"><h:outputText value="#{lang.beneficiary}" title="#{lang.schemeDiscount} #{lang.beneficiary}"/></f:facet>
+            <p:selectOneMenu value="#{row.schemeDiscountBeneficiary}" >
+              <f:selectItem itemLabel="Company" itemValue="Company" />
+              <f:selectItem itemLabel="Customer" itemValue="Customer" />
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:selectOneMenu>
+          </p:column>
+
+          <!--Product Discount-->
+          <p:column sortBy="#{row.productDiscount}" filterBy="#{row.productDiscount}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.productDiscount}" title="#{lang.productDiscount}"/></f:facet>
+            <p:inputNumber value="#{row.productDiscount}" title="#{appView.decimal(row.productDiscount)}" styleClass="fw" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Product Discount Beneficiary-->
+          <p:column sortBy="#{row.productDiscountBeneficiary}" filterBy="#{row.productDiscountBeneficiary}" filterStyleClass="hidden" width="200">
+            <f:facet name="header"><h:outputText value="#{lang.beneficiary}" title="#{lang.productDiscount} #{lang.beneficiary}"/></f:facet>
+            <p:selectOneMenu value="#{row.productDiscountBeneficiary}" >
+              <f:selectItem itemLabel="Company" itemValue="Company" />
+              <f:selectItem itemLabel="Customer" itemValue="Customer" />
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:selectOneMenu>
+          </p:column>
+
+          <!--Rate-->
+          <p:column sortBy="#{row.rate}" filterBy="#{row.rate}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+            <p:inputNumber value="#{row.rate}" title="#{appView.decimal(row.rate)}" styleClass="fw" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Pts-->
+          <p:column sortBy="#{row.pts}" filterBy="#{row.pts}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+            <p:inputNumber value="#{row.pts}" title="#{appView.decimal(row.pts)}" styleClass="fw" autocomplete="off" >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importProductEntryView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+        </p:dataTable>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="importProductEntryTable" var="importProductEntryVar" widgetVar="importProductEntryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{importProductEntryView.importProductEntryLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{importProductEntryVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true"
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{importProductEntryView.importProductEntryListSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true"
+                   paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Reference No -->
+        <p:column sortBy="#{importProductEntryVar.referenceNo}" field="scm_import.reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(importProductEntryVar.referenceNo)}"
+                         process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{importProductEntryView.importProductEntry}" value="#{importProductEntryVar}" /> 
+          </p:commandLink>
+        </p:column>
+
+        <!-- Entry Date -->
+        <p:column sortBy="#{importProductEntryVar.entryDate}" field="scm_import.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(importProductEntryVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Amount -->
+        <p:column sortBy="#{importProductEntryVar.invoiceAmount}" field="scm_import.invoice_amount" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}"/></f:facet>
+          <h:outputText value="#{appView.number(importProductEntryVar.invoiceAmount)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{importProductEntryVar.status}" field="scm_import.status" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{importProductEntryVar.status ne 1 ? lang.pending: lang.imported }" title="#{importProductEntryVar.status}" escape="false"
+                        style="background-color: #{sysRuntimeView.statusColor(importProductEntryVar.status eq 0 ?1:2)}"
+                        styleClass="m-r-5 #{sysRuntimeView.statusStyle(importProductEntryVar.status)}" />
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(importProductEntryVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(importProductEntryVar.createdAt)}</ui:define>
+            <ui:define name="id">#{appView.display(importProductEntryVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+
+  </ui:decorate>
+  <script>
+    function refreshDatatable() {
+      page.refresh();
+    }
+  </script>
+</ui:composition>

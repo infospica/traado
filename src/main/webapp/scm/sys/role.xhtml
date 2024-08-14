@@ -1,0 +1,206 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{roleView.switchRole(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.role} #{main.isEdit() ? '/' : ''} #{main.isEdit() ? appView.display(roleView.role.title) : ''}" />
+    <ui:param name="ids" value="role" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{roleView.deleteRole(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('roleWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{roleView.cloneRole(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{roleView.deleteRole(main)}" value="#{lang.delete}" onclick="wdgOff('roleWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{roleView.saveRole(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true) and (!roleView.role.isAdmin or userRuntimeView.appUser.root)}"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form"> 
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{roleView.activeIndex}" styleClass="materialTabs">
+        <p:tab title="#{lang.role}" id="roleTab"  >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <p:outputLabel value="#{lang.title}" for="title" />
+            <ui:param name="ids" value="RolePrivilage" />
+
+            <h:panelGroup><p:inputText styleClass="fw" value="#{roleView.role.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text"/></h:panelGroup>                 
+            <h:panelGroup></h:panelGroup>
+            <h:panelGroup></h:panelGroup>
+
+            <p:outputLabel value="#{lang.roleType}" for="roleType"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{roleView.role.roleType}" required="true" requiredMessage="#{lang.roleType} #{lang.isRequired}" id="roleType">
+                <f:selectItem itemLabel="INTERNAL" itemValue="1" />
+                <f:selectItem itemLabel="EXTERNAL" itemValue="2" />
+                <f:selectItem itemLabel="SYSTEM" itemValue="3" />
+              </p:selectOneMenu>
+            </h:panelGroup>
+            <p:outputLabel value="#{lang.isAdmin}" for="isAdmin" rendered="#{userRuntimeView.appUser.root}"/>
+            <h:panelGroup rendered="#{userRuntimeView.appUser.root}">
+              <h:selectBooleanCheckbox  value="#{roleView.role.isAdmin}" id="isAdmin">
+              </h:selectBooleanCheckbox>
+            </h:panelGroup>
+            <p:outputLabel value="#{lang.menu}" for="menus" />
+            <h:panelGroup>
+
+              <p:tree id="menus" value="#{roleView.menuNode}" var="menu" 
+                      selectionMode="checkbox" selection="#{roleView.selectedMenuNodes}">
+                <!--<p:ajax event="select" listener="#{roleView.onNodeSelect}" />-->
+                <p:treeNode >
+                  <h:outputText value="#{menu.title}"/>
+                </p:treeNode>  
+              </p:tree>
+            </h:panelGroup>
+            <!--  <h:panelGroup style="padding-left: 14px" rendered="#{main.isForm()}">
+                
+                <p:selectManyCheckbox id="menus" value="#{roleView.menuSelected}" layout="responsive" columns="3" converter="omnifaces.SelectItemsConverter">
+                  <f:selectItems value="#{roleView.loadMenuTree(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                  </p:selectManyCheckbox><p:message for="menus" />
+                           
+             </h:panelGroup>--> 
+          </ui:decorate>
+        </p:tab>
+        <p:tab title="#{lang.privilege}" id="rolePlgTab" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="roleMenuPrivilage" />
+            <ui:param name="search" value="false" />
+            <ui:define name="menuleft">
+              <h:commandButton value="#{lang.reset}" immediate="true" onclick="toTop()" styleClass="btn btn-default" >
+                <!--action="#{main.setViewType(main.viewType)}"-->
+                <f:ajax execute="@this" render="f1" resetValues="true"/>
+                <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+              </h:commandButton>
+              <h:commandButton value="#{lang.save}" styleClass="btn btn-primary" action="#{roleView.savePrivilage(main)}" rendered="#{(userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true) and (!roleView.role.isAdmin or userRuntimeView.appUser.root)}">
+                <f:ajax execute="rolePlgTab" render="f1"/>
+              </h:commandButton>
+            </ui:define>
+            <p:dataTable id="roleMenuPrivilageTable" var="roleMenuPrivilageVar" widgetVar="roleMenuPrivilageWidget" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks"  rowHover="true" value="#{roleView.getRoleMenuPrivilageList(main)}" expandableRowGroups="true" sortBy="#{roleMenuPrivilageVar.parentId.title}">
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('roleMenuPrivilageWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:headerRow>
+                <p:column headerText="#{lang.parentMenu}" colspan="10" >
+                  <div class="ib-m"> <h:outputText value="#{roleMenuPrivilageVar.parentId.title}" escape="false"/></div>
+                  <div class="ib-m"><p:selectManyCheckbox value="#{roleMenuPrivilageVar.selectedParentId}" valueChangeListener="#{roleView.selectAllPrentMenuPrivilage}" id="chk_#{roleMenuPrivilageVar.parentId.id}">
+                      <f:selectItem itemLabel="" itemValue="#{roleMenuPrivilageVar.parentId.id}" />
+                      <p:ajax listener="#{roleView.listenerEvent}" update="roleMenuPrivilageTable"/>
+                    </p:selectManyCheckbox></div>
+                </p:column>
+              </p:headerRow>
+              <p:column headerText="#{lang.menu}" style="text-align: right" filterStyleClass="hidden">
+                <h:outputText value="#{roleMenuPrivilageVar.title}" escape="false"/>
+              </p:column>
+              <p:column headerText="Add" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.add}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.add}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Modify" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.modify}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.modify}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="View" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.view}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.view}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Delete" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.delete}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.delete}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Modify Tax" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.modifyTax}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.modifyTax}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Print" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.print}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.print}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Export" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.export}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.export}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Confirm" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.confirm}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.confirm}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Renew" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.renew}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.renew}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="ResetToDraft" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.resetToDraft}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.resetToDraft}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+                <p:column headerText="Edit Field" style="text-align: right">
+                  <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.editField}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.editField}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+              <p:column headerText="Cancel" style="text-align: right">
+                <h:selectBooleanCheckbox  value="#{roleMenuPrivilageVar.privChecked.cancel}" rendered="#{roleMenuPrivilageVar.privCheckedRendered.cancel}">
+                </h:selectBooleanCheckbox>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+      </p:tabView>
+    </ui:define>
+    <!--<ui:define name="after">-->
+    <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+      <ui:define name="cby">#{appView.display(roleView.role.createdBy)}</ui:define>
+      <ui:define name="cat">#{appView.dateTime(roleView.role.createdAt)}</ui:define>
+      <ui:define name="uby">#{appView.display(roleView.role.modifiedBy)}</ui:define>
+      <ui:define name="uat">#{appView.dateTime(roleView.role.modifiedAt)}</ui:define>
+    </ui:decorate>  
+
+    <!--</ui:define>-->
+
+    <ui:define name="list">
+      <p:dataTable id="roleTable" var="roleVar" widgetVar="roleWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{roleView.roleLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{roleVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{roleView.roleSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{roleVar.id}" field="id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{roleVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{roleView.role}" value="#{roleVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{roleVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+
+          <h:outputText value="#{appView.display(roleVar.title)}" title="#{appView.title(roleVar.title)}" escape="false" />
+          <h:outputText value=" (#{roleVar.isAdmin ? lang.isAdmin:''})" title="#{appView.title(roleVar.title)}" escape="false" rendered="#{roleVar.isAdmin}" style="color:red;" />
+
+        </p:column>
+        <p:column headerText="#{lang.roleType}" sortBy="#{roleVar.roleType}" field="roleType">
+          <f:facet name="header"><h:outputText value="#{lang.roleType}" title="#{lang.roleType}"/></f:facet>
+
+          <h:outputText value="INTERNAL" rendered="#{roleVar.roleType==1}" escape="false" styleClass="label" style="background-color:lightgreen" /> 
+          <h:outputText value="EXTERNAL" rendered="#{roleVar.roleType==2}" escape="false" styleClass="label" style="background-color:orange" /> 
+          <h:outputText value="SYSTEM" rendered="#{roleVar.roleType==3}" escape="false" styleClass="label" style="background-color:lightcoral" /> 
+        </p:column>
+        <p:column headerText="#{lang.log}" exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(roleVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(roleVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(roleVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(roleVar.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

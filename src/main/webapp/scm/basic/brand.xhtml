@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" >
+  #{brandView.switchBrand(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.brand}" />
+    <ui:param name="ids" value="brand" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  onclick="closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{brandView.deleteBrand(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('brandWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{brandView.cloneBrand(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{brandView.deleteBrand(main)}" value="#{lang.delete}" onclick="wdgOff('brandWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{brandView.saveBrand(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Name -->
+      <p:outputLabel value="#{lang.name}" for="name" />
+      <h:panelGroup>
+        <p:inputText value="#{brandView.brand.name}" maxlength="200" id="name" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" styleClass="fw"/>
+        <p:message for="name" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Code -->
+      <p:outputLabel value="#{lang.code}" for="code" />
+      <h:panelGroup>
+        <p:inputText value="#{brandView.brand.code}" maxlength="3" id="code" required="true" styleClass="fw text-uppercase"/>
+        <p:message for="code" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Description -->
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{brandView.brand.description}" maxlength="500" id="description" />
+        <p:message for="description" display="text" styleClass="fw" />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(brandView.brand.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(brandView.brand.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(brandView.brand.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(brandView.brand.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(brandView.brand.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="brandTable" var="brandVar" widgetVar="brandWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{brandView.brandLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{brandVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{brandView.brandSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Name -->
+        <p:column sortBy="#{brandVar.name}" field="scm_brand.name" >
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{brandVar.name}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{brandView.brand}" value="#{brandVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Code -->
+        <p:column sortBy="#{appView.display(brandVar.code)}" field="scm_brand.code">
+          <f:facet name="header"><h:outputText value="#{lang.code}" title="#{lang.code}"/></f:facet>
+          <h:outputText value="#{appView.display(brandVar.code)}" title="#{appView.title(brandVar.code)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.log}">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(brandVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(brandVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(brandVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(brandVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(brandVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

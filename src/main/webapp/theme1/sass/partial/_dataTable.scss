@@ -1,0 +1,160 @@
+/* <-- dataTable STYLE begins */
+
+input{
+	&.expiry,&.qty,&.free,&.rate,&.val,&.mrp,&.ptr,&.disc,&.tax{
+		text-align:right;
+	}
+}
+
+.table{
+	&.autoWidth{
+		width:auto;
+	}
+}
+
+.invoiceTable,
+.billDetails{
+	@extend .clearfix !optional;
+	input[type="text"],
+	.tagit,
+	.form-control{
+		height:35px;
+		font-size:13px;
+		padding: 0 5px;
+		//border:none transparent;
+		border-bottom:#aaa 1px solid;
+		@include box-shadow(none);
+		@include border-radius(0px);
+		&:focus{
+			border-bottom:$prColor 1px solid;
+		}
+	}
+	.tagit{height:auto;}
+	textarea.form-control{
+		height:5em;
+	}
+	.txtView{
+		font-size:13px;
+		min-height:40px;
+		padding: 0px 10px;
+		line-height:40px;
+		border-color:transparent;
+	}
+}
+
+.billDetails{
+	@extend .clearfix !optional;
+	input[type="text"],
+	.tagit,
+	.form-control{
+		height:30px;
+		margin:0 0 10px 0;
+		border-bottom: $Brdr 1px solid;
+		@include box-shadow(none);
+	}
+	.txtView{
+		min-height:30px;
+		border-color:#CCC;
+		margin-bottom:10px;
+		line-height:2em;
+	}
+}
+
+.themeTable,
+.invoiceTable{
+	//border-bottom: 1px solid $table-border-color;
+	.tagit,
+	input[type="text"],
+	.form-control{
+		//background:none;
+		&[disabled],
+		&[readonly]{
+			background:#D3D3D3;
+		}
+	}
+	& > thead > tr > th,
+	& > thead > tr > td,
+	& > tbody > tr > th,
+	& > tbody > tr > td,
+	& > tfoot > tr > th,
+	& > tfoot > tr > td {
+    	padding: 4px;
+		vertical-align: middle;
+		&>span{
+			display:block;
+			padding: 10px 0;
+			text-align:center;
+		}
+		&.text-right{
+			&>span{
+				text-align:right;
+			}
+		}
+	}
+	& > thead > tr > th,
+	& > tbody > tr > th,
+	& > tfoot > tr > th{
+		color:$Clr3;
+		padding: 3px;
+		background:$prColor;
+		&>div{ padding:0 7px; }
+		&>span{ padding: 0 5px; }
+		.form-control{background:rgba(255,255,255,0.5);height:30px;}
+	}
+	& > tbody > tr{
+		&:nth-child(2n+1){
+			& > td{
+				background:$odd;
+			}
+		}
+	}
+}
+
+[data-fixedfooter]{
+	position:relative;
+	padding-bottom:250px;
+	.fixedFooter{
+		left: 0px;
+		width:100%;
+		bottom:-1px;
+		z-index:800;
+		padding:20px;
+		height: 250px;
+		overflow: auto;
+		background: #fff;
+		position: absolute;
+		border-top:$prBrdr 15px solid;
+		border-bottom:$prBrdr 1px solid;
+	}
+}
+[data-scroll-y]{
+	///*position:relative;*/
+	.ui-autocomplete { position: absolute; }
+}
+ul.tagit{
+	max-width:200px;
+	padding:0px 2px;
+	input[type="text"] { width:75px; }
+}
+
+.text-center th{
+	text-align:center !important;
+}
+
+/* TABLE SORTER */
+table[aria-table-sort="true"] {
+	thead{
+		tr{
+			.header {
+				cursor: pointer;
+				background-repeat:no-repeat;
+				background-position: 98% 62%;
+				background-image: url('#{$img}/sort.png');
+			}
+			.headerSortUp { background-image: url('#{$img}/asc.png'); }
+			.headerSortDown{ background-image: url('#{$img}/desc.png'); }
+		}
+	}
+}
+
+/* dataTable STYLE ends --> */

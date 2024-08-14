@@ -1,0 +1,220 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{importCustomerView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+    i:hover{
+      color:#444;
+    }
+    .download{
+      border: none;
+      color: #CCC;            
+      font-size: 16px;     
+      transition: 0.3s;
+    }
+
+    .download:hover {color: black;}    
+  </style>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="ids" value="importCustomer" />
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="more" />
+    <ui:define name="newList"/>
+    <ui:define name="rightList">
+      <h:panelGroup id="validateUploadDiv">
+        <p:commandButton id="validateUpload" ajax="true" value="Validate and Upload" actionListener="#{importCustomerView.actionCustomerImport(main)}" immediate="true" partialSubmit="true" 
+                         rendered="#{importCustomerView.activeIndex eq 1}" styleClass="btn btn-primary" onstart="block()" oncomplete="unblock()" update="tabFragmentId">
+        </p:commandButton>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:fragment id="tabFragmentId">
+        <p:tabView  id="importCustomerTabs" dynamic="true" styleClass="materialTabs" activeIndex="#{importCustomerView.activeIndex}" >
+          <p:ajax event="tabChange" update="validateUploadDiv" />
+          <p:tab  title="#{lang.upload}"  id="newTab"  >
+            <h:panelGroup layout="block" styleClass="row">
+              <h:panelGroup layout="block" styleClass="col-md-6">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">                
+                  <ui:param name="label" value=" Download Excel Template " />
+                  <ui:define name="menuleft">
+
+                  </ui:define>
+                  <div style="text-align: center;padding: 40px;"> 
+                    <p:commandLink id="downLoad" class="download" ajax="false" actionListener="#{importCustomerView.downloadExcelFormat(main)}" immediate="true" partialSubmit="true" >
+                      <i class="fa fa-download" style="font-size: 45px;color:#CCC;" />
+                    </p:commandLink>
+                  </div>
+                </ui:decorate>
+              </h:panelGroup>
+
+              <h:panelGroup layout="block" styleClass="col-md-6" id="uploadDiv">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">                
+                  <ui:param name="label" value=" Upload Customers" />
+                  <ui:define name="menuleft">
+
+                  </ui:define>
+                  <div style="text-align: center;padding: 40px;"> 
+                    <p:fileUpload styleClass="myUpload"  fileUploadListener="#{importCustomerView.handleFileUpload}" id="dragDropUpload" mode="advanced"  auto="true" sizeLimit="10000000"
+                                  allowTypes="/(\.|\/)(xls|xlsx)$/" dragDropSupport="true" chooseIcon="fa fa-upload" uploadIcon="fa fa-upload" style="display:none;" onstart="block();" oncomplete="unblock();">
+
+                    </p:fileUpload> 
+                    <p:commandLink  onclick="document.querySelector('.myUpload input').click()" onstart="block();" oncomplete="unblock()" >
+                      <i class="fa fa-upload" style="font-size: 45px;color:#CCC;" />
+                    </p:commandLink>
+                    <p:remoteCommand name="uploadCommand" update="importCustomerTabs validateUploadDiv" />
+                  </div>
+                </ui:decorate>
+              </h:panelGroup>
+
+            </h:panelGroup>
+
+          </p:tab>
+          <p:tab title="#{lang.errors} ( #{importCustomerView.errorLogNum gt 0?importCustomerView.errorLogNum:''} )" id="errorTab" disabled="#{importCustomerView.errorLogNum eq 0}" >            
+            <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0"  >
+              <p:dataTable id="customerImportTable" var="row" widgetVar="customerImportWidget" rowIndexVar="rowIndex"
+                           tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{importCustomerView.getCustomerLogErrorList(main)}"
+                           rows="10" editable="true" editMode="cell" 
+                           paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"  
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="50,100,150" rowKey="#{row.id eq null?importCustomerView.rowKey:row.id}"
+                           rowSelectMode="checkbox" selection="#{importCustomerView.selectedCustomer}">                
+                <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+                <p:ajax event="rowSelectCheckbox"  />
+                <p:ajax event="rowUnselectCheckbox" />
+                <p:ajax event="toggleSelect" />
+
+                <p:column selectionMode="multiple" exportable="false"/>
+                <p:column style="width:30px">
+                  <f:facet name="header">
+                    <p:commandButton process="@this" value="" update="tabFragmentId" icon="fa fa-trash" tabindex="-1"
+                                     rendered="true" style="color: mediumvioletred;" 
+                                     actionListener="#{importCustomerView.deleteCustomerLogErrorList(main)}" title="Delete Error Log Items" >
+                      <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                    </p:commandButton>
+                  </f:facet>
+                </p:column>
+                <p:column sortBy="#{row.lineNo}" field="id" filterBy="#{row.lineNo}" filterStyleClass="hidden">
+                  <f:facet name="header"><h:outputText value="#{lang.lineNo}" title="#{lang.lineNo}"/></f:facet>
+                  <h:outputText value="#{appView.number(row.lineNo)}" title="#{appView.title(row.lineNo)}" escape="false" /></p:column>
+
+                <p:column sortBy="#{row.error}" filterBy="#{row.error}" filterStyleClass="hidden" width="400" style="width:400;">
+                  <f:facet name="header"><h:outputText value="#{lang.errors} " title="#{lang.errors}"/></f:facet>
+                  <h:outputText value="#{appView.display(row.error)}" title="#{appView.title(row.error)}" styleClass="fw" /></p:column>
+
+                <p:column width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.customerName} "/></f:facet>
+                  <p:inputText value="#{row.customerName}" title="#{appView.title(row.customerName)}" styleClass="fw" >
+                    <p:ajax event="keyup" process="@this" delay="500" listener="#{importCustomerView.updateLineItem(main,row)}" />
+                  </p:inputText>
+                </p:column>
+
+                <p:column  width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.country} "/></f:facet>
+                  <h:panelGroup id="countryDiv">
+                    <p:autoComplete value="#{row.countryId}" completeMethod="#{importCustomerView.countryAuto}" converter="wawo.LookupIntConverter" 
+                                    id="customerCountryId" var="c" itemValue="#{c}" itemLabel="#{c.countryName}"
+                                    emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                                    autocomplete="off" forceSelection="true"  styleClass="fw">
+                      <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+                      <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+                      <p:ajax event="itemSelect" immediate="true" process="@this" update="customerStateDiv customerDistrictDiv" listener="#{importCustomerView.updateLineItem(main,row)}"/>
+                    </p:autoComplete>
+                    <p:message for="customerCountryId" display="text" />
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.state} "/></f:facet>
+                  <h:panelGroup id="customerStateDiv">
+                    <p:autoComplete  value="#{row.stateId}" completeMethod="#{importCustomerView.stateAuto(filter,row)}" converter="wawo.LookupIntConverter"
+                                     dropdown="true"  id="customerStateId" var="s" itemValue="#{s}"
+                                     itemLabel="#{s.stateName ne null ? s.stateName +=' ('+=s.stateCode+=')' : ''}" 
+                                     readonly="#{customerView.customer.gstNo eq null ? false : true}" 
+                                     emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                                     autocomplete="off" forceSelection="true"  styleClass="fw">
+                      <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+                      <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+                      <p:ajax event="itemSelect" immediate="true" process="@this" update="customerDistrictDiv" listener="#{importCustomerView.updateLineItem(main, row)}"/>
+                      <p:column styleClass="w-20">
+                        <h:outputText value="#{s.stateCode}" />
+                      </p:column>
+                      <p:column>
+                        <h:outputText value="#{s.stateName}" />
+                      </p:column>
+                    </p:autoComplete>
+                    <p:message for="customerStateId" display="text" />
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.district}" /></f:facet>
+                  <h:panelGroup id="customerDistrictDiv">
+                    <p:autoComplete  value="#{row.districtId}" completeMethod="#{importCustomerView.districtAuto(filter,row)}" converter="wawo.LookupIntConverter"
+                                     id="customerDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}"
+                                     dropdown="true" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                                     autocomplete="off" forceSelection="true"  styleClass="fw">
+                      <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+                      <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+                      <p:ajax event="itemSelect" process="@this" update="customerImportTable" listener="#{importCustomerView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:autoComplete>
+                    <p:message for="customerDistrictId" display="text" />
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.gstNo}" /></f:facet>
+                  <h:panelGroup rendered="#{userRuntimeView.isGstRegime()}" id="gstinDiv">
+                    <p:inputText styleClass="fw text-uppercase" value="#{row.gstNo}" maxlength="15" id="gstNo" autocomplete="off" >
+                      <f:validator validatorId="spica.scm.validators.GstinValidator" />
+                      <p:ajax event="keyup" process="@this" delay="500" listener="#{importCustomerView.updateLineItem(main,row)}" />
+                    </p:inputText>
+                    <p:message for="gstNo" display="text"/>
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column width="200">
+                  <f:facet name="header"><h:outputText value="#{lang.address} "/></f:facet>
+                  <p:inputText value="#{row.address}" title="#{appView.title(row.address)}" styleClass="fw" >
+                    <p:ajax event="keyup" process="@this" delay="500" listener="#{importCustomerView.updateLineItem(main,row)}" />
+                  </p:inputText>
+                </p:column>
+
+                <p:column sortBy="#{row.customerType}" filterBy="#{row.customerType}" filterStyleClass="hidden">
+                  <f:facet name="header"><h:outputText value="#{lang.customer} #{lang.type}" title="#{lang.customer} #{lang.type}"/></f:facet>
+                  <h:panelGroup>
+                    <p:selectOneMenu id="tradeType" value="#{customerView.tradeProfile}" 
+                                     converter="omnifaces.SelectItemsConverter"
+                                     required="true" requiredMessage="#{lang.tradeProfile} #{lang.isRequired}">
+                      <f:selectItems value="#{customerView.getTradeProfileSelected()}" var="type" itemLabel="#{type.title}" itemValue="#{type}" />
+                      <p:ajax event="itemSelect" process="@this" update="customerImportTable" listener="#{importCustomerView.updateLineItem(main,row)}" onstart="block()" oncomplete="unblock()" />
+                    </p:selectOneMenu>
+                    <p:message for="tradeType" />
+                  </h:panelGroup></p:column>
+
+              </p:dataTable>
+            </h:panelGroup>
+          </p:tab>
+
+        </p:tabView>
+      </p:fragment>
+      <script>
+//        $(document).ready(function (e) {
+//          $('#dragDropUpload').fileupload({
+//            dropZone: $('#uploadDiv')
+//          });
+//        });
+
+      </script>
+
+    </ui:define>
+
+  </ui:decorate>
+
+</ui:composition>

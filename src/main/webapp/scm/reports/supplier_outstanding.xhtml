@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{supplierOutstandingView.setSupplierOutstandingList(null)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>  
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.supplierOutstanding}"/>
+    <ui:param name="ids" value="supplierOutstanding"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <!--<p:inputText styleClass="fw" id="supplierOutstandingST" onkeyup="return callDtFilter(this.value, 'supplierOutstanding');"  placeholder="#{lang.search}"/>-->
+    </ui:define>
+
+    <ui:define name="form"/>
+    <ui:define name="rightList" >
+      <h:panelGroup id="vendorAutoGroup" >
+
+        <p:autoComplete id='vendorAuto'  value="#{supplierOutstandingView.filterParameters.vendor}" completeMethod="#{supplierOutstandingView.vendorAuto}" 
+                        converter="wawo.LookupIntConverter" scrollHeight="500" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectSupplierCombo}" autocomplete="off" forceSelection="true"                               
+                        title="#{lang.vendor}" >
+          <f:attribute name="clazz" value="#{scmLookupView.vendorClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.vendorById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.vendorName}" />
+          </p:column>          
+          <p:ajax event="itemSelect" immediate="true" process="vendorAutoGroup" update=" accountGroup supplierOutstandingTable" listener="#{supplierOutstandingView.vendorSelectEvent}"
+                  onstart="block()" oncomplete="unblock()"  />
+        </p:autoComplete>                       
+
+      </h:panelGroup>
+      <h:panelGroup id="accountGroupDiv" rendered="true">
+        <p:autoComplete id='accountGroup'  value="#{supplierOutstandingView.filterParameters.accountGroup}" completeMethod="#{supplierOutstandingView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="100" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" scrollHeight="400"
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-users" style="color:#000;"></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <i class="fa fa-users" style="color:#CCC;" ></i>
+            </p:fragment>
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv reportList" listener="#{supplierOutstandingView.accountGroupSelectEvent}" onstart="block()" oncomplete="unblock()" />
+        </p:autoComplete>    
+      </h:panelGroup>
+      <h:panelGroup id="accountDiv" >
+        <p:autoComplete id='account'  value="#{supplierOutstandingView.filterParameters.account}" completeMethod="#{supplierOutstandingView.accountAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true"  
+                        title="#{lang.accountNumber}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.vendorId.vendorName}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountCode}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.companyTradeProfileId.title}" />
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountDiv" update="reportList" listener="#{supplierOutstandingView.accountSelectEvent}" onstart="block()" oncomplete="unblock()" />
+        </p:autoComplete>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="reportList" >
+        <p:dataTable id="supplierOutstandingTable" var="row" widgetVar="supplierOutstandingWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{supplierOutstandingView.fetchSupplierOutstandingList(main)}"                                                                           
+                     rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" >
+          <f:facet name="header">
+            <p:outputPanel styleClass="hidden" >
+              <p:inputText id="globalFilter"  onkeyup="return PF('supplierOutstandingWidget').filter()" />
+            </p:outputPanel>
+          </f:facet>   
+
+          <p:column groupRow="true" headerText="#{lang.customerName}" sortBy="#{row.name}"  filterBy="#{row.name}" >
+            <p:commandLink actionListener="#{popUpView.showLedgerBalance(main, row.id, supplierOutstandingView.filterParameters.accountGroup)}" >
+              <h:outputText value="#{appView.display(row.name)}" title="#{appView.title(row.name)}" escape="false" />
+            </p:commandLink>
+          </p:column>
+          <p:column headerText="#{lang.invoiceNo}" sortBy="#{row.invoiceno}"  filterBy="#{row.invoiceno}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.display(row.invoiceno)}  #{row.entityTypeId}" title="#{appView.title(row.invoiceno)}" escape="false" 
+                          rendered="#{row.entityTypeId eq null and row.tranId eq null }"  />
+            <p:commandLink value="#{row.invoiceno}" actionListener="#{popUpView.showPurchase(row.entityId)}" rendered="#{row.entityTypeId eq 8 }"  />
+            <p:commandLink value="#{row.invoiceno}" actionListener="#{popUpView.showSupplier(row.entityId)}" rendered="#{row.entityTypeId eq 1 }"  />
+            <p:commandLink value="#{row.invoiceno}" actionListener="#{popUpView.showAccountingTransaction(row.tranId)}" rendered="#{row.entityTypeId eq null and row.tranId ne null }"  />
+          </p:column>
+          <p:column headerText="#{lang.invoiceDate}" sortBy="#{row.invoicedate}"  filterBy="#{row.invoicedate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.invoicedate)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.billAmount}" sortBy="#{row.invoiceamount}"  style="text-align: right" filterBy="#{row.invoiceamount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.invoiceamount)}" escape="false" />
+            <f:facet name="footer">
+              <div style="text-align: right;">
+                <h:outputText style="text-align: right;" value="#{appView.decimal(supplierOutstandingView.billAmount)}" />
+              </div>
+            </f:facet>
+          </p:column>
+
+          <p:column headerText="#{lang.paid} #{lang.amount}" style="text-align: right" sortBy="#{appView.decimal(row.receivedAmount)}">
+            <h:outputText value="#{appView.decimal(row.receivedAmount)}" rendered="#{row.receivedAmount gt 0}" />
+            <f:facet name="footer">
+              <div style="text-align: right;">
+                <h:outputText value="#{appView.decimal(supplierOutstandingView.receivedAmount)}"  />
+              </div>
+            </f:facet>
+          </p:column>
+
+          <p:column headerText="#{lang.payable} #{lang.amount}" style="text-align: right" sortBy="#{appView.decimal(row.oustandingamount)}">
+            <h:outputText value="#{appView.decimal(row.oustandingamount)}" />
+            <f:facet name="footer">
+              <div style="text-align: right;">
+                <h:outputText value="#{appView.decimal(supplierOutstandingView.balance)}" />
+              </div>
+            </f:facet>
+          </p:column>
+          <p:column headerText="Cumulative" sortBy="#{row.oustandingamount}"  style="text-align: right" filterBy="#{row.oustandingamount}" filterStyleClass="hidden">          
+            <h:outputText value="#{appView.decimal(row.cumulativeAmount)}"  />  
+          </p:column>
+          <!--
+                    <p:column headerText="#{lang.receivable} #{lang.amount}" style="text-align: right" sortBy="#{appView.decimal(row.receivableAmount)}">
+                      <h:outputText value="#{appView.decimal(row.receivableAmount)}" />
+                      <f:facet name="footer">
+                        <div style="text-align: right;">
+                          <h:outputText value="#{appView.decimal(supplierOutstandingView.receivableAmount)}" />
+                        </div>
+                      </f:facet>
+                    </p:column>-->
+
+          <p:column headerText="#{lang.daysOutstanding}" sortBy="#{row.daysoutstanding}"  style="text-align: right" filterBy="#{row.daysoutstanding}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.daysoutstanding)}" escape="false" /></p:column>
+
+        </p:dataTable>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

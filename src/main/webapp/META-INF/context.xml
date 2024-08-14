@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="">
+  <Resource auth="Container" factory="org.jboss.weld.resources.ManagerObjectFactory" name="BeanManager" type="javax.enterprise.inject.spi.BeanManager"/>
+  <Resource auth="Container" connectionTimeout="1800000" dataSource.password="pass" dataSource.url="jdbc:postgresql://localhost:5432/traadodb" dataSource.user="traado" dataSourceClassName="org.postgresql.ds.PGSimpleDataSource" factory="com.zaxxer.hikari.HikariJNDIFactory" leakDetectionThreshold="125000" maximumPoolSize="60" minimumIdle="5" name="jdbc/traadoDS" poolName="EntityPool" type="javax.sql.DataSource"/>
+</Context>

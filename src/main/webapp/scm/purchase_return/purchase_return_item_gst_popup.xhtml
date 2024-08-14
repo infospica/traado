@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{purchaseReturnItemView.switchPurchaseReturnItem(main,main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReturn}" />
+    <ui:param name="subLabel" value="#{purchaseReturnItemView.purchaseReturn.purchaseReturnStockCat.title}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="navLabel" value="#{lang.product}" />
+    <ui:param name="ids" value="purchaseReturnItem" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+    <ui:param name="search" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" actionListener="#{purchaseReturnItemView.purchaseReturnItemPopupClose}" oncomplete="parent.purchaseReturnItemPopupReturned(); closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" id="prStockItemContainer" >
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="" />
+<!--          <ui:param name="menuright" value="#{purchaseReturnItemView.purchaseReturnNonMovingAndNearExpiry}" />-->
+          <!--          <ui:define name="menuleft">   
+                      <h:panelGroup layout="block" styleClass="L">
+                        <p:inputText styleClass="ib-m" id="purchaseReturnItemST" onkeyup="return callDtFilter(this.value, 'purchaseReturnItem');"  placeholder="#{lang.search} #{lang.product}"/>
+                      </h:panelGroup>
+                      <p:spacer width="5" />
+          
+                    </ui:define>-->
+          <ui:define name="menuright">       
+            <!--Product Search Panel-->
+            <h:panelGroup layout="block" id="productDiv" styleClass="L">
+              <p:autoComplete value="#{purchaseReturnItemView.productId}" completeMethod="#{purchaseReturnItemView.productAuto}" converter="wawo.LookupIntConverter"
+                              placeholder="#{lang.type} #{lang.productName}"
+                              id="productId" var="p" itemValue="#{p}" itemLabel="#{p.productName}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500"
+                              maxResults="500" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="ib-m" >
+                <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true" update="purchaseReturnItemDiv batchDiv" onstart="block();"
+                        listener="#{purchaseReturnItemView.productSelectEvent(main)}" oncomplete="$('#batchId_input').focus();unblock();updateRtrnFooter();updateAvlFooter();" />
+              </p:autoComplete>
+            </h:panelGroup>
+            <p:spacer width="5" />
+            <!--Batch Search Panel-->
+            <h:panelGroup layout="block" id="batchDiv" styleClass="L">
+              <p:autoComplete value="#{purchaseReturnItemView.batch}" completeMethod="#{purchaseReturnItemView.batchAuto}" converter="wawo.LookupIntConverter"
+                              placeholder="#{lang.search} #{lang.batchNo}"
+                              id="batchId" var="b" itemValue="#{b}" itemLabel="#{b.batchNo}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="300"
+                              maxResults="500" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="ib-m" 
+                              disabled="#{purchaseReturnItemView.productId eq null}" >
+                <f:attribute name="clazz" value="#{scmLookupView.productBatchClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productBatchById()}"/>
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true" update="purchaseReturnItemDiv" onstart="block();" oncomplete="updateRtrnFooter();updateAvlFooter();unblock();"
+                        listener="#{purchaseReturnItemView.batchSelectEvent(main)}" />
+              </p:autoComplete>
+            </h:panelGroup>
+            <!-- Load Button -->
+            <p:commandButton value="#{lang.load} #{lang.all}" action="#{purchaseReturnItemView.loadPurchaseReturnStock(main)}" styleClass="btn btn-info ib-m" id="loadBtnId"
+                             process="purchaseReturnItemF" update="productDiv batchDiv purchaseReturnItemDiv" disabled="#{!purchaseReturnItemView.loadable}" onstart="block();"
+                             oncomplete="updateRtrnFooter();updateAvlFooter();unblock();" >
+            </p:commandButton>    
+            <!--Select Button-->
+            <p:commandButton actionListener="#{purchaseReturnItemView.insertPurchaseReturnItems(main)}" title="#{lang.select}"
+                             onclick="return preSelect('purchaseReturnItemWidget');" oncomplete="parent.purchaseReturnItemPopupReturned();unblock();"
+                             icon="fa fa-check" iconPos="left" styleClass="btn btn-primary" value="#{lang.select}" update="numberOfItemsDiv" >
+            </p:commandButton>
+            <!--Select and Close Button-->
+            <p:commandButton actionListener="#{purchaseReturnItemView.insertPurchaseReturnItems(main)}" title="#{lang.select}"
+                             onclick="return preSelect('purchaseReturnItemWidget');"
+                             icon="fa fa-check" iconPos="left" styleClass="btn btn-primary" value="#{lang.select} #{lang.andclose}"
+                             oncomplete="parent.purchaseReturnItemPopupReturned();closePopup()" >
+            </p:commandButton>
+            <p:spacer width="40" />
+            <h:panelGroup id="numberOfItemsDiv"  >
+              <h:outputText value="#{lang.numberOfItems} #{lang.selected} " rendered="#{purchaseReturnItemView.selectedItemsNo gt 0}"/>
+              <h:outputText value="#{purchaseReturnItemView.selectedItemsNo}" styleClass="btn btn-primary" rendered="#{purchaseReturnItemView.selectedItemsNo gt 0}"/>
+            </h:panelGroup>
+          </ui:define>
+
+          <h:panelGroup layout="block" id="purchaseReturnItemDiv">
+            <p:dataTable id="purchaseReturnItemTable"
+                         var="purchaseReturnStockItemVar"
+                         widgetVar="purchaseReturnItemWidget"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{purchaseReturnItemView.stockItemList}"
+                         rowKey="#{purchaseReturnStockItemVar.invoiceProductKey}"
+                         selection="#{purchaseReturnItemView.purchaseReturnStockItem}">
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('purchaseReturnItemWidget').filter()" /> 
+                </p:outputPanel>
+              </f:facet>
+              <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+              <p:ajax event="rowSelectCheckbox"  />
+              <p:ajax event="rowUnselectCheckbox" />
+              <p:ajax event="toggleSelect" update="loadBtnId" />
+              <p:column selectionMode="multiple" />
+
+              <!-- Product Name -->
+              <p:column headerText="#{lang.productName}" sortBy="#{purchaseReturnStockItemVar.productName}" filterBy="#{purchaseReturnStockItemVar.productName}" >
+                <h:outputText value="#{purchaseReturnStockItemVar.productName}"  escape="false" />
+              </p:column>
+
+              <!-- Batch No-->
+              <p:column headerText="#{lang.batchNumber}" sortBy="#{purchaseReturnStockItemVar.batchNo}" filterBy="#{purchaseReturnStockItemVar.batchNo}" >
+                <h:outputText value="#{purchaseReturnStockItemVar.batchNo}"  escape="false" />
+              </p:column>
+
+              <!-- Expiry Date -->
+              <p:column headerText="#{lang.expiryDate}" sortBy="#{purchaseReturnStockItemVar.expiryDateActual}" filterBy="#{purchaseReturnStockItemVar.expiryDateActual}" >
+                <h:outputText value="#{sysRuntimeView.dateToMMYY(purchaseReturnStockItemVar.expiryDateActual)}"  escape="false" />
+              </p:column>
+
+              <!-- reference No-->
+              <p:column headerText="#{lang.referenceNo}" sortBy="#{purchaseReturnStockItemVar.referenceNo}" filterBy="#{purchaseReturnStockItemVar.referenceNo}" >
+                <h:outputText value="#{purchaseReturnStockItemVar.referenceNo}"  escape="false" />
+              </p:column>
+
+              <!-- reference Date -->
+              <p:column headerText="#{lang.reference} #{lang.date}" sortBy="#{purchaseReturnStockItemVar.referenceDate}" filterBy="#{purchaseReturnStockItemVar.referenceDate}" >
+                <h:outputText value="#{appView.date(purchaseReturnStockItemVar.referenceDate)}"  escape="false" />
+              </p:column>
+
+
+              <!-- Value MRP -->
+              <p:column headerText="#{lang.mrp}" sortBy="#{purchaseReturnStockItemVar.mrpValue}" filterBy="#{purchaseReturnStockItemVar.mrpValue}" >
+                <h:outputText value="#{purchaseReturnStockItemVar.mrpValue}"  escape="false" />
+              </p:column>
+
+              <!--               Purchase Date 
+                            <p:column headerText="#{lang.purchase} #{lang.date}" filterBy="#{purchaseReturnStockItemVar.expiryDateActual}" >
+                              <h:outputText value="#{appView.date(purchaseReturnStockItemVar.expiryDateActual)}"  escape="false" />
+                            </p:column>-->
+
+              <!-- Landing Rate -->
+              <p:column headerText="#{lang.landingPrice}" filterBy="#{purchaseReturnStockItemVar.landingRateCompany}" >
+                <h:outputText value="#{appView.decimal(purchaseReturnStockItemVar.landingRateCompany)}"  escape="false" />
+              </p:column>
+
+              <!-- Value Rate -->
+              <p:column headerText="#{lang.purchaseRate}" filterBy="#{purchaseReturnStockItemVar.valueRate}" >
+                <h:outputText value="#{appView.decimal(purchaseReturnStockItemVar.valueRate)}"  escape="false" />
+              </p:column>
+
+              <!-- Available Quantity -->
+              <p:column headerText="#{lang.available} #{lang.qty}" filterBy="#{purchaseReturnStockItemVar.quantityAvailable}" style="text-align: right" >
+                <h:outputText value="#{appView.decimal(purchaseReturnStockItemVar.quantityAvailable)}"  escape="false" style="color: #108210;" />
+                <f:facet name="footer">
+                  <h:panelGroup layout="block" id="aqtyDiv">
+                    <span>Total : </span><h:outputText style="color: #108210;" value="#{appView.decimal(purchaseReturnItemView.quantityAvailable)}" />
+                  </h:panelGroup>
+                </f:facet>
+              </p:column>
+
+              <!-- Return Quantity -->
+              <p:column headerText="#{lang.retrunQty}" filterBy="#{purchaseReturnStockItemVar.qty}" style="text-align: right">
+                <p:inputNumber value="#{purchaseReturnStockItemVar.qty}" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{purchaseReturnStockItemVar.quantityAvailable eq null? 0 : purchaseReturnStockItemVar.quantityAvailable }"
+                               style="color:#ed143d;" decimalPlaces="2">
+                  <p:ajax process="@this" event="change" update="@this" oncomplete="updateRtrnFooter();" listener="#{purchaseReturnItemView.returnQtyChangeEvent}" />
+                </p:inputNumber>
+                <f:facet name="footer">
+                  <h:panelGroup layout="block" id="rqtyDiv">
+                    <span></span><h:outputText style="color:#ed143d;" value="#{appView.decimal(purchaseReturnItemView.quantityReturn)}" />
+                  </h:panelGroup>
+                </f:facet>
+              </p:column>
+
+              <!-- Source Type -->
+              <p:column headerText="#{lang.sourceType}" filterBy="#{purchaseReturnStockItemVar.productSourceType}" rendered="#{purchaseReturnItemView.purchaseReturn.purchaseReturnStockCat.id eq 1}">
+                <p:commandLink actionListener="#{purchaseReturnItemView.loadRelatedItemsList(main, purchaseReturnStockItemVar.productEntryDetailId)}"
+                               oncomplete="PF('overlay').show();" id="tagBtn" update="overlay">
+                  <h:outputText value="#{purchaseReturnStockItemVar.productSourceType}"  escape="false" />
+                </p:commandLink>
+                <p:overlayPanel id="overlay" dynamic="true" dismissable="true"  showCloseIcon="true"  widgetVar="overlay" for="tagBtn" showEvent="none" hideEvent="none" at="left" style="width:auto;min-width: 400px;" >  
+                  <p:panelGrid style="height: 90px;">
+                    <f:facet name="header">
+                      <p:row>
+                        <p:column style="text-align: left;width:13%">Invoice No</p:column>
+                        <p:column style="text-align: right;width:5%">Source Type</p:column>
+                      </p:row>
+                    </f:facet>
+
+                    <ui:repeat value="#{purchaseReturnItemView.relatedItemsList}" var="row">
+                      <p:row>
+                        <p:column style="text-align: left;width:13%">
+                          <p:commandLink actionListener="#{purchaseReturnItemView.showPopup(row.id,row.title)}" immediate="true" >
+                            <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+                          </p:commandLink>
+                        </p:column>
+                        <p:column style="text-align: right;width:5%">#{row.title}</p:column>
+                      </p:row>
+                    </ui:repeat>
+                  </p:panelGrid>
+                </p:overlayPanel>
+              </p:column>
+            </p:dataTable>
+          </h:panelGroup>
+
+          <p:remoteCommand name="updateRtrnFooter" process="@this" update="purchaseReturnItemTable:rqtyDiv" />
+          <p:remoteCommand name="updateAvlFooter" process="@this" update="purchaseReturnItemTable:aqtyDiv" />
+
+          <p:dialog widgetVar="emptyTable" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+            <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+            <p:commandButton value="#{lang.btnOk}" onclick="wdgOff('emptyTable')" type="button" title="#{lang.btnYes}" />
+          </p:dialog>
+          <script>
+            //<![CDATA[
+            function preSelect(widget) {
+              var rowcount = PF(widget).getSelectedRowsCount();
+              if (rowcount == 0) {
+                PF('emptyTable').show();
+                return false;
+              }
+              return true;
+            }
+            //]]>
+          </script>
+        </ui:decorate>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</html>

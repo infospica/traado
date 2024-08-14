@@ -1,0 +1,230 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{productCategoryView.switchProductCategory(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productCategory}" />
+    <ui:param name="ids" value="productCategory" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{productCategoryView.productCatClose}" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productCategoryView.deleteProductCategory(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productCategoryWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productCategoryView.cloneProductCategory(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productCategoryView.deleteProductCategory(main)}" value="#{lang.delete}" onclick="wdgOff('productCategoryWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productCategoryView.saveProductCategory(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"   rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+      <!-- Title -->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{productCategoryView.productCategory.title}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="afterForm">      
+
+      <!-- GST Regime Tax Codes -->
+      <ui:fragment rendered="#{productCategoryView.gstRegime}">
+        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+
+          <!-- Commodity -->
+          <p:outputLabel value="#{lang.commodity}" for="productCategoryCommodityIdGst"/>
+          <h:panelGroup id="gstCommodityGstDiv">                 
+            <p:autoComplete value="#{productCategoryView.productCategory.commodityId}" completeMethod="#{productCategoryView.commodityAuto}" converter="wawo.LookupIntConverter" 
+                            required="true" requiredMessage="#{lang.commodity} #{lang.isRequired}" id="productCategoryCommodityIdGst" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                            emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
+                            styleClass="fw" readonly="#{!(main.isNew() or (productCategoryView.draft and (userRuntimeView.privilege.editField or userRole.isRoot())))}" >
+              <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+              <p:ajax event="itemSelect" process="@this" immediate="true" update="hsnCode productCategoryPurchaseTaxCodeId productCategorysalesTaxCodeId" listener="#{productCategoryView.gstCommoditySelectEvent}" />
+            </p:autoComplete>        
+            <p:message for="productCategoryCommodityIdGst" display="text" />
+          </h:panelGroup>
+
+          <!-- HSN Code -->
+          <p:outputLabel value="#{lang.hsnCode}" for="hsnCode" />
+          <h:panelGroup>
+            <p:inputText value="#{productCategoryView.productCategory.hsnCode}" readonly="#{!(main.isNew() or (productCategoryView.draft and (userRuntimeView.privilege.editField or userRole.isRoot())))}" maxlength="10" id="hsnCode" validator="wawo.WhiteSpaceValidator"
+                         required="true" requiredMessage="#{lang.hsnCode} #{lang.isRequired}">
+              <f:validateLength minimum="2"/>
+            </p:inputText>
+
+            <p:message for="hsnCode" display="text" styleClass="fw" />
+          </h:panelGroup>
+
+          <!-- Purchase GST tax Code-->
+          <p:outputLabel value="#{lang.purchaseTax}" for="productCategoryPurchaseTaxCodeId"/>
+          <h:panelGroup id="purchaseTaxDiv">
+            <p:selectOneMenu value="#{productCategoryView.productCategory.purchaseTaxCodeId}" converter="omnifaces.SelectItemsConverter" 
+                             required="true" requiredMessage="#{lang.purchaseTax} #{lang.isRequired}"
+                             disabled="#{!(main.isNew() or (productCategoryView.draft and (userRuntimeView.privilege.editField or userRole.isRoot())))}"
+                             id="productCategoryPurchaseTaxCodeId">
+              <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+              <f:selectItems value="#{productCategoryView.lookupGstTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+              <p:ajax event="itemSelect" process="purchaseTaxDiv" update="productCategorysalesTaxCodeId" listener="#{productCategoryView.gstPurchaseTaxItemSelectEvent}" />
+            </p:selectOneMenu>
+            <p:message for="productCategoryPurchaseTaxCodeId" display="text" />
+          </h:panelGroup> 
+
+          <!-- Sales GST tax Code-->
+          <p:outputLabel value="#{lang.salesTax}" for="productCategorysalesTaxCodeId"/>
+          <h:panelGroup id="salesTaxDiv">
+            <p:selectOneMenu value="#{productCategoryView.productCategory.salesTaxCodeId}" converter="omnifaces.SelectItemsConverter" 
+                             required="true" requiredMessage="#{lang.salesTax} #{lang.isRequired}"
+                             id="productCategorysalesTaxCodeId"  disabled="true" >
+              <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+              <f:selectItems value="#{productCategoryView.lookupGstTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+              <p:ajax event="itemSelect" process="salesTaxDiv" update="@this" />
+            </p:selectOneMenu>
+            <p:message for="productCategorysalesTaxCodeId" display="text" />
+          </h:panelGroup>
+
+          <!-- Purchase Cess Tax Code-->
+          <p:outputLabel value="#{lang.purchaseTaxCess}" for="productCategoryPurchaseCessTaxCodeId"/>
+          <h:panelGroup>
+            <p:selectOneMenu value="#{productCategoryView.productCategory.purchaseCessTaxCodeId}"                               
+                             id="productCategoryPurchaseCessTaxCodeId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+              <f:selectItems value="#{productCategoryView.lookupGstCessTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+            </p:selectOneMenu>
+            <p:message rendered="false" for="productCategoryPurchaseCessTaxCodeId" display="text" />
+          </h:panelGroup>
+
+          <!-- Sales Cess Tax Code-->
+          <p:outputLabel value="#{lang.salesTaxCess}" for="productCategorySalesCessTaxCodeId"/>
+          <h:panelGroup>
+            <p:selectOneMenu value="#{productCategoryView.productCategory.salesCessTaxCodeId}"  id="productCategorySalesCessTaxCodeId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+              <f:selectItems value="#{productCategoryView.lookupGstCessTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+            </p:selectOneMenu>
+            <p:message rendered="false" for="productCategorySalesCessTaxCodeId" display="text" />
+          </h:panelGroup>
+
+        </p:panelGrid>
+      </ui:fragment>
+
+      <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+        <!-- Sort Order -->
+        <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+        <h:panelGroup>
+          <p:inputNumber value="#{productCategoryView.productCategory.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" thousandSeparator=""/>
+          <p:message for="sortOrder" display="text"/>
+        </h:panelGroup>      
+
+        <!-- Status -->
+        <p:outputLabel value="#{lang.status}" for="statusId"/>
+        <h:panelGroup>
+          <p:selectOneMenu value="#{productCategoryView.productCategory.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
+                           id="statusId">
+            <f:selectItems value="#{productCategoryView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+          </p:selectOneMenu>
+          <p:message for="statusId" display="text" />
+        </h:panelGroup> 
+      </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(productCategoryView.productCategory.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(productCategoryView.productCategory.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(productCategoryView.productCategory.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(productCategoryView.productCategory.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >      
+      <p:autoComplete value="#{productCategoryView.commodity}" completeMethod="#{productCategoryView.commodityAuto}" converter="wawo.LookupIntConverter"  
+                      required="true" requiredMessage="#{lang.commodity} #{lang.isRequired}" id="productCommodity" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                      emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
+                      styleClass="fw" >
+        <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+        <p:ajax event="itemSelect" process="@this" immediate="true" update="productCategoryTable" listener="#{productCategoryView.commoditySelectEvent}" />
+      </p:autoComplete>        
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="productCategoryTable" var="productCategoryVar" widgetVar="productCategoryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{productCategoryView.productCategoryLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productCategoryVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productCategoryView.productCategorySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <!-- Title -->
+        <p:column styleClass="w-200" sortBy="#{productCategoryVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productCategoryVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productCategoryView.productCategory}" value="#{productCategoryVar}" />
+          </p:commandLink>
+        </p:column>        
+
+        <!-- Commodity -->
+        <p:column styleClass="w-300" sortBy="#{productCategoryVar.commodityId.title}" field="commodity_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.commodity}" title="#{lang.commodity}"/></f:facet>
+          <h:outputText value="#{appView.title(productCategoryVar.commodityId.title)}" title="#{productCategoryVar.commodityId.title}" escape="false" />
+        </p:column>
+
+        <!-- HSN Code -->
+        <p:column  sortBy="#{productCategoryVar.hsnCode}" field="scm_product_category.hsn_code" rendered="#{userRuntimeView.isGstRegime()}">
+          <f:facet name="header"><h:outputText value="#{lang.hsnCode}" title="#{lang.hsnCode}"/></f:facet>
+          <h:outputText value="#{appView.display(productCategoryVar.hsnCode)}" title="#{appView.title(productCategoryVar.hsnCode)}" escape="false" />
+        </p:column>
+
+        <!-- Purchase Cess -->
+        <p:column sortBy="#{productCategoryVar.purchaseTaxCodeId}" field="scm_product_category.purchase_tax_code_id">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseTax}" title="#{lang.purchaseTax}"/></f:facet>
+          <h:outputText value="#{appView.display(productCategoryVar.purchaseTaxCodeId.code)}" title="#{appView.title(productCategoryVar.purchaseTaxCodeId.code)}" escape="false" />
+        </p:column>
+
+        <!-- Sales Cess -->
+        <p:column sortBy="#{productCategoryVar.salesTaxCodeId}" field="scm_product_category.sales_tax_code_id">
+          <f:facet name="header"><h:outputText value="#{lang.salesTax}" title="#{lang.salesTax}"/></f:facet>
+          <h:outputText value="#{appView.display(productCategoryVar.salesTaxCodeId.code)}" title="#{appView.title(productCategoryVar.salesTaxCodeId.code)}" escape="false" />
+        </p:column>
+
+        <!-- Purchase Cess -->
+        <p:column sortBy="#{productCategoryVar.purchaseCessTaxCodeId}" field="scm_product_category.purchase_cess_tax_code_id">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseTaxCess}" title="#{lang.purchaseTax}"/></f:facet>
+          <h:outputText value="#{appView.display(productCategoryVar.purchaseCessTaxCodeId.code)}" title="#{appView.title(productCategoryVar.purchaseCessTaxCodeId.code)}" escape="false" />
+        </p:column>
+
+        <!-- Sales Cess -->
+        <p:column sortBy="#{productCategoryVar.salesCessTaxCodeId}" field="scm_product_category.sales_cess_tax_code_id">
+          <f:facet name="header"><h:outputText value="#{lang.salesTaxCess}" title="#{lang.salesTaxCess}"/></f:facet>
+          <h:outputText value="#{appView.display(productCategoryVar.salesCessTaxCodeId.code)}" title="#{appView.title(productCategoryVar.salesCessTaxCodeId.code)}" escape="false" />
+        </p:column>
+
+
+        <!-- Status -->
+        <p:column sortBy="#{productCategoryVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(productCategoryVar.statusId.title)}" title="#{appView.title(productCategoryVar.statusId.title)}" rendered="#{productCategoryVar.statusId.id==1}" escape="false" />
+          <h:outputText value="#{appView.display(productCategoryVar.statusId.title)}" title="#{appView.title(productCategoryVar.statusId.title)}" rendered="#{productCategoryVar.statusId.id==3}" style="color:grey" escape="false" />
+        </p:column>
+        <p:column styleClass="w-40" exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(productCategoryVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productCategoryVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productCategoryVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productCategoryVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(productCategoryVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

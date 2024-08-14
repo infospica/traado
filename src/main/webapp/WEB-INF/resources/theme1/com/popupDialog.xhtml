@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"
+                >
+  <div class="popup p-t-0" data-modal="#{frameId eq null ? 'frameId' : frameId}" id="#{frameId eq null ? 'frameId' : frameId}" data-xsource="false" data-loader="true" data-dismiss="true">
+<!--    <h:panelGroup class="popHeader" rendered="#{param.close eq null ? false : param.close}">
+      <span data-get-text="true">Heading</span>
+      <a href="javascript:;" class="close ignoreLoad" data-hide="popupIframe">X</a>
+      </h:panelGroup>-->
+
+    <div class="popContent" data-reset="true" style="height:100%">
+      Content Area
+    </div>
+
+    <div class="popFooter">
+      <input type="hidden" id="jsonExport" name="jsonExport" data-get-data-focus="true" />
+      <!--		<div class="btn btn-default pull-left" data-hide="popupIframe" data-get-data-focus="true">Cancel</div>
+          <div class="btn btn-default pull-right" data-hide="popupIframe" data-get-data-focus="true">OK</div>-->
+    </div>
+  </div>
+  <o:importConstants type="spica.sys.FileConstant" />
+  <ui:insert />
+  <ui:include src="popupDialogInit.xhtml" />
+</ui:composition>
+
+

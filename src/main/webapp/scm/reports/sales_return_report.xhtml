@@ -1,0 +1,333 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{salesReturnReportView.setSalesReturnReportList(null)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesReturn} #{lang.report} "/>
+    <ui:param name="ids" value="#{salesReturnReportView.reportNames.get(salesReturnReportView.filterParameters.reportType)}"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList" >
+      <p:selectOneMenu value="#{salesReturnReportView.type}" >
+        <f:selectItem itemLabel="All" itemValue="0" />
+        <f:selectItem itemLabel="Damaged" itemValue="2" />
+        <f:selectItem itemLabel="Non-Moving" itemValue="1" />
+        <p:ajax event="change" process="@this" onstart="block()" oncomplete="unblock()" update="InvoiceWiseTable" listener="#{salesReturnReportView.setSalesReturnReportList(null)}"  />
+      </p:selectOneMenu>
+
+      <p:selectOneMenu id="reportType" value="#{salesReturnReportView.filterParameters.reportType}"  styleClass="l-p-10" valueChangeListener="#{salesReturnReportView.applyFilter}"  >
+        <f:selectItem itemLabel="#{lang.selectReportNameCombo}" itemValue="#{null}" />
+        <f:selectItem itemLabel="#{lang.invoiceWise}" itemValue="#{ReportConstant.PRETURN_INVOICE_WISE}" />
+        <f:selectItem itemLabel="#{lang.invoiceProductWise}" itemValue="#{ReportConstant.PRETURN_INVOICE_PRODUCT_WISE}" />
+        <p:ajax event="itemSelect" process="reportType accountDiv" onstart="block()" oncomplete="unblock()" update="f1"/>
+      </p:selectOneMenu>
+      <h:panelGroup id="accountGroupDiv" rendered="true">
+
+        <p:autoComplete id='accountGroup'  value="#{salesReturnReportView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" cacheTimeout="2000" queryDelay="500" scrollHeight="400" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="false" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" 
+                        title="#{lang.accountGroup}" dynamic="true" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.groupName}" />
+          </p:column>
+          <p:column style="width: 40px;">
+            <h:outputText value="#{e.groupCode}" />
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-users" style="color:#000;"></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <i class="fa fa-users" style="color:#CCC;" ></i>
+            </p:fragment>
+          </p:column>
+          <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv customerDiv" listener="#{salesReturnReportView.accountGroupSelectEvent}" />
+        </p:autoComplete> 
+
+      </h:panelGroup> 
+      <h:panelGroup id="accountDiv">
+        <p:autoComplete id='account'  value="#{salesReturnReportView.filterParameters.account}" completeMethod="#{salesReturnReportView.accountAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" scrollHeight="400" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                        title="#{lang.accountNumber}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.vendorId.vendorName}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountCode}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.companyTradeProfileId.title}" />
+          </p:column>
+        </p:autoComplete>   
+      </h:panelGroup>
+      <h:panelGroup id="customerDiv" >  
+        <p:autoComplete id='customer'   value="#{salesReturnReportView.filterParameters.customer}" completeMethod="#{salesReturnReportView.customerAuto}" converter="wawo.LookupIntConverter" 
+                        var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectCustomerCombo}" autocomplete="off" forceSelection ="true" required="false" title="#{lang.customerName}">
+          <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>           
+        </p:autoComplete> 
+      </h:panelGroup>
+
+      <!-- From Date -->
+      <p:calendar value="#{salesReturnReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.fromDate} #{lang.invalidDate}" maxlength="10" 
+                  id="fromDate" pages="1" showButtonPanel="true" navigator="true" mask="true" size="10" placeholder="#{lang.fromDate}" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                  maxdate="#{salesReturnReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate:salesReturnReportView.filterParameters.today}"
+                  onclick="this.select();" onfocus="this.select()" >
+        <p:ajax event="dateSelect" process="@this" listener="#{salesReturnReportView.setSalesReturnReportList(null)}" update="toDate InvoiceWiseTable InvoiceProductWiseTable" onstart="block();" oncomplete="unblock();" />
+        <p:ajax event="change" process="@this" listener="#{salesReturnReportView.setSalesReturnReportList(null)}" update="toDate InvoiceWiseTable InvoiceProductWiseTable" onstart="block();" oncomplete="unblock();" />
+      </p:calendar>
+
+      <!-- To Date -->
+      <p:calendar value="#{salesReturnReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="10" 
+                  id="toDate" pages="1" showButtonPanel="true" navigator="true" mask="true" size="10" placeholder="#{lang.toDate}"  onfocus="this.select();"
+                  mindate="#{salesReturnReportView.filterParameters.fromDate}" onclick="this.select();"
+                  maxdate="#{salesReturnReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate:salesReturnReportView.filterParameters.today}"  >
+        <p:ajax event="dateSelect" process="@this" listener="#{salesReturnReportView.setSalesReturnReportList(null)}" update="toDate InvoiceWiseTable InvoiceProductWiseTable" onstart="block();" oncomplete="unblock();" />
+
+      </p:calendar>
+
+      <p:commandButton value="#{lang.ok}" actionListener="#{salesReturnReportView.submitForm}" styleClass="btn btn-info" onclick="block();" oncomplete="unblock();" 
+                       process="reportType accountGroupDiv accountDiv customerDiv toDate fromDate" update="f1"  style="margin-left: 3px; margin-bottom: 4px;"  >
+      </p:commandButton>
+
+    </ui:define>
+
+
+
+    <ui:define name="list">
+      <p:selectCheckboxMenu   id="columns" value="#{salesReturnReportView.selectedColumns}" label="Columns" 
+                              filter ="true" filterMatchMode="startsWith" panelStyle="width:250px" >
+        <f:selectItems value="#{salesReturnReportView.columnNames}"  />
+        <p:ajax event="change" listener="#{salesReturnReportView.applyColumnFilter}" update="reportList" />
+      </p:selectCheckboxMenu>
+
+      <h:panelGroup id="reportList" >
+
+
+
+        <p:dataTable id="InvoiceWiseTable" var="row" widgetVar="salesReturnReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{salesReturnReportView.getSalesReturnReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+                     rendered="#{salesReturnReportView.filterParameters.reportType eq '1'}" >
+
+
+<!--<p:column headerText="#{lang.supplier}" rendered="#{salesReturnReportView.companyCustomerSalesRender.supplierName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>-->
+          <p:column headerText="#{lang.invoiceNo}" rendered="#{salesReturnReportView.companyCustomerSalesRender.invoiceNo}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+            <p:commandLink actionListener="#{popUpView.showSalesReturn(row.id)}" immediate="true" 
+                           rendered="#{row.splitInvoice eq 0}">
+              <h:outputText value="#{appView.title(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+            </p:commandLink>
+            <p:commandLink actionListener="#{popUpView.showSalesReturnSplitById(row.id)}" immediate="true" 
+                           rendered="#{row.splitInvoice eq 1}">
+              <h:outputText value="#{appView.title(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+            </p:commandLink>
+          </p:column>
+          <p:column headerText="#{lang.regno}"  sortBy="#{row.regNo}"  filterBy="#{row.regNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.regNo)}" title="#{appView.title(row.regNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.entryDate}" rendered="#{salesReturnReportView.companyCustomerSalesRender.entryDate}" sortBy="#{row.entryDate}"  filterBy="#{row.entryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.customerName}" rendered="#{salesReturnReportView.companyCustomerSalesRender.customerName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.gstNo}" rendered="#{salesReturnReportView.companyCustomerSalesRender.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.district}" rendered="#{salesReturnReportView.companyCustomerSalesRender.districtName}" sortBy="#{row.districtName}"  filterBy="#{row.districtName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.districtName)}" title="#{appView.title(row.districtName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.territory}" rendered="#{salesReturnReportView.companyCustomerSalesRender.territoryName}" sortBy="#{row.territoryName}"  filterBy="#{row.territoryName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.territoryName)}" title="#{appView.title(row.territoryName)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.goodsValue}" rendered="#{salesReturnReportView.companyCustomerSalesRender.goodsValue}" sortBy="#{row.goodsValue}"  style="text-align: right" filterBy="#{row.goodsValue}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.goodsValue)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.goodsValue)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.schemeDiscount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.schemeDiscount}" sortBy="#{row.schemeDiscount}"  style="text-align: right" filterBy="#{row.schemeDiscount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.schemeDiscount)}" escape="false" rendered="#{row.schemeDiscount gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.schemeDiscount)}" rendered="#{salesReturnReportView.schemeDiscount gt 0}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.productDiscount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.productDiscount}" sortBy="#{row.productDiscount}"  style="text-align: right" filterBy="#{row.productDiscount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.productDiscount)}" escape="false" rendered="#{row.productDiscount gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.productDiscount)}" rendered="#{salesReturnReportView.productDiscount gt 0}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.invoiceDiscount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.invoiceDiscount}" sortBy="#{row.invoiceDiscount}"  style="text-align: right" filterBy="#{row.invoiceDiscount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.invoiceDiscount)}" escape="false" rendered="#{row.invoiceDiscount gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.invoiceDiscount)}" rendered="#{salesReturnReportView.invoiceDiscount gt 0}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.salesValue}" rendered="#{salesReturnReportView.companyCustomerSalesRender.returnValue}" sortBy="#{row.returnValue}"  style="text-align: right" filterBy="#{row.returnValue}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.returnValue)}" escape="false" rendered="#{row.returnValue gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.returnValue)}" rendered="#{salesReturnReportView.returnValue gt 0}" />
+            </f:facet>
+          </p:column>  
+          <p:column headerText="#{lang.igst}" rendered="#{salesReturnReportView.companyCustomerSalesRender.igst}" sortBy="#{row.igst}" style="text-align: right" filterBy="#{row.igst}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.igst)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.igst)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.cgst}" rendered="#{salesReturnReportView.companyCustomerSalesRender.cgst}" sortBy="#{row.cgst}"  style="text-align: right" filterBy="#{row.cgst}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.cgst)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.cgst)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.sgst}" rendered="#{salesReturnReportView.companyCustomerSalesRender.sgst}" sortBy="#{row.sgst}"  style="text-align: right" filterBy="#{row.sgst}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.sgst)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.sgst)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.gstNo}  #{lang.amount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.gstAmount}" sortBy="#{row.gstAmount}"  style="text-align: right" filterBy="#{row.gstAmount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.gstAmount)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.gstAmt)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.bill} #{lang.amount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.netAmount}" sortBy="#{row.netAmount}"  style="text-align: right" filterBy="#{row.netAmount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.number(row.invoiceAmount)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.billAmt)}" />
+            </f:facet>
+          </p:column>        
+          <p:column headerText="#{lang.type}" rendered="#{salesReturnReportView.companyCustomerSalesRender.returnType}" sortBy="#{row.returnType}"  filterBy="#{row.returnType}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.returnType)}" title="#{appView.title(row.returnType)}" escape="false" /></p:column>
+        </p:dataTable>
+
+
+
+        <p:dataTable id="InvoiceProductWiseTable" var="row" widgetVar="purchaseReturnReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{salesReturnReportView.getSalesReturnReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  rendered="#{salesReturnReportView.filterParameters.reportType eq '2'}" >
+
+
+          <p:column headerText="#{lang.invoiceNo}" rendered="#{salesReturnReportView.companyCustomerSalesRender.invoiceNo}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+            <p:commandLink actionListener="#{salesReturnReportView.openSalesReturnPopUp(row.id)}" immediate="true" >
+              <h:outputText value="#{appView.title(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+            </p:commandLink>
+          </p:column>
+          <p:column headerText="#{lang.regno}"  sortBy="#{row.regNo}"  filterBy="#{row.regNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.regNo)}" title="#{appView.title(row.regNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.entryDate}" rendered="#{salesReturnReportView.companyCustomerSalesRender.entryDate}" sortBy="#{row.entryDate}"  filterBy="#{row.entryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
+<p:column headerText="#{lang.regno}" sortBy="#{row.regNo}" filterBy="#{row.regNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.regNo)}" title="#{appView.title(row.regNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.customerName}" rendered="#{salesReturnReportView.companyCustomerSalesRender.customerName}" sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.gstNo}" rendered="#{salesReturnReportView.companyCustomerSalesRender.gstNo}" sortBy="#{row.gstNo}"  filterBy="#{row.gstNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.gstNo)}" title="#{appView.title(row.gstNo)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.mfr}" rendered="#{salesReturnReportView.companyCustomerSalesRender.mfrCode}" sortBy="#{row.mfrCode}"  filterBy="#{row.mfrCode}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.mfrCode)}" title="#{appView.title(row.mfrCode)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.productName}" rendered="#{salesReturnReportView.companyCustomerSalesRender.productName}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.hsnCode}" rendered="#{salesReturnReportView.companyCustomerSalesRender.hsnCode}" sortBy="#{row.hsnCode}"  filterBy="#{row.hsnCode}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.packType}" rendered="#{salesReturnReportView.companyCustomerSalesRender.packType}" sortBy="#{row.packType}"  filterBy="#{row.packType}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.packType)}" title="#{appView.title(row.packType)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.batchNo}" rendered="#{salesReturnReportView.companyCustomerSalesRender.batchNo}" sortBy="#{row.batchNo}"  filterBy="#{row.batchNo}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.batchNo)}" title="#{appView.title(row.batchNo)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.expiryDate}" rendered="#{salesReturnReportView.companyCustomerSalesRender.expiryDate}" sortBy="#{row.expiryDate}"  filterBy="#{row.expiryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.expiryDate)}" escape="false" /></p:column>
+
+          <p:column headerText="#{lang.qty}" rendered="#{salesReturnReportView.companyCustomerSalesRender.qty}" sortBy="#{row.qty}"  style="text-align: right" filterBy="#{row.qty}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.qty)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.qty)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.qtyFree}" rendered="#{salesReturnReportView.companyCustomerSalesRender.qtyFree}" sortBy="#{row.freeQty}"  style="text-align: right" filterBy="#{row.freeQty}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.number(row.freeQty)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.display(salesReturnReportView.freeQty)}" />
+            </f:facet>
+          </p:column>
+
+          <p:column headerText="#{lang.mrp}" rendered="#{salesReturnReportView.companyCustomerSalesRender.valueMrp}" sortBy="#{row.valueMrp}"  style="text-align: right" filterBy="#{row.valueMrp}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.valueMrp)}" escape="false" />
+          </p:column>
+          <p:column headerText="#{lang.pts}" rendered="#{salesReturnReportView.companyCustomerSalesRender.valuePts}" sortBy="#{row.valuePts}"  style="text-align: right" filterBy="#{row.valuePts}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.valuePts)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.ptr}" rendered="#{salesReturnReportView.companyCustomerSalesRender.valuePtr}" sortBy="#{row.valuePtr}"  style="text-align: right" filterBy="#{row.valuePtr}" filterStyleClass="hidden"><h:outputText value="#{appView.decimal(row.valuePtr)}" escape="false" /></p:column>
+
+
+          <p:column headerText="#{lang.goodsValue}" rendered="#{salesReturnReportView.companyCustomerSalesRender.goodsValue}" sortBy="#{row.goodsValue}"  style="text-align: right" filterBy="#{row.goodsValue}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.goodsValue)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.goodsValue)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.schemeDiscount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.schemeDiscount}" sortBy="#{row.schemeDiscount}" style="text-align: right" filterBy="#{row.schemeDiscount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.schemeDiscount)}" escape="false" rendered="#{row.schemeDiscount gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.schemeDiscount)}" rendered="#{salesReturnReportView.schemeDiscount gt 0}"  />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.productDiscount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.productDiscount}" sortBy="#{row.productDiscount}"  style="text-align: right" filterBy="#{row.productDiscount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.productDiscount)}" escape="false" rendered="#{row.productDiscount gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.productDiscount)}" rendered="#{salesReturnReportView.productDiscount gt 0}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.invoiceDiscount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.invoiceDiscount}" sortBy="#{row.invoiceDiscount}"  style="text-align: right" filterBy="#{row.invoiceDiscount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.invoiceDiscount)}" escape="false" rendered="#{row.invoiceDiscount gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.invoiceDiscount)}" rendered="#{salesReturnReportView.invoiceDiscount gt 0}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.salesValue}" rendered="#{salesReturnReportView.companyCustomerSalesRender.returnValue}" sortBy="#{row.returnValue}"  style="text-align: right" filterBy="#{row.returnValue}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.returnValue)}" escape="false" rendered="#{row.returnValue gt 0}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.returnValue)}"  />
+            </f:facet>
+          </p:column>  
+          <p:column headerText="#{lang.igst}" rendered="#{salesReturnReportView.companyCustomerSalesRender.igst}" sortBy="#{row.igst}" style="text-align: right" filterBy="#{row.igst}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.igst)}" escape="false" rendered="#{row.igst gt 0}"/>
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.igst)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.cgst}" rendered="#{salesReturnReportView.companyCustomerSalesRender.cgst}" sortBy="#{row.cgst}"  style="text-align: right" filterBy="#{row.cgst}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.cgst)}" escape="false" rendered="#{row.cgst gt 0}"/>
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.cgst)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.sgst}" rendered="#{salesReturnReportView.companyCustomerSalesRender.sgst}" sortBy="#{row.sgst}"  style="text-align: right" filterBy="#{row.sgst}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.sgst)}" escape="false" rendered="#{row.sgst gt 0}"/>
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.sgst)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.gstNo}  #{lang.amount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.gstAmount}" sortBy="#{row.gstAmount}"  style="text-align: right" filterBy="#{row.gstAmount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.gstAmount)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.gstAmt)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.bill} #{lang.amount}" rendered="#{salesReturnReportView.companyCustomerSalesRender.netAmount}" sortBy="#{row.netAmount}"  style="text-align: right" filterBy="#{row.netAmount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.netAmount)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesReturnReportView.billAmt)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.type}" rendered="#{salesReturnReportView.companyCustomerSalesRender.returnType}" sortBy="#{row.returnType}"  filterBy="#{row.returnType}" filterStyleClass="hidden"><h:outputText value="#{appView.display(row.returnType)}" title="#{appView.title(row.returnType)}" escape="false" /></p:column>
+
+        </p:dataTable>
+
+
+
+      </h:panelGroup>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

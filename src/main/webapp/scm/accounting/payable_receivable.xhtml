@@ -1,0 +1,185 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >      
+  <style>.conArea { padding: 10px !important; }</style>  
+  <h:panelGroup layout="block" styleClass="row" rendered="#{actDetailItemView.accountingTransactionDetail.id == null and (actDetailItemView.showSettlement())}">
+    <h:panelGroup layout="block" styleClass="col-md-6" pt:data-fast-input="true"  >
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="label" value="#{actDetailItemView.headerPayable}"/>
+        <ui:define name="menuleft"> <h:panelGroup id="adjTotalDiv"> 
+                <h:outputText  value="#{appView.decimal(actDetailItemView.adjTotal)}" escape="false" styleClass="label" style="background-color: #{actDetailItemView.balanceAmount == 0 ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}"/> <p:autoUpdate/></h:panelGroup></ui:define>
+        <ui:define name="menuright"> <h:panelGroup id="adjSelfDiv">  
+            <!--<p:commandButton  actionListener="#{actDetailItemView.selfAdjust(main)}"  value="#{lang.selfadjust}" title="#{lang.selfadjust}" process="@this leftTable rightTable" styleClass="btn btn-primary" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{actDetailItemView.hasSelfAdjust()}" />--> 
+          </h:panelGroup> </ui:define>
+        <p:dataTable id="leftTable" var="detailItemVar" widgetVar="leftWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{actDetailItemView.accountingTransactionDetail.getDetailItemPayable()}" >
+          <p:column >
+            <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+<!--            <p:commandLink rendered="#{detailItemVar.settlement}" actionListener="#{popUpView.journalDetails(detailItemVar.accountingTransactionDetailId)}"  value="#{appView.display(detailItemVar.documentTypeId.title)}" title="#{appView.title(detailItemVar.documentTypeId.title)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+                <i class="fa fa-hand-o-left" ></i>
+            </p:commandLink> -->
+            <p:commandLink  actionListener="#{popUpView.journalDetails(detailItemVar.accountingTransactionDetailId)}"  value="#{appView.display(detailItemVar.documentTypeId.title)}" title="#{appView.title(detailItemVar.documentTypeId.title)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >                
+            </p:commandLink> 
+          </p:column>
+          <p:column styleClass="w-120">
+            <f:facet name="header" >
+              <h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}" escape="false" />
+            </f:facet>              
+            <h:outputText value="#{appView.display(detailItemVar.documentNumber)}" title="#{appView.title(detailItemVar.documentTypeId.title)} #{detailItemVar.accountingTransactionDetailId.accountingTransactionId.narration}" escape="false" rendered="#{detailItemVar.accountingTransactionDetailId.accountingTransactionId.entityId eq null}"/>
+            <p:commandLink action="#{actDetailItemView.showDetails(detailItemVar)}" value="#{appView.display(detailItemVar.documentNumber)}" title="#{detailItemVar.accountingTransactionDetailId.accountingTransactionId.narration}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{detailItemVar.accountingTransactionDetailId.accountingTransactionId.entityId ne null}">
+            </p:commandLink> 
+          </p:column>
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value=" #{lang.date} /  Ref. #{lang.no}" title=" #{lang.date} / Ref. #{lang.no}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.date(detailItemVar.accountingTransactionDetailId.entryDate)}" escape="false" 
+                          title="#{appView.date(detailItemVar.accountingTransactionDetailId.entryDate)} / #{appView.title(detailItemVar.referNumber)}" />
+            <h:outputText value="/ #{appView.title(detailItemVar.referNumber)}" rendered="#{detailItemVar.referNumber ne null}"
+                          title="#{appView.date(detailItemVar.accountingTransactionDetailId.entryDate)} / #{appView.title(detailItemVar.referNumber)}" escape="false" />
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.amount}" title="#{lang.amount}" escape="false" />
+            </f:facet>
+            <h:outputText id="balColor" value="#{appView.decimal(detailItemVar.netAmount)}" style="color: #{detailItemVar.fontColor}" escape="false" />
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.balance}" title="#{lang.balance}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.balanceAmount)}" escape="false" rendered="#{detailItemVar.settlement}" styleClass="label" style="background-color:#df6c4f;" />
+            <h:outputText value="#{appView.decimal(detailItemVar.balanceAmount)}" escape="false" rendered="#{!detailItemVar.settlement}" />
+          </p:column>  
+          <p:column >
+            <f:facet name="header">
+              <h:outputText value="#{lang.adjustment} #{lang.amount}" title="#{lang.adjustment} #{lang.amount}" escape="false" />
+            </f:facet>             
+            <p:inputNumber value="#{detailItemVar.adjustmentAmount}"  id="adjustmentAmount" valueChangeListener="#{actDetailItemView.adjustmentValueChange}" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{detailItemVar.balanceAmount ne null ? detailItemVar.balanceAmount: 0}" autocomplete="off" >
+              <p:ajax event="change" update="@this totalAmount adjSelfDiv balColor addBtn" listener="#{actDetailItemView.resetBalanceAmount(detailItemVar)}" />
+            </p:inputNumber>
+          </p:column>   
+          <p:column styleClass="w-40">
+            <h:panelGroup id="addBtn"  >
+              <p:commandButton actionListener="#{actDetailItemView.setAdjustmentBal(detailItemVar, true)}" value="+" styleClass="w-20"
+                               update="leftTable balColor" rendered="#{detailItemVar.adjustmentAmount eq null || detailItemVar.adjustmentAmount eq 0}" immediate="true" />
+              <p:commandButton actionListener="#{actDetailItemView.setAdjustmentBal(detailItemVar, false)}" value="-" styleClass="w-20" 
+                               update="leftTable balColor" rendered="#{detailItemVar.adjustmentAmount ne null and detailItemVar.adjustmentAmount > 0}" immediate="true" />
+            </h:panelGroup>
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.running} #{lang.balance}" title="#{lang.running} #{lang.balance}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.runningBalance)}" escape="false" style="color:##{detailItemVar.documentTypeId.voucherTypeId.displayColor}" title="#{detailItemVar.documentTypeId.voucherTypeId.title}" />
+          </p:column>  
+          <p:column styleClass="w-40" style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.dueDays}" title="#{lang.dueDays}" escape="false" />
+            </f:facet>           
+            <h:outputText value="#{detailItemVar.dueDays}" title="#{detailItemVar.dueDays}"  escape="false" />
+          </p:column>  
+          <p:columnGroup type="footer">
+            <p:row>
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="#{lang.total}" />
+              <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(actDetailItemView.accountingTransactionDetail.getDetailItemPayable().stream().map(item -> item.balanceAmount).sum())}" ></p:column>
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+            </p:row>     
+          </p:columnGroup>
+        </p:dataTable> 
+      </ui:decorate>
+    </h:panelGroup>
+    <h:panelGroup layout="block" styleClass="col-md-6" id="rightTable">
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="label" value="#{actDetailItemView.headerReceivale}"/>
+        <ui:define name="menuleft"> </ui:define>
+        <ui:define name="menuright"> 
+<!--  enable later   <p:selectBooleanCheckbox value="#{actDetailItemView.accountingTransactionDetail.showAllBills}" styleClass="w-140" itemLabel="Show All #{actDetailItemView.headerReceivale}" rendered="#{actDetailItemView.showAccountGroup() and actDetailItemView.lookupGroupAuto() ne null and actDetailItemView.lookupGroupAuto().size() gt 1}">
+            <p:ajax process="@this" listener="#{actDetailItemView.showAllEvent(main)}" update="rightTable"/>
+          </p:selectBooleanCheckbox>  -->
+        </ui:define>
+        <p:dataTable  var="detailItemVar" widgetVar="rightWidget" tableStyleClass="noHover mDataTable mDataTable-center fw editLinks"
+                      value="#{actDetailItemView.accountingTransactionDetail.getDetailItemReceivable()}" 
+                      rowKey="#{detailItemVar.id}" selection="#{actDetailItemView.accountingTransactionDetail.accountingTransactionDetailItemSelected}"
+                      rowHover="false" rowSelectMode="checkbox" > 
+          <p:ajax event="toggleSelect" listener="#{actDetailItemView.onToggleSelect}" update="totalAmount adjSelfDiv leftTable" process="rightTable" onstart="block()" oncomplete="unblock()" />
+          <p:ajax event="rowSelect" listener="#{actDetailItemView.onRowSelect}" update="totalAmount adjSelfDiv leftTable" process="rightTable" onstart="block()" oncomplete="unblock()" />
+          <p:ajax event="rowUnselect" listener="#{actDetailItemView.onRowUnselect}" update="totalAmount adjSelfDiv leftTable" process="rightTable" onstart="block()" oncomplete="unblock()"/>
+          <p:ajax event="rowSelectCheckbox" listener="#{actDetailItemView.onRowSelect}" update="totalAmount adjSelfDiv leftTable" process="rightTable"  onstart="block()" oncomplete="unblock()"/>
+          <p:ajax event="rowUnselectCheckbox" listener="#{actDetailItemView.onRowUnselect}" update="totalAmount adjSelfDiv leftTable" process="rightTable" onstart="block()" oncomplete="unblock()"/>
+          <p:column selectionMode="multiple" exportable="false"  />
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.documentType}" title="#{lang.documentType}" escape="false" />
+            </f:facet>
+<!--            <p:commandLink rendered="#{detailItemVar.settlement}"  actionListener="#{popUpView.journalDetails(main,detailItemVar.accountingTransactionDetailId)}"  value="#{appView.display(detailItemVar.documentTypeId.title)}" title="#{appView.title(detailItemVar.documentTypeId.title)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+               <i class="fa fa-hand-o-left" ></i>
+            </p:commandLink>    -->
+            <p:commandLink  actionListener="#{popUpView.journalDetails(detailItemVar.accountingTransactionDetailId)}"  value="#{appView.display(detailItemVar.documentTypeId.title)}" title="#{appView.title(detailItemVar.documentTypeId.title)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+            </p:commandLink>    
+          </p:column>              
+          <p:column styleClass="w-120">
+            <f:facet name="header">
+              <h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.display(detailItemVar.documentNumber)}" title="#{appView.title(detailItemVar.documentTypeId.title)} #{detailItemVar.accountingTransactionDetailId.accountingTransactionId.narration}" escape="false" rendered="#{detailItemVar.accountingTransactionDetailId.accountingTransactionId.entityId eq null}"/>
+            <p:commandLink action="#{actDetailItemView.showDetails(detailItemVar)}" value="#{appView.display(detailItemVar.documentNumber)}" title="#{detailItemVar.accountingTransactionDetailId.accountingTransactionId.narration}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{detailItemVar.accountingTransactionDetailId.accountingTransactionId.entityId ne null}">
+            </p:commandLink>
+          </p:column>
+          <!--          <p:column>
+                      <f:facet name="header">
+                        <h:outputText value="#{lang.reference} #{lang.no}" title="#{lang.reference} #{lang.no}" escape="false" />
+                      </f:facet>
+                      <h:outputText value="#{appView.title(detailItemVar.referNumber)}" escape="false" />
+                    </p:column>-->
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.date} / Ref. #{lang.no}" title="#{lang.date} / #{lang.reference} #{lang.no}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.date(detailItemVar.documentDate)}"
+                          title="#{appView.date(detailItemVar.documentDate)} / #{appView.title(detailItemVar.referNumber)}" escape="false" />
+
+            <h:outputText value="/ #{appView.title(detailItemVar.referNumber)}"  rendered="#{detailItemVar.referNumber ne null}"
+                          title="#{appView.date(detailItemVar.documentDate)} / #{appView.title(detailItemVar.referNumber)}" escape="false" />
+
+          </p:column>
+          <p:column style="text-align: right" > 
+            <f:facet name="header">
+              <h:outputText value="#{lang.amount}" title="#{lang.amount}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.netAmount)}" escape="false" />
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.balance}" title="#{lang.balance}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.balanceAmount)}" escape="false" rendered="#{detailItemVar.settlement}" styleClass="" style="color:#df6262;" />
+            <h:outputText value="#{appView.decimal(detailItemVar.balanceAmount)}" escape="false" rendered="#{!detailItemVar.settlement}"  />
+          </p:column> 
+          <p:column styleClass="w-40" style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.dueDays}" title="#{lang.dueDays}" escape="false" />
+            </f:facet>           
+            <h:outputText value="#{detailItemVar.dueDays}" title="#{detailItemVar.dueDays}"  escape="false" />
+          </p:column> 
+          <p:columnGroup type="footer">
+            <p:row>
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <!--<p:column style="text-align:right" footerText="" />-->
+              <p:column style="text-align:right" footerText="#{lang.total}" />
+              <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(actDetailItemView.accountingTransactionDetail.getDetailItemReceivable().stream().map(item -> item.balanceAmount).sum())}" ></p:column>
+              <p:column style="text-align:right" footerText="" />
+            </p:row>     
+          </p:columnGroup>
+        </p:dataTable> 
+      </ui:decorate>
+    </h:panelGroup>   
+  </h:panelGroup>
+</ui:composition>

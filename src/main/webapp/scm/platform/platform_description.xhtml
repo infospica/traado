@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{platformDescriptionView.switchPlatformDescription(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.platformDescription}" />
+    <ui:param name="ids" value="platformDescription" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{platformDescriptionView.deletePlatformDescription(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('platformDescriptionWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{platformDescriptionView.clonePlatformDescription(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{platformDescriptionView.deletePlatformDescription(main)}" value="#{lang.delete}" onclick="wdgOff('platformDescriptionWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{platformDescriptionView.savePlatformDescription(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup><p:inputText value="#{platformDescriptionView.platformDescription.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.shortcode}" for="shortCode" />
+      <h:panelGroup>
+        <p:inputText id="shortCode" value="#{platformDescriptionView.platformDescription.shortCode}" maxlength="4" required="true" requiredMessage="#{lang.shortcode} #{lang.isRequired}" />
+        <p:message for="shortCode" display="text" styleClass="fw" />
+        
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup><p:inputTextarea value="#{platformDescriptionView.platformDescription.description}" cols="100" rows="3" maxlength="1000" id="description" autoResize="false" styleClass="fw" /><p:message for="description" display="text"/></h:panelGroup>
+      <!--
+                  
+              <p:outputLabel value="#{lang.description}" for="description" />
+              <h:panelGroup><p:inputText value="#{platformDescriptionView.platformDescription.description}" maxlength="1000" id="description" /><p:message for="description" display="text" styleClass="fw" /></h:panelGroup>
+      -->            
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup><p:inputText value="#{platformDescriptionView.platformDescription.sortOrder}" maxlength="5" id="sortOrder" /><p:message for="sortOrder" display="text" styleClass="fw" /></h:panelGroup>            
+<!--        <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+      <h:panelGroup><p:inputText value="#{platformDescriptionView.platformDescription.createdBy}" maxlength="200" required="true" requiredMessage="#{lang.createdBy} #{lang.isRequired}" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>            
+      <p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
+      <h:panelGroup><p:inputText value="#{platformDescriptionView.platformDescription.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+      <h:panelGroup><p:calendar value="#{platformDescriptionView.platformDescription.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+      <h:panelGroup><p:calendar value="#{platformDescriptionView.platformDescription.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>-->
+      <p:outputLabel value="#{lang.displayColor}" for="displayColor" />
+      <h:panelGroup>
+        <p:colorPicker value="#{platformDescriptionView.platformDescription.displayColor}" id="displayColor" mode="inline"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="platformDescriptionTable" var="platformDescriptionVar" widgetVar="platformDescriptionWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{platformDescriptionView.platformDescriptionLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{platformDescriptionVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{platformDescriptionView.platformDescriptionSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.title}" sortBy="#{platformDescriptionVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{platformDescriptionVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{platformDescriptionView.platformDescription}" value="#{platformDescriptionVar}" />
+          </p:commandLink>
+        </p:column>
+<!--        <p:column headerText="#{lang.title}" sortBy="#{platformDescriptionVar.title}" field="title"><h:outputText value="#{appView.display(platformDescriptionVar.title)}" title="#{appView.title(platformDescriptionVar.title)}" escape="false" /></p:column>-->
+        
+            <!-- Column for the short code -->
+            <p:column headerText="#{lang.shortcode}" sortBy="#{platformDescriptionVar.shortCode}" field="short_code">
+              <f:facet name="header" ><h:outputText value="#{lang.shortcode}" title="#{lang.shortcode}" /></f:facet>              
+              <h:outputText styleClass="label" style="background-color: ##{platformDescriptionVar.displayColor}" value="#{platformDescriptionVar.shortCode}" escape="false" />
+            </p:column>
+        
+          <p:column headerText="#{lang.description}" sortBy="#{platformDescriptionVar.description}" field="description">
+          <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+
+          <h:outputText value="#{appView.display(platformDescriptionVar.description)}" title="#{appView.title(platformDescriptionVar.description)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.sortOrder}" sortBy="#{platformDescriptionVar.sortOrder}" field="sort_order">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+
+          <h:outputText value="#{appView.display(platformDescriptionVar.sortOrder)}" title="#{appView.title(platformDescriptionVar.sortOrder)}" escape="false" />
+        </p:column>
+<!--        <p:column headerText="#{lang.createdBy}" sortBy="#{platformDescriptionVar.createdBy}" field="created_by"><h:outputText value="#{appView.display(platformDescriptionVar.createdBy)}" title="#{appView.title(platformDescriptionVar.createdBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.modifiedBy}" sortBy="#{platformDescriptionVar.modifiedBy}" field="modified_by"><h:outputText value="#{appView.display(platformDescriptionVar.modifiedBy)}" title="#{appView.title(platformDescriptionVar.modifiedBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.createdAt}" sortBy="#{platformDescriptionVar.createdAt}" field="created_at" ><h:outputText value="#{appView.dateTime(platformDescriptionVar.createdAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.modifiedAt}" sortBy="#{platformDescriptionVar.modifiedAt}" field="modified_at" ><h:outputText value="#{appView.dateTime(platformDescriptionVar.modifiedAt)}" escape="false" /></p:column>-->
+        <p:column headerText="#{lang.id}" sortBy="#{platformDescriptionVar.id}" field="id"> 
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+
+          <h:outputText value="#{appView.display(platformDescriptionVar.id)}" title="#{appView.title(platformDescriptionVar.id)}" escape="false" />
+        </p:column>
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

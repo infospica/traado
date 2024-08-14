@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+  <!--PURCHASE ORDER-->
+
+  <c:if test="#{consignmentReferenceView.consignmentReference.consignmentId.consignmentTypeId.title=='Purchase'}" >          
+    #{purchaseOrderView.switchPurchaseOrder(main, main.viewType ,consignmentReferenceView.consignmentReference.consignmentId,"purchaseConsignment")}
+    <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+      <ui:param name="label" value="#{lang.reference}" />
+      <ui:param name="ids" value="consignmentReference" />
+      <ui:param name="newList" value="false" />
+
+      <ui:define name="more" >
+      </ui:define>
+
+      <ui:define name="navRight" >
+        <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{purchaseOrderView.consignmentPODialogClose}" oncomplete="parent.referencePoPopupReturned(); closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+      </ui:define>
+
+      <ui:define name="leftLeftList">
+        <h:commandButton action="#{purchaseOrderView.insertConsignmentPO(main,consignmentReferenceView.consignmentReference.consignmentId)}" 
+                         value="#{lang.select}" onclick="toTop()" styleClass="btn btn-primary">
+          <f:ajax execute="f1" render="f1"  />
+        </h:commandButton>
+      </ui:define>
+
+      <ui:define name="list">
+        <p:dataTable id="purchaseOrderTable" var="purchaseOrderVar" widgetVar="purchaseOrderWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     lazy="true" value="#{purchaseOrderView.purchaseOrderLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseOrderVar.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" 
+                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                     selection="#{purchaseOrderView.purchaseOrderSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" >
+          <p:column selectionMode="multiple" exportable="false" />              
+          <p:column headerText="#{lang.title}" sortBy="#{purchaseOrderVar.purchaseOrderNo}" field="title">
+            <h:outputText value="#{appView.display(purchaseOrderVar.purchaseOrderNo)}" title="#{appView.title(purchaseOrderVar.purchaseOrderNo)}" escape="false" />
+          </p:column>              
+        </p:dataTable> 	
+      </ui:define>
+    </ui:decorate>
+  </c:if>
+
+  <!--PURCHASE RETURN-->
+
+<!--        <c:if test="#{consignmentReferenceView.consignmentReference.consignmentId.consignmentTypeId.title=='Purchase Return'}" >          
+  #{purchaseReturnView.switchPurchaseReturn(main, main.viewType)}   
+  <ui:decorate template="/WEB-INF/resources/theme1/dialogList.xhtml">
+    <ui:param name="label" value="#{lang.reference}" />
+    <ui:param name="ids" value="consignmentReference" />
+    <ui:param name="newList" value="false" />
+
+    <ui:define name="more" >
+    </ui:define>
+
+    <ui:define name="navLeftRight">
+      <p:commandButton actionListener="#{purchaseReturnView.consignmentPRDialogClose}" value="#{lang.close}" partialSubmit="true" process="@this" 
+                       immediate="true"  styleClass="btn btn-default"/>
+    </ui:define>
+
+    <ui:define name="leftLeftList">
+      <h:commandButton action="#{purchaseReturnView.insertConsignmentPO(main,consignmentReferenceView.consignmentReference.consignmentId)}" 
+                       value="#{lang.select}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseReturnTable" var="purchaseReturnVar" widgetVar="purchaseReturnWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{purchaseReturnView.purchaseReturnLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseReturnVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" 
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{purchaseReturnView.purchaseReturnSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" >
+        <p:column selectionMode="multiple" exportable="false" />              
+        <p:column headerText="#{lang.title}" sortBy="#{purchaseReturnVar.invoiceNo}" field="title">
+          <h:outputText value="#{appView.display(purchaseReturnVar.invoiceNo)}" title="#{appView.title(purchaseReturnVar.invoiceNo)}" escape="false" />
+        </p:column>              
+      </p:dataTable> 	
+    </ui:define>
+
+  </ui:decorate>
+
+</c:if>-->
+
+  <!--Sales-->
+  <!--Sales Return-->
+
+</html>
+
+
+
+

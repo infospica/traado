@@ -1,0 +1,1156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" >
+
+  #{consignmentView.switchConsignment(main, viewType)}
+  <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{main.isEdit() ? consignmentView.consignment.consignmentNo : lang.consignment}"/>
+    <ui:param name="subLabel" value="#{main.isEdit() ? consignmentView.consignmentDetail.entryDocumentTypeId.title : null}"/>
+    <ui:param name="navLabel" value="#{main.isEdit() ? consignmentView.consignment.consignmentStatusId.title : null}" />
+    <ui:param name="ids" value="consignment" />
+    <ui:param name="deleteFormMenu" value="#{consignmentView.isDraft()}" />
+    <ui:param name="newList" value="#{!userRole.isCustomer()}" />
+    <ui:param name="hideList" value="#{consignmentView.hideList}" />
+    <ui:param name="more" value="#{!userRole.isCustomer()}"/>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{consignmentView.deleteConsignment(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('consignmentWidgetDelConf')" process="f1" update="f1" rendered="#{userRuntimeView.privilege.delete==true}" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{consignmentView.cloneConsignment(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{consignmentView.deleteConsignment(main)}" value="#{lang.delete}" onclick="wdgOff('consignmentWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" rendered="#{userRuntimeView.privilege.delete==true}"/>
+    </ui:define>
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{companyAddressView.companyAddressPopupClose}" 
+                       oncomplete="parent.purchaseReturnConsignmentPopupReturned();closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="formRight">
+      <p:commandButton value="#{lang.expense}" styleClass="R btn btn-info" actionListener="#{consignmentView.showExpense(main)}" immediate="true" process="@this" partialSubmit="true"/>
+    </ui:define>    
+
+    <ui:define name="save" >      
+      <!--Draft-->
+      <p:commandButton id="saveBtn" value="#{lang.saveAsDraft}" styleClass="btn btn-info" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and (consignmentView.isNewConsignment() or consignmentView.isDraft())}"
+                       process="consignmentTab" update="f1" action="#{consignmentView.saveConsignment(main,sysConstant.CONSIGNMENT_STATUS_DRAFT)}">        
+      </p:commandButton>
+
+      <p:commandButton actionListener="#{consignmentView.saveConsignmentClose(main,sysConstant.CONSIGNMENT_STATUS_DRAFT)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" onclick="toTop()" 
+                       styleClass="btn btn-primary" process="consignmentTab" update="f1"
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup and (consignmentView.isNewConsignment() or consignmentView.isDraft())}">         
+      </p:commandButton>
+
+      <!--Confirm-->
+      <p:commandButton id="saveBtnConfirm" value="#{lang.confirm}" styleClass="btn btn-info" action="#{consignmentView.saveConsignment(main,sysConstant.CONSIGNMENT_STATUS_CONFIRMED)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and (consignmentView.isDraft() and !userRole.isCustomer())}" 
+                       update="f1" process="consignmentTab">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Cancel-->
+      <p:commandButton id="btnCancelled" value="#{lang.cancel}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_CENCELLED)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.isConfirm()}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirmCancelHeader}" message="#{lang.confirmCancelConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Confirm Waybill-->
+      <p:commandButton id="saveBtnConfWaybill" value="#{lang.confirm} #{lang.waybill}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_READY_FOR_DISPATCH_AND_WAY_BILL_READY)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.isConfirm() and (userRole.isCompany() or userRole.isCustomer() or userRole.isRoot())}"
+                       update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Cancel-->
+      <p:commandButton id="btnCancelled_2" value="#{lang.cancel}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_CANCEL_AND_INFORM_ST)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==6}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirmCancelHeader}" message="#{lang.confirmCancelConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Despatch-->
+      <p:commandButton id="saveBtnDespatch" value="#{lang.setAsDespatched}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_DISPATCHED)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==6 and !userRole.isCustomer()}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Inform Sales Tax-->
+      <p:commandButton id="saveBtnInformedST" value="#{lang.setAsInformedSalesTax}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_CENCEL_AND_INFORMED_ST)}" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==11}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Cancel-->
+      <p:commandButton id="btnCancelled_3" value="#{lang.cancel}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_CANCEL_LOST_AND_INFORM_ST)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==7 and (userRole.isCompany() or userRole.isCustomer())}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirmCancelHeader}" message="#{lang.confirmCancelConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Check Post Cleared-->
+      <p:commandButton id="saveBtnDespatchAndCleared" value="#{lang.setAsCheckpostCleared}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_DISPACHED_AND_CHECKPOST_CLEARED)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==7 and (userRole.isCompany() or userRole.isCustomer())}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Informed Sales Tax-->
+      <p:commandButton id="saveBtnInformedST_1" value="#{lang.setAsInformedSalesTax}" immediate="true" styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_CANCEL_LOST_AND_INFORMED_ST)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==13}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Received-->
+      <p:commandButton id="saveBtnreceived" value="#{lang.setAsReceived}"  styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_DELIVERED)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==15 and (userRole.isCompany() or userRole.isCustomer())}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!--Received Lost-->
+      <p:commandButton id="saveBtnreceivedLost" value="#{lang.lostOrFullyDamagedAndDelivered}"  styleClass="btn btn-info" 
+                       action="#{consignmentView.saveConsignmentStatus(main,sysConstant.CONSIGNMENT_STATUS_FULLY_DAMAGED_DELIVERED)}" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and consignmentView.consignment.consignmentStatusId.id==15 and (userRole.isCompany() or userRole.isCustomer())}" update="f1" process="@this">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirmConsignmentMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{consignmentView.activeIndex}" styleClass="materialTabs" onTabShow="unblock()" >
+        <!--Consignment Tab-->
+        <p:tab title="#{lang.consignment}" id="consignmentTab">
+          <!--Consignment Number-->
+
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml" >
+            <ui:param name="ids" value="consignment" />    
+            <!--<ui:param name="watermark" value="#{consignmentView.isConfirmCancelled()}" />-->             
+            <p:outputLabel value="#{lang.consignmentNo}" for="consignmentNo" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignmentNo}" maxlength="100" required="true"
+                           requiredMessage="#{lang.consignmentNo} #{lang.isRequired}" id="consignmentNo"  />
+              <p:message for="consignmentNo" display="text"/>
+            </h:panelGroup>
+            <!--Consignment Date-->
+            <p:outputLabel value="#{lang.consignmentDate}" for="consignmentDate" />
+            <h:panelGroup>
+              <p:calendar value="#{consignmentView.consignment.consignmentDate}" pattern="#{lang.datePattern}"
+                          converterMessage="#{lang.consignmentDate} #{lang.invalidDate}" validator="#{sysRuntimeView.dateLteToday}"
+                          maxlength="29" required="true" requiredMessage="#{lang.consignmentDate} #{lang.isRequired}" id="consignmentDate" showButtonPanel="true"
+                          navigator="true" mask="true" mindate="#{userRuntimeView.minDate}" maxdate="#{userRuntimeView.today}"/>
+              <p:message for="consignmentDate" display="text"/>
+            </h:panelGroup>            
+          </ui:decorate>
+
+          <!--Consignor Details-->
+          <div class="row">
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="conTab" />
+                <ui:param name="label" value="#{lang.consignor}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <!-- Supplier -->
+                <p:outputLabel value="#{lang.supplier}" rendered="#{consignmentView.isFromVendor()}"/>
+                <h:panelGroup rendered="#{consignmentView.isFromVendor()}">
+                  <h:outputLabel styleClass="txtView" value="#{userRuntimeView.account.vendorId.vendorName}"/>
+                </h:panelGroup>
+
+                <!-- Company -->
+                <p:outputLabel value="#{lang.company}" rendered="#{consignmentView.isFromCompany()}"/>
+                <h:panelGroup rendered="#{consignmentView.isFromCompany()}">
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.companyId.companyName}" maxlength="200" disabled="true"  />
+                </h:panelGroup>
+
+                <!-- Customer -->
+                <p:outputLabel value="#{lang.customer}" for="consignmentCustomerId" rendered="#{consignmentView.isFromCustomer()}"/>
+                <h:panelGroup rendered="#{consignmentView.isFromCustomer()}">
+                  <p:autoComplete  value="#{consignmentView.consignment.customerId}" completeMethod="#{consignmentView.customerAuto}" converter="wawo.LookupIntConverter"
+                                   id="consignmentCustomerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true"
+                                   queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw"  required="true" requiredMessage="#{lang.consignor} #{lang.isRequired}">
+                    <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+                    <p:ajax event="itemSelect" process="@this" listener="#{consignmentView.fromCustomerDetail}"
+                            update="consignorAddress consignorCountry consignorState consignorDistrict consignorPin
+                            consignorPhone1 consignorPhone2 consignorPhone3 consignorFax1 consignorFax2 consignorEmail"/>
+                  </p:autoComplete>
+                  <p:message for="consignmentCustomerId" display="text" />
+                </h:panelGroup>
+
+                <p:commandLink target="_blank"  onclick="window.open('#{sysConstant.GST_URL}')" oncomplete="unblock();" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromVendor()}" > 
+                  <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromVendor()}" />
+                </p:commandLink>
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromVendor()}">
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentView.consignment.vendorId.gstNo}"   id="consignorGst" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:commandLink target="_blank"  onclick="window.open('#{sysConstant.GST_URL}')" oncomplete="unblock();" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromCompany()}" > 
+                  <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromCompany()}" />
+                </p:commandLink>
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromCompany()}">
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentView.consignment.companyId.gstNo}"   id="consignorGst2" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:commandLink target="_blank"  onclick="window.open('#{sysConstant.GST_URL}')" oncomplete="unblock();" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromCustomer()}" > 
+                  <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromCustomer()}" />
+                </p:commandLink>
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime() and consignmentView.isFromCustomer()}">
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentView.consignment.customerId.gstNo}"   id="consignorGst3" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.tin}" title="#{lang.tinabbr}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentView.consignment.consignorTin}"  id="consignorTin" title="#{lang.tinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.cstRegNumber}"  title="#{lang.cstRegistrationNumber}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentView.consignment.consignorCst}"  id="consignorCst" title="#{lang.cstRegistrationNumber}" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.address}" for="consignorAddress" />
+                <h:panelGroup>
+                  <p:inputTextarea  styleClass="fw" value="#{consignmentView.consignment.consignorAddress}" cols="100" rows="3" maxlength="500" id="consignorAddress" autoResize="false" />
+                  <p:message for="consignorAddress" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.country}" for="consignorCountry" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorCountry}" maxlength="80" id="consignorCountry" />
+                  <p:message for="consignorCountry" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.state}" for="consignorState" />
+                <h:panelGroup>
+                  <p:selectOneMenu value="#{consignmentView.consignment.consignorStateId}" required="true" requiredMessage="#{lang.state} #{lang.isRequired}" 
+                                   id="consignorState" converter="omnifaces.SelectItemsConverter" disabled="#{consignmentView.consignment.consignmentTypeId.id == sysConstant.CONSIGNMENT_TYPE_PURCHASE_RETURN}">
+                    <f:selectItem itemLabel="#{consignmentView.consignment.consignorStateId.stateName}" itemValue="#{consignmentView.consignment.consignorStateId}" />
+                    <f:selectItems value="#{scmLookupView.state(main)}" var="e" itemLabel="#{e.stateName}" itemValue="#{e}" />
+                  </p:selectOneMenu>                      
+                  <p:message for="consignorState" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.district}" for="consignorDistrict" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorDistrict}" maxlength="80" id="consignorDistrict" />
+                  <p:message for="consignorDistrict" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.pincode}" for="consignorPin" />
+                <h:panelGroup>
+                    <p:inputNumber styleClass="fw" value="#{consignmentView.consignment.consignorPin}" thousandSeparator="" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" maxlength="6" id="consignorPin" decimalPlaces="0"  />
+                  <p:message for="consignorPin" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone1}" for="consignorPhone1" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorPhone1}" maxlength="20" id="consignorPhone1" />
+                  <p:message for="consignorPhone1" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone2}" for="consignorPhone2" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorPhone2}" maxlength="20" id="consignorPhone2" />
+                  <p:message for="consignorPhone2" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone3}" for="consignorPhone3" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorPhone3}" maxlength="20" id="consignorPhone3" />
+                  <p:message for="consignorPhone3" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.fax1}" for="consignorFax1" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorFax1}" maxlength="50" id="consignorFax1" />
+                  <p:message for="consignorFax1" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.fax2}" for="consignorFax2" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorFax2}" maxlength="50" id="consignorFax2" />
+                  <p:message for="consignorFax2" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.email}" for="consignorEmail" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consignorEmail}" validator="wawo.EmailValidator" maxlength="200" id="consignorEmail" />
+                  <p:message for="consignorEmail" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+
+            <!--Consignee Details-->
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="csiTab" />
+                <ui:param name="label" value="#{lang.consignee}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <p:outputLabel value="#{lang.supplier}" for="consignmentVendorId1" rendered="#{consignmentView.isToVendor()}"/>
+                <h:panelGroup rendered="#{consignmentView.isToVendor()}">
+                  <p:autoComplete  value="#{consignmentView.consignment.vendorId}" completeMethod="#{consignmentView.vendorAutoPR}" converter="wawo.LookupIntConverter"
+                                   id="consignmentVendorId1" var="e" itemValue="#{e}" itemLabel="#{e.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true"
+                                   queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw"  required="true" requiredMessage="#{lang.consignee} #{lang.isRequired}">
+                    <f:attribute name="clazz" value="#{scmLookupView.vendorClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.vendorById()}"/>
+                    <p:ajax event="itemSelect" process="@this" listener="#{consignmentView.toVendorDetail}"
+                            update="consigneeAddress consigneeCountry consigneeState consigneeDistrict
+                            consigneePin consigneePhone1 consigneePhone2 consigneePhone3 consigneeFax1 consigneeFax2 consigneeEmail"/>
+                  </p:autoComplete>
+                  <p:message for="consignmentVendorId1" display="text" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.company}" rendered="#{consignmentView.isToCompany()}"/>
+                <h:panelGroup rendered="#{consignmentView.isToCompany()}">
+                  <h:outputLabel  styleClass="txtView p-x-5" value="#{consignmentView.consignment.companyId.companyName}" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.customer}" for="consignmentCustomerId" rendered="#{consignmentView.isToCustomer()}"/>
+                <h:panelGroup rendered="#{consignmentView.isToCustomer()}">
+                  <p:autoComplete  value="#{consignmentView.consignment.customerId}" completeMethod="#{consignmentView.customerAuto}" converter="wawo.LookupIntConverter"
+                                   id="consignmentCustomerId1" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true"
+                                   queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
+                                   styleClass="fw"  required="true" requiredMessage="#{lang.consignee} #{lang.isRequired}"
+                                   disabled="#{consignmentView.customerEditable}">
+                    <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+                    <p:ajax event="itemSelect" process="@this" listener="#{consignmentView.toCustomerDetail}"
+                            update="consigneeAddress consigneeCountry consigneeState consigneeDistrict
+                            consigneePin consigneePhone1 consigneePhone2 consigneePhone3 consigneeFax1 consigneeFax2 consigneeEmail"/>
+                  </p:autoComplete>
+                  <p:message for="consignmentCustomerId1" display="text" />                  
+                </h:panelGroup>
+
+                <p:commandLink target="_blank"  onclick="window.open('#{sysConstant.GST_URL}')"  rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToVendor()}" oncomplete="unblock();" > 
+                  <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToVendor()}" />
+                </p:commandLink>
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToVendor()}" >
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentView.consignment.vendorId.gstNo}"  id="consigneeGst" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:commandLink target="_blank"  onclick="window.open('#{sysConstant.GST_URL}')" oncomplete="unblock();" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToCompany()}" > 
+                  <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToCompany()}" />
+                </p:commandLink>
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToCompany()}" >
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentView.consignment.companyId.gstNo}"  id="consigneeGst2" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:commandLink target="_blank"  onclick="window.open('#{sysConstant.GST_URL}')" oncomplete="unblock();" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToCustomer()}" > 
+                  <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToCustomer()}" />
+                </p:commandLink>
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime() and consignmentView.isToCustomer()}" >
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentView.consignment.customerId.gstNo}"  id="consigneeGst3" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.tinabbr}" value="#{lang.tin}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentView.consignment.consigneeTin}"  id="consigneeTin" title="#{lang.tinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.cstRegistrationNumber}" value="#{lang.cstRegNumber}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentView.consignment.consigneeCst}"  id="consigneeCst" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.address}" for="consigneeAddress" />
+                <h:panelGroup>
+                  <p:inputTextarea  styleClass="fw" value="#{consignmentView.consignment.consigneeAddress}" cols="100" rows="3" maxlength="500" id="consigneeAddress" autoResize="false" />
+                  <p:message for="consigneeAddress" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.country}" for="consigneeCountry" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneeCountry}" maxlength="80" id="consigneeCountry" />
+                  <p:message for="consigneeCountry" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.state}" for="consigneeState" />
+                <h:panelGroup>
+                  <p:selectOneMenu value="#{consignmentView.consignment.consigneeStateId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.state} #{lang.isRequired}" 
+                                   id="consigneeState" disabled="#{consignmentView.consignment.consignmentTypeId.id == sysConstant.CONSIGNMENT_TYPE_PURCHASE}">
+                    <f:selectItem itemLabel="#{consignmentView.consignment.consignorStateId.stateName}" itemValue="#{consignmentView.consignment.consignorStateId}" />
+                    <f:selectItems value="#{scmLookupView.state(main)}" var="e" itemLabel="#{e.stateName}" itemValue="#{e}" />
+                  </p:selectOneMenu>                      
+                  <p:message for="consigneeState" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.district}" for="consigneeDistrict" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneeDistrict}" maxlength="80" id="consigneeDistrict" />
+                  <p:message for="consigneeDistrict" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.pincode}" for="consigneePin" />
+                <h:panelGroup>
+                  <p:inputNumber styleClass="fw" value="#{consignmentView.consignment.consigneePin}" maxlength="6" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" thousandSeparator="" id="consigneePin" decimalPlaces="0" />
+                  <p:message for="consigneePin" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone1}" for="consigneePhone1" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneePhone1}" maxlength="20" id="consigneePhone1" />
+                  <p:message for="consigneePhone1" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone2}" for="consigneePhone2" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneePhone2}" maxlength="20" id="consigneePhone2" />
+                  <p:message for="consigneePhone2" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone3}" for="consigneePhone3" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneePhone3}" maxlength="20" id="consigneePhone3" />
+                  <p:message for="consigneePhone3" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.fax1}" for="consigneeFax1" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneeFax1}" maxlength="50" id="consigneeFax1" />
+                  <p:message for="consigneeFax1" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.fax2}" for="consigneeFax2" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneeFax2}" maxlength="50" id="consigneeFax2" />
+                  <p:message for="consigneeFax2" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.email}" for="consigneeEmail" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignment.consigneeEmail}" validator="wawo.EmailValidator" maxlength="200" id="consigneeEmail" />
+                  <p:message for="consigneeEmail" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+          </div>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+            <ui:param name="ids" value="statusLog" />
+            <ui:param name="label" value="#{lang.status} #{lang.log}" />
+            <p:outputLabel value=""/>
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView" value="#{consignmentView.consignment.consignmentStatusLog}" escape="false"/>
+            </h:panelGroup>
+          </ui:decorate>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:param name="cnf" value="true"></ui:param>
+            <ui:param name="desp" value="true"></ui:param>
+            <ui:define name="cby">#{appView.display(consignmentView.consignment.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(consignmentView.consignment.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(consignmentView.consignment.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(consignmentView.consignment.modifiedAt)}</ui:define>
+            <ui:define name="coby">#{appView.display(consignmentView.consignment.confirmedBy)}</ui:define>
+            <ui:define name="coat">#{appView.dateTime(consignmentView.consignment.confirmedAt)}</ui:define>
+            <ui:define name="dby">#{appView.display(consignmentView.consignment.despatchedAt)}</ui:define>
+            <ui:define name="dat">#{appView.dateTime(consignmentView.consignment.deliveredAt)}</ui:define>
+          </ui:decorate>
+
+        </p:tab>
+
+        <!--Consignment Commodity Tab-->
+        <p:tab  title="#{lang.commodity}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="consignmentCommodity" />
+            <!--<ui:define name="more" rendered="{!consignmentView.isDraft()}"/>-->
+            <ui:param name="search" value="false" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{consignmentView.consignmentCommodityInvoiceNewPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus"
+                               iconPos="left" styleClass="btn btn-info" rendered="#{consignmentView.isBeforeConfirm()}">                
+              </p:commandButton>
+              <p:remoteCommand name="consignmentCommodityPopupReturned" actionListener="#{consignmentView.consignmentCommodityPopupReturned()}" update="consignmentCommodityTable"  
+                               process="@this" immediate="true" />
+            </ui:define>
+
+            <p:dataTable id="consignmentCommodityTable" var="consignmentCommodityVar" widgetVar="consignmentCommodityWidget" 
+                         value="#{consignmentView.getConsignmentCommodityList(main)}" rowHover="true" reflow="false" draggableColumns="true" scrollable="false"  
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('consignmentCommodityWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+
+              <p:column headerText="#{lang.invoiceNo}" sortBy="#{consignmentCommodityVar.invoiceNo}" field="invoice_no" >
+                <p:commandLink action="#{consignmentView.consignmentCommodityEditPopup(consignmentCommodityVar.id)}" process="@this" immediate="true" 
+                               onstart="block();"
+                               oncomplete="unblock();" title="#{lang.editMe}" value="#{appView.display(consignmentCommodityVar.invoiceNo)}">
+                </p:commandLink>
+              </p:column>
+
+              <p:column headerText="#{lang.invoiceDate}" sortBy="#{consignmentCommodityVar.invoiceDate}" field="invoice_date" >
+                <h:outputText value="#{appView.date(consignmentCommodityVar.invoiceDate)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.qty}" sortBy="#{consignmentCommodityVar.commodityQty}" field="commodity_qty" style="text-align: right">
+                <h:outputText value="#{appView.number(consignmentCommodityVar.commodityQty)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.weight}" sortBy="#{consignmentCommodityVar.commodityWeight}" field="commodity_weight" style="text-align: right">
+                <h:outputText value="#{appView.number(consignmentCommodityVar.commodityWeight)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.value}" sortBy="#{consignmentCommodityVar.commodityValue}" field="commodity_value" style="text-align: right">
+                <h:outputText value="#{appView.decimal(consignmentCommodityVar.commodityValue)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.commodity} #{lang.name}" sortBy="#{consignmentCommodityVar.commodityName}" field="commodity_name">
+                <h:outputText value="#{appView.display(consignmentCommodityVar.commodityName == null ? consignmentCommodityVar.commodityId.title: consignmentCommodityVar.commodityName)}" title="#{appView.title(consignmentCommodityVar.commodityName == null ? consignmentCommodityVar.commodityId.title: consignmentCommodityVar.commodityName)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.debitNoteNo}" sortBy="#{consignmentCommodityVar.debitNoteNo}" field="debit_note_no" rendered="false">
+                <h:outputText value="#{appView.display(consignmentCommodityVar.debitNoteNo)}" title="#{appView.title(consignmentCommodityVar.debitNoteNo)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.debitNoteDate}" sortBy="#{consignmentCommodityVar.debitNoteDate}" field="debit_note_date" rendered="false" >
+                <h:outputText value="#{appView.dateTime(consignmentCommodityVar.debitNoteDate)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.debitNoteFilePath}" sortBy="#{consignmentCommodityVar.debitNoteFilePath}" field="debit_note_file_path" rendered="false">
+                <h:outputText value="#{appView.display(consignmentCommodityVar.debitNoteFilePath)}" title="#{appView.title(consignmentCommodityVar.debitNoteFilePath)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.receipt}" >
+                <p:commandButton action="#{consignmentCommodityView.consignmentCommodityReceiptPopup(consignmentCommodityVar)}" icon="fa fa-plus" process="@this" immediate="true"
+                                 onstart="block()" oncomplete="unblock()" title="Add New Receipt"
+                                 rendered="#{consignmentView.consignment.consignmentStatusId.id>=7 and !consignmentView.isReceiptDetailEntered(consignmentCommodityVar) }">
+
+                </p:commandButton>
+
+                <p:commandButton action="#{consignmentCommodityView.consignmentCommodityReceiptPopup(consignmentCommodityVar)}" icon="fa fa-eye" process="@this" immediate="true"
+                                 onstart="block()" oncomplete="unblock()" title="View Receipt" rendered="#{consignmentView.isReceiptDetailEntered(consignmentCommodityVar)}">
+                </p:commandButton>
+              </p:column>
+
+              <p:column headerText="#{lang.remove}" rendered="#{consignmentView.consignment.consignmentTypeId.id eq 2}" >
+                <p:commandButton action="#{consignmentCommodityView.deleteSalesConsignmentCommodity(main, consignmentCommodityVar)}" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="fa fa-trash" >
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+        <!--Consignment Detail Tab-->
+
+        <p:tab  title="#{lang.consignmentDetail}" id="consignmentDetailTab" disabled="#{main.isNew()}" >
+          <!--disabled="#{!consignmentView.isConfirmed()}"--> 
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="consignmentDetail" />
+            <ui:param name="cols" value="2" />
+            <ui:param name="more" value="false"/>
+            <ui:define name="save" >
+              <h:commandButton action="#{consignmentView.saveConsignmentDetail(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" >
+                <!--rendered="#{!consignmentView.isConsignmentDetailSaved()}"-->
+                <!--or userRole.isCompany()-->
+                <!--process="@this" partial_submit="true"-->
+                <f:ajax execute="consignmentDetailTab" render="f1"  />
+              </h:commandButton>
+            </ui:define>
+
+            <!--Transport Mode-->
+            <p:outputLabel value="#{lang.transportMode}" for="consignmentTransportMode"/>
+            <h:panelGroup>
+              <p:autoComplete  value="#{consignmentView.consignmentDetail.transportModeId}" completeMethod="#{consignmentView.transportModeAuto}"
+                               converter="wawo.LookupIntConverter" readonly="#{consignmentView.isConfirmed()}"
+                               required="true" requiredMessage="#{lang.transportMode} #{lang.isRequired}" id="consignmentTransportMode" var="e"
+                               itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                               converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.transportModeClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.transportModeById()}"/>
+                <p:ajax event="itemSelect" update="documentTypeDiv vehicleDetailsDiv documentTypeDiv1 checkPointDiv" listener="#{consignmentView.clearDocType}"/>
+              </p:autoComplete>
+              <p:message for="consignmentTransportMode" display="text" />
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.docType}" for="docTypeId" rendered="#{consignmentView.isInterState()}" />
+            <h:panelGroup id="documentTypeDiv1" rendered="#{consignmentView.isInterState()}">              
+              <p:autoComplete value="#{consignmentView.consignmentDetail.entryDocumentTypeId}" 
+                              completeMethod="#{consignmentView.getConsignmentDocumentType(main, consignmentView.consignmentDetail.transportModeId.id)}" 
+                              converter="wawo.LookupIntConverter" required="#{consignmentView.consignment.consigneeStateId.id == 1}" requiredMessage="#{lang.docType} #{lang.isRequired}" id="docTypeId" var="dt" itemValue="#{dt}" itemLabel="#{dt.title}"
+                              emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" forceSelection="true" 
+                              autocomplete="off" style="position: relative">
+                <f:attribute name="clazz" value="#{scmLookupView.consignmentDocTypeClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.consignmentDocTypeById()}"/>
+              </p:autoComplete>
+              <p:message for="docTypeId" display="text" />
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.transporter}" for="consignmentDetailTransporterId" rendered="#{!consignmentView.purchaseConsignment and !consignmentView.salesReturnConsignment}" />
+            <h:panelGroup  rendered="#{!consignmentView.purchaseConsignment and !consignmentView.salesReturnConsignment}">
+              <p:autoComplete  value="#{consignmentView.consignmentDetail.transporterId}" completeMethod="#{consignmentView.transporterAuto}"
+                               converter="wawo.LookupIntConverter"   id="consignmentDetailTransporterId" var="e" itemValue="#{e}" itemLabel="#{e.transporterName}"
+                               emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw"  readonly="#{consignmentView.isConfirmed()}">
+                <f:attribute name="clazz" value="#{scmLookupView.transporterClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.transporterById()}"/>
+              </p:autoComplete>
+              <p:message for="consignmentDetailTransporterId" display="text" />
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.transporterName}" for="transporterName"/>
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.transporterName}" maxlength="50" id="transporterName" readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}"/>
+              <p:message for="transporterName" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.note}" for="note" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{consignmentView.consignmentDetail.note}" cols="100" rows="3" maxlength="500" id="note" autoResize="false" readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}"/>
+              <p:message for="note" display="text"/>
+            </h:panelGroup>
+          </ui:decorate>
+
+          <!-- Transporter Vehicle Details -->
+          <h:panelGroup layout="block" styleClass="row" id="vehicleDetailsDiv">
+            <h:panelGroup layout="block" styleClass="col-md-12" rendered="#{consignmentView.is8F()}">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.consignmentVehicleDetails}" />
+                <ui:param name="cols" value="2" />
+                <ui:param name="ids" value="vehicle" />
+                <p:outputLabel value="#{lang.vehicleType}" for="vehicleType" />
+                <h:panelGroup >
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.vehicleType}" maxlength="200" id="vehicleType"  readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}" 
+                               required="#{consignmentView.is8F()}" requiredMessage="#{lang.vehicleType} #{lang.isRequired}"/>
+                  <p:message for="vehicleType" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.vehicleNo}" for="vehicleNo" />
+                <h:panelGroup >
+                  <p:inputText styleClass="fw text-uppercase" value="#{consignmentView.consignmentDetail.vehicleNo}" maxlength="100" id="vehicleNo" readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}"
+                               required="#{consignmentView.is8F()}" requiredMessage="#{lang.vehicleNo} #{lang.isRequired}"/>
+                  <p:message for="vehicleNo" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.driverName}" for="driverName" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.driverName}" maxlength="200" id="driverName" readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}"
+                               required="#{consignmentView.is8F()}" requiredMessage="#{lang.driverName} #{lang.isRequired}"/>
+                  <p:message for="driverName" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.driverLicenseNo}" for="driverLicenseNo" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw text-uppercase" value="#{consignmentView.consignmentDetail.driverLicenseNo}" maxlength="100" id="driverLicenseNo" readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}"
+                               required="#{consignmentView.is8F()}" requiredMessage="#{lang.driverLicenseNo} #{lang.isRequired}"/>
+                  <p:message for="driverLicenseNo" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <h:panelGroup layout="block" styleClass="row" id="deliveryNoteDiv">
+            <h:panelGroup layout="block" styleClass="col-md-12" rendered="#{consignmentView.purchaseReturnConsignment}">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.delivery} #{lang.note}" />
+                <ui:param name="cols" value="2" />
+                <ui:param name="ids" value="deliveryNote" />
+
+                <!--EXIT 2 DETAILS - DELIVERY NOTE DETAIL-->
+                <p:outputLabel value="#{lang.delivery} #{lang.documentNo}" for="exitDocument2No"/>
+                <h:panelGroup >
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.exitDocument2No}" maxlength="100" id="exitDocument2No" 
+                               required="true" requiredMessage="#{lang.delivery} #{lang.documentNo} #{lang.isRequired}"/>
+                  <p:message for="exitDocument2No" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.delivery} #{lang.documentPath}" for="exitDocument2FilePath"/>
+                <h:panelGroup id="exitDocument2FilePathPart">
+                  <h:inputFile value="#{consignmentView.exitDocument2FilePathPart}"  maxlength="200" id="exitDocument2FilePath"/>
+                  <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.exitDocument2FilePath}" icon="fa fa-trash" title="#{lang.deleteFile}"
+                                   process="@this" oncomplete="hide('exitDocument2FilePathLink')" update="exitDocument2FilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                    <f:setPropertyActionListener target="#{consignmentView.exitDocument2FilePathPart}" value="#{appIo.getRemoveFile()}" />
+                  </p:commandButton>
+                  <p:spacer width="5"/>
+                  <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.exitDocument2FilePath)}" ajax="false" id="exitDocument2FilePathLink" class="ignoreLoad" >
+                    <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.exitDocument2FilePath)}" />
+                  </p:commandLink>
+                  <p:message for="exitDocument2FilePath" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.delivery} #{lang.receipt} #{lang.type}"/>
+                <h:panelGroup>
+                  <h:outputLabel styleClass="txtView p-x-5" value="Form-15"/>                              
+                </h:panelGroup>
+              </ui:decorate>
+            </h:panelGroup>
+
+<!--            <h:panelGroup layout="block" styleClass="col-md-12" rendered="#{consignmentView.salesConsignment}">
+  <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+    <ui:param name="label" value="#{lang.waybill}" />
+    <ui:param name="cols" value="2" />
+    <ui:param name="ids" value="waybill" />
+
+    EXIT 2 DETAILS - DELIVERY NOTE DETAIL
+    <p:outputLabel value="#{lang.lrNo}" for="exitDocument1No"/>
+    <h:panelGroup >
+      <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.exitDocumentNo}" maxlength="100" id="exitDocument1No" 
+                   required="true" requiredMessage="#{lang.lrNo} #{lang.isRequired}"/>
+      <p:message for="exitDocument1No" display="text"/>
+    </h:panelGroup>
+
+    <p:outputLabel value="#{lang.waybill} #{lang.documentPath}" for="exitDocument1FilePath"/>
+    <h:panelGroup id="exitDocument1FilePathPart">
+      <h:inputFile value="#{consignmentView.exitDocumentFilePathPart}"  maxlength="200" id="exitDocument1FilePath"/>
+      <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.exitDocumentFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}"
+                       process="@this" oncomplete="hide('exitDocument1FilePathLink')" update="exitDocument1FilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+        <f:setPropertyActionListener target="#{consignmentView.exitDocument1FilePathPart}" value="#{appIo.getRemoveFile()}" />
+      </p:commandButton>
+      <p:spacer width="5"/>
+      <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.exitDocumentFilePath)}" ajax="false" id="exitDocument1FilePathLink" class="ignoreLoad" >
+        <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.exitDocumentFilePath)}" />
+      </p:commandLink>
+      <p:message for="exitDocument1FilePath" display="text"/>
+    </h:panelGroup>
+
+    <p:outputLabel value="#{lang.delivery} #{lang.receipt} #{lang.type}"/>
+    <h:panelGroup>
+      <h:outputLabel styleClass="txtView p-x-5" value="Form-15"/>                              
+    </h:panelGroup>
+  </ui:decorate>
+</h:panelGroup>-->
+            <h:panelGroup layout="block" styleClass="col-md-12" rendered="#{consignmentView.salesConsignment}">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="LR" />
+                <ui:param name="cols" value="2" />
+                <ui:param name="ids" value="LR" />
+
+                <!--EXIT 2 DETAILS - DELIVERY NOTE DETAIL-->
+                <p:outputLabel value="#{lang.lrNo}" for="exitDocument1No"/>
+                <h:panelGroup >
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.exitDocumentNo}" maxlength="100" id="exitDocument1No" 
+                               required="true" requiredMessage="#{lang.lrNo} #{lang.isRequired}"/>
+                  <p:message for="exitDocument1No" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.date}" />
+                <p:calendar value="#{consignmentView.consignmentDetail.lrDate}" pages="3"
+                            pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}" maxlength="13" 
+                            id="fromDate" showButtonPanel="true"  mask="true" placeholder="#{lang.fromDate}">
+                </p:calendar>
+
+                <p:outputLabel value="LR #{lang.documentPath}" for="exitDocument1FilePath"/>
+                <h:panelGroup id="exitDocument1FilePathPart">
+                  <h:inputFile value="#{consignmentView.exitDocumentFilePathPart}"  maxlength="200" id="exitDocument1FilePath"/>
+                  <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.exitDocumentFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}"
+                                   process="@this" oncomplete="hide('exitDocument1FilePathLink')" update="exitDocument1FilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                    <f:setPropertyActionListener target="#{consignmentView.exitDocument1FilePathPart}" value="#{appIo.getRemoveFile()}" />
+                  </p:commandButton>
+                  <p:spacer width="5"/>
+                  <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.exitDocumentFilePath)}" ajax="false" id="exitDocument1FilePathLink" class="ignoreLoad" >
+                    <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.exitDocumentFilePath)}" />
+                  </p:commandLink>
+                  <p:message for="exitDocument1FilePath" display="text"/>
+                </h:panelGroup>
+
+<!--                <p:outputLabel value="#{lang.delivery} #{lang.receipt} #{lang.type}"/>-->
+                <!--                <h:panelGroup>
+                                  <h:outputLabel styleClass="txtView p-x-5" value="Form-15"/>                              
+                                </h:panelGroup>-->
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Consignment Entry -->
+
+          <h:panelGroup layout="block" styleClass="row" id="checkPointDiv">
+            <h:panelGroup layout="block" styleClass="col-md-12" rendered="#{consignmentView.is8F()}">
+              <!--rendered="#{userRuntimeView.appUser.userProfileId.vendorId!=null}"-->
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.consignmentEntry}" />
+                <ui:param name="ids" value="centry" />
+                <ui:param name="cols" value="2" />
+
+                <!-- Entry Check point name -->
+                <p:outputLabel value="#{lang.checkPoint} #{lang.name}" for="entryCheckpostName" rendered="#{consignmentView.is8F()}"/>
+                <h:panelGroup rendered="#{consignmentView.is8F()}">
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.entryCheckpostName}" maxlength="50" id="entryCheckpostName" 
+                               required="true" requiredMessage="#{lang.checkPoint} #{lang.name} #{lang.isRequired}" readonly="#{consignmentView.isConfirmed() or userRole.isCustomer()}"/>
+                  <p:message for="entryCheckpostName" display="text"/>
+                </h:panelGroup>
+
+                <!-- Expected arrival date at entry check point -->
+                <p:outputLabel value="#{lang.expectedArrival} #{lang.at} #{lang.checkPoint}" for="entryCheckpostArrivalAt" rendered="#{consignmentView.is8F()}"/>
+                <h:panelGroup rendered="#{consignmentView.is8F()}">
+                  <p:calendar value="#{consignmentView.consignmentDetail.entryCheckpostArrivalAt}" pattern="#{lang.datePattern}" 
+                              converterMessage="#{lang.entryCheckpostArrivalAt} #{lang.invalidDate}"
+                              maxlength="29" required="true" requiredMessage="#{lang.expectedArrival} #{lang.at} #{lang.isRequired}" 
+                              id="entryCheckpostArrivalAt" showButtonPanel="true" mindate="#{userRuntimeView.minDate}"
+                              navigator="true" mask="true" pages="3" disabled="#{consignmentView.isConfirmed() or userRole.isCustomer()}"/>
+                  <p:message for="entryCheckpostArrivalAt" display="text"/>
+                </h:panelGroup>
+
+                <!-- Entry Document Number -->
+                <p:outputLabel value="#{lang.documentNo}" for="entryDocumentNo" rendered="#{consignmentView.isConfirmed() and (consignmentView.renderDocumentPurchase() or consignmentView.renderDocumentPurchaseReturn())}"/>
+                <h:panelGroup rendered="#{consignmentView.isConfirmed() and (consignmentView.renderDocumentPurchase() or consignmentView.renderDocumentPurchaseReturn())}">
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.entryDocumentNo}" maxlength="100" id="entryDocumentNo"
+                               required="true" requiredMessage="#{lang.documentNo} #{lang.isRequired}" readonly="#{consignmentView.consignment.consignmentStatusId.id ge 6 or (consignmentView.isConfirmed() and userRole.isVendor())}"/>
+                  <p:message for="entryDocumentNo" display="text"/>
+                </h:panelGroup>
+
+                <!-- Entry Document Path -->
+                <p:outputLabel value="#{lang.documentPath} *" for="entryDocumentFilePath" rendered="#{consignmentView.isConfirmed() and (consignmentView.renderDocumentPurchase() or consignmentView.renderDocumentPurchaseReturn())}"/>
+                <h:panelGroup id="entryDocumentFilePathPart" rendered="#{consignmentView.isConfirmed() and (consignmentView.renderDocumentPurchase() or consignmentView.renderDocumentPurchaseReturn())}">
+                    <!--required="true" requiredMessage="#{lang.documentPath} #{lang.isRequired}"-->
+                  <h:inputFile value="#{consignmentView.entryDocumentFilePathPart}"  maxlength="200" id="entryDocumentFilePath"
+                               disabled="#{consignmentView.consignment.consignmentStatusId.id ge 6 or (consignmentView.isConfirmed() and userRole.isVendor())}"/>
+                  <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.entryDocumentFilePath}" icon="fa fa-trash"
+                                   title="#{lang.deleteFile}" process="@this" oncomplete="hide('entryDocumentFilePathLink')" update="entryDocumentFilePathPart"
+                                   partialSubmit="true" immediate="true"  style="width:30px" disabled="#{consignmentView.consignment.consignmentStatusId.id ge 6 or (consignmentView.isConfirmed() and userRole.isVendor())}">
+                    <f:setPropertyActionListener target="#{consignmentView.entryDocumentFilePathPart}" value="#{appIo.getRemoveFile()}" />
+                  </p:commandButton>
+                  <p:spacer width="5"/>
+                  <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.entryDocumentFilePath)}" ajax="false" id="entryDocumentFilePathLink" class="ignoreLoad">
+                    <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.entryDocumentFilePath)}" />
+                  </p:commandLink>
+                  <p:message for="entryDocumentFilePath" display="text"/>
+                </h:panelGroup>
+
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Consignment Exit -->
+
+          <h:panelGroup layout="block" styleClass="row" rendered="#{consignmentView.purchaseReturnConsignment and userRole.isCompany()}">
+            <h:panelGroup layout="block" styleClass="col-md-12">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.consignmentExit}" />
+                <ui:param name="ids" value="exit" />
+                <ui:param name="cols" value="2" />
+
+                <!--Exit Document Number-->
+                <p:outputLabel value="#{lang.documentNo}" for="exitDocumentNo"/>
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.exitDocumentNo}" maxlength="100" id="exitDocumentNo"/>
+                  <p:message for="exitDocumentNo" display="text"/>
+                </h:panelGroup>
+
+                <!--Exit Document Path-->
+                <p:outputLabel value="#{lang.documentPath}" for="exitDocumentFilePath"/>
+                <h:panelGroup id="exitDocumentFilePathPart">
+                  <h:inputFile value="#{consignmentView.exitDocumentFilePathPart}"  maxlength="200" id="exitDocumentFilePath"/>
+                  <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.exitDocumentFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this"
+                                   oncomplete="hide('exitDocumentFilePathLink')" update="exitDocumentFilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                    <f:setPropertyActionListener target="#{consignmentView.exitDocumentFilePathPart}" value="#{appIo.getRemoveFile()}" />
+                  </p:commandButton>
+                  <p:spacer width="5"/>
+                  <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.exitDocumentFilePath)}" ajax="false" id="exitDocumentFilePathLink" class="ignoreLoad" >
+                    <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.exitDocumentFilePath)}" />
+                  </p:commandLink>
+                  <p:message for="exitDocumentFilePath" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.exit} #{lang.documents} #{lang.type}"/>
+                <h:panelGroup>
+                  <h:outputLabel styleClass="txtView p-x-5" value="Form-15"/>                              
+                </h:panelGroup>
+
+                <!-- Exit Check point Name -->
+                <p:outputLabel value="#{lang.checkPoint} #{lang.name}" for="exitCheckpostName"/>
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.exitCheckpostName}" maxlength="200" id="exitCheckpostName" />
+                  <p:message for="exitCheckpostName" display="text"/>
+                </h:panelGroup>
+
+                <!-- Expected date of arrival at exit check point -->
+                <p:outputLabel value="#{lang.expectedArrival} #{lang.at} #{lang.checkPoint}" for="exitCheckpostArrivalAt"/>
+                <h:panelGroup>
+                  <p:calendar value="#{consignmentView.consignmentDetail.exitCheckpostArrivalAt}" pattern="#{lang.datePattern}"
+                              converterMessage="#{lang.exitCheckpostArrivalAt} #{lang.invalidDate}" maxlength="29" id="exitCheckpostArrivalAt" 
+                              showButtonPanel="true" navigator="true" mask="true" mindate="#{userRuntimeView.minDate}"/>
+                  <p:message for="exitCheckpostArrivalAt" display="text"/>
+                </h:panelGroup>
+
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Consignment Receipt -->
+          <h:panelGroup layout="block" styleClass="row" rendered="#{consignmentView.consignment.consignmentStatusId.id>=6}">
+            <h:panelGroup layout="block" styleClass="col-md-12">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.consignmentReceipt}" />
+                <ui:param name="cols" value="2" />
+                <ui:param name="ids" value="reciept" />
+                <!--RECEIPT DETAILS-->
+                <p:outputLabel value="#{lang.receiptNo}" for="receiptNo" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentView.consignmentDetail.receiptNo}" maxlength="100" id="receiptNo" required="#{userRole.isCompany()}" requiredMessage="#{lang.receiptNo} #{lang.isRequired}"
+                               readonly="#{consignmentView.consignment.consignmentStatusId.id>=7}"/>
+                  <p:message for="receiptNo" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.receiptFilePath} *" for="receiptFilePath"/>
+                <h:panelGroup id="receiptFilePathPart">
+                  <h:inputFile value="#{consignmentView.receiptFilePathPart}"  maxlength="200" id="receiptFilePath" 
+                               disabled="#{consignmentView.consignment.consignmentStatusId.id>=7}"/>
+                  <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.receiptFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}"
+                                   process="@this" oncomplete="hide('receiptFilePathLink')" update="receiptFilePathPart" partialSubmit="true" immediate="true"  style="width:30px"
+                                   disabled="#{consignmentView.consignment.consignmentStatusId.id>=7}">
+                    <f:setPropertyActionListener target="#{consignmentView.receiptFilePathPart}" value="#{appIo.getRemoveFile()}" />
+                  </p:commandButton>
+                  <p:spacer width="5"/>
+                  <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.receiptFilePath)}" ajax="false" id="receiptFilePathLink" class="ignoreLoad" >
+                    <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.receiptFilePath)}"/>
+                  </p:commandLink>
+                  <p:message for="receiptFilePath" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.receiptType}" />
+                <h:panelGroup id="documentTypeDiv" >
+                  <h:outputLabel  styleClass="txtView p-x-5" value="#{consignmentView.documentType}"/>
+                </h:panelGroup>
+
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!--Receipt Detail Note-->
+
+          <h:panelGroup layout="block" styleClass="row" rendered="#{consignmentView.renderReceiptDetailNote()}">
+            <h:panelGroup layout="block" styleClass="col-md-12">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.receiptNote}" />
+                <ui:param name="cols" value="2" />
+                <ui:param name="ids" value="recieptNote" />
+
+                <!--Receipt return file path-->
+                <p:outputLabel value="#{lang.receiptReturnFilePath}" for="receiptReturnFilePath" rendered="#{consignmentView.consignment.consignmentStatusId.id>6 and (userRole.isCompany() or userRole.isCustomer())}"/>
+                <h:panelGroup id="receiptReturnFilePathPart" rendered="#{consignmentView.consignment.consignmentStatusId.id>6 and (userRole.isCompany() or userRole.isCustomer())}">
+                  <h:inputFile value="#{consignmentView.receiptReturnFilePathPart}"  maxlength="200" id="receiptReturnFilePath" required="true" requiredMessage="#{lang.receiptReturnFilePath} #{lang.isRequired}"/>
+                  <p:commandButton rendered="#{not empty consignmentView.consignmentDetail.receiptReturnFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}"
+                                   process="@this" oncomplete="hide('receiptReturnFilePathLink')" update="receiptReturnFilePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                    <f:setPropertyActionListener target="#{consignmentView.receiptReturnFilePathPart}" value="#{appIo.getRemoveFile()}" />
+                  </p:commandButton>
+                  <p:spacer width="5"/>
+                  <p:commandLink value="#{appIo.fileName(consignmentView.consignmentDetail.receiptReturnFilePath)}" ajax="false" id="receiptReturnFilePathLink" class="ignoreLoad" >
+                    <p:fileDownload value="#{appIo.downloadPrivate(consignmentView.consignmentDetail.receiptReturnFilePath)}" />
+                  </p:commandLink>
+                  <p:message for="receiptReturnFilePath" display="text"/>
+                </h:panelGroup>
+
+                <!--Note-->
+                <p:outputLabel value="#{lang.note}" for="rNote"/>
+                <h:panelGroup>
+                  <p:inputTextarea  styleClass="fw" value="#{consignmentView.consignment.note}" cols="100" rows="3" maxlength="500" id="rNote" autoResize="false"/>
+                  <p:message for="rNote" display="text"/>
+                </h:panelGroup>
+
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+        </p:tab>
+
+        <!-- Consignment Reference Tab -->
+        <p:tab title="#{lang.reference}" disabled="#{main.isNew()}" rendered="#{consignmentView.consignment.consignmentTypeId.id ne 3 and consignmentView.consignment.consignmentTypeId.id ne 2}" titleStyleClass="ignoreLoad">
+          <!--Purchase Order-->
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml" >
+            <ui:param name="rendered" value="#{consignmentView.consignment.consignmentTypeId.title=='Purchase'}" />
+            <ui:param name="ids" value="consignmentReferencePO" />
+            <ui:param name="search" value="false" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{consignmentView.consignmentReferencePOSelectPopup()}" title="#{lang.add}"
+                               process="@this" immediate="true" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info" rendered="#{consignmentView.isBeforeConfirm()}">
+
+              </p:commandButton>
+              <p:remoteCommand name="referencePoPopupReturned" actionListener="#{consignmentReferenceView.consignmentReferencePOPopupReturned()}" update="consignmentReferencePOTable"  
+                               process="@this" immediate="true" />
+            </ui:define>
+            <p:dataTable id="consignmentReferencePOTable" var="consignmentReferencePOVar" widgetVar="consignmentReferencePOWidget" value="#{consignmentView.getPOList(main)}"
+                         rowHover="false" reflow="true"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('consignmentReferencePOWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+
+              <p:column headerText="#{lang.purchaseOrderNo}" sortBy="#{consignmentReferencePOVar.purchaseOrderNo}" field="purchase_order_no" filterBy="#{consignmentReferencePOVar.purchaseOrderNo}" filterStyleClass="hidden" >
+                <h:outputText value="#{appView.display(consignmentReferencePOVar.purchaseOrderNo)}" title="#{appView.title(consignmentReferencePOVar.purchaseOrderNo)}" escape="false" />
+              </p:column>
+              <p:column headerText="#{lang.purchaseOrder} #{lang.date}" sortBy="#{consignmentReferencePOVar.purchaseOrderDate}" field="name">
+                <h:outputText value="#{appView.date(consignmentReferencePOVar.purchaseOrderDate)}" title="#{appView.date(consignmentReferencePOVar.purchaseOrderDate)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.createdBy}" sortBy="#{consignmentReferencePOVar.createdBy}" field="name">
+                <h:outputText value="#{appView.display(consignmentReferencePOVar.createdBy)}" title="#{appView.title(consignmentReferencePOVar.createdBy)}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.remove}" >
+                <p:commandButton action="#{consignmentView.deleteConsignmentReferencePO(main, consignmentReferencePOVar)}" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="fa fa-trash" >
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+
+          <!--Purchase Return-->
+
+          <!--          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml"  >
+                      <ui:param name="rendered" value="#{consignmentView.consignment.consignmentTypeId.title=='Purchase Return'}" />
+                      <ui:param name="ids" value="consignmentReferencePR" />
+          
+                      <ui:define name="menuleft">
+                        <p:commandButton action="#{consignmentView.consignmentReferencePOSelectDialog1()}" value="#{lang.add}"
+                                         process="@this" immediate="true" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"  >
+                          <p:ajax event="dialogReturn" listener="#{consignmentReferenceView.consignmentReferencePRDialogReturn}" update="consignmentReferencePRTable" />
+                        </p:commandButton>
+                      </ui:define>
+          
+                      <p:dataTable id="consignmentReferencePRTable" var="consignmentReferencePRVar" widgetVar="consignmentReferencePRWidget" value="#{consignmentView.getPRList(main)}"
+                                   rowHover="false" reflow="true"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+                        <f:facet name="header">
+                          <p:outputPanel styleClass="hidden" >
+                            <p:inputText id="globalFilter"  onkeyup="return PF('consignmentReferencePRWidget').filter()" />
+                          </p:outputPanel>
+                        </f:facet>
+                        <p:column headerText="#{lang.invoiceNo}" sortBy="#{consignmentReferencePRVar.invoiceNo}" field="name">
+                          <h:outputText value="#{appView.display(consignmentReferencePRVar.invoiceNo)}" title="#{appView.title(consignmentReferencePRVar.invoiceNo)}" escape="false" />
+                        </p:column>
+                        <p:column headerText="#{lang.createdBy}" sortBy="#{consignmentReferencePRVar.createdBy}" field="name">
+                          <h:outputText value="#{appView.display(consignmentReferencePRVar.createdBy)}" title="#{appView.title(consignmentReferencePRVar.createdBy)}" escape="false" />
+                        </p:column>
+                        <p:column headerText="#{lang.remove}" >
+                          <p:commandButton action="#{consignmentView.deleteConsignmentReferencePR(main, consignmentReferencePRVar)}" value="#{lang.delete}" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+                        </p:column>
+                      </p:dataTable>
+                    </ui:decorate>-->
+
+          <!--             Sales Order
+                    <p:dataTable id="consignmentReferenceSOTable" var="consignmentReferenceSOVar" widgetVar="consignmentReferenceSOWidget" value="#{consignmentView.getSOList(main)}"
+                                 rowHover="false" reflow="true"  tableStyleClass="mDataTable mDataTable-center fw editLinks" rendered="#{consignmentView.consignment.consignmentModeId.title=="sales order"}">
+                      <f:facet name="header">
+                        <p:outputPanel style="text-align: left"  >
+                          <p:commandButton action="#{consignmentView.consignmentReferenceSOSelectDialog()}" value="#{lang.add}"
+
+                                                               process="@this" immediate="true" icon="fa fa-plus" iconPos="left" styleClass="btn btn-default"  >
+                            <p:ajax event="dialogReturn" listener="#{consignmentView.consignmentReferenceSODialogReturn}" update="consignmentReferenceSOTable" />
+                          </p:commandButton>
+                        </p:outputPanel>
+                      </f:facet>
+                      <p:column headerText="#{lang.name}" sortBy="#{consignmentReferenceSOVar.salesOrderNo}" field="name">
+                        <h:outputText value="#{appView.display(consignmentReferenceSOVar.salesOrderNo)}" title="#{appView.title(consignmentReferenceSOVar.salesOrderNo)}" escape="false" />
+                      </p:column>
+                      <p:column headerText="#{lang.remove}" >
+                        <p:commandButton action="#{consignmentView.deleteConsignmentReferenceSO(main, consignmentReferenceSOVar)}" value="#{lang.delete}" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+                      </p:column>
+                    </p:dataTable>
+
+                    Sales Return
+                    <p:dataTable id="consignmentReferenceSRTable" var="consignmentReferenceSRVar" widgetVar="consignmentReferenceSRWidget" value="#{consignmentView.getSOList(main)}"
+                                 rowHover="false" reflow="true"  tableStyleClass="mDataTable mDataTable-center fw editLinks" rendered="#{consignmentView.consignment.consignmentModeId.title=="sales order"}">
+                      <f:facet name="header">
+                        <p:outputPanel style="text-align: left"  >
+                          <p:commandButton action="#{consignmentView.consignmentReferenceSRSelectDialog()}" value="#{lang.add}"
+
+                                                               process="@this" immediate="true" icon="fa fa-plus" iconPos="left" styleClass="btn btn-default"  >
+                            <p:ajax event="dialogReturn" listener="#{consignmentView.consignmentReferenceSRDialogReturn}" update="consignmentReferenceSRTable" />
+                          </p:commandButton>
+                        </p:outputPanel>
+                      </f:facet>
+                      <p:column headerText="#{lang.name}" sortBy="#{consignmentReferenceSRVar.salesReturnNo}" field="name">
+                        <h:outputText value="#{appView.display(consignmentReferenceSOVar.salesReturnNo)}" title="#{appView.title(consignmentReferenceSOVar.salesReturnNo)}" escape="false" />
+                      </p:column>
+                      <p:column headerText="#{lang.remove}" >
+                        <p:commandButton action="#{consignmentView.deleteConsignmentReferenceSO(main, consignmentReferenceSOVar)}" value="#{lang.delete}" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+                      </p:column>
+                    </p:dataTable>-->
+
+        </p:tab>
+
+      </p:tabView>
+
+      <p:confirmDialog showEffect="fade" widgetVar="cfmTransportMode" hideEffect="fade" header="Confirm Transport Mode">
+        <p:commandButton value="Yes" actionListener="#{consignmentView.resetTransportMode(1)}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" onclick="PF('cfmTransportMode').hide();" />
+        <p:commandButton value="No" actionListener="#{consignmentView.resetTransportMode(2)}" process="@this" update="consignmentTransportMode vehicleDetailsDiv" styleClass="ui-confirmdialog-no" icon="ui-icon-close" oncomplete="PF('cfmTransportMode').hide();" />
+      </p:confirmDialog>
+    </ui:define>
+
+    <ui:define name="list">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:dataTable id="consignmentTable" var="consignmentVar" widgetVar="consignmentWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{consignmentView.consignmentLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{consignmentVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{consignmentView.consignmentSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" 
+                   paginatorPosition="bottom"  scrollable="false" emptyMessage="No Records Found">
+
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{consignmentVar.consignmentNo}" field="consignmentNo">
+          <f:facet name="header"><h:outputText value="#{lang.consignmentNo}" title="#{lang.consignmentNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentVar.consignmentNo}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{consignmentView.consignment}" value="#{consignmentVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{consignmentVar.consignmentDate}" field="consignment_date" >
+          <f:facet name="header"><h:outputText value="#{lang.consignmentDate}" title="#{lang.consignmentDate}"/></f:facet>
+          <h:outputText value="#{appView.date(consignmentVar.consignmentDate)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{consignmentVar.vendorId.vendorName}" field="vendor_id.vendor_name" rendered="#{userRole.isVendor()}">
+          <f:facet name="header"><h:outputText value="#{lang.vendorName}" title="#{lang.vendorName}"/></f:facet>
+          <h:outputText value="#{appView.display(consignmentVar.vendorId.vendorName)}" title="#{appView.title(consignmentVar.vendorId.vendorName)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{consignmentVar.companyId.companyName}" field="company_id.company_name">
+          <f:facet name="header"><h:outputText value="#{lang.companyName}" title="#{lang.companyName}"/></f:facet>
+          <h:outputText value="#{appView.display(consignmentVar.companyId.companyName)}" title="#{appView.title(consignmentVar.companyId.companyName)}" escape="false" />
+        </p:column>        
+        <p:column  sortBy="#{consignmentVar.customerId.customerName}" field="customer_id.customer_name" rendered="#{userRole.isCustomer()}">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(consignmentVar.customerId.customerName)}" title="#{appView.title(consignmentVar.customerId.customerName)}" escape="false" />
+        </p:column>
+        <p:column  sortBy="#{consignmentVar.consignmentStatusId.title}" field="consignment_status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(consignmentVar.consignmentStatusId.title)}" title="#{appView.title(consignmentVar.consignmentStatusId.title)}" escape="false" />
+        </p:column>
+        <p:column styleClass="w-80" exportable="false"> 
+          <f:facet name="header"><h:outputText value="#{lang.action}" title="#{lang.action}"/></f:facet>
+          <p:commandButton action="#{consignmentView.consignmentReceiptPopup(consignmentVar)}" icon="fa fa-plus" process="@this" immediate="true"
+                           onstart="block()" oncomplete="unblock()" title="Add Receipt"
+                           rendered="#{consignmentView.isDespatchedOrDelivered(consignmentVar) and !consignmentView.isReceiptEntered(consignmentVar)}">
+          </p:commandButton>
+
+          <p:remoteCommand name="receiptPopupReturned" update="consignmentTable" process="@this" immediate="true" />
+          <p:commandButton action="#{consignmentView.consignmentReceiptPopup(consignmentVar)}" icon="fa fa-eye" process="@this" immediate="true"
+                           onstart="block()" oncomplete="unblock()" title="View Receipt" rendered="#{consignmentView.isReceiptEntered(consignmentVar)}">
+            <p:ajax event="dialogReturn" update="consignmentTable" />
+          </p:commandButton>
+          <p:commandButton id="expense1" icon="fa fa-dollar" title="#{lang.expense}" styleClass="btn btn-default" actionListener="#{consignmentView.showExpense(main)}" 
+                           immediate="true" process="@this" partialSubmit="true">
+          </p:commandButton>
+        </p:column>
+        <p:column  styleClass="w-80"  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:param name="cnf" value="true"></ui:param>
+            <ui:param name="desp" value="true"></ui:param>
+            <ui:define name="cby">#{appView.display(consignmentVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(consignmentVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(consignmentVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(consignmentVar.modifiedAt)}</ui:define>
+            <ui:define name="coby">#{appView.display(consignmentVar.confirmedBy)}</ui:define>
+            <ui:define name="coat">#{appView.dateTime(consignmentVar.confirmedAt)}</ui:define>
+            <ui:define name="dby">#{appView.dateTime(consignmentVar.despatchedAt)}</ui:define>
+            <ui:define name="dat">#{appView.dateTime(consignmentVar.deliveredAt)}</ui:define>
+            <ui:define name="id">#{appView.display(consignmentVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+
+  </ui:decorate>
+  <!--</h:form>-->
+</ui:composition>

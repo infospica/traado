@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"> 
+
+
+  #{invoicePrintView.invoicePrint(main)}
+  <style>
+    .data{
+      font-size: 8px;
+      color:#222;
+    } 
+    .dataTitle{
+      font-size: 10px;
+      font-weight: bold;
+      color:#000;
+    }
+    .dataHead{
+      font-size: 10px;
+      font-weight: bold;
+      color:#000;
+    }
+    .mainTable{
+      border:none;
+      width:100%;
+      border-collapse: collapse;
+    }
+    .cellTable{
+      font-weight: bold !important;
+      border-top:1px solid #000;
+      border-right:1px solid #000;
+      border-bottom:1px solid #000;
+      border-left:1px solid #000;
+    }
+    .horizontalLine{
+      border-top:1px solid #000;
+      border-bottom:1px solid #000;
+    }
+    .verticalLine{
+      border-right:1px solid #000;
+      border-left:1px solid #000;
+    }
+
+  </style>
+  <br />
+  <!--  <button type="button" class="export-pdf" id="btnExportToPDF" >Pdf</button>-->
+  <br/>
+
+  <div class="print invoice content-wrapper" onclick="closePopup()" style="background-color: white;margin: 5px;width:560px;line-height: 1.1em;">
+    <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+    <p:importConstants type="spica.scm.util.CurencyToText" var="currencyConfig" />
+    <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
+    <h:inputHidden value="#{invoicePrintView.salesInvoice.invoiceNo}" id="invoiceNo" />
+    <h:inputHidden value="#{request.contextPath}/#{accountingConstant.INVOICE_PRINT_PROXY_URL}" id="proxyUrl" />
+
+    <table class="mainTable">
+       
+      <ui:include src="print_invoice_common_header.xhtml" />
+            
+      <ui:include src="print_invoice_common_product_list.xhtml" />
+          
+          
+      <tr>
+        <td>
+          <!-- Tax Split with net amount -->
+          <ui:include src="print_invoice_common_tax_amount.xhtml" />
+        </td>
+      </tr>
+      <tr>
+        <td align="left"  valign="top" >
+          <ui:include src="print_invoice_common_footer.xhtml" />
+        </td>
+      </tr>
+    </table>
+    <div class="data">
+      <div class="R" style="padding-right: 150px;"></div>
+      <div class="C"> 
+        <h:outputLabel value="Email:#{invoicePrintView.salesInvoice.companyAddressId.email}" rendered="#{invoicePrintView.salesInvoice.companyAddressId.email!=null}" />
+        &#160;&#160;&#160;&#160;
+        <h:outputLabel value="Web:#{invoicePrintView.salesInvoice.companyAddressId.email}" rendered="#{invoicePrintView.salesInvoice.companyAddressId.website!=null}" />
+      </div>
+    </div>
+  </div>     
+  <div class="loading" ></div>
+  <script src="#{request.contextPath}/theme1/js/kendo.all.min.js" type="text/javascript" ></script>
+  <script>
+    //<![CDATA[
+    $(".export-pdf").click(function () {
+      // Convert the DOM element to a drawing using kendo.drawing.drawDOM
+      genPdf();
+    });
+    $(document).ready(function () {
+      genPdf();
+
+    });
+    </script>
+  <script>
+    function genPdf() {
+      kendo.drawing.drawDOM($(".content-wrapper"), {forcePageBreak: ".page-break"})
+              .then(function (group) {
+                // Render the result as a PDF file
+                return kendo.drawing.exportPDF(group, {
+                  paperSize: "A4",
+
+                  margin: {left: "0.5cm", top: "0.5cm", right: "0.5cm", bottom: "0.5cm"}
+                });
+              })
+              .done(function (data) {
+                // Save the PDF file
+                kendo.saveAs({
+                  dataURI: data,
+                  fileName: $("#invoiceNo").val(),
+                  forceProxy: true,
+                  proxyURL: $("#proxyUrl").val()
+                });
+              });
+    }
+    //]]>
+  </script>
+</ui:composition>

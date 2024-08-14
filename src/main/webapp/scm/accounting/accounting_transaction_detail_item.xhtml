@@ -1,0 +1,199 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >      
+  #{actDetailItemView.switchAccountingTransactionDetailItem(main, 'newform')}
+  <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{actDetailItemView.headerValue}" />
+
+    <ui:param name="navLabel" value="#{actDetailItemView.accountingTransactionDetail.accountingLedgerId.title}" />
+    <ui:param name="ids" value="accountingTransactionDetailItem" />
+    <ui:param name="reset" value="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null}" />
+    <ui:define name="deleteList" >
+<!--      <p:commandButton action="#{actDetailItemView.deleteAccountingTransactionDetailItem(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountingTransactionDetailItemWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>-->
+    </ui:define>
+    <ui:define name="menu1" >
+      <!--<p:menuitem actionListener="#{actDetailItemView.cloneAccountingTransactionDetailItem(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>-->
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <!--<p:commandButton action="#{actDetailItemView.deleteAccountingTransactionDetailItem(main)}" value="#{lang.delete}" onclick="wdgOff('accountingTransactionDetailItemWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />-->
+    </ui:define>
+   
+    <ui:define name="save" >      
+      <p:commandButton  value="#{lang.confirm}" styleClass="btn btn-primary" update="detailItemTableDiv errorMess" onclick="checkConfirm(#{actDetailItemView.accountingTransactionDetail.getDetailItemPayable().size()},#{(actDetailItemView.accountingTransactionDetail.accountingTransactionId.isReceipt() or actDetailItemView.accountingTransactionDetail.accountingTransactionId.isPayment())})" oncomplete="atdiValid(xhr, status, args)" rendered="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null}"  ></p:commandButton>        
+      <p:remoteCommand name="atdiSub" actionListener="#{actDetailItemView.saveAccountingTransactionDetailItem(main)}" oncomplete="parent.transactionDetailItemReturned();closeIt()" rendered="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null}"/>
+    </ui:define>   
+    <ui:define name="navRight" >
+      <script>
+        //<![CDATA[
+        var atdi = false;
+        function checkConfirm(rowCount, isReceiptOrPay) {
+          atdi = false;
+          if (isReceiptOrPay) {
+            for (var i = 0; i < rowCount; i++) {
+              var val = $('#leftTable\\:' + i + '\\:adjustmentAmount_hinput').val();
+              if (val && val > 0) {
+                atdi = true;
+                break;
+              }
+            }
+          } else {
+            atdi = true;
+          }
+        }
+        function atdiValid(xhr, status, args) {
+          if (!args.validationFailed) {
+            if (atdi) {
+              atdiSub();
+            }
+            else{
+               wdgOn('saveDetailConf');
+            }
+          }
+        }
+        //]]>
+      </script>
+      <p:confirmDialog widgetVar="saveDetailConf" message="#{lang.areUSure}" header="#{actDetailItemView.headerValue} - Advance Confirmation" severity="alert" closable="false" >
+        <p:commandButton actionListener="#{actDetailItemView.saveAccountingTransactionDetailItem(main)}" value="#{lang.confirm}" styleClass="btn btn-primary" oncomplete="parent.transactionDetailItemReturned();closeIt()" rendered="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null}"  ></p:commandButton>        
+        <p:commandButton value="#{lang.btnNo}" onclick="wdgOff('saveDetailConf')" type="button" styleClass="btn" />
+      </p:confirmDialog>
+      <p:remoteCommand name="closeIt" actionListener="#{actDetailItemView.remoteCloseCommand(main)}" process="@this" immediate="true"  />   
+
+      <p:commandButton process="@this" immediate="true"                        
+                       actionListener="#{actDetailItemView.dialogClose}"
+                       icon="fa fa-times" iconPos="right" styleClass="btn btn-default right" oncomplete="parent.transactionDetailItemReturned();closePopup()"   />            
+    </ui:define>
+    <!--    <ui:define name="formRight" >
+    
+        </ui:define>-->
+    <ui:define name="form">  </ui:define>
+    <ui:define name="list">  </ui:define>   
+    <ui:define name="afterForm">
+       <p:messages id="errorMess" />
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <h:panelGroup layout="block" id="detailItemTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
+        #{actDetailItemView.loadAccountingDocType()}        
+        <p:dataTable id="detailItemTable" var="detailItemVar" widgetVar="accountingTransactionDetailItemWidget" tableStyleClass="mDataTable mDataTable-center editLinks"
+                     value="#{actDetailItemView.accountingTransactionDetail.detailItem}" rowIndexVar="rowIndex"  >
+
+          <p:column  headerText="#{lang.accountGroup}" rendered="#{actDetailItemView.showAccountGroup() and actDetailItemView.lookupGroupAuto() ne null and actDetailItemView.lookupGroupAuto().size() gt 1}">  
+            <h:panelGroup  id="selectedAccountGroupDiv" >
+              <p:selectOneMenu value="#{accountingMainView.selectedAccountGroup}" id="selectedAccountGroupId" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"                   
+                               converter="omnifaces.SelectItemsConverter" filter="true" var="ag">
+                <f:selectItem itemLabel="#{lang.all} #{lang.accountGroup}" itemValue="#{null}" />
+                <f:selectItems value="#{actDetailItemView.lookupGroupAuto()}" var="a" itemValue="#{a}" itemLabel="#{a.groupName}" />
+                <p:column styleClass="w-340">
+                  <h:outputText value="#{ag.groupName}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{ag.groupCode}" />
+                </p:column>          
+                <p:ajax event="itemSelect" process="selectedAccountGroupDiv" listener="#{actDetailItemView.accountGroupChanged}" onstart="block()" oncomplete="unblock()" 
+                        update="payableReceivableDiv detailItemTable adjTotalDiv leftTable totalAmount rightTable" /> 
+              </p:selectOneMenu>   
+               <p:message for="selectedAccountGroupId" />
+            </h:panelGroup>
+          </p:column>
+          <p:column  headerText="#{lang.docType}" >            
+            <p:selectOneMenu value="#{detailItemVar.documentTypeId}"  id="accountingDocType"
+                             styleClass="fw"  
+                             converter="omnifaces.SelectItemsConverter">
+              <f:selectItems value="#{actDetailItemView.accountingDocType()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              <p:ajax event="itemSelect" process="@this" update="detailItemTable leftTable totalAmount rightTable" listener="#{actDetailItemView.docTypeChanged}" partialSubmit="true" onstart="block()" oncomplete="unblock()"  />
+            </p:selectOneMenu>
+          </p:column>
+
+          <p:column headerText="#{lang.chequeNO}" rendered="#{actDetailItemView.isChequeSelect() and actDetailItemView.isBank and actDetailItemView.chequeEntryList.size() gt 0 }">
+            <p:selectOneMenu var="ce" value="#{detailItemVar.chequeEntryId}"  id="accountCompanyBankId" styleClass="fw" rendered="#{actDetailItemView.chequeEntryList.size() gt 0}"
+                             converter="omnifaces.SelectItemsConverter" valueChangeListener="#{actDetailItemView.chequeValueChanged}" >
+              <f:selectItem itemValue="#{null}" itemLabel="#{lang.select}" />
+              <f:selectItems value="#{actDetailItemView.chequeEntryList}" var="e" itemValue="#{e}" itemLabel="#{e.chequeNo}" />
+              <p:ajax event="itemSelect" process="@this" update="detailItemTable netAmount leftTable totalAmount rightTable" listener="#{actDetailItemView.chequeChanged}" onstart="block()" oncomplete="unblock()"  />
+              <p:column >
+                <h:outputText value="#{ce.chequeNo}" />
+              </p:column> 
+              <p:column >
+                <h:outputText value="#{ce.amount}" />
+              </p:column> 
+              <p:column>
+                <h:outputText value="#{appView.date(ce.chequeDate)}" />
+              </p:column>
+              <p:column>
+                <h:outputText value="#{appView.display(ce.note)}" title="${ce.note}" />
+              </p:column>
+            </p:selectOneMenu>
+          </p:column>
+          <p:column  headerText="#{lang.documentNo}"  >
+            <p:inputText value="#{detailItemVar.documentNumber}" id="documentNumber" styleClass="fw" required="true" requiredMessage="#{lang.documentNo} #{lang.isRequired}" />
+            <p:message for="documentNumber" />
+          </p:column>
+          <p:column  headerText="#{lang.date} #{lang.document} "  rendered="#{actDetailItemView.isBank or !actDetailItemView.showSettlement()}">
+            <p:calendar value="#{detailItemVar.documentDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}"
+                        mindate="#{userRuntimeView.getMinEntryDate()}" maxdate="#{userRuntimeView.getMaxEntryDate()}"
+                        maxlength="11" id="documentDate" showButtonPanel="true" navigator="true" mask="true"  readonlyInput="#{actDetailItemView.isChequeSelect()}"/>
+          </p:column>           
+
+<!--          <p:column headerText="#{lang.reference} #{lang.no}" rendered="#{!actDetailItemView.showSettlement()}" >
+            <p:inputText value="#{detailItemVar.referNumber}"  id="referNumber" ></p:inputText>
+          </p:column>          -->
+          <p:column headerText="#{lang.amount}"> 
+            <p:inputNumber value="#{detailItemVar.netAmount}" id="netAmount" onfocus="this.select()" inputStyleClass="text-right"  decimalPlaces="2" maxValue="999999999" minValue="-99999999" readonly="#{((!actDetailItemView.accountingTransactionDetail.accountingTransactionId.isPayment() and !actDetailItemView.accountingTransactionDetail.accountingTransactionId.isReceipt()) or actDetailItemView.isChequeSelect() or actDetailItemView.accountingTransactionDetail.accountingTransactionId.isJournalSettlement())}">
+              <p:ajax event="change" update="totalAmount rightTable leftTable settlementGrid adjSelfDiv" listener="#{actDetailItemView.calculateBalanceAmount()}" process="netAmount" />
+            </p:inputNumber>
+          </p:column> 
+          <p:column >
+            <p:commandButton actionListener="#{actDetailItemView.saveAccountingTransactionDetailItem(main)}" value="#{lang.confirm}" styleClass="btn btn-primary" 
+                             onclick="return checkConfirm(#{actDetailItemView.accountingTransactionDetail.getDetailItemPayable().size()}, #{(actDetailItemView.accountingTransactionDetail.accountingTransactionId.isReceipt() or actDetailItemView.accountingTransactionDetail.accountingTransactionId.isPayment())})" oncomplete="parent.transactionDetailItemReturned();closeIt()" 
+                             rendered="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.id eq null and !actDetailItemView.accountingTransactionDetail.accountingTransactionId.isReceipt() and !actDetailItemView.accountingTransactionDetail.accountingTransactionId.isPayment() and !actDetailItemView.accountingTransactionDetail.accountingTransactionId.isJournalSettlement() }"  ></p:commandButton>        
+          </p:column>
+        </p:dataTable>  
+      </h:panelGroup> 
+    </ui:define>
+    <ui:define name="after">
+
+      <h:panelGroup layout="block" styleClass="row"  rendered="#{actDetailItemView.accountingTransactionDetail.id == null and (actDetailItemView.showSettlement())}">
+        <h:panelGroup layout="block" styleClass="col-md-6" id="totalAmount">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="label" value="#{lang.settlement}" />
+            <p:panelGrid columns="5" columnClasses="#{sysRuntimeView.grid4Uniform}" id="settlementGrid" styleClass="mDataTable mDataTable-center fw editLinks">
+              <p:column><h:outputLabel value="#{lang.payment}" /></p:column>
+              <p:column>Adj. Receivable / Advance</p:column>
+              <p:column>Adj. Total</p:column>
+              <p:column>Adj. Balance</p:column>
+              <p:column>Auto fill</p:column>
+
+              <p:column>#{appView.decimal(actDetailItemView.paymentAmount)}</p:column>
+              <p:column>#{appView.decimal(actDetailItemView.receivableAmount)}</p:column>
+              <p:column>#{appView.decimal(actDetailItemView.totalAmount)}</p:column>
+              <p:column>
+                <h:outputText value="#{appView.decimal(actDetailItemView.balanceAmount)}" escape="false" styleClass="label" style="background-color: #{actDetailItemView.balanceAmount gt 0 ? AccountingConstant.COLOR_CR : AccountingConstant.COLOR_DR}"/>
+              </p:column>
+              <p:column> 
+                <h:panelGroup layout="block"  style="width:50px;">
+                  <p:selectBooleanCheckbox value="#{actDetailItemView.isAutoFill}">
+                    <p:ajax update="leftTable totalAmount rightTable" listener="#{actDetailItemView.autoFill(actDetailItemView.accountingTransactionDetail.getDetailItemPayable(), true)}" onstart="block()" oncomplete="unblock()"  />
+                  </p:selectBooleanCheckbox>
+                </h:panelGroup>
+              </p:column>
+            </p:panelGrid>
+          </ui:decorate>
+          <p:autoUpdate />
+        </h:panelGroup>
+        <h:panelGroup layout="block" styleClass="col-md-6" >
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="label" value="#{lang.note}" />
+            <p:inputTextarea  value="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.tempNote}" maxlength="1000" id="narration" styleClass="fw" rows="4" placeholder="#{lang.note}"/>
+            <!--            <h:panelGroup >
+                          <p:outputLabel  value="#{actDetailItemView.accountingTransactionDetail.accountingTransactionId.narration}" styleClass="fw" />
+                        </h:panelGroup>-->
+          </ui:decorate>
+        </h:panelGroup>
+      </h:panelGroup>
+      <h:panelGroup id="payableReceivableDiv">
+        <ui:include src="payable_receivable.xhtml" />
+      </h:panelGroup>
+    </ui:define>
+
+
+  </ui:decorate>
+</ui:composition>

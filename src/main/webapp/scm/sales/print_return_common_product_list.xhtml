@@ -1,0 +1,173 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"> 
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANTS" />
+  <!-- PORTRAIT -->
+  <p:fragment rendered="#{salesReturnPrintView.salesReturn.printType eq SYSTEM_CONSTANTS.PRINT_PORTRAIT}" >
+
+    <tr>
+      <td>               
+
+        <table border="0" style="width:100%; border-collapse: collapse;">
+          #{salesReturnPrintView.setIncrementCount(null, false)}
+          <ui:repeat var="inv" value="#{salesReturnPrintView.salesReturnItemList}" varStatus="status"  >
+            <p:fragment rendered="#{salesReturnPrintView.getIncrementCount()%salesReturnPrintView.firstBreakRow==0}">
+              <tr class="data #{status.index gt 0 and salesReturnPrintView.getIncrementCount()%salesReturnPrintView.firstBreakRow==0?'page-break':''}" 
+                  style="font-size: 7.5px;border-collapse:collapse">
+                <td class="cellTable" style="width:15px;"><b>Sl#</b></td>
+                <p:fragment rendered="#{salesReturnPrintView.companySettings.showManufacturer==1}"><td class="cellTable" style="width:15px;"><b>Mfg.</b></td></p:fragment>
+                <td class="cellTable" style="width:35px;"><b>HSN.<br/>Code</b></td>
+                <td class="cellTable" style="width:90px;"><b>Product Name</b></td>
+                <td class="cellTable" style="width:30px;"><b>Pack</b></td>
+                <td class="cellTable" style="width:45px;"><b>Batch No.</b></td>
+                <td class="cellTable" style="width:25px;"><b>Exp.<br/>Date</b></td>
+                <td class="cellTable" style="width:15px;"><b>Tax <br />%</b></td> 
+                <td class="cellTable" style="width:23px;"><b>Qty<br/></b></td>
+                <td class="cellTable" style="width:28px;"><b>MRP<br/>(Rs.)</b></td>
+                <td class="cellTable" style="width:35px;"><b>PTR<br/>(Rs.)</b></td>
+<!--                <td class="cellTable" style="width:20px;"><b>Dis.<br/>%</b></td>-->
+                <td class="cellTable" style="width:35px;"><b>Rate<br /> (Rs.)</b></td>
+                <td class="cellTable" style="width:35px;"><b>Dis.<br />(Rs.)</b></td>
+                <td class="cellTable" style="width:40px;"><b>Goods <br/> Value</b></td>
+                <!--<td class="cellTable" style="width:15px;"><b>GST <br />%</b></td>--> 
+                <!--<td class="cellTable" style="width:35px;"><b>GST<br/>Amount</b></td>-->
+                <td class="cellTable" style="width:40px;border-right:1px solid #ooo;"><b>Total<br/>(Rs.)</b></td>
+              </tr>
+              #{salesReturnPrintView.setIncrementCount(status.index, false)}
+            </p:fragment>
+            #{salesReturnPrintView.incrementCount()}
+            <tr style="font-size: 7.5px;">
+              <td class="verticalLine" style="border-left: none;height:20px;border-right:1px solid ##FFF;">#{status.index + 1}</td>
+              <p:fragment rendered="#{salesReturnPrintView.companySettings.showManufacturer==1}"><td class="verticalLine" >#{inv.mfgCode}&#160;</td></p:fragment>
+              <td class="verticalLine" align="right">#{inv.hsnCode}&#160;</td>
+              <td class="verticalLine" >#{inv.productName}&#160;</td>
+              <td class="verticalLine" align="right">#{inv.packSize}&#160;</td>
+              <td class="verticalLine" align="right">#{inv.batchNo}&#160;</td>
+              <td class="verticalLine" align="right">#{inv.expiryDate}&#160;</td>
+              <td class="verticalLine" align="right"> #{inv.cgstTaxRate+inv.sgstTaxRate}</td> 
+              <td class="verticalLine" align="right">#{inv.productQty}<h:outputText value=" +#{inv.productQtyFree}" rendered="#{inv.productQtyFree>0}" /></td>
+              <td class="verticalLine" align="right">#{appView.decimal(inv.valueMrp)}&#160;</td>
+              <td class="verticalLine" align="right">#{appView.decimal(inv.valuePtr)}&#160;</td>
+<!--              <td class="verticalLine" align="right">                 
+                
+                <h:outputText value=" +" rendered="#{inv.schemeDiscountPercentage gt 0 and inv.productDiscountPercentage gt 0}" />
+                <h:outputText value="#{appView.decimal(inv.productDiscountPercentage)}" rendered="#{inv.productDiscountPercentage gt 0.0}"/>
+              </td>-->
+              <td class="verticalLine" align="right">#{appView.decimal(inv.valueRate)}&#160;</td>
+              <td class="verticalLine" align="right">
+                
+<!--                <h:outputText value=" +" rendered="#{inv.schemeDiscountValue gt 0 and inv.productDiscountValue gt 0}" />-->
+                <h:outputText value="#{appView.decimal(inv.productDiscountValue + inv.schemeDiscountValue)}"/>
+              </td>
+              <td class="verticalLine" align="right">#{appView.decimal(inv.valueGoods)}&#160;</td>
+              <!--<td class="verticalLine" align="right"> #{inv.cgstTaxRate+inv.sgstTaxRate}</td>--> 
+              <!--<td class="verticalLine" align="right">#{appView.decimal(inv.valueSgst+inv.valueCgst)}&#160;</td>-->
+              <td class="verticalLine" style="border-right:1px solid #000;" align="right" >#{appView.decimal(inv.taxableAmount)}&#160;</td>
+            </tr>
+          </ui:repeat>
+        </table>
+
+
+        <p:fragment rendered="#{((salesReturnPrintView.getIncrementCount())+salesReturnPrintView.salesReturn.invoiceGroup.size()) gt salesReturnPrintView.lastBreakRow  }">           
+          <span class="page-break"> </span>                 
+        </p:fragment>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="width:100%;border: solid 1px #000000;">
+          <p:repeat value="#{salesReturnPrintView.extraLiner(false)}" var="dummy">
+            <div style="height:20px;"></div>
+          </p:repeat>
+        </div>
+      </td>
+    </tr>  
+
+  </p:fragment>
+  <!-- LANDSCAPE -->
+  <p:fragment rendered="#{(salesReturnPrintView.salesReturn.printType eq SYSTEM_CONSTANTS.PRINT_SINGLE_LINE) or (salesReturnPrintView.salesReturn.printType eq SYSTEM_CONSTANTS.PRINT_MULTIPLE_LINE) }">
+
+    <tr>
+      <td>
+
+        <table border="0" style="width:100%;">            
+          #{salesReturnPrintView.setIncrementCount(null, true)}
+          <ui:repeat var="inv" value="#{salesReturnPrintView.salesReturnItemList}" varStatus="status"  >
+            <p:fragment rendered="#{salesReturnPrintView.getIncrementCount()%salesReturnPrintView.firstBreakRow==0}">
+              <tr class="data #{status.index gt 0 and salesReturnPrintView.getIncrementCount()%salesReturnPrintView.firstBreakRow==0?'page-break':''}" style="font-size: 7.5px;">
+                <td class="cellTable" style="width:15px;"><b>Sl#</b></td>
+                <p:fragment rendered="#{salesReturnPrintView.companySettings.showManufacturer==1}"><td class="cellTable" style="width:15px;"><b>Mfg.</b></td></p:fragment>
+                <td class="cellTable" style="width:33px;"><b>HSN.<br/>Code</b></td>
+                <td class="cellTable" style="width:125px;"><b>Product Name</b></td>
+                <td class="cellTable" style="width:30px;"><b>Pack</b></td>
+                <td class="cellTable" style="width:45px;"><b>Batch No.</b></td>
+                <td class="cellTable" style="width:23px;"><b>Exp.<br/>Date</b></td>
+                <td class="cellTable" style="width:15px;"><b>Tax <br />%</b></td> 
+                <td class="cellTable" style="width:20px;"><b>Qty<br/></b></td>
+                <td class="cellTable" style="width:35px;"><b>MRP<br/>(Rs.)</b></td>
+                <td class="cellTable" style="width:35px;"><b>PTR<br/>(Rs.)</b></td>
+                <td class="cellTable" style="width:35px;"><b>PTS<br/>(Rs.)</b></td>
+                
+                <td class="cellTable" style="width:35px;"><b>Rate<br /> (Rs.)</b></td>
+                <td class="cellTable"  style="width:35px;"><b>Dis.<br />(Rs.)</b></td>
+
+                <td class="cellTable" style="width:35px;"><b>Goods <br/> Value</b></td>
+                <!--<td class="cellTable" style="width:15px;"><b>GST <br />%</b></td>--> 
+                <!--<td class="cellTable" style="width:35px;"><b>GST<br/>Amount</b></td>-->
+                <td class="cellTable" style="width:40px;border-right:1px solid #ooo;"><b>Total<br/>(Rs.)</b></td>
+
+              </tr>
+              #{salesReturnPrintView.setIncrementCount(status.index, true)}
+            </p:fragment>
+            #{salesReturnPrintView.incrementCount()}
+            <tr style="font-size: 7.5px;">
+
+              <td class="verticalLine" style="border-left: none;">#{status.index + 1}</td>
+              <p:fragment rendered="#{salesReturnPrintView.companySettings.showManufacturer==1}"><td class="verticalLine"  >#{inv.mfgCode}&#160;</td></p:fragment>
+              <td  class="verticalLine" align="right">#{inv.hsnCode}&#160;</td>
+              <td class="verticalLine" >#{inv.productName}&#160;</td>
+              <td class="verticalLine" align="right">#{inv.packSize}&#160;</td>
+
+              <td  class="verticalLine" align="right">#{inv.batchNo}&#160;</td>
+              <td class="verticalLine"  align="right">#{inv.expiryDate}</td>
+              <td class="verticalLine"  align="right"> #{inv.cgstTaxRate+inv.sgstTaxRate} </td> 
+              <td class="verticalLine"  align="right">#{inv.productQty} <h:outputLabel value=" +#{inv.productQtyFree}" rendered="#{inv.productQtyFree>0}" />&#160;</td>
+              <td  class="verticalLine" align="right">#{appView.decimal(inv.valueMrp)}&#160;</td>
+              <td class="verticalLine"  align="right">#{appView.decimal(inv.valuePtr)}&#160;</td>
+              <td  class="verticalLine" align="right">#{appView.decimal(inv.valuePts)}&#160;</td>
+              <!--<td class="verticalLine"  align="right">#{appView.decimal(inv.schemeDiscountPercentage)}<h:outputText value=" +" rendered="#{inv.schemeDiscountPercentage gt 0 and inv.productDiscountPercentage gt 0}" /><h:outputText value="#{appView.decimal(inv.productDiscountPercentage)}" rendered="#{inv.productDiscountPercentage gt 0.0}"/>           </td>-->
+              <td class="verticalLine"  align="right">#{appView.decimal(inv.valueRate)}&#160;</td>
+              <td class="verticalLine"  align="right">
+                
+                <!--<h:outputText value=" +" rendered="#{inv.schemeDiscountValue gt 0 and inv.productDiscountValue gt 0}" /><h:outputText value="#{appView.decimal(inv.productDiscountValue)}" rendered="#{inv.productDiscountValue gt 0.0}"/>-->
+                <h:outputText value="#{appView.decimal(inv.productDiscountValue+inv.schemeDiscountValue)}"/>
+              </td>
+
+              <td class="verticalLine"  align="right">#{appView.decimal(inv.valueGoods)}&#160;</td>
+              <!--<td class="verticalLine"  align="right"> #{inv.cgstTaxRate+inv.sgstTaxRate} </td>--> 
+              <!--<td class="verticalLine"  align="right">#{appView.decimal(inv.valueSgst+inv.valueCgst)}&#160;</td>-->
+              <td class="verticalLine" style="border-right:1px solid #000;" align="right" >#{appView.decimal(inv.taxableAmount)}&#160;</td>
+
+
+            </tr>
+          </ui:repeat>
+
+        </table>
+
+        <p:fragment rendered="#{((salesReturnPrintView.getIncrementCount())+salesReturnPrintView.salesReturn.invoiceGroup.size()) gt salesReturnPrintView.lastBreakRow  }">
+          <span class="page-break"></span>                 
+        </p:fragment>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <div style="width:100%;border: solid 1px #000000;">
+          <p:repeat value="#{salesReturnPrintView.extraLiner(true)}" var="dummy">
+            <div style="height:10px;"></div>
+          </p:repeat>
+
+        </div>
+      </td>
+    </tr>
+
+  </p:fragment>
+</ui:composition>

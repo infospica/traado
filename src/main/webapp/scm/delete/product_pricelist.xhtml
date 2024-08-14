@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{productPricelistView.switchProductPricelist(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productPricelist}" />
+    <ui:param name="ids" value="productPricelist" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productPricelistView.deleteProductPricelist(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productPricelistWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productPricelistView.cloneProductPricelist(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productPricelistView.deleteProductPricelist(main)}" value="#{lang.delete}" onclick="wdgOff('productPricelistWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productPricelistView.saveProductPricelist(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.productPricelistPurchaseEntryDetailId}" for="productPricelistPurchaseEntryDetailId" /><h:panelGroup>
+             <p:selectOneMenu value="#{productPricelistView.productPricelist.purchaseEntryDetailId}"  required="true" requiredMessage="#{lang.productPricelistPurchaseEntryDetailId} #{lang.isRequired}" id="productPricelistPurchaseEntryDetailId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.productDetail(main)}" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" />
+            </p:selectOneMenu><p:message for="productPricelistPurchaseEntryDetailId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.productPricelistPurchaseEntryDetailId}" for="productPricelistPurchaseEntryDetailId" /><h:panelGroup>
+              <p:autoComplete value="#{productPricelistView.productPricelist.purchaseEntryDetailId}" completeMethod="#{scmLookupView.productDetailAuto}"  required="true" requiredMessage="#{lang.productPricelistPurchaseEntryDetailId} #{lang.isRequired}" id="productPricelistPurchaseEntryDetailId" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+              <o:converter list="#{scmLookupView.productDetail(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="productPricelistPurchaseEntryDetailId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+      <p:outputLabel value="#{lang.productPricelistPurchaseEntryDetailId}" for="productPricelistPurchaseEntryDetailId"/><h:panelGroup>
+        <p:autoComplete value="#{productPricelistView.productPricelist.purchaseEntryDetailId}" completeMethod="#{productPricelistView.productDetailAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productPricelistPurchaseEntryDetailId} #{lang.isRequired}" id="productPricelistPurchaseEntryDetailId" var="e" itemValue="#{e}" itemLabel="#{e.batchNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productDetailClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productDetailById()}"/>
+        </p:autoComplete><p:message for="productPricelistPurchaseEntryDetailId" display="text" /></h:panelGroup>
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.productPricelistAccountGroupPriceListId}" for="productPricelistAccountGroupPriceListId" /><h:panelGroup>
+             <p:selectOneMenu value="#{productPricelistView.productPricelist.accountGroupPriceListId}"  required="true" requiredMessage="#{lang.productPricelistAccountGroupPriceListId} #{lang.isRequired}" id="productPricelistAccountGroupPriceListId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.accountGroupPriceList(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            </p:selectOneMenu><p:message for="productPricelistAccountGroupPriceListId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.productPricelistAccountGroupPriceListId}" for="productPricelistAccountGroupPriceListId" /><h:panelGroup>
+              <p:autoComplete value="#{productPricelistView.productPricelist.accountGroupPriceListId}" completeMethod="#{scmLookupView.accountGroupPriceListAuto}"  required="true" requiredMessage="#{lang.productPricelistAccountGroupPriceListId} #{lang.isRequired}" id="productPricelistAccountGroupPriceListId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+              <o:converter list="#{scmLookupView.accountGroupPriceList(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="productPricelistAccountGroupPriceListId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+      <p:outputLabel value="#{lang.productPricelistAccountGroupPriceListId}" for="productPricelistAccountGroupPriceListId"/><h:panelGroup>
+        <p:autoComplete value="#{productPricelistView.productPricelist.accountGroupPriceListId}" completeMethod="#{productPricelistView.accountGroupPriceListAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productPricelistAccountGroupPriceListId} #{lang.isRequired}" id="productPricelistAccountGroupPriceListId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountGroupPriceListClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupPriceListById()}"/>
+        </p:autoComplete><p:message for="productPricelistAccountGroupPriceListId" display="text" /></h:panelGroup>
+      <p:outputLabel value="#{lang.valuePtsPerProdPieceSell}" for="valuePtsPerProdPieceSell" />
+      <h:panelGroup><p:inputNumber value="#{productPricelistView.productPricelist.valuePtsPerProdPieceSell}" converterMessage="#{lang.valuePtsPerProdPieceSell} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="valuePtsPerProdPieceSell" /><p:message for="valuePtsPerProdPieceSell" display="text"/></h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productPricelistTable" var="productPricelistVar" widgetVar="productPricelistWidget" tableStyleClass="editLinks"
+                   lazy="true" value="#{productPricelistView.productPricelistLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productPricelistVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"   
+                   selection="#{productPricelistView.productPricelistSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{productPricelistVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productPricelistVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productPricelistView.productPricelist}" value="#{productPricelistVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.batchNo}" sortBy="#{productPricelistVar.purchaseEntryDetailId.batchNo}" field="purchase_entry_detail_id.batch_no"><h:outputText value="#{appView.display(productPricelistVar.purchaseEntryDetailId.batchNo)}" title="#{appView.title(productPricelistVar.purchaseEntryDetailId.batchNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{productPricelistVar.accountGroupPriceListId.title}" field="account_group_price_list_id.title"><h:outputText value="#{appView.display(productPricelistVar.accountGroupPriceListId.title)}" title="#{appView.title(productPricelistVar.accountGroupPriceListId.title)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.valuePtsPerProdPieceSell}" sortBy="#{productPricelistVar.valuePtsPerProdPieceSell}" field="value_pts_per_prod_piece_sell" style="text-align: right"><h:outputText value="#{appView.decimal(productPricelistVar.valuePtsPerProdPieceSell)}" escape="false" /></p:column>
+        </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

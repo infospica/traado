@@ -1,0 +1,438 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" 
+                xmlns:o="http://omnifaces.org/ui"  >      
+  #{stockMovementView.switchStockMovement(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{stockMovementView.pageTitle}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? stockMovementView.stockMovement.statusId eq 2 ? 'Confirmed' : 'Draft' : null}" />
+    <ui:param name="ids" value="stockMovement" />
+    <ui:param name="deleteFormMenu" value="#{stockMovementView.draft}" />
+    <ui:param name="reset" value="false" />
+
+    <ui:define name="navRight" >
+           <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{stockMovementView.deleteStockMovement(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('stockMovementWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >      
+    </ui:define>
+
+    <ui:define name="formRight">
+      <p:outputLabel id="expiryDateLbl" value="#{lang.expiryDate}" for="expiryDate" rendered="#{stockMovementView.stockMovementType eq 3 and !stockMovementView.confirmed}"  />
+      <h:panelGroup rendered="#{stockMovementView.stockMovementType eq 3}" >
+        <p:calendar value="#{stockMovementView.expiryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.expiryDate} #{lang.invalidDate}"
+                    required="true" requiredMessage="#{lang.expiryDate} #{lang.isRequired}" rendered="#{!stockMovementView.confirmed}"
+                    maxlength="29" id="expiryDate" showButtonPanel="true" navigator="true" mask="true" >
+          <p:ajax event="dateSelect" update="f1" onstart="block();" oncomplete="unblock();"/>
+          <p:ajax event="change" update="f1" onstart="block();" oncomplete="unblock();" />
+        </p:calendar>
+        <p:message for="expiryDate" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{stockMovementView.deleteStockMovement(main)}" value="#{lang.delete}" onclick="wdgOff('stockMovementWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >       
+      <!-- Draft Button -->
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <h:commandButton action="#{stockMovementView.saveStockMovement(main, sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-success"
+                       rendered="#{main.isNew()}" >
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <!-- Confirm Button -->      
+      <p:commandButton action="#{stockMovementView.saveStockMovement(main, sysConstant.CONFIRMED)}" value="#{lang.confirm}" onclick="block();toTop();" styleClass="btn btn-success"
+                       rendered="#{stockMovementView.draft and stockMovementView.stockMovementType ne 3}" process="f1" update="f1" oncomplete="unblock()">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Move to Expired Button -->      
+      <p:commandButton action="#{stockMovementView.moveToexpiry(main)}" value="#{lang.movetoExpiry}" onclick="block();toTop()" styleClass="btn btn-success"
+                       process="f1" update="f1" rendered="#{stockMovementView.stockMovementType eq 3 and !stockMovementView.confirmed}" oncomplete="unblock();" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <!-- Up Coming Documet No -->
+      <h:panelGroup id="nextDocNoDiv">
+        <h:outputText  value="#{lang.next} #{lang.documentNo} #{lang.colon} " id="nextDocNoLabel"
+                       rendered="#{stockMovementView.draft and stockMovementView.nextInvoiceNumber ne null}" /> 
+        <p:outputLabel styleClass="m-r-10" value="#{stockMovementView.nextInvoiceNumber}" style="color:#900;" id="nextDocNo"
+                       rendered="#{stockMovementView.draft and stockMovementView.nextInvoiceNumber ne null}" />
+      </h:panelGroup>
+    </ui:define>   
+    <ui:define name="leftRightList">
+      <p:selectOneMenu id="stocktypeFilter" placeholder="#{lang.select} #{lang.stock} #{lang.type}" value="#{stockMovementView.stockMovementType}" styleClass="L" >
+        <f:selectItem itemLabel="#{lang.select} #{lang.all}" itemValue="#{null}"/>
+        <f:selectItem itemLabel="#{lang.saleableToDamaged}" itemValue="1"/>
+        <f:selectItem itemLabel="#{lang.damagedToSaleable}" itemValue="2"/>
+        <f:selectItem itemLabel="#{lang.saleableToExpired}" itemValue="3"/>
+        <p:ajax event="itemSelect" update="stockMovementTable"/>
+      </p:selectOneMenu>
+
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <h:panelGroup id="p1" layout="block" rendered="#{main.isForm()}">
+        <p:panelGrid id="pg1"  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                     columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+          <!--Account Group-->
+          <p:outputLabel value="#{lang.accountGroup}" />
+          <h:panelGroup id="accountGroupDiv">
+            <p:autoComplete id='accountGroup'  value="#{stockMovementView.stockMovement.accountGroupId}" completeMethod="#{stockMovementView.accountGroupList}" converter="wawo.LookupIntConverter" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" cacheTimeout="2000" queryDelay="500" 
+                            converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="false" 
+                            disabled="#{stockMovementView.stockMovement.accountId ne null or stockMovementView.confirmed or stockMovementView.disabled}" 
+                            title="#{lang.accountGroup}" dynamic="true" >
+              <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+              <p:column style="width:250px;">
+                <h:outputText value="#{e.groupName}" />
+              </p:column>
+              <p:column style="width: 40px;">
+                <h:outputText value="#{e.groupCode}" />
+              </p:column>
+              <p:column style="width: 50px;">
+                <p:fragment rendered="#{e.isDefault eq 0}">
+                  <i class="fa fa-users" style="color:#000;"></i>
+                </p:fragment>
+                <p:fragment rendered="#{e.isDefault eq 1}">
+                  <i class="fa fa-users" style="color:#CCC;" ></i>
+                </p:fragment>
+              </p:column>
+              <p:ajax event="itemSelect" immediate="false" process="accountGroupDiv" update="accountDiv dt2 nextDocNoLabel nextDocNo txt1 dt1"  onstart="block()" oncomplete="unblock()"
+                      listener="#{stockMovementView.updateReferenceNo(main)}" />
+            </p:autoComplete> 
+
+          </h:panelGroup> 
+          <!--Account -->
+          <p:outputLabel value="#{lang.account}"/>
+          <h:panelGroup id="accountDiv">            
+            <p:autoComplete id='account'  value="#{stockMovementView.stockMovement.accountId}" completeMethod="#{stockMovementView.accountList}" converter="wawo.LookupIntConverter" 
+                            var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                            converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" 
+                            disabled="#{stockMovementView.stockMovement.accountGroupId ne null or stockMovementView.confirmed or stockMovementView.disabled}" title="#{lang.accountNumber}" scrollHeight="400" >
+              <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+              <p:column style="width: 200px;">
+                <h:outputText value="#{e.vendorId.vendorName}" />
+              </p:column>
+              <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                <h:outputText value="#{e.accountCode}" />
+              </p:column>
+              <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                <h:outputText value="#{e.companyTradeProfileId.title}" />
+              </p:column>
+              <p:ajax event="itemSelect" immediate="false" process="accountDiv" update="accountGroupDiv dt2 p3 nextDocNoLabel nextDocNo txt1 dt1" onstart="block()" oncomplete="unblock()"
+                      listener="#{stockMovementView.updateReferenceNo(main)}"  />
+
+            </p:autoComplete>   
+          </h:panelGroup>
+
+          <!-- Invoice No -->
+          <p:outputLabel id="lbl1" value="#{lang.referenceNo}" for="txt1" />
+          <h:panelGroup>
+            <p:outputLabel value="#{stockMovementView.stockMovement.referenceNo}" rendered="#{stockMovementView.confirmed}"/>
+            <p:inputText value="#{stockMovementView.stockMovement.referenceNo}" maxlength="100" id="txt1" autocomplete="off"
+                         required="true" requiredMessage="#{lang.referenceNo} #{lang.isRequired}" styleClass="fw"
+                         rendered="#{!stockMovementView.confirmed}"/>
+            <p:message for="txt1" display="text" />
+          </h:panelGroup>
+          <p:outputLabel value=""/>
+          <h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Entry Date -->
+          <p:outputLabel id="lbl2" value="#{lang.entryDate}" for="cal1" />
+          <h:panelGroup>
+            <p:outputLabel value="#{appView.date(stockMovementView.entryDate)}" rendered="#{stockMovementView.confirmed}"/>
+            <p:calendar value="#{stockMovementView.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}"
+                        required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" rendered="#{!stockMovementView.confirmed}" mindate="#{userRuntimeView.minEntryDate}"
+                        maxlength="29" id="cal1" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.maxEntryDate}"
+                        disabled="true" />
+            <p:message for="cal1" display="text"/>
+          </h:panelGroup>
+          <p:outputLabel value=""/>
+          <h:panelGroup>
+          </h:panelGroup>
+
+          <!-- note -->
+          <p:outputLabel value="#{lang.note}" for="note2" />
+          <h:panelGroup>
+            <p:outputLabel value="#{stockMovementView.stockMovement.description}" rendered="#{stockMovementView.confirmed}"/>
+            <p:inputTextarea  styleClass="fw" tabindex="12" value="#{stockMovementView.stockMovement.description}"
+                              cols="100" rows="3" maxlength="500" id="note2" autoResize="false" rendered="#{!stockMovementView.confirmed}" />
+            <p:message for="note2" display="text"/>
+          </h:panelGroup>
+        </p:panelGrid>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after" >
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+
+        .bg-danger {
+          color: #fff;
+          background: #ef565a !important;
+        }
+      </style>
+
+      <h:panelGroup id="p2" layout="block" styleClass="card" rendered="#{main.isForm()}">
+        <h:panelGroup layout="block" id="p3" styleClass="table-responsive" pt:data-fast-input="true" 
+                      rendered="#{stockMovementView.stockMovementType ne 3 and (stockMovementView.stockMovement.accountId ne null or stockMovementView.stockMovement.accountGroupId ne null)}">
+
+          <p:dataTable var="stock" id="dt1" widgetVar="stockTableVar" value="#{stockMovementView.stockMovementItemList}" rowIndexVar="rowIndex"
+                       rows="50" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="50,100,150"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
+            <p:column id="col1" headerText="Sno" width="45" style="text-align: center;" >
+              <h:outputText id="lbl3" value="#{rowIndex + 1}" />
+            </p:column>
+
+            <p:column id="col2" width="200">
+              <f:facet name="header"><h:outputText id="lbl4" value="#{lang.product}" title="#{lang.productName}"/></f:facet>
+              <h:outputText value="#{stock.productId.productName}" rendered="#{stockMovementView.confirmed}" title="#{stock.productId.productName}" />
+              <p:autoComplete id="ac1" value="#{stock.productDetailId}" completeMethod="#{stockMovementView.completeProduct}"
+                              converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative" title="#{stock.productId.productName}"
+                              cache="true" queryDelay="500" maxResults="30" rendered="#{!stockMovementView.confirmed}" scrollHeight="500"
+                              var="prod" itemLabel="#{prod.productBatchId.productId.productName}" itemValue="#{prod}" forceSelection="true">
+                <f:attribute name="clazz" value="#{scmLookupView.productDetailClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productDetailById()}"/>
+                <f:attribute name="stockMovementItem" value="#{stock}"/>
+                <!-- Product Name -->
+                <p:column style="width:275px;">
+                  <f:facet name="header"><h:outputText style="font-weight: bold;" value="#{lang.name}" /></f:facet>
+                  <h:outputText value="#{prod.productBatchId.productId.productName}" />
+                </p:column>
+                <!-- Batch -->
+                <p:column style="width: 130px;">
+                  <f:facet name="header"><h:outputText style="font-weight: bold;" value="#{lang.batch}" /></f:facet>
+                  <h:outputText value="#{prod.productBatchId.batchNo}" />
+                </p:column>
+                <!-- Expiry Date -->
+                <p:column style="width: 130px;">
+                  <f:facet name="header"><h:outputText style="font-weight: bold;" value="#{lang.expDate}" /></f:facet>
+                  <h:outputText value="#{appView.date(prod.productBatchId.expiryDateActual)}" />
+                </p:column>
+
+                <!-- MRP -->
+                <p:column>
+                  <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+                  <h:outputText value="#{prod.productBatchId.valueMrp}" />
+                </p:column>
+
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true" update="lbl6 lbl8 lbl10 lbl12 lbl15 txt2 txt3 accountGroupDiv accountDiv cal1"
+                        listener="#{stockMovementView.productSelectEventHandler(stock, rowIndex)}"/>
+              </p:autoComplete>
+            </p:column>
+
+            <p:column id="col3">
+              <f:facet name="header"><h:outputText id="lbl5" value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+              <h:outputText id="lbl6" value="#{stock.productDetailId.productBatchId.batchNo}" />
+            </p:column>
+
+            <p:column id="col4">
+              <f:facet name="header"><h:outputText id="lbl7" value="#{lang.expDate}" title="#{lang.expiryDate}"/></f:facet>
+              <h:outputText id="lbl8" value="#{sysRuntimeView.dateToMMYY(stock.productDetailId.productBatchId.expiryDateActual)}" />
+            </p:column>
+
+            <p:column id="col5">
+              <f:facet name="header"><h:outputText id="lbl9" value="#{lang.purchasedQty}" title="#{lang.purchasedQuantity}"/></f:facet>
+              <h:outputText id="lbl10" value="#{stock.quantityPurchased}" />
+            </p:column>
+
+            <p:column id="col6" rendered="#{stockMovementView.stockMovementType eq 1}">
+              <f:facet name="header"><h:outputText id="lbl11" value="#{lang.saleableQty}" title="#{lang.saleableQuantity}"/></f:facet>
+              <h:outputText id="lbl12" value="#{stock.quantityAvailable}" />
+            </p:column>            
+
+            <!-- Damaged Qty -->
+            <p:column id="col8" rendered="#{stockMovementView.stockMovementType eq 2}">
+              <f:facet name="header"><h:outputText id="lbl14" value="#{lang.damagedQty}" title="#{lang.damagedQty}"/></f:facet>
+              <h:outputText id="lbl15" value="#{stock.quantityDamaged}" />
+            </p:column>
+
+            <p:column id="col7" rendered="#{stockMovementView.stockMovementType eq 2}">
+              <f:facet name="header"><h:outputText id="lbl13" value="#{lang.saleableQty}" title="#{lang.saleableQuantity}"/></f:facet>
+              <h:outputText id="lbl17" value="#{stock.quantitySaleableActual}" rendered="#{stockMovementView.confirmed}" />
+              <p:inputNumber id="txt2" value="#{stock.quantitySaleableActual}" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="#{stock.maxSaleableActualQty eq null ? 0: stock.maxSaleableActualQty }" minValue="0"
+                             decimalPlaces="0" rendered="#{!stockMovementView.confirmed}"
+                             readonly="#{stock.maxSaleableActualQty eq 0}"
+                             styleClass="submit_item fw">                
+              </p:inputNumber>
+            </p:column>
+
+            <p:column id="col9" rendered="#{stockMovementView.stockMovementType eq 1}">
+              <f:facet name="header"><h:outputText id="lbl16" value="#{lang.damagedQty}" title="#{lang.damagedQty}"/></f:facet>
+              <h:outputText id="lbl18" value="#{stock.quantityDamagedActual}" rendered="#{stockMovementView.confirmed}" />
+              <p:inputNumber id="txt3" value="#{stock.quantityDamagedActual}" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="#{stock.maxDamagedActualQty eq null ? 0: stock.maxDamagedActualQty}" minValue="0"
+                             readonly="#{stock.maxDamagedActualQty eq 0}" rendered="#{!stockMovementView.confirmed}" decimalPlaces="0" 
+                             styleClass="submit_item fw">                
+              </p:inputNumber>
+            </p:column>
+
+            <!-- Action Icons -->
+            <p:column headerText="" id="col10">
+              <p:commandButton id="b3" process="@this" value="" update="dt1" icon="fa fa-trash" tabindex="-1"
+                               rendered="#{!stockMovementView.confirmed}"
+                               style="color: mediumvioletred;" actionListener="#{stockMovementView.actionDeleteStockMovementItem(main, stock)}">
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" /> 
+              </p:commandButton>
+            </p:column>
+          </p:dataTable>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" id="p4" styleClass="table-responsive" pt:data-fast-input="true" rendered="#{stockMovementView.stockMovementType eq 3}">
+          <p:dataTable var="expire" id="dt2" widgetVar="stocktoExpireVar" value="#{stockMovementView.getStocktoExpiryList(main)}" rowIndexVar="rowIndex"
+                       rows="15" paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                       rowsPerPageTemplate="15,50,100,150" 
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
+            <p:column id="col1" headerText="Sno" width="45" style="text-align: center;" rendered="#{stockMovementView.stockMovementType eq 3}" >
+              <h:outputText id="lbl3" value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!--Product Name-->
+            <p:column width="300">
+              <f:facet name="header"><h:outputText value="#{lang.product}" title="#{lang.productName}"/></f:facet>
+              <h:outputText value="#{expire.productName}" title="#{expire.productName}" />
+            </p:column>
+            <!--Batch-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+              <h:outputText value="#{expire.batchNo}" title="#{expire.batchNo}" />
+            </p:column>
+            <!--Expiry Date-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+              <h:outputText value="#{sysRuntimeView.dateToMMYY(expire.expiryDate)}" title="#{expire.expiryDate}" />
+            </p:column>
+            <!--Pack Size-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.packSize}" title="#{lang.packSize}"/></f:facet>
+              <h:outputText value="#{expire.packSize}" title="#{expire.packSize}" />
+            </p:column>
+            <!--Mrp Value-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+              <h:outputText value="#{appView.decimal(expire.mrpValue)}" title="#{expire.mrpValue}" />
+            </p:column>
+            <!--Purchase Rate-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.purchaseRate}" title="#{lang.purchaseRate}"/></f:facet>
+              <h:outputText value="#{appView.decimal(expire.purchaseRate)}" title="#{expire.purchaseRate}" />
+            </p:column>
+            <!--Pts-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+              <h:outputText value="#{appView.decimal(expire.ptsRate)}" title="#{expire.ptsRate}" />
+            </p:column>
+            <!--Quantity-->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.quantity}" title="#{lang.quantity}"/></f:facet>
+              <h:outputText value="#{appView.number(expire.quantity)}" title="#{expire.quantity}" />
+            </p:column>
+          </p:dataTable>
+        </h:panelGroup>
+        <p:remoteCommand name="insertOrUpdateStockMovementItem" actionListener="#{stockMovementView.actionInsertOrUpdateStockMovementItem(main)}"
+                         process="f1" update="dt1 txt1 cal1" />
+
+        <script>
+          //<![CDATA[
+          function submitForm(params) {
+            insertOrUpdateStockMovementItem([{name: 'rownumber', value: params[2]}]);
+            $('#dt1\\:0\\:ac1_input').focus();
+            return false;
+          }
+          //]]>
+        </script>
+
+
+      </h:panelGroup>
+    </ui:define>    
+
+    <ui:define name="newList">
+      <p:commandButton id="accountBtn" type="button" value="#{lang.newform}" immediate="true" partialSubmit="true" process="@this" update="accountPanel" 
+                       styleClass="btn btn-info" >
+      </p:commandButton>
+
+      <p:overlayPanel id="accountPanel" widgetVar="panel" for="accountBtn" hideEffect="fade" showEvent="click" hideEvent="click" 
+                      showCloseIcon="true" dynamic="false" style="width:auto">
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <!-- Stock Movement -->
+          <h:outputText value="#{lang.stockMovement}" />
+          <p:selectOneRadio value="#{stockMovementView.stockMovementType}"  id="stockMovementTypeId" converter="omnifaces.SelectItemsConverter">            
+            <f:selectItems value="#{stockMovementView.stockMovementTypeList}" var="s" itemValue="#{s.intValue}" itemLabel="#{s.itemLabel}" />
+          </p:selectOneRadio>
+        </h:panelGroup>
+
+        <!-- Action Buttons -->
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <p:commandButton action="#{stockMovementView.actionNewForm(main)}" value="#{lang.create}" styleClass="btn btn-primary"
+                           process="accountPanel" update="f1">            
+          </p:commandButton>          
+        </h:panelGroup>
+
+      </p:overlayPanel>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="stockMovementTable" var="stockMovementVar" widgetVar="stockMovementWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{stockMovementView.stockMovementLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{stockMovementVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{stockMovementView.stockMovementSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />        
+
+        <p:column sortBy="#{stockMovementVar.referenceNo}" field="scm_stock_movement.reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>          
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(stockMovementVar.referenceNo)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{stockMovementView.stockMovement}" value="#{stockMovementVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{stockMovementVar.entryDate}" field="scm_stock_movement.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(stockMovementVar.entryDate)}" escape="false" />
+        </p:column>        
+
+        <p:column sortBy="#{stockMovementVar.stockMovementType}" field="scm_stock_movement.stock_movement_type" >
+          <f:facet name="header"><h:outputText value="#{lang.stock} #{lang.type}" title="#{lang.stock} #{lang.type}"/></f:facet>
+          <h:outputText value="#{stockMovementVar.stockMovementType eq 1 ? lang.saleableToDamaged  : stockMovementVar.stockMovementType eq 2? lang.damagedToSaleable:lang.saleableToExpired}" escape="false" />
+        </p:column>        
+
+        <p:column sortBy="#{stockMovementVar.statusId}" field="scm_stock_movement.status_id" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>          
+          <h:outputText value="#{stockMovementVar.statusId eq 2 ? 'Confirmed' : 'Draft'}" title="#{stockMovementVar.statusId eq 2 ? 'Confirmed' : 'Draft'}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(stockMovementVar.statusId)}" 
+                        style="background-color: #{sysRuntimeView.statusColor(stockMovementVar.statusId)}"/>          
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(stockMovementVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(stockMovementVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(stockMovementVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(stockMovementVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(stockMovementVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>        
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

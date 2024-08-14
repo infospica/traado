@@ -1,0 +1,606 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"   >
+  #{accountExpenseView.switchAccountExpense(main, main.viewType, expenseFrom)}
+  <o:importConstants type="spica.constant.AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.expense}" />
+    <ui:param name="ids" value="accountExpense" />
+    <ui:param name="cols" value="4" />
+    <ui:param name="columnClasses" value="#{sysRuntimeView.grid4}" />
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountExpenseView.deleteAccountExpense(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountExpenseWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="menu1" >
+<!--      <p:menuitem actionListener="#{accountExpenseView.cloneAccountExpense(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>-->
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountExpenseView.deleteAccountExpense(main)}" value="#{lang.delete}" onclick="wdgOff('accountExpenseWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    <ui:define name="save" >
+      <h:commandButton action="#{accountExpenseView.saveAccountExpense(main)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and accountExpenseView.accountExpense.isDraft()}"><f:ajax execute="f1" render="f1"/></h:commandButton>
+      <h:commandButton actionListener="#{accountExpenseView.saveAccountExpenseClose(main)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and accountExpenseView.accountExpense.isDraft() and main.popup}"><f:ajax execute="f1" render="f1"/></h:commandButton>
+    </ui:define>
+    <ui:define name="moreForm" >
+      <h:commandButton action="#{accountExpenseView.saveAccountExpenseConfirm(main)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-warning" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and accountExpenseView.accountExpense.isDraft() and accountExpenseView.accountExpense.id ne null}"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+      <h:commandButton action="#{accountExpenseView.saveBackToDraft(main)}" value="#{lang.reset} #{lang.to} #{lang.draft}" onclick="toTop()" styleClass="btn btn-info" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true or userRuntimeView.privilege.resetToDraft==true or main.appUser.isRoot()) and accountExpenseView.accountExpense.isConfirmed()}"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{accountExpenseView.dialogClose()}" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="form">
+      <!-- Account -->
+      <p:outputLabel value="#{lang.account}" for="accountExpenseAccountId" rendered="#{accountExpenseView.accountExpense.isExpensePurchase() and accountExpenseView.expenseFrom eq '0'}"/>
+      <h:panelGroup rendered="#{accountExpenseView.accountExpense.isExpensePurchase() and accountExpenseView.expenseFrom eq '0'}">
+        <p:autoComplete  id="accountExpenseAccountId" value="#{accountExpenseView.accountExpense.accountId}" completeMethod="#{userRuntimeView.accountAuto}" converter="wawo.LookupIntConverter"
+                         var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                         converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" required="true" requiredMessage="#{lang.account} #{lang.isRequired}"
+                         title="#{lang.accountNumber}" rendered="#{accountExpenseView.accountExpense.isExpensePurchase() and accountExpenseView.expenseFrom eq '0'}" readonly="#{main.edit}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>          
+          <p:column style="width: 350px;"><h:outputText value="#{e.vendorId.vendorName}" /></p:column>
+          <p:column style="width: 40px;"><h:outputText value="#{e.accountCode}" /></p:column>
+          <p:column style="width: 160px;"><h:outputText value="#{e.companyTradeProfileId.title}" /></p:column>          
+          <p:ajax event="itemSelect" process="@this" listener="#{accountExpenseView.updateTaxType()}" update="accountGroupId accountReimbursableTable" />
+        </p:autoComplete>
+        <p:message for="accountExpenseAccountId" display="text" />
+      </h:panelGroup>      
+      <!-- Consignment Receipt -->
+      <p:outputLabel value="#{lang.consignmentReceipt}" for="accountExpenseConsignmentPurchaseId" rendered="#{accountExpenseView.accountExpense.isExpensePurchase()}"/>
+      <h:panelGroup rendered="#{accountExpenseView.accountExpense.isExpensePurchase()}">
+        <p:autoComplete value="#{accountExpenseView.accountExpense.consignmentPurchaseId}" completeMethod="#{accountExpenseView.consignmentAuto}" converter="wawo.LookupIntConverter"
+                        id="accountExpenseConsignmentPurchaseId" var="e" itemValue="#{e}" itemLabel="#{e.consignmentNo}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500"
+                        maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                        forceSelection="true" styleClass="fw" required="false" requiredMessage="#{lang.consignmentReceipt} #{lang.isRequired}" >
+          <f:attribute name="clazz" value="#{scmLookupView.consignmentClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.consignmentById()}"/>
+        </p:autoComplete>
+        <p:message for="accountExpenseConsignmentPurchaseId" display="text" />
+      </h:panelGroup>
+      <!-- Account Group -->    
+
+      <p:outputLabel value="#{lang.accountGroup}" for="selectAccountGroupId" rendered="#{accountExpenseView.accountExpense.isExpensePurchase()}"/>
+      <h:panelGroup rendered="#{accountExpenseView.accountExpense.isExpensePurchase()}" id="accountGroupId" > 
+        <p:inputText value="#{accountExpenseView.accountExpense.accountGroupId.groupName}" readonly="true" rendered="#{accountExpenseView.groupList.size() eq 1}" />
+        <p:selectOneMenu value="#{accountExpenseView.accountExpense.accountGroupId}"  id="selectAccountGroupId" rendered="#{accountExpenseView.groupList.size() gt 1}"
+                         styleClass="fw"  autoWidth="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"
+                         converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.selectCombo} #{lang.accountGroup}" itemValue="#{null}" />
+          <f:selectItems value="#{accountExpenseView.groupList}" itemLabel="#{a.groupName}" itemValue="#{a}" var="a" />
+        </p:selectOneMenu>
+        <p:message for="selectAccountGroupId" display="text" />
+      </h:panelGroup>
+
+      <!-- Consignment Receipt -->
+      <p:outputLabel value="#{lang.consignmentReceipt}" for="accountExpenseConsignmentSalesId" rendered="#{accountExpenseView.accountExpense.isExpenseSales()}"/>
+      <h:panelGroup rendered="#{accountExpenseView.accountExpense.isExpenseSales()}">
+        <p:autoComplete value="#{accountExpenseView.accountExpense.consignmentSalesId}" completeMethod="#{accountExpenseView.consignmentSalesAuto}" converter="wawo.LookupIntConverter"
+                        id="accountExpenseConsignmentSalesId" var="e" itemValue="#{e}" itemLabel="#{e.consignmentNo}" emptyMessage="#{lang.noResult}"
+                        dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                        autocomplete="off" forceSelection="true" styleClass="fw"
+                        required="false" requiredMessage="#{lang.consignmentReceipt} #{lang.isRequired}"
+                        >
+          <f:attribute name="clazz" value="#{scmLookupView.consignmentClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.consignmentById()}"/>
+        </p:autoComplete>
+        <p:message for="accountExpenseConsignmentSalesId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.account}" for="selectAccountId" rendered="#{accountExpenseView.accountExpense.isExpenseSales() }"/>      
+      <h:panelGroup rendered="#{accountExpenseView.accountExpense.isExpenseSales() }"> 
+        <p:inputText value="#{accountExpenseView.accountExpense.accountId.accountTitle}" readonly="true" rendered="#{accountExpenseView.accountList.size() eq 1}" />        
+        <p:selectOneMenu var="acc" value="#{accountExpenseView.accountExpense.accountId}"  id="selectAccountId" rendered="#{accountExpenseView.accountList.size() gt 1}"
+                         styleClass="fw"  autoWidth="true"  
+                         converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.account} #{lang.isRequired}">
+          <f:selectItem itemLabel="#{lang.selectCombo} #{lang.account}" itemValue="#{null}" />
+          <f:selectItems value="#{accountExpenseView.accountList}" itemLabel="#{ac.accountTitle}" itemValue="#{ac}" var="ac" />
+          <p:column style="width: 350px;"><h:outputText value="#{acc.vendorId.vendorName}" /></p:column>
+          <p:column style="width: 40px;"><h:outputText value="#{acc.accountCode}" /></p:column>
+          <p:column style="width: 160px;"><h:outputText value="#{acc.companyTradeProfileId.title}" /></p:column>
+          <p:ajax event="itemSelect" process="@this" listener="#{accountExpenseView.updateTaxType()}" update="accountReimbursableTable accountExpenseDetailTable" />
+        </p:selectOneMenu>
+        <p:message for="selectAccountId" display="text" />
+      </h:panelGroup>
+
+      <!-- Entry Date -->
+      <p:outputLabel value="#{lang.entryDate}" for="entryDate" />
+      <h:panelGroup>
+        <p:calendar value="#{accountExpenseView.accountExpense.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}"
+                    maxlength="29" id="entryDate" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" pages="3"/>
+        <p:message for="entryDate" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <h:panelGroup layout="block" rendered="#{main.isForm()}" pt:data-fast-input="true" class="table-responsive">
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="#{lang.reimbursable} #{lang.expense}" />
+          <ui:param name="ids" value="reimbursable" />
+
+          <p:dataTable id="accountReimbursableTable" var="accountExpenseDetailVarR" widgetVar="accountExpenseDetailWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{accountExpenseView.accountReimbursableExpenseList}" emptyMessage="#{lang.noResult}"
+                       rowHover="true" reflow="false" draggableColumns="true" scrollable="false" rowIndexVar="index" >
+            <p:column style="width:18%;">
+              <f:facet name="header"><h:outputText value="#{lang.expense} *" title="#{lang.expense}"/></f:facet>              
+              <p:autoComplete value="#{accountExpenseDetailVarR.expenseLedgerId}" completeMethod="#{accountExpenseView.accountingLedgerExpenseAuto}" 
+                              converter="wawo.LookupIntConverter" id="expenseLedgerR" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect" listener="#{accountExpenseView.calculateTax(accountExpenseDetailVarR)}" process="@this" update="taxAmountR totalAmountR  sumTotalR" />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+            </p:column>
+            <p:column style="width:16%;">
+              <f:facet name="header"><h:outputText value="#{lang.party}" title="#{lang.party}"/></f:facet>
+              <p:autoComplete value="#{accountExpenseDetailVarR.vendorLedgerId}" completeMethod="#{accountExpenseView.accountingLedgerPartyExpenseAuto}" converter="wawo.LookupIntConverter" id="partyLedgerR"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw"
+                              validator="#{accountExpenseView.validateReimbursable}" > 
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <f:attribute name="rowIndex" value="#{index}"/>
+                <p:ajax event="itemSelect"  process="@this" />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+              <p:message for="partyLedgerR" display="text" styleClass="fw" />
+            </p:column>
+            <p:column style="width:16%;">
+              <f:facet name="header"><h:outputText value="#{lang.payment} #{lang.ledger}" title="#{lang.payment} #{lang.ledger}"/></f:facet>
+              <p:autoComplete value="#{accountExpenseDetailVarR.bankCashLedgerId}" completeMethod="#{accountExpenseView.accountingLedgerExpenseBankAuto}" converter="wawo.LookupIntConverter" id="bankLedgerR"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect"  process="@this" update="fragmentR paymentTypeR" />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+              <p:message for="partyLedgerR" display="text" styleClass="fw" />
+            </p:column>
+            <p:column style="width:12%;">
+              <f:facet name="header"><h:outputText value="#{lang.payment} #{lang.type}" title="#{lang.payment} #{lang.type}"/></f:facet>
+              <p:fragment id="fragmentR">
+                <p:selectOneMenu value="#{accountExpenseDetailVarR.paymentType}"  id="paymentTypeR" rendered="#{!(accountExpenseDetailVarR.bankCashLedgerId eq null)}"
+                                 styleClass="fw" 
+                                 converter="omnifaces.SelectItemsConverter">
+                  <f:selectItems value="#{accountExpenseView.accountingDocType()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+                </p:selectOneMenu>
+              </p:fragment>
+            </p:column>
+            <p:column style="width:9%;">
+              <f:facet name="header"><h:outputText value="#{lang.docNo}" title="#{lang.documentNo}"/></f:facet>
+              <p:inputText value="#{accountExpenseDetailVarR.paymentDocumentNo}" maxlength="200" id="paymentDocumentNoR" /><p:message for="paymentDocumentNoR" display="text" styleClass="fw" />
+            </p:column>
+
+            <p:column style="width: 6%;">
+              <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.entry} #{lang.date}"/></f:facet>
+              <p:calendar value="#{accountExpenseDetailVarR.paymentDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.paymentDate} #{lang.invalidDate}" maxlength="29" id="paymentDateR" showButtonPanel="true" navigator="true" mask="true"/><p:message for="paymentDateR" display="text"/>
+            </p:column>
+
+            <p:column style="width: 6%;">
+              <f:facet name="header"><h:outputText value="#{lang.tax}" title="#{lang.tax} #{lang.amount}" /></f:facet>
+              <h:panelGroup id="taxAmountR">
+                <p:selectOneMenu value="#{accountExpenseDetailVarR.taxCode}" converter="omnifaces.SelectItemsConverter">                  
+                  <f:selectItems value="#{accountExpenseView.accountExpenseTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+                  <p:ajax event="itemSelect" process="@this paymentValueR expenseLedgerR" update="@this totalAmountR sumTotalR sgstAmount cgstAmount igstAmount"
+                          listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarR)}"
+                          />
+                </p:selectOneMenu>
+<!--                <p:inputNumber value="#{accountExpenseDetailVarR.taxAmount}" converterMessage="#{lang.taxAmount} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"  maxlength="10" styleClass="fw"   readonly="#{accountExpenseDetailVarR.expenseLedgerId.igstId.code ne null}" >
+                  <p:ajax listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarR)}" process="@this paymentValueR expenseLedgerR" update="@this totalAmountR sumTotalR" />
+                </p:inputNumber>-->
+              </h:panelGroup>
+            </p:column>
+
+            <p:column style="width:10%;">
+              <f:facet name="header"><h:outputText value="#{lang.amount}*" title="#{lang.amount}" /></f:facet>
+              <p:inputNumber value="#{accountExpenseDetailVarR.totalAmount}" converterMessage="#{lang.paymentValue} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                             maxlength="18" id="paymentValueR" styleClass="fw" autocomplete="off" >
+                <p:ajax event="change" listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarR)}" process="@this" update="totalAmountR taxAmountR sgstAmount cgstAmount igstAmount sumTotalR"  />
+              </p:inputNumber>              
+            </p:column>
+
+            <!-- SGST -->
+            <p:column style="width:7%;" rendered="#{accountExpenseView.intrastate}">
+              <f:facet name="header"><h:outputText value="#{lang.sgst}" title="#{lang.sgst}"/></f:facet>
+              <h:panelGroup id="sgstAmount">
+                <p:inputNumber value="#{accountExpenseDetailVarR.sgstAmount}" converterMessage="#{lang.sgstAmount} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0"
+                               maxlength="10"  disabled="true"/>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- CGST -->
+            <p:column style="width:7%;" rendered="#{accountExpenseView.intrastate}">
+              <f:facet name="header"><h:outputText value="#{lang.cgst}" title="#{lang.cgst}"/></f:facet>
+              <h:panelGroup id="cgstAmount"> 
+                <p:inputNumber value="#{accountExpenseDetailVarR.cgstAmount}" converterMessage="#{lang.cgstAmount} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0"
+                               maxlength="10"  disabled="true"/>
+              </h:panelGroup>
+            </p:column>
+            <!-- IGST -->
+            <p:column style="width:7%;" rendered="#{!accountExpenseView.intrastate}">
+              <f:facet name="header"><h:outputText value="#{lang.igst}" title="#{lang.igst}"/></f:facet>
+              <h:panelGroup id="igstAmount">
+                <p:inputNumber value="#{accountExpenseDetailVarR.igstAmount}" converterMessage="#{lang.igstAmount} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0"
+                               maxlength="10"  disabled="true"/>
+              </h:panelGroup>
+            </p:column>
+
+
+            <p:column style="text-align: right;width: 10%;" >
+              <f:facet name="header"><h:outputText value="#{lang.netAmount}" title="#{lang.netAmount}" /></f:facet>
+              <p:inputNumber value="#{accountExpenseDetailVarR.paymentValue}" converterMessage="#{lang.paymentValue} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                             maxlength="18" id="totalAmountR" styleClass="fw"  readonly="true" />
+            </p:column>
+            <p:column style="width:10%;">
+              <f:facet name="header" ><h:outputText value="#{lang.narration}"/></f:facet>
+              <p:inputText styleClass="fw  submit_b_#{index}_R" value="#{accountExpenseDetailVarR.note}" rendered="#{accountExpenseDetailVarR.transactionId == null}" 
+                           onkeydown="if (event.keyCode == 13)
+                                 updateAccountGroup()" />
+              <!--<h:outputText  value="#{accountExpenseDetailVarR.transactionId.documentNumber}  #{accountExpenseDetailVarR.transactionId.narration}" rendered="#{accountExpenseDetailVarR.transactionId != null}"  />-->
+              <p:commandLink styleClass="fw" actionListener="#{accountExpenseView.showDetails(accountExpenseDetailVarR.transactionId)}"
+                             value="#{accountExpenseDetailVarR.transactionId.documentNumber} #{accountExpenseDetailVarR.transactionId.narration}" 
+                             title="#{accountExpenseDetailVarR.transactionId.documentNumber} #{accountExpenseDetailVarR.transactionId.narration}" 
+                             process="@this" immediate="true" onstart="block()" 
+                             oncomplete="unblock()"
+                             rendered="#{accountExpenseDetailVarR.transactionId != null}">
+              </p:commandLink>
+            </p:column>
+
+            <p:column headerText="" style="width:3%;">
+              <p:commandButton process="@this" value="" icon="fa fa-trash" tabindex="-1"
+                               actionListener="#{accountExpenseView.actionDeleteReimbursementExpense(main,accountExpenseDetailVarR)}" update="accountReimbursableTable" rendered="#{accountExpenseDetailVarR.accountExpenseId.isDraft()}">
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </p:column>                      
+          </p:dataTable>
+          <h:panelGroup id="sumTotalR">
+            <p:panelGrid>
+              <p:row >
+                <p:column style="width:14%;" > </p:column>
+                <p:column style="width:13%;" > </p:column>
+                <p:column style="width:14%;" > </p:column>
+                <p:column style="width:9%;" > </p:column>
+                <p:column style="width:8%;" > </p:column>
+                <p:column style="width:5%;" > </p:column>
+                <p:column style="width:5%;" > </p:column>
+                <p:column style="width:8%;" styleClass="text-right" > #{appView.decimal(accountExpenseView.reimbursementAmount)} &#160;&#160;&#160; </p:column>
+                <p:column style="width:6%;" styleClass="text-right" rendered="#{accountExpenseView.intrastate}" > #{appView.decimal(accountExpenseView.reimbursementSgst)}&#160;&#160; </p:column>
+                <p:column style="width:6%;" styleClass="text-right" rendered="#{accountExpenseView.intrastate}" >#{appView.decimal(accountExpenseView.reimbursementCgst)} &#160;&#160;</p:column>
+                <p:column style="width:6%;" styleClass="text-right" rendered="#{!accountExpenseView.intrastate}" > #{appView.decimal(accountExpenseView.reimbursementIgst)}&#160;&#160; </p:column>
+                <p:column style="width:8%;" styleClass="text-right" >#{appView.decimal(accountExpenseView.reimbursementExpenseTotal)}</p:column>
+                <p:column style="width:9%;" > </p:column>
+                <p:column style="width:3%;" ></p:column>
+
+              </p:row>
+            </p:panelGrid>
+
+          </h:panelGroup>
+
+        </ui:decorate>
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="Non #{lang.reimbursable} #{lang.expense}" />
+          <p:dataTable id="accountExpenseDetailTable" var="accountExpenseDetailVarE" widgetVar="accountReimbursableWidget" 
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks" 
+                       lazy="true"  value="#{accountExpenseView.getAccountExpenseList()}" emptyMessage="#{lang.noResult}" rowHover="true" reflow="true" 
+                       draggableColumns="true" scrollable="false" rowIndexVar="index" >
+            <p:column style="width:18%;">
+              <f:facet name="header"><h:outputText value="#{lang.expense} *" title="#{lang.expense}"/></f:facet>                           
+              <p:autoComplete value="#{accountExpenseDetailVarE.expenseLedgerId}" completeMethod="#{accountExpenseView.accountingLedgerExpenseAuto}" 
+                              converter="wawo.LookupIntConverter" id="expenseLedgerE"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw"   >
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect" listener="#{accountExpenseView.calculateTax(accountExpenseDetailVarE)}" process="@this" update="totalAmountE sumTotalE" />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+            </p:column>
+            <p:column style="width:16%;">
+              <f:facet name="header"><h:outputText value="#{lang.party}" title="#{lang.party}"/></f:facet>
+              <p:autoComplete value="#{accountExpenseDetailVarE.vendorLedgerId}" completeMethod="#{accountExpenseView.accountingLedgerPartyExpenseAuto}" converter="wawo.LookupIntConverter" id="partyLedgerE"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" 
+                              validator="#{accountExpenseView.validateExpense}" > 
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>          
+                <f:attribute name="rowIndex" value="#{index}"/>
+                <p:ajax event="itemSelect"  process="@this" />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+              <p:message for="partyLedgerE" display="text" styleClass="fw" />
+            </p:column>
+            <p:column style="width:16%;">
+              <f:facet name="header"><h:outputText value="#{lang.payment} #{lang.ledger}" title="#{lang.payment} #{lang.ledger}"/></f:facet>
+              <p:autoComplete value="#{accountExpenseDetailVarE.bankCashLedgerId}" completeMethod="#{accountExpenseView.accountingLedgerExpenseBankAuto}" converter="wawo.LookupIntConverter" id="bankLedgerE"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect"  process="@this" update="fragmentE paymentTypeE"  />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+              <p:message for="partyLedgerE" display="text" styleClass="fw" />
+            </p:column>
+            <p:column style="width:12%;">
+              <f:facet name="header"><h:outputText value="#{lang.payment} #{lang.type}" title="#{lang.payment} #{lang.type}"/></f:facet>
+              <p:fragment id="fragmentE">
+                <p:selectOneMenu value="#{accountExpenseDetailVarE.paymentType}"  id="paymentTypeE"
+                                 styleClass="fw" converter="omnifaces.SelectItemsConverter" rendered="#{!(accountExpenseDetailVarE.bankCashLedgerId eq null)}" >
+                  <f:selectItems value="#{accountExpenseView.accountingDocType()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+                </p:selectOneMenu>
+              </p:fragment>
+            </p:column>
+            <p:column style="width:9%;">
+              <f:facet name="header"><h:outputText value="#{lang.docNo}" title="#{lang.documentNo}"/></f:facet>
+              <p:inputText value="#{accountExpenseDetailVarE.paymentDocumentNo}" maxlength="15" id="paymentDocumentNoE" /><p:message for="paymentDocumentNoE" display="text" styleClass="fw" />
+            </p:column>
+
+            <p:column style="width:6%;">
+              <f:facet name="header"><h:outputText value="#{lang.date}" title="#{lang.entry} #{lang.date}"/></f:facet>
+              <p:calendar value="#{accountExpenseDetailVarE.paymentDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.paymentDate} #{lang.invalidDate}" maxlength="29" id="paymentDateE" showButtonPanel="true" navigator="true" mask="true"/><p:message for="paymentDateE" display="text"/>
+            </p:column>
+            <p:column style="width: 6%;">
+              <f:facet name="header"><h:outputText value="#{lang.tax}" title="#{lang.tax} #{lang.amount}" /></f:facet>
+              <h:panelGroup id="taxAmountR">
+                <p:selectOneMenu value="#{accountExpenseDetailVarE.taxCode}" converter="omnifaces.SelectItemsConverter">                  
+                  <f:selectItems value="#{accountExpenseView.accountExpenseTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+                  <p:ajax event="itemSelect" process="@this paymentValueE expenseLedgerE" update="@this totalAmountE sumTotalE sgstAmountE cgstAmountE igstAmountE"
+                          listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarE)}"
+                          />
+                </p:selectOneMenu>
+              </h:panelGroup>
+            </p:column>
+            <p:column style="width:10%;">
+              <f:facet name="header"><h:outputText value="#{lang.amount} *" title="#{lang.amount}" /></f:facet>
+              <p:inputNumber value="#{accountExpenseDetailVarE.totalAmount}" converterMessage="#{lang.paymentValue} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                             maxlength="18" id="paymentValueE" styleClass="fw" autocomplete="off" >
+                <p:ajax listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarE)}" process="@this" update="totalAmountE sgstAmountE cgstAmountE igstAmountE sumTotalE"  />
+              </p:inputNumber>
+            </p:column>
+
+            <!-- SGST -->
+            <p:column style="width:6%;" rendered="#{accountExpenseView.intrastate}">
+              <f:facet name="header"><h:outputText value="#{lang.sgst}" title="#{lang.sgst}"/></f:facet>
+              <h:panelGroup id="sgstAmountE">
+                <p:inputNumber value="#{accountExpenseDetailVarE.sgstAmount}" converterMessage="#{lang.sgstAmount} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                               maxlength="10"  disabled="true"/>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- CGST -->
+            <p:column style="width:6%;" rendered="#{accountExpenseView.intrastate}">
+              <f:facet name="header"><h:outputText value="#{lang.cgst}" title="#{lang.cgst}"/></f:facet>
+              <h:panelGroup id="cgstAmountE"> 
+                <p:inputNumber value="#{accountExpenseDetailVarE.cgstAmount}" converterMessage="#{lang.cgstAmount} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                               maxlength="10"  disabled="true"/>
+              </h:panelGroup>
+            </p:column>
+            <!-- IGST -->
+            <p:column style="width:6%;" rendered="#{!accountExpenseView.intrastate}">
+              <f:facet name="header"><h:outputText value="#{lang.igst}" title="#{lang.igst}"/></f:facet>
+              <h:panelGroup id="igstAmountE">
+                <p:inputNumber value="#{accountExpenseDetailVarE.igstAmount}" converterMessage="#{lang.igstAmount} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                               maxlength="10"  disabled="true"/>
+              </h:panelGroup>
+            </p:column>
+
+            <!--            <p:column styleClass="w-100" style="text-align: right;">
+                          <f:facet name="header"><h:outputText value="#{lang.tax}" title="#{lang.tax} #{lang.amount}" /></f:facet>
+                          <h:panelGroup id="taxAmountE">
+                            <p:inputNumber value="#{accountExpenseDetailVarE.taxAmount}" converterMessage="#{lang.taxAmount} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"  maxlength="10" styleClass="fw"   readonly="#{accountExpenseDetailVarE.expenseLedgerId.igstId.code ne null}" >
+                              <p:ajax listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarE)}" process="@this paymentValueE expenseLedgerE" update="@this totalAmountE sumTotalE" />
+                            </p:inputNumber>
+                          </h:panelGroup>
+                        </p:column>-->
+
+
+            <p:column style="text-align: right;width:10%;">
+              <f:facet name="header"><h:outputText value="#{lang.netAmount}" title="#{lang.netAmount}" /></f:facet>
+              <p:inputNumber value="#{accountExpenseDetailVarE.paymentValue}" converterMessage="#{lang.paymentValue} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0"
+                             maxlength="18" id="totalAmountE" styleClass="fw"  readonly="true" />
+
+            </p:column>
+            <p:column style="width:10%;">
+              <f:facet name="header" ><h:outputText value="#{lang.narration}"/></f:facet>
+              <p:inputText styleClass="fw submit_b_#{index}_E" value="#{accountExpenseDetailVarE.note}" rendered="#{accountExpenseDetailVarE.transactionId == null}" 
+                           onkeydown="if (event.keyCode == 13)
+                                 updateAccountGroup()" />
+              <!--<h:outputText  value="#{accountExpenseDetailVarE.transactionId.documentNumber}  #{accountExpenseDetailVarE.transactionId.narration}" rendered="#{accountExpenseDetailVarE.transactionId != null}"  />-->
+              <p:commandLink styleClass="fw" actionListener="#{accountExpenseView.showDetails(accountExpenseDetailVarE.transactionId)}"
+                             value="#{accountExpenseDetailVarE.transactionId.documentNumber} #{accountExpenseDetailVarE.transactionId.narration}" 
+                             title="#{accountExpenseDetailVarE.transactionId.documentNumber} #{accountExpenseDetailVarE.transactionId.narration}" 
+                             process="@this" immediate="true" onstart="block()" 
+                             oncomplete="unblock()"
+                             rendered="#{accountExpenseDetailVarE.transactionId != null}">
+              </p:commandLink>
+            </p:column>
+            <!--            <p:column styleClass="w-40">
+                          <f:facet name="header" ><h:outputText value="#{lang.tax} #{lang.percentageSymbol}" title="#{lang.tax} #{lang.percentageSymbol}"/></f:facet>
+                          <h:panelGroup id="taxCodeE">
+                            <h:selectBooleanCheckbox  value="#{accountExpenseDetailVarE.isTax}"  label="#{accountExpenseDetailVarE.expenseLedgerId.igstId.code}" title="#{accountExpenseDetailVarE.expenseLedgerId.igstId.code}" rendered="#{accountExpenseDetailVarE.expenseLedgerId.igstId.code ne null and accountExpenseDetailVarE.transactionId == null}">
+                              <p:ajax listener="#{accountExpenseView.updateTaxAmount(accountExpenseDetailVarE)}" process="@this paymentValueE expenseLedgerE" update="@this totalAmountE sumTotalE" />
+                            </h:selectBooleanCheckbox>
+                          </h:panelGroup>
+                        </p:column>-->
+
+            <p:column headerText="" style="width:3%;">
+              <p:commandButton  process="@this" value="" icon="fa fa-trash" tabindex="-1"
+                                actionListener="#{accountExpenseView.actionDeleteExpense(main,accountExpenseDetailVarE)}" update="accountExpenseDetailTable" rendered="#{accountExpenseDetailVarE.accountExpenseId.isDraft()}">
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </p:column>           
+          </p:dataTable>
+          <h:panelGroup id="sumTotalE">
+            <p:panelGrid>
+              <p:row>
+                <p:column style="width:15%;" > </p:column>
+                <p:column style="width:13%;" > </p:column>
+                <p:column style="width:14%;" > </p:column>
+                <p:column style="width:9%;" > </p:column>
+                <p:column style="width:8%;" > </p:column>
+                <p:column style="width:5%;" > </p:column>
+                <p:column style="width:5%;" > </p:column>
+                <p:column style="width:7%;" styleClass="text-right" > #{appView.decimal(accountExpenseView.nonReimbursementAmount)}&#160;&#160;&#160; </p:column>
+                <p:column style="width:6%;" styleClass="text-right" rendered="#{accountExpenseView.intrastate}" > #{appView.decimal(accountExpenseView.nonReimbursementSgst)}&#160;&#160; </p:column>
+                <p:column style="width:6%;" styleClass="text-right" rendered="#{accountExpenseView.intrastate}" > #{appView.decimal(accountExpenseView.nonReimbursementCgst)} &#160;&#160;</p:column>
+                <p:column style="width:6%;" styleClass="text-right" rendered="#{!accountExpenseView.intrastate}" > #{appView.decimal(accountExpenseView.nonReimbursementIgst)} &#160;&#160;</p:column>
+                <p:column style="width:8%;" styleClass="text-right" >#{appView.decimal(accountExpenseView.nonReimbursementExpenseTotal)}</p:column>
+                <p:column style="width:9%;" > </p:column>
+                <p:column style="width:3%;" > </p:column>
+
+              </p:row>
+            </p:panelGrid>
+
+          </h:panelGroup>
+        </ui:decorate>
+        <p:remoteCommand name="updateAccountGroup" update="accountGroupId" />
+        <p:remoteCommand name="insertOrUpdateExpenseE" actionListener="#{accountExpenseView.addNewExpense()}" process="f1"  update="accountExpenseDetailTable selectAccountId"  />
+        <p:remoteCommand name="insertOrUpdateExpenseR" actionListener="#{accountExpenseView.addNewReimbursableExpense()}" process="f1" update="accountReimbursableTable selectAccountId" />
+      </h:panelGroup>
+
+      <script type="text/javascript">
+        //<![CDATA[
+        // page.refresh();
+        function submitForm(params) {
+          if ("R" == params[3]) {
+            insertOrUpdateExpenseR([{name: 'rownumber', value: params[2]}]);
+            $('#accountReimbursableTable\\:0\\:expenseLedgerR_input').focus();
+          } else {
+            insertOrUpdateExpenseE([{name: 'rownumber', value: params[2]}]);
+            $('#accountExpenseDetailTable\\:0\\:expenseLedgerE_input').focus();
+          }
+          return false;
+        }
+        function refreshDatatable() {
+          page.refresh();
+        }
+        $(document).ready(function (e) {
+          refreshDatatable();
+        });
+
+        //]]>
+      </script>
+
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(accountExpenseView.accountExpense.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(accountExpenseView.accountExpense.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(accountExpenseView.accountExpense.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(accountExpenseView.accountExpense.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(accountExpenseView.accountExpense.id)}</ui:define>
+      </ui:decorate>
+
+
+    </ui:define>
+    <ui:define name="rightList" >
+      <p:selectOneMenu id="summary" value="#{accountExpenseView.selectedExpense}">
+        <f:selectItem itemLabel="#{lang.all}" itemValue="#{0}" />
+        <f:selectItem itemLabel="#{lang.purchase}" itemValue="#{AccountingConstant.EXPENSE_TYPE_PURCHASE}" />
+        <f:selectItem itemLabel="#{lang.sales}" itemValue="#{AccountingConstant.EXPENSE_TYPE_SALES}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{accountExpenseView.filterByExpenseType}" update="accountExpenseTable"/>
+      </p:selectOneMenu>
+    </ui:define>
+    <ui:define name="newList">
+      <h:commandButton rendered="#{expenseFrom ne 0}" action="#{main.setViewType(newform)}" value="#{lang.newform}" immediate="true" 
+                       onclick="toTop()" styleClass="btn btn-info">
+        <f:ajax execute="@this" render="f1" resetValues="true"/>
+        <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+      </h:commandButton>
+
+      <p:commandButton id="createBtn" type="button" value="#{lang.newform}" immediate="true" partialSubmit="true" process="@this" update="createPanel" 
+                       styleClass="btn btn-info" rendered="#{expenseFrom eq 0}" >
+      </p:commandButton>      
+      <p:overlayPanel id="createPanel" for="createBtn" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true" dynamic="false" style="width:auto">
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <p:selectOneRadio id="console" value="#{accountExpenseView.accountExpense.expenseType}" >
+            <f:selectItem itemLabel="#{lang.purchase} #{lang.expense}" itemValue="#{AccountingConstant.EXPENSE_TYPE_PURCHASE}" />
+            <f:selectItem itemLabel="#{lang.sales}  #{lang.expense}" itemValue="#{AccountingConstant.EXPENSE_TYPE_SALES}" />
+          </p:selectOneRadio>
+        </h:panelGroup>
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <h:commandButton value="#{lang.create}" styleClass="btn btn-primary" action="#{main.setViewType(newform)}" >
+            <f:ajax execute="createPanel" render="@parent f1"/>
+          </h:commandButton>
+          <h:commandButton value="#{lang.close}" styleClass="btn btn-primary">
+          </h:commandButton>
+        </h:panelGroup>
+      </p:overlayPanel>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="accountExpenseTable" var="accountExpenseVar" widgetVar="accountExpenseWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{accountExpenseView.accountExpenseLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountExpenseVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   emptyMessage="#{lang.noResult}"  selection="#{accountExpenseView.accountExpenseSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column >
+          <f:facet name="header"><h:outputText value="#{lang.code}" title="#{lang.code}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{accountExpenseVar.accountId.accountTitle}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}" rendered="#{accountExpenseVar.isExpensePurchase()}">
+            <f:setPropertyActionListener target="#{accountExpenseView.accountExpense}" value="#{accountExpenseVar}" />
+          </p:commandLink>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{accountExpenseVar.accountGroupId.groupName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}" rendered="#{accountExpenseVar.isExpenseSales()}">
+            <f:setPropertyActionListener target="#{accountExpenseView.accountExpense}" value="#{accountExpenseVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column >
+          <f:facet name="header"><h:outputText value="#{lang.consignmentNo}" title="#{lang.consignmentNo}"/></f:facet>
+          <h:outputText value="#{appView.display(accountExpenseVar.consignmentPurchaseId.consignmentNo)}" title="#{appView.title(accountExpenseVar.consignmentPurchaseId.consignmentNo)}" escape="false" rendered="#{accountExpenseVar.isExpensePurchase()}"/>
+          <h:outputText value="#{appView.display(accountExpenseVar.consignmentSalesId.consignmentNo)}" title="#{appView.title(accountExpenseVar.consignmentSalesId.consignmentNo)}" escape="false" rendered="#{accountExpenseVar.isExpenseSales()}" />
+        </p:column>
+        <p:column sortBy="#{accountExpenseVar.entryDate}" field="t1.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(accountExpenseVar.entryDate)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.reimbursable} #{lang.expense}" style="text-align: right;" field="t1.reimbursable_expense_amount" >
+          <h:outputText value="#{appView.decimal(accountExpenseVar.reimbursableExpenseAmount)}" />
+        </p:column>
+        <p:column headerText="#{lang.nonReimbursableExpense}" style="text-align: right;" field="t1.non_reimbursable_expense_amount">
+          <h:outputText value="#{appView.decimal(accountExpenseVar.nonReimbursableExpenseAmount)}" />
+        </p:column>
+
+        <p:column headerText="#{lang.narration}" styleClass="wrap">
+          <h:outputText value="#{accountExpenseVar.narration}" />
+        </p:column>
+
+        <p:column sortBy="#{accountExpenseVar.status}" field="t1.status">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText styleClass="m-r-5 #{sysRuntimeView.statusStyle(accountExpenseVar.isDraft()?1:2)}" value="#{accountExpenseVar.isDraft() ? lang.draft: lang.confirmed}"
+                        style="background-color: #{sysRuntimeView.statusColor(accountExpenseVar.isDraft()?1:2)}"  escape="false" />
+        </p:column>
+
+        <p:column styleClass="w-60"  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(accountExpenseVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountExpenseVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountExpenseVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountExpenseVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(accountExpenseVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

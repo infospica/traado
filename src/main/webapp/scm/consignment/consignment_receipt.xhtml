@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{consignmentReceiptView.switchConsignmentReceipt(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{consignmentReceiptView.consignmentReceipt.consignmentId.consignmentNo} / #{lang.receipt}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="consignmentReceipt" />
+    <ui:define name="more" ></ui:define>
+    <ui:define name="reset"></ui:define>
+
+     <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{consignmentReceiptView.consignmentReceiptPopupClose}"  
+                       oncomplete="parent.receiptPopupReturned(); closePopup()"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{consignmentReceiptView.saveConsignmentReceipt(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"   rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+      <h:commandButton actionListener="#{consignmentReceiptView.saveConsignmentReceiptClose(main)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" onclick="toTop()"  styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup}"><f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.receipt} #{lang.status}" for="consignmentReceiptConsignmentReceiptStatusId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{consignmentReceiptView.consignmentReceipt.consignmentReceiptStatusId}" completeMethod="#{consignmentReceiptView.consignmentReceiptStatusAuto}" 
+                         converter="wawo.LookupIntConverter"   id="consignmentReceiptConsignmentReceiptStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw"  
+                         required="true" requiredMessage="#{lang.receipt} #{lang.status} #{lang.isRequired}">
+          <f:attribute name="clazz" value="#{scmLookupView.consignmentReceiptStatusClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.consignmentReceiptStatusById()}"/>
+        </p:autoComplete><p:message for="consignmentReceiptConsignmentReceiptStatusId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.receiptNote}" for="receiptNote" />
+      <h:panelGroup><p:inputTextarea  styleClass="fw" value="#{consignmentReceiptView.consignmentReceipt.receiptNote}" cols="100" rows="3" maxlength="2000" id="receiptNote" autoResize="false" />
+        <p:message for="receiptNote" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.consignment} #{lang.ok}" for="consignmentOk" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{consignmentReceiptView.consignmentReceipt.consignmentOk}" maxlength="200" id="consignmentOk" />
+        <p:message for="consignmentOk" display="text"/>
+      </h:panelGroup>            
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(consignmentReceiptView.consignmentReceipt.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(consignmentReceiptView.consignmentReceipt.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(consignmentReceiptView.consignmentReceipt.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(consignmentReceiptView.consignmentReceipt.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(consignmentReceiptView.consignmentReceipt.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+  </ui:decorate>
+
+</html>

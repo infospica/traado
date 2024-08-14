@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesAgentCommisionView.switchSalesAgentCommision(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesAgentCommision}" />
+    <ui:param name="ids" value="salesAgentCommision" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesAgentCommisionView.deleteSalesAgentCommision(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesAgentCommisionWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesAgentCommisionView.cloneSalesAgentCommision(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesAgentCommisionView.deleteSalesAgentCommision(main)}" value="#{lang.delete}" onclick="wdgOff('salesAgentCommisionWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesAgentCommisionView.saveSalesAgentCommision(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+    <ui:define name="rightList" >
+      <p:selectOneMenu styleClass="L" id="userProfile"  >
+        <f:selectItems  value="#{salesAgentCommisionView.getUserProfileList(main)}" var="item" itemLabel="#{item.name} - #{item.userCode}" itemValue="#{item}" />
+<!--        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{platformView.yearFilter}" update="platformTable1 platformTable2 platformTable3 platformTable4 tables"/>-->
+      </p:selectOneMenu> 
+      <p:selectOneMenu styleClass="L" id="year" value="#{salesAgentCommisionView.selectedYear}"  >
+        <f:selectItem itemLabel="#{userRuntimeView.currentYear}" itemValue="#{userRuntimeView.currentYear}" />
+        <f:selectItems  value="#{userRuntimeView.getYearList()}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+<!--        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{platformView.yearFilter}" update="platformTable1 platformTable2 platformTable3 platformTable4 tables"/>-->
+      </p:selectOneMenu>     
+      <p:selectOneMenu id="month" value="#{salesAgentCommisionView.selectedMonth}" >
+        <f:selectItems  value="#{userRuntimeView.monthsFiscalMap.entrySet()}" var="item" itemLabel="#{item.value}" itemValue="#{item.key}" />
+<!--        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{journalView.monthFilter}" update="journalAllTable"/>-->
+      </p:selectOneMenu>       
+    </ui:define>
+    <ui:define name="navRight" >
+      <h:commandButton rendered="#{main.popup}"   onclick="closePopup();" immediate="true" styleClass="btn btn-default" />
+    </ui:define>    
+    <ui:define name="form">
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.salesAgentCommisionUserProfileId}" for="salesAgentCommisionUserProfileId" /><h:panelGroup>
+             <p:selectOneMenu value="#{salesAgentCommisionView.salesAgentCommision.userProfileId}"  required="true" requiredMessage="#{lang.salesAgentCommisionUserProfileId} #{lang.isRequired}" id="salesAgentCommisionUserProfileId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.scmUserProfile(main)}" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" />
+            </p:selectOneMenu><p:message for="salesAgentCommisionUserProfileId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.salesAgentCommisionUserProfileId}" for="salesAgentCommisionUserProfileId" /><h:panelGroup>
+              <p:autoComplete value="#{salesAgentCommisionView.salesAgentCommision.userProfileId}" completeMethod="#{scmLookupView.scmUserProfileAuto}"  required="true" requiredMessage="#{lang.salesAgentCommisionUserProfileId} #{lang.isRequired}" id="salesAgentCommisionUserProfileId" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+              <o:converter list="#{scmLookupView.scmUserProfile(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="salesAgentCommisionUserProfileId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+<!--      <p:outputLabel value="#{lang.salesAgentCommisionUserProfileId}" for="salesAgentCommisionUserProfileId"/><h:panelGroup>
+        <p:autoComplete value="#{salesAgentCommisionView.salesAgentCommision.userProfileId}" completeMethod="#{salesAgentCommisionView.scmUserProfileAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.salesAgentCommisionUserProfileId} #{lang.isRequired}" id="salesAgentCommisionUserProfileId" var="e" itemValue="#{e}" itemLabel="#{e.userCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.userProfileClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.userProfileById()}"/>
+        </p:autoComplete><p:message for="salesAgentCommisionUserProfileId" display="text" /></h:panelGroup>-->
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.salesAgentCommisionSalesInvoiceId}" for="salesAgentCommisionSalesInvoiceId" /><h:panelGroup>
+             <p:selectOneMenu value="#{salesAgentCommisionView.salesAgentCommision.salesInvoiceId}"  required="true" requiredMessage="#{lang.salesAgentCommisionSalesInvoiceId} #{lang.isRequired}" id="salesAgentCommisionSalesInvoiceId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.scmSalesInvoice(main)}" var="e" itemValue="#{e}" itemLabel="#{e.invoiceNo}" />
+            </p:selectOneMenu><p:message for="salesAgentCommisionSalesInvoiceId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.salesAgentCommisionSalesInvoiceId}" for="salesAgentCommisionSalesInvoiceId" /><h:panelGroup>
+              <p:autoComplete value="#{salesAgentCommisionView.salesAgentCommision.salesInvoiceId}" completeMethod="#{scmLookupView.scmSalesInvoiceAuto}"  required="true" requiredMessage="#{lang.salesAgentCommisionSalesInvoiceId} #{lang.isRequired}" id="salesAgentCommisionSalesInvoiceId" var="e" itemValue="#{e}" itemLabel="#{e.invoiceNo}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+              <o:converter list="#{scmLookupView.scmSalesInvoice(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="salesAgentCommisionSalesInvoiceId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+<!--      <p:outputLabel value="#{lang.salesAgentCommisionSalesInvoiceId}" for="salesAgentCommisionSalesInvoiceId"/><h:panelGroup>
+        <p:autoComplete value="#{salesAgentCommisionView.salesAgentCommision.salesInvoiceId}" completeMethod="#{salesAgentCommisionView.scmSalesInvoiceAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.salesAgentCommisionSalesInvoiceId} #{lang.isRequired}" id="salesAgentCommisionSalesInvoiceId" var="e" itemValue="#{e}" itemLabel="#{e.invoiceNo}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.scmSalesInvoiceClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.scmSalesInvoiceById()}"/>
+        </p:autoComplete><p:message for="salesAgentCommisionSalesInvoiceId" display="text" /></h:panelGroup>-->
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.salesAgentCommisionContractId}" for="salesAgentCommisionContractId" /><h:panelGroup>
+             <p:selectOneMenu value="#{salesAgentCommisionView.salesAgentCommision.contractId}"  required="true" requiredMessage="#{lang.salesAgentCommisionContractId} #{lang.isRequired}" id="salesAgentCommisionContractId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.scmContract(main)}" var="e" itemValue="#{e}" itemLabel="#{e.contractCode}" />
+            </p:selectOneMenu><p:message for="salesAgentCommisionContractId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.salesAgentCommisionContractId}" for="salesAgentCommisionContractId" /><h:panelGroup>
+              <p:autoComplete value="#{salesAgentCommisionView.salesAgentCommision.contractId}" completeMethod="#{scmLookupView.scmContractAuto}"  required="true" requiredMessage="#{lang.salesAgentCommisionContractId} #{lang.isRequired}" id="salesAgentCommisionContractId" var="e" itemValue="#{e}" itemLabel="#{e.contractCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+              <o:converter list="#{scmLookupView.scmContract(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="salesAgentCommisionContractId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+<!--      <p:outputLabel value="#{lang.salesAgentCommisionContractId}" for="salesAgentCommisionContractId"/><h:panelGroup>
+        <p:autoComplete value="#{salesAgentCommisionView.salesAgentCommision.contractId}" completeMethod="#{salesAgentCommisionView.scmContractAuto}" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.salesAgentCommisionContractId} #{lang.isRequired}" id="salesAgentCommisionContractId" var="e" itemValue="#{e}" itemLabel="#{e.contractCode}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.scmContractClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.scmContractById()}"/>
+        </p:autoComplete><p:message for="salesAgentCommisionContractId" display="text" /></h:panelGroup>            -->
+      <p:outputLabel value="#{lang.commissionApplicableOn}" for="commissionApplicableOn" />
+      <h:panelGroup><p:inputText value="#{salesAgentCommisionView.salesAgentCommision.commissionApplicableOn}" maxlength="100" id="commissionApplicableOn" /><p:message for="commissionApplicableOn" display="text" styleClass="fw" /></h:panelGroup>
+      <p:outputLabel value="#{lang.commisionActualValue}" for="commisionActualValue" />
+      <h:panelGroup><p:inputNumber value="#{salesAgentCommisionView.salesAgentCommision.commisionActualValue}" converterMessage="#{lang.commisionActualValue} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="commisionActualValue" /><p:message for="commisionActualValue" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.commisionProvisionedValue}" for="commisionProvisionedValue" />
+      <h:panelGroup><p:inputNumber value="#{salesAgentCommisionView.salesAgentCommision.commisionProvisionedValue}" converterMessage="#{lang.commisionProvisionedValue} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="commisionProvisionedValue" /><p:message for="commisionProvisionedValue" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.commisionActualPercent}" for="commisionActualPercent" />
+      <h:panelGroup><p:inputNumber value="#{salesAgentCommisionView.salesAgentCommision.commisionActualPercent}" converterMessage="#{lang.commisionActualPercent} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="commisionActualPercent" /><p:message for="commisionActualPercent" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.commisionProvisionedPercent}" for="commisionProvisionedPercent" />
+      <h:panelGroup><p:inputNumber value="#{salesAgentCommisionView.salesAgentCommision.commisionProvisionedPercent}" converterMessage="#{lang.commisionProvisionedPercent} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="commisionProvisionedPercent" /><p:message for="commisionProvisionedPercent" display="text"/></h:panelGroup>
+      <!--            
+              <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+              <h:panelGroup><p:inputText value="#{salesAgentCommisionView.salesAgentCommision.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>
+      -->
+      <!--            
+              <p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
+              <h:panelGroup><p:inputText value="#{salesAgentCommisionView.salesAgentCommision.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+      -->
+      <!--
+              <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+              <h:panelGroup><p:calendar value="#{salesAgentCommisionView.salesAgentCommision.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+      -->
+      <!--
+              <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+              <h:panelGroup><p:calendar value="#{salesAgentCommisionView.salesAgentCommision.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>
+      -->
+    </ui:define>
+
+    <ui:define name="list">
+     
+      <p:dataTable id="salesAgentCommisionTable" var="salesAgentCommisionVar" widgetVar="salesAgentCommisionWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesAgentCommisionView.salesAgentCommisionLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesAgentCommisionVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesAgentCommisionView.salesAgentCommisionSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+<!--        <p:column sortBy="#{salesAgentCommisionVar.id}" field="scm_sales_agent_commision.id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{salesAgentCommisionVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesAgentCommisionView.salesAgentCommision}" value="#{salesAgentCommisionVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{salesAgentCommisionVar.userProfileId.userCode}" field="user_profile_id.user_code">
+          <f:facet name="header"><h:outputText value="#{lang.userCode}" title="#{lang.userCode}"/></f:facet>
+          <h:outputText value="#{appView.display(salesAgentCommisionVar.userProfileId.userCode)}" title="#{appView.title(salesAgentCommisionVar.userProfileId.userCode)}" escape="false" />
+        </p:column>-->
+        <p:column sortBy="#{salesAgentCommisionVar.salesInvoiceId.invoiceNo}" field="sales_invoice_id.invoice_no">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <h:outputText value="#{appView.display(salesAgentCommisionVar.salesInvoiceId.invoiceNo)}" title="#{appView.title(salesAgentCommisionVar.salesInvoiceId.invoiceNo)}" escape="false" />
+        </p:column>
+<!--        <p:column sortBy="#{salesAgentCommisionVar.contractId.contractCode}" field="contract_id.contract_code">
+          <f:facet name="header"><h:outputText value="#{lang.contractCode}" title="#{lang.contractCode}"/></f:facet>
+          <h:outputText value="#{appView.display(salesAgentCommisionVar.contractId.contractCode)}" title="#{appView.title(salesAgentCommisionVar.contractId.contractCode)}" escape="false" />
+        </p:column>-->
+        <p:column sortBy="#{salesAgentCommisionVar.commissionApplicableOn}" field="scm_sales_agent_commision.commission_applicable_on">
+          <f:facet name="header"><h:outputText value="#{lang.commissionApplicableOn}" title="#{lang.commissionApplicableOn}"/></f:facet>
+          <h:outputText value="#{appView.display(salesAgentCommisionVar.commissionApplicableOn)}" title="#{appView.title(salesAgentCommisionVar.commissionApplicableOn)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{salesAgentCommisionVar.commisionActualValue}" field="scm_sales_agent_commision.commision_actual_value" style="text-align:right">
+          <f:facet name="header"><h:outputText value="#{lang.commisionActualValue}" title="#{lang.commisionActualValue}"/></f:facet>
+          <h:outputText value="#{appView.decimal(salesAgentCommisionVar.commisionActualValue)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{salesAgentCommisionVar.commisionProvisionedValue}" field="scm_sales_agent_commision.commision_provisioned_value" style="text-align:right">
+          <f:facet name="header"><h:outputText value="#{lang.commisionProvisionedValue}" title="#{lang.commisionProvisionedValue}"/></f:facet>
+          <h:outputText value="#{appView.decimal(salesAgentCommisionVar.commisionProvisionedValue)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{salesAgentCommisionVar.commisionActualPercent}" field="scm_sales_agent_commision.commision_actual_percent" style="text-align:right">
+          <f:facet name="header"><h:outputText value="#{lang.commisionActualPercent}" title="#{lang.commisionActualPercent}"/></f:facet>
+          <h:outputText value="#{appView.decimal(salesAgentCommisionVar.commisionActualPercent)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{salesAgentCommisionVar.commisionProvisionedPercent}" field="scm_sales_agent_commision.commision_provisioned_percent" style="text-align:right">
+          <f:facet name="header"><h:outputText value="#{lang.commisionProvisionedPercent}" title="#{lang.commisionProvisionedPercent}"/></f:facet>
+          <h:outputText value="#{appView.decimal(salesAgentCommisionVar.commisionProvisionedPercent)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.payablePercent}"  style="text-align:right">
+
+          <h:inputText value="#{salesAgentCommisionVar.payablePercent}" id="payablePercent" style="text-align:right">
+            <p:ajax event="blur" listener="#{salesAgentCommisionView.calculatePayableValue(salesAgentCommisionVar)}" update="payableValue" />
+          </h:inputText>
+        </p:column>   
+        <p:column headerText="#{lang.payableValue}"  style="text-align:right">
+          <h:inputText value="#{salesAgentCommisionVar.payableValue}" id="payableValue" style="text-align:right" >
+            <p:ajax event="blur" listener="#{salesAgentCommisionView.calculatePayablePercent(salesAgentCommisionVar)}" update="payablePercent" />
+          </h:inputText>
+        </p:column>          
+<!--        <p:columnGroup type="footer" id="total">
+          <p:row >
+            <p:column  style="text-align:right;font-weight: bold;" styleClass="text-right" footerText="#{lang.total}: #{appView.decimal(salesAgentCommisionView.total)}" >
+            
+            </p:column>
+          </p:row>
+        </p:columnGroup>  -->
+
+      </p:dataTable> 	
+      
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,413 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{vendorClaimView.setVendorClaimLazyModel(null)}
+  #{vendorClaimView.switchVendorClaim(main, viewType)}  
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANTS" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="navLabel" value="#{main.isNew() ? vendorClaimView.selectedAccount.accountTitle : null}" />
+    <ui:param name="ids" value="vendorClaim" />
+    <ui:param name="search" value="false" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{vendorClaimView.deleteVendorClaim(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('vendorClaimWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{vendorClaimView.cloneVendorClaim(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{vendorClaimView.deleteVendorClaim(main)}" value="#{lang.delete}" onclick="wdgOff('vendorClaimWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="navRight" >
+           <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{vendorClaimView.saveVendorClaim(main, 1)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{vendorClaimView.vendorClaim.id eq null or vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.DRAFT}"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+      <h:commandButton action="#{vendorClaimView.resetToDraft(main, 1)}" value="#{lang.resetToDraft}" onclick="toTop()" styleClass="btn btn-info" rendered="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED}"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+      <h:commandButton action="#{vendorClaimView.saveVendorClaim(main, 2)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-warning" rendered="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.DRAFT}"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+<!--      <p:commandButton value="#{lang.print}" rendered="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED}" actionListener="#{vendorClaimView.showPdf(main)}" 
+                       immediate="true"  process="@this"  styleClass="btn btn-info" ajax="true" />-->
+      <p:commandButton id="printClaimButton" type="button" icon="fa fa-angle-down" value="#{lang.print}" iconPos="down" styleClass="btn btn-primary" 
+                       rendered="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED}"/>
+      <p:menu overlay="true" trigger="printClaimButton" my="left top" at="left bottom" styleClass="w-240"  >
+        <p:menuitem  value="#{lang.print} #{lang.commission} #{lang.claim}" actionListener="#{vendorClaimView.showPdf(main,SYSTEM_CONSTANTS.PRINT_COMMISSION_CLAIM)}" 
+                     rendered="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED}" immediate="true"  process="@this" styleClass="btn" />
+        <p:menuitem  value="#{lang.print} #{lang.expense}" actionListener="#{vendorClaimView.showPdf(main,SYSTEM_CONSTANTS.PRINT_COMMISSION_EXPENSE)}" 
+                     rendered="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED}" immediate="true"  process="@this" styleClass="btn" />
+      </p:menu>
+
+
+    </ui:define>   
+
+
+    <ui:define name="leftLeftList" >
+      <div class="L">
+        <p:selectOneMenu filter="true" filterMatchMode="startsWith" id="acount" value="#{vendorClaimView.selectedAccount}" converter="omnifaces.SelectItemsConverter">
+          <f:selectItems  value="#{vendorClaimView.accountList}" var="item" itemLabel="#{item.accountTitle}" itemValue="#{item}" />
+          <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.accountFilter}" update="dropMonthDiv vendorClaimTable"  />
+        </p:selectOneMenu>  
+      </div>
+      <div class="L">
+        <p:fragment id="dropMonthDiv" >
+          <p:commandButton id="newClaimBtn" type="button" icon="fa fa-angle-down" value="#{lang.newform}" iconPos="down" styleClass="btn btn-primary"/>
+          <p:menu overlay="true" trigger="newClaimBtn" my="left top" at="left bottom" styleClass="w-80" >
+            <c:forEach var="claimMonth" items="#{vendorClaimView.generateClaimMonths(main)}" >
+              <p:menuitem  immediate="true" update="f1" value="#{claimMonth.claimMonthName}-#{claimMonth.claimYear}" 
+                           actionListener="#{vendorClaimView.newClaim(main,claimMonth)}">
+              </p:menuitem>
+
+            </c:forEach>
+          </p:menu>
+        </p:fragment>
+      </div>
+    </ui:define>
+    <ui:define name="reset" ></ui:define>
+    <ui:define name="rightList" >    
+
+      <p:selectOneMenu id="year" value="#{vendorClaimView.selectedYear}" >
+        <f:selectItem itemLabel="#{vendorClaimView.currentYear}" itemValue="#{vendorClaimView.currentYear}" />
+        <f:selectItems  value="#{vendorClaimView.year}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{vendorClaimView.yearFilter}" update="vendorClaimTable"/>
+      </p:selectOneMenu>      
+    </ui:define>    
+    <ui:define name="newList" ></ui:define>
+    <ui:define name="after">
+
+      <h:panelGroup layout="block" styleClass="row" style="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED ?'pointer-events:none':'block'}" >
+        <h:panelGroup layout="block" styleClass="col-md-12"  >              
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="ids" value="cheque" />
+            <ui:param name="rendered" value="#{!main.isList()}" />
+            <ui:param name="label" value=" " />
+            <ui:param name="search" value="false" />
+
+            <p:panelGrid columns="2">
+              <h:panelGroup>
+                <h:outputLabel for="entryDate" value="#{lang.entryDate}" style="font-weight: bold" />   
+                <p:calendar value="#{vendorClaimView.vendorClaim.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}" maxlength="29"
+                            required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" id="entryDate" showButtonPanel="true" navigator="true" mask="true"
+                            mindate="#{userRuntimeView.minDate}" autocomplete="off" maxdate="#{vendorClaimView.today}"
+                            disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}"/>
+                <p:message for="entryDate" display="text"/>
+              </h:panelGroup>
+              <h:panelGroup>
+                <h:outputLabel value="#{lang.narration}" for="claim_narration" style="font-weight: bold" />
+                <p:inputText value="#{vendorClaimView.vendorClaim.narration}" id="claim_narration" />
+              </h:panelGroup>
+              <h:panelGroup />
+              <h:panelGroup />
+            </p:panelGrid>
+          </ui:decorate>
+        </h:panelGroup>
+      </h:panelGroup>
+
+      <h:panelGroup layout="block" styleClass="row" style="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED ?'pointer-events:none':'block'}">
+        <!-- Commission Claim    -->        
+        <h:panelGroup layout="block" styleClass="col-md-12">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="rendered" value="#{!main.isList()}" />
+            <ui:param name="label" value="#{lang.commissionClaim} " />
+            <ui:define name="menuleft">
+              <h:panelGroup style="padding-left:30px;">
+                <h:outputLabel value="For the #{lang.claimMonth} of #{vendorClaimView.selectedClaimMonthName} - #{vendorClaimView.vendorClaim.claimYear}" style="font-weight: bold"/>
+              </h:panelGroup>
+            </ui:define>
+            <h:panelGroup layout="block" id="claimTableDiv" >
+              <p:importConstants type="spica.sys.SystemConstants" var="SYS_CONST" />
+              <p:dataTable value="#{vendorClaimView.claimDetailList}" var="detail" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                           rowIndexVar="rowIndex" id="claimTable"  expandableRowGroups="true" scrollable="false"  >
+                <p:column headerText="#{lang.items}" style="width:15%;" >
+                  <p:commandButton icon="fa fa-plus" styleClass="btn btn-info" action="#{vendorClaimView.newTableRow(rowIndex,detail.claimType)}"
+                                   immediate="true" update="claimTable"
+                                   onclick="block()" oncomplete="unblock()" rendered="#{detail.childRow eq 0}"  />
+                  <h:outputText value="#{lang.sales}" rendered="#{detail.claimType eq 1 and detail.childRow eq 0}" />
+                  <h:outputText value="#{lang.salesReturn}" rendered="#{detail.claimType eq 2 and detail.childRow eq 0}" />
+                  <h:outputText value="#{lang.purchase}" rendered="#{detail.claimType eq 3 and detail.childRow eq 0}" />
+                  <h:outputText value="#{lang.purchaseReturn}" rendered="#{detail.claimType eq 4 and detail.childRow eq 0}" />
+                  <h:outputText value="#{lang.debitNote}" rendered="#{detail.claimType eq 5 and detail.childRow eq 0}" />
+                  <h:outputText value="#{lang.creditNote}" rendered="#{detail.claimType eq 6 and detail.childRow eq 0}" />
+                  <h:outputText value="#{lang.expense}" rendered="#{detail.claimType eq 7 and detail.childRow eq 0}" />
+
+                </p:column>
+                <p:column headerText="#{lang.tax} #{lang.rate} %" style="text-align:right;width:20%;">
+                    
+                  <p:selectOneMenu  value="#{detail.accountingLedgerId}" converter="omnifaces.SelectItemsConverter" style="width:200px;"
+                                   rendered="#{(detail.claimType eq 1) or (detail.claimType eq 4) or (detail.claimType eq 5) }" filter="true" filterMatchMode="startsWith" >
+                    <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.tax}" />
+                    <f:selectItems value="#{vendorClaimView.getTaxCode(main,2)}" var="tax_out" itemLabel="#{tax_out.title}" itemValue="#{tax_out}"  />                    
+                    <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType)}" update="claimTable taxSummationTable" />
+                  </p:selectOneMenu>
+
+                  <p:selectOneMenu  value="#{detail.accountingLedgerId}" converter="omnifaces.SelectItemsConverter" style="width:200px;"
+                                   rendered="#{(detail.claimType eq 3) or (detail.claimType eq 2) or (detail.claimType eq 6) }" filter="true" filterMatchMode="startsWith" >
+                    <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.tax}" />
+                    <f:selectItems value="#{vendorClaimView.getTaxCode(main,1)}" var="tax_in" itemLabel="#{tax_in.title}" itemValue="#{tax_in}" />
+                    <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType)}" update="claimTable taxSummationTable"  />
+                  </p:selectOneMenu>
+
+                  <p:selectOneMenu  value="#{detail.accountingLedgerId}" converter="omnifaces.SelectItemsConverter" style="width:200px;"
+                                   rendered="#{(detail.claimType eq 7)}" filter="true" filterMatchMode="startsWith" >
+                    <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.expense}" />
+                    <f:selectItems value="#{vendorClaimView.getTaxCode(main,3)}" var="tax_in" itemLabel="#{tax_in.title}" itemValue="#{tax_in}" />
+                    <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType)}"  update="claimTable taxSummationTable"  />
+                  </p:selectOneMenu>
+
+                </p:column>
+                <p:column style="text-align: right;width:15%" headerText="#{lang.taxable} #{lang.amount}" styleClass="text-right" 
+                          footerText="#{lang.total} #{lang.expense} #{vendorClaimView.totalExpense}" >
+                  <p:inputNumber readonly="#{!detail.includable}" value="#{(detail.taxableAmount)}" styleClass="fw text-right" autocomplete="off" inputStyleClass="text-right" >
+                    <p:ajax event="blur" process="@this" update="claimTable taxSummationTable" listener="#{vendorClaimView.findSumTaxableValue(rowIndex,detail.claimType,detail)}" />
+                  </p:inputNumber>
+                </p:column>
+                <p:column style="width:15%;text-align: right;" footerText="#{lang.total} #{lang.taxable} #{lang.amount}" styleClass="text-right"  >                   
+                  <h:outputText value="#{lang.total} #{lang.sales}" rendered="#{detail.claimType eq 1 and detail.totalTaxableAmount ne null }" />
+                  <h:outputText value="#{lang.total} #{lang.salesReturn}" rendered="#{detail.claimType eq 2 and detail.totalTaxableAmount ne null }" />
+                  <h:outputText value="#{lang.total} #{lang.purchase}" rendered="#{detail.claimType eq 3 and detail.totalTaxableAmount ne null }" />
+                  <h:outputText value="#{lang.total} #{lang.purchaseReturn}" rendered="#{detail.claimType eq 4 and detail.totalTaxableAmount ne null }" />
+                  <h:outputText value="#{lang.total} #{lang.debitNote}" rendered="#{detail.claimType eq 5 and detail.totalTaxableAmount ne null }" />
+                  <h:outputText value="#{lang.total} #{lang.creditNote}" rendered="#{detail.claimType eq 6 and detail.totalTaxableAmount ne null }" />
+                  <!--<h:outputText value="#{lang.expense}" rendered="#{detail.claimType eq 7 and detail.totalTaxableAmount ne null }" />-->
+                </p:column>
+                <p:column  style="text-align: right;width:15%;" headerText="#{lang.total} #{lang.taxable} #{lang.amount}" 
+                           footerText="#{appView.decimal(vendorClaimView.totalTax)}">
+                  <h:outputText value="#{appView.decimal(detail.totalTaxableAmount)}" />
+                </p:column>
+                <p:column headerText="#{lang.taxAmount}" style="text-align: right;width: 15%;" 
+                          footerText="#{lang.total} #{lang.taxAmount}" >
+                  <h:outputText value="#{appView.decimal(detail.taxValue)}" />
+                </p:column>
+                <p:column headerText="#{lang.total} #{lang.taxAmount}" style="text-align: right;width: 15%;" styleClass="text-right" 
+                          footerText="#{appView.decimal(vendorClaimView.totalTaxAmount)}" >                         
+                  <h:outputText value="#{appView.decimal(detail.totalTaxAmount)}" />
+                </p:column>
+                <p:column style="text-align: center;width: 5%;">
+                  <p:commandButton icon="fa fa-trash" title="#{lang.delete}"  
+                                   actionListener="#{vendorClaimView.deleteRow(rowIndex,detail.claimType,detail.childRow)}" update="claimTableDiv taxSummationTable" immediate="true" />
+                </p:column>                
+              </p:dataTable>
+
+            </h:panelGroup>
+          </ui:decorate>
+        </h:panelGroup>  
+
+      </h:panelGroup>
+
+      <h:panelGroup layout="block" styleClass="row" style="#{vendorClaimView.vendorClaim.statusId eq SYSTEM_CONSTANTS.CONFIRMED ?'pointer-events:none':'block'}" >
+        <h:panelGroup layout="block" styleClass="col-md-6"  >              
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="ids" value="cheque" />
+            <ui:param name="rendered" value="#{!main.isList()}" />
+            <ui:param name="label" value="#{lang.commissionClaim}" />
+            <ui:param name="search" value="false" />
+
+            <table style="width: 100%;" class="mDataTable mDataTable-center fw editLinks">            
+              <tr>
+                <td> &#160;</td>
+                <td>
+                  <p:selectOneMenu value="#{vendorClaimView.vendorClaim.service}" id="serviceCombo"  converter="omnifaces.SelectItemsConverter" required="true" 
+                                   requiredMessage="#{lang.service} #{lang.isRequired}" >
+                    <f:selectItem itemLabel="#{lang.select} #{lang.service}" itemValue="#{null}" />
+                    <f:selectItems value="#{vendorClaimView.getCommodityServices(main)}" itemValue="#{service}" itemLabel="#{service.title}" var="service" />
+                    <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.updateServiceTax(main)}" update="igstTaxGroupDiv igstTaxGroupValueDiv
+                            cgstTaxGroupDiv  sgstTaxGroupDiv sgstGroupDiv cgstGroupDiv igstGroupDiv commissionClaimDiv" />
+                  </p:selectOneMenu>
+                </td>
+                <td><h:outputText value="#{lang.fixed}" /></td>
+                <td style="text-align:right;"> 
+                  <p:inputNumber id="commissionInput" required="true" requiredMessage="#{lang.commission} #{lang.isRequired}" value="#{(vendorClaimView.vendorClaim.commissionAmount)}" inputStyleClass="text-right"  >
+                    <p:ajax event="keyup" delay="500" listener="#{vendorClaimView.updateIGSTTaxCode(0)}" update="igstTaxGroupDiv igstTaxGroupValueDiv cgstTaxGroupDiv  sgstTaxGroupDiv tdsValueDiv commissionClaimDiv" />
+                  </p:inputNumber>
+                  <p:message for="commissionInput" display="text" />
+                </td>
+                <td style="width:30px;"> &#160;</td>
+              </tr>
+
+              <p:fragment rendered="#{vendorClaimView.selectedAccount.isPurchaseInterstate eq 2}" id="intraStateId">
+                <tr>
+                  <td> &#160;</td>
+                  <td> <h:outputText value="#{lang.igst} " /> </td>
+                  <td>
+                    <h:panelGroup id="igstGroupDiv" >
+                      #{vendorClaimView.vendorClaim.igstTaxCode.code}
+<!--                      <p:selectOneMenu value="#{vendorClaimView.vendorClaim.igstTaxCode}" converter="omnifaces.SelectItemsConverter" >
+                      <f:selectItem itemLabel="#{lang.select} #{lang.gstNo}" />
+                      <f:selectItems value="#{vendorClaimView.getGSTTaxCode(main)}" var="gst" itemLabel="#{gst.code}" itemValue="#{gst}" />
+                      <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.updateIGSTTaxCode(1)}" update="igstTaxGroupDiv igstTaxGroupValueDiv tdsValueDiv commissionClaimDiv" />
+                    </p:selectOneMenu>-->
+                    </h:panelGroup>
+                  </td>
+                  <td  style="text-align:right;">
+                    <h:panelGroup id="igstTaxGroupDiv">
+                      <h:outputText value="#{appView.decimal(vendorClaimView.vendorClaim.taxValueIgst)}" styleClass="text-right" />
+                    </h:panelGroup>
+                  </td>
+                  <td style="width:30px;"> &#160;</td>
+                </tr>
+              </p:fragment>
+
+              <p:fragment rendered="#{vendorClaimView.selectedAccount.isPurchaseInterstate eq 1}" id="interStateId" >
+                <tr>
+                  <td> &#160;</td>
+                  <td> <h:outputText value="#{lang.cgst} " /> </td>
+                  <td>
+                    <h:panelGroup id="cgstGroupDiv" >
+                      #{vendorClaimView.vendorClaim.cgstTaxCode.code}
+<!--                      <p:selectOneMenu value="#{vendorClaimView.vendorClaim.cgstTaxCode}" converter="omnifaces.SelectItemsConverter" >
+                        <f:selectItem itemLabel="#{lang.select} #{lang.cgst}" />
+                        <f:selectItems value="#{vendorClaimView.getCGSTTaxCode(main)}" var="gst" itemLabel="#{gst.code}" itemValue="#{gst}" />
+                        <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.updateIGSTTaxCode(2)}" update="cgstTaxGroupDiv igstTaxGroupValueDiv tdsValueDiv commissionClaimDiv" />
+                      </p:selectOneMenu>-->
+                    </h:panelGroup>
+                  </td>
+                  <td  style="text-align:right;">
+                    <h:panelGroup id="cgstTaxGroupDiv">
+                      <h:outputText value="#{appView.decimal(vendorClaimView.vendorClaim.taxValueCgst)}" styleClass="text-right" />
+                    </h:panelGroup>
+                  </td>
+                  <td style="width:30px;"> &#160;</td>
+                </tr>
+                <tr>
+                  <td> &#160;</td>
+                  <td> <h:outputText value="#{lang.sgst} " /> </td>
+                  <td>
+                    <h:panelGroup id="sgstGroupDiv" >
+                      #{vendorClaimView.vendorClaim.sgstTaxCode.code}
+<!--                      <p:selectOneMenu value="#{vendorClaimView.vendorClaim.sgstTaxCode}" converter="omnifaces.SelectItemsConverter" >
+                        <f:selectItem itemLabel="#{lang.select} #{lang.sgst}" />
+                        <f:selectItems value="#{vendorClaimView.getSGSTTaxCode(main)}" var="gst" itemLabel="#{gst.code}" itemValue="#{gst}" />
+                        <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.updateIGSTTaxCode(3)}" update="sgstTaxGroupDiv igstTaxGroupValueDiv tdsValueDiv commissionClaimDiv" />
+                      </p:selectOneMenu>-->
+                    </h:panelGroup>
+                  </td>
+                  <td  style="text-align:right;">
+                    <h:panelGroup id="sgstTaxGroupDiv">
+                      <h:outputText value="#{appView.decimal(vendorClaimView.vendorClaim.taxValueSgst)}" styleClass="text-right" />
+                    </h:panelGroup>
+                  </td>
+                  <td style="width:30px;"> &#160;</td>
+                </tr>
+              </p:fragment>
+
+              <tr>
+                <td> &#160;</td>
+                <td> &#160;</td>
+                <td> &#160;</td>
+                <td  style="text-align:right;"> 
+                  <h:panelGroup id="igstTaxGroupValueDiv">
+                    <h:outputText value="#{appView.decimal(vendorClaimView.vendorClaim.taxValueIgstSum)}" styleClass="text-right" />
+                  </h:panelGroup> 
+                </td>
+                <td style="width:30px;"> &#160;</td>
+              </tr>
+
+              <tr>
+                <td> &#160;</td>
+                <td><h:outputText value="#{lang.tds} " /> </td>
+                <td> 
+                  <p:selectOneMenu value="#{vendorClaimView.vendorClaim.tdsTaxCode}" converter="omnifaces.SelectItemsConverter" >
+                    <f:selectItem itemLabel="#{lang.select} #{lang.tds}" />
+                    <f:selectItems value="#{vendorClaimView.tdsTaxCodelist}" var="tds" itemLabel="#{tds.code}" itemValue="#{tds}" />
+                    <p:ajax event="itemSelect" process="@this" listener="#{vendorClaimView.updateIGSTTaxCode(4)}" update="igstTaxGroupDiv igstTaxGroupValueDiv tdsValueDiv commissionClaimDiv" />
+                  </p:selectOneMenu>
+                </td>
+                <td  style="text-align:right;"> 
+                  <p:fragment id="tdsValueDiv">
+                    <h:outputText value="#{appView.decimal(vendorClaimView.vendorClaim.tdsValue)}" styleClass="text-right" />
+                  </p:fragment>
+                </td>
+                <td style="width:30px;"> &#160;</td>
+              </tr>
+
+              <tr>
+                <td> &#160;</td>
+                <td> <h:outputText value="#{lang.total} #{lang.commissionClaim}" /> </td>
+                <td> &#160;</td>
+                <td  style="text-align:right;">
+                  <p:fragment id="commissionClaimDiv">
+                    <h:outputText value="#{appView.decimal(vendorClaimView.vendorClaim.commissionClaim)}" styleClass="text-right" />
+                  </p:fragment>
+                </td>
+                <td style="width:30px;"> &#160;</td>
+              </tr>
+            </table>     
+
+          </ui:decorate>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" styleClass="col-md-6"  id="taxSummationTable">              
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="ids" value="taxsummation" />
+            <ui:param name="rendered" value="#{!main.isList()}" />
+            <ui:param name="label" value="#{lang.gstNo} #{lang.claim}" />
+            <ui:param name="search" value="false" />
+
+            <p:dataTable value="#{vendorClaimView.taxList}" var="row" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         rowIndexVar="rowTaxIndex" id="taxableTable" >
+              <p:column headerText="#{lang.tax}" footerText="#{lang.total} #{lang.gstNo} #{lang.claim}">
+                <h:outputText value="#{row}" />                
+              </p:column>
+              <p:column headerText="#{lang.total} Input" styleClass="text-right" style="text-align:right;" >
+                <h:outputText value="#{appView.decimal(vendorClaimView.getTaxInputValue(row))}"   />
+              </p:column>
+              <p:column headerText="#{lang.total} Output" styleClass="text-right"  style="text-align:right;">
+                <h:outputText value="#{appView.decimal(vendorClaimView.getTaxOutputValue(row))}"  />
+              </p:column>
+              <p:column headerText="#{lang.difference}" footerText="#{appView.decimal(vendorClaimView.vendorClaim.gstClaim)}" styleClass="text-right"  style="text-align:right;"  >
+                <h:outputText value="#{appView.decimal(vendorClaimView.taxInputOutPutDifference(row))}"  />
+              </p:column>
+              <p:column>
+
+              </p:column>
+            </p:dataTable>
+
+          </ui:decorate>
+        </h:panelGroup>
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="vendorClaimTable" var="vendorClaimVar" widgetVar="vendorClaimWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{vendorClaimView.vendorClaimLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{vendorClaimVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{vendorClaimView.vendorClaimSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{vendorClaimVar.id}" field="scm_vendor_claim.invoice_number" >
+          <f:facet name="header"><h:outputText value="#{lang.debitNoteNo}" title="#{lang.debitNoteNo}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{vendorClaimVar.invoiceNumber}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{vendorClaimView.vendorClaim}" value="#{vendorClaimVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.claim} range">
+          <h:outputText value="#{vendorClaimVar.claimMonth}/#{vendorClaimVar.claimYear}" />
+        </p:column>
+        <p:column headerText="#{lang.service}" >
+          <h:outputText value="#{vendorClaimVar.service.title}" title="#{vendorClaimVar.service.title}" />
+        </p:column>
+        <p:column headerText="#{lang.hsnCode}">
+          <h:outputText value="#{vendorClaimVar.service.hsnSacCode}" title="#{vendorClaimVar.service.hsnSacCode}" />
+        </p:column>
+        <p:column sortBy="#{vendorClaimVar.commissionClaim}" field="scm_vendor_claim.commission_claim" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.commission} #{lang.claim}" title="#{lang.total} #{lang.commission} #{lang.claim}"/></f:facet>
+          <h:outputText value="#{appView.decimal(vendorClaimVar.commissionClaim)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{vendorClaimVar.statusId.title}" field="status_id.title" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText styleClass="m-r-5 #{sysRuntimeView.statusStyle(vendorClaimVar.statusId)}" 
+                        value="#{vendorClaimVar.statusId eq SYSTEM_CONSTANTS.CONFIRMED ? lang.confirmed : vendorClaimVar.statusId eq SYSTEM_CONSTANTS.DRAFT ? lang.draft : ''}"
+                        style="background-color: #{sysRuntimeView.statusColor(vendorClaimVar.statusId)}" escape="false" />          
+        </p:column>
+
+
+      </p:dataTable> 	     
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>
+

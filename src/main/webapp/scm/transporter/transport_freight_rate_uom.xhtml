@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{transportFreightRateUomView.switchTransportFreightRateUom(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.transporterUom}" />
+    <ui:param name="ids" value="transportFreightRateUom" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{transportFreightRateUomView.deleteTransportFreightRateUom(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('transportFreightRateUomWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{transportFreightRateUomView.cloneTransportFreightRateUom(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{transportFreightRateUomView.deleteTransportFreightRateUom(main)}" value="#{lang.delete}" onclick="wdgOff('transportFreightRateUomWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{transportFreightRateUomView.saveTransportFreightRateUom(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"     rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText value="#{transportFreightRateUomView.transportFreightRateUom.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.freightRateBase}" for="transportFreightRateUomTransportFreightRatebaseId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{transportFreightRateUomView.transportFreightRateUom.transportFreightRatebaseId}" completeMethod="#{transportFreightRateUomView.transportFreightRatebaseAuto}" 
+                        converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.freightRateBase} #{lang.isRequired}" 
+                        id="transportFreightRateUomTransportFreightRatebaseId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" 
+                        cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.transportFreightRatebaseClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.transportFreightRatebaseById()}"/>
+        </p:autoComplete>
+        <p:message for="transportFreightRateUomTransportFreightRatebaseId" display="text" />
+      </h:panelGroup>            
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(transportFreightRateUomView.transportFreightRateUom.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(transportFreightRateUomView.transportFreightRateUom.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(transportFreightRateUomView.transportFreightRateUom.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(transportFreightRateUomView.transportFreightRateUom.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="transportFreightRateUomTable" var="transportFreightRateUomVar" widgetVar="transportFreightRateUomWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{transportFreightRateUomView.transportFreightRateUomLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{transportFreightRateUomVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"   
+                   selection="#{transportFreightRateUomView.transportFreightRateUomSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false">
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column  sortBy="#{transportFreightRateUomVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.uom}" title="#{lang.uom}"/></f:facet>
+            <p:commandLink action="#{main.setViewType(editform)}" value="#{transportFreightRateUomVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{transportFreightRateUomView.transportFreightRateUom}" value="#{transportFreightRateUomVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.freightRateBase}" sortBy="#{transportFreightRateUomVar.transportFreightRatebaseId.title}" field="transport_freight_ratebase_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.freightRateBase}" title="#{lang.freightRateBase}"/></f:facet>
+          <h:outputText value="#{appView.display(transportFreightRateUomVar.transportFreightRatebaseId.title)}" title="#{appView.title(transportFreightRateUomVar.transportFreightRatebaseId.title)}" escape="false" /></p:column>
+        <p:column  exportable="false">
+           <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(transportFreightRateUomVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(transportFreightRateUomVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(transportFreightRateUomVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(transportFreightRateUomVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(transportFreightRateUomVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>  
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

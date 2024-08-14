@@ -1,0 +1,250 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{smsSummaryView.loadAllStatus(main)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title} "/>
+    <ui:param name="ids" value="smsLog"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList" >
+
+
+    </ui:define>
+    <ui:define name="list">
+      <h:panelGroup  id="smsStatusView" >
+        <p:tabView prependId="false" dynamic="true" cache="false"  styleClass="materialTabs" tabindex="#{smsSummaryView.tabIndex}">
+          <p:tab title="Sms Status">
+
+            <p:dataTable value="#{smsSummaryView.usageList}" id="smsLogTable" widgetVar="smsLogWidget" var="smsLog" tableStyleClass="mDataTable mDataTable-center editLinks"
+                         paginatorPosition="bottom"  
+                         rows="#{main.pageData.pageSize}"
+                         rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" 
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "     >
+              <p:column>
+                <f:facet name="header" >
+                  <h:outputText value="#{lang.companyName}" />
+                </f:facet>
+                <p:commandLink value="#{smsLog.companyId.companyName}" actionListener="#{popUpView.showCompanySmsLogInDetail(smsLog.companyId)}" />
+
+              </p:column>
+              <p:column>
+                <f:facet name="header" >
+                  <h:outputText value="#{lang.status}" />
+                </f:facet>
+
+                <h:outputText value="#{appView.display(smsLog.smsEnabled eq 1 ? lang.smsEnabled : lang.smsDisabled)}" 
+                              title="#{appView.title(smsLog.smsEnabled eq 1 ? lang.smsEnabled : lang.smsDisabled)}" 
+                              escape="false" styleClass="m-r-5 #{sysRuntimeView.statusStyle(smsLog.smsEnabled)}" 
+                              style="background-color: #{sysRuntimeView.statusColorYesNo(smsLog.smsEnabled)}"/>
+
+              </p:column>
+              <p:column>
+                <f:facet name="header" >
+                  <h:outputText value="#{lang.smsAllowed}" />
+                </f:facet>
+                <h:outputText value="#{smsLog.smsAllowed}" />
+              </p:column>
+              <p:column>
+                <f:facet name="header">
+                  <h:outputText value="#{lang.smsUsed}" />
+                </f:facet>
+                <h:outputText value="#{smsLog.smsUsed}" />
+              </p:column>
+              <p:column>
+                <f:facet name="header">
+                  <h:outputText value="#{lang.sms} #{lang.balance}" />
+                </f:facet>
+                <h:outputText  styleClass="label" style="background-color: #{smsSummaryView.smsBalanceColor(smsLog.remainingSms)}" value="#{smsLog.remainingSms}"  escape="false"   />
+
+              </p:column>
+              <p:column>
+                <p:commandButton icon="fa fa-fw fa-trash" iconPos="left" styleClass="btn btn-info" title="Clear Log" 
+                                 actionListener="#{smsSummaryView.clearLog(main, smsLog.companyId.id)}" >
+                  <p:confirm header="Confirmation" message="Are you sure want to delete all SMS log ?" icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+
+              </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">           
+              <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no btn btn-info" icon="fa fa-times" />
+              <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes btn btn-primary" icon="fa fa-check" />
+            </p:confirmDialog>  
+          </p:tab>
+          <p:tab title="Provider Status">
+            <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+              <ui:param name="ids" value="proviserStatus" />
+              <ui:define name="menuleft">
+                <p:commandButton action="#{smsSummaryView.setSelectedProvider(null)}" title="#{lang.add}"  process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}"
+                                 oncomplete="PF('smsProviderWidgetDialog').show();" update="smsProviderWidgetDialogId"  >
+
+                </p:commandButton>
+
+              </ui:define>
+
+              <p:dataTable  value="#{smsSummaryView.smsProviders}" id="proviserStatusTable" widgetVar="proviserStatusWidget" var="smsProvider" rowKey="#{smsProvider.id}" tableStyleClass="mDataTable mDataTable-center editLinks"
+                            paginatorPosition="bottom"  
+                            rows="#{main.pageData.pageSize}"
+                            rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" 
+                            paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "     >
+                <p:column>
+                  <f:facet name="header">
+                    <h:outputText value="#{lang.serviceProvider}" />
+                  </f:facet>
+                  <h:outputText value="#{smsProvider.smsProvider}" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header" >
+                    <h:outputText value="#{lang.apiKey}" />
+                  </f:facet>
+                  <h:outputText value="#{smsProvider.apiKey}" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header">
+                    <h:outputText value="#{lang.sms}" />
+                  </f:facet>
+                  <h:outputText value="#{smsProvider.smsQuantity}" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header" >
+                    <h:outputText value="#{lang.smsAllowed}" />
+                  </f:facet>
+                  <h:outputText value="#{smsProvider.availableQuantity}" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header" >
+                    <h:outputText value="#{lang.modifiedAt}" />
+                  </f:facet>
+                  <h:outputText value="#{smsProvider.modifiedAt}" >
+                    <f:convertDateTime pattern="dd-MM-YYYY" timeStyle="localTime" />
+                  </h:outputText>
+                </p:column>
+                <p:column >
+                  <table>
+                    <tr>
+                      <td>
+                        <p:commandLink actionListener="#{smsSummaryView.setSelectedProvider(smsProvider)}" 
+                                       oncomplete="PF('smsProviderWidgetDialog').show();" update="smsProviderWidgetDialogId" title="#{lang.edit}" >
+                          <i class="fa fa-fw fa-edit"></i>
+                        </p:commandLink>
+                      </td>
+                      <td>
+                        <p:commandLink title="Allow to Company" actionListener="#{smsSummaryView.shareAllowedSmsToOtherCompany(smsProvider)}" update="f1"
+                                       oncomplete="PF('shareSmsWidgetDialog').show();" >
+                          <i class="fa fa-share-alt" ></i>
+                        </p:commandLink>
+                      </td>
+                    </tr>
+                  </table>
+
+
+
+                </p:column>
+              </p:dataTable>
+            </ui:decorate>
+            <p:dialog widgetVar="smsProviderWidgetDialog" id="smsProviderWidgetDialogId" position="center" positionType="absolute" draggable="false" modal="true"
+                      responsive="true" resizable="false"  header="Sms Provider" closable="false" closeOnEscape="false" >
+              <p:panelGrid columns="2">
+                <h:outputText value="#{lang.serviceProvider}" />
+                <p:inputText value="#{smsSummaryView.selectedProvider.smsProvider}" styleClass="fw" />
+
+                <h:outputText value="#{lang.apiKey}" />
+                <p:inputText value="#{smsSummaryView.selectedProvider.apiKey}" styleClass="fw" />
+
+                <h:outputText value="#{lang.api}" />
+                <p:inputTextarea value="#{smsSummaryView.selectedProvider.serviceApi}" styleClass="fw" />
+
+                <h:outputText value="Update Quantity" />
+                <p:inputText value="#{smsSummaryView.selectedProvider.smsQuantity}" styleClass="fw" autocomplete="off" >
+                  <p:ajax event="blur" listener="#{smsSummaryView.updateAvailableQty()}" update="availableQtyDiv" />
+                </p:inputText>
+
+                <h:outputText value="#{lang.smsAllowed}" />
+                <h:panelGroup id="availableQtyDiv">
+                  <h:outputText value="#{smsSummaryView.selectedProvider.availableQuantity}" styleClass="fw" />
+                </h:panelGroup>
+
+                <h:panelGroup />
+                <h:panelGroup>
+                  <p:commandButton value="#{lang.cancel}" actionListener="#{smsSummaryView.setSelectedProvider(null)}" 
+                                   oncomplete="PF('smsProviderWidgetDialog').hide();" styleClass="btn btn-info" />
+                  <p:commandButton value="#{lang.save}" actionListener="#{smsSummaryView.insertOrUpdateSmsProvider(main)}" 
+                                   onclick="block();" update="proviserStatusTable" oncomplete="unblock();PF('smsProviderWidgetDialog').hide();" styleClass="btn btn-primary" />
+                </h:panelGroup>
+
+              </p:panelGrid>
+
+            </p:dialog>
+
+            <p:dialog widgetVar="shareSmsWidgetDialog" id="shareSmsWidgetDialogId" position="center" positionType="absolute" 
+                      draggable="false" resizable="false" responsive="true" modal="true" header="#{smsSummaryView.selectedProvider.smsProvider}"  >
+              <h:panelGroup layout="block" id="shareQuantityDiv">
+                <h:outputText value="#{lang.available} #{lang.sms}  " />
+                <b><h:outputText value="#{smsSummaryView.selectedProvider.availableQuantity}" /></b>
+              </h:panelGroup>
+              <p:dataTable value="#{smsSummaryView.usageList}" var="cs" rows="10" rowIndexVar="index"
+                           tableStyleClass="mDataTable mDataTable-center editLinks" id="shareSmsWidgetTable">
+                <p:column headerText="#{lang.slno}">
+                  <h:outputText value="#{index+1}" />
+                </p:column>
+                <p:column headerText="#{lang.company}">
+                  <h:outputText value="#{cs.companyId.companyName}" />
+                </p:column>
+                <p:column>
+                  <f:facet name="header" >
+                    <h:outputText value="#{lang.status}" />
+                  </f:facet>
+
+                  <h:outputText value="#{appView.display(cs.smsEnabled eq 1 ? lang.smsEnabled : lang.smsDisabled)}" 
+                                title="#{appView.title(cs.smsEnabled eq 1 ? lang.smsEnabled : lang.smsDisabled)}" 
+                                escape="false" styleClass="m-r-5 #{sysRuntimeView.statusStyle(cs.smsEnabled)}" 
+                                style="background-color: #{sysRuntimeView.statusColorYesNo(cs.smsEnabled)}"/>
+
+                </p:column>
+
+                <p:column>
+                  <f:facet name="header">
+                    <h:outputText value="Provider" />
+                  </f:facet>
+                  <h:outputText value="#{cs.smsProviderId.smsProvider}" styleClass="label" style="background-color: #{cs.smsProviderId.id eq smsSummaryView.selectedProvider.id ? 'green':'red'}" />
+                </p:column>
+
+                <p:column headerText="#{lang.smsAllowed}" style="text-align: right;width:150px;">
+                  <h:outputText value="#{cs.smsAllowed}" />
+                </p:column>
+                <p:column headerText="#{lang.balance}" style="text-align: right;width:150px;">
+                  <h:outputText value="#{(cs.smsAllowed eq null ? 0 : cs.smsAllowed) - (cs.smsUsed eq null ? 0 : cs.smsUsed)}" />
+                </p:column>
+                <p:column headerText="Updated Quantity" style="text-align:right;width:150px;">
+                  <p:inputText styleClass="fw" value="#{cs.updatedSmsQuantity}" readonly="#{!(cs.smsProviderId.id eq smsSummaryView.selectedProvider.id)}" >
+                    <p:ajax />
+                  </p:inputText>
+                </p:column>
+                <p:column headerText="">
+                  <p:commandButton value="Save" styleClass="btn btn-primary" disabled="#{!(cs.smsProviderId.id eq smsSummaryView.selectedProvider.id)}"
+                                   onclick="block();" oncomplete="unblock();" update="shareSmsWidgetTable proviserStatusTable shareQuantityDiv" actionListener="#{smsSummaryView.updateCompanySettingSmsQuantity(main,cs)}" />
+                </p:column>
+              </p:dataTable>
+            </p:dialog>
+
+          </p:tab>
+        </p:tabView>
+      </h:panelGroup> 
+    </ui:define>
+  </ui:decorate>           
+</ui:composition>

@@ -1,0 +1,218 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{stockAdjustmentDamagedView.switchStockAdjustmentDamaged(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.stockAdjustmentDamaged}" />
+    <ui:param name="ids" value="stockAdjustmentDamaged" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{stockAdjustmentDamagedView.deleteStockAdjustmentDamaged(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('stockAdjustmentDamagedWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{stockAdjustmentDamagedView.cloneStockAdjustmentDamaged(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{stockAdjustmentDamagedView.deleteStockAdjustmentDamaged(main)}" value="#{lang.delete}" onclick="wdgOff('stockAdjustmentDamagedWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <!-- Draft Button -->
+      <h:commandButton action="#{stockAdjustmentDamagedView.saveStockAdjustmentDamaged(main, 2)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-success"
+                       rendered="#{stockAdjustmentDamagedView.draft or main.isNew()}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+
+      <!-- Confirm Button -->
+      <p:commandButton action="#{stockAdjustmentDamagedView.saveStockAdjustmentDamaged(main, 1)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-success"
+                       process="f1" update="f1" rendered="#{stockAdjustmentDamagedView.draft}">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />        
+      </p:commandButton>     
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <h:panelGroup id="p1" layout="block" rendered="#{main.isForm()}">
+        <p:panelGrid id="pg1"  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                     columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+          <!-- Invoice No -->
+          <p:outputLabel id="lbl1" value="#{lang.referenceNo}" for="txt1" />
+          <h:panelGroup>
+            <p:inputText value="#{stockAdjustmentDamagedView.stockAdjustmentDamaged.referenceNo}" maxlength="100" id="txt1" autocomplete="off"
+                         required="true" requiredMessage="#{lang.referenceNo} #{lang.isRequired}" styleClass="fw"/>
+            <p:message for="txt1" display="text" />
+          </h:panelGroup>
+          <p:outputLabel value=""/>
+          <h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Entry Date -->
+          <p:outputLabel id="lbl2" value="#{lang.entryDate}" for="cal1" />
+          <h:panelGroup>
+            <p:calendar value="#{stockAdjustmentDamagedView.stockAdjustmentDamaged.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}" 
+                        required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"
+                        maxlength="29" id="cal1" showButtonPanel="true" navigator="true" mask="true"/>
+            <p:message for="cal1" display="text"/>
+          </h:panelGroup>
+          <p:outputLabel value=""/>
+          <h:panelGroup>
+          </h:panelGroup>
+
+          <!-- note -->
+          <p:outputLabel value="#{lang.note}" for="note2" />
+          <h:panelGroup>
+            <p:inputTextarea  styleClass="fw" tabindex="12" value="#{stockAdjustmentDamagedView.stockAdjustmentDamaged.description}"                              
+                              cols="100" rows="3" maxlength="500" id="note2" autoResize="false" />
+            <p:message for="note2" display="text"/>
+          </h:panelGroup>
+        </p:panelGrid>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after" >
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+
+        .bg-danger {
+          color: #fff;
+          background: #ef565a !important;
+        }
+      </style>
+      <h:panelGroup id="p2" layout="block" styleClass="card" rendered="#{main.isForm()}">
+        <h:panelGroup layout="block" id="p3" styleClass="table-responsive" pt:data-fast-input="true">
+
+          <p:dataTable var="stock" id="dt1" widgetVar="stockTableVar" value="#{stockAdjustmentDamagedView.stockAdjustmentDamagedItemList}" rowIndexVar="rowIndex"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
+            <p:column id="col1" headerText="Sno" width="45" style="text-align: center;" >
+              <h:outputText id="lbl3" value="#{rowIndex + 1}" />              
+            </p:column>
+
+            <p:column id="col2" width="200">
+              <f:facet name="header"><h:outputText id="lbl4" value="Product" title="Product Name"/></f:facet>
+              <p:autoComplete id="ac1" value="#{stock.productDetailId}" completeMethod="#{stockAdjustmentDamagedView.completeProduct}"
+                              converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative"
+                              cache="true" queryDelay="500" maxResults="30" 
+                              var="prod" itemLabel="#{prod.productId.productName}" itemValue="#{prod}" forceSelection="true">
+                <f:attribute name="clazz" value="#{scmLookupView.productDetailClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productDetailById()}"/>                
+                <f:attribute name="stockAdjustmentDamagedItem" value="#{stock}"/>
+                <!-- Product Name -->
+                <p:column style="width:275px;">
+                  <f:facet name="header"><h:outputText style="font-weight: bold;" value="Name" /></f:facet>
+                  <h:outputText value="#{prod.productBatchId.productId.productName}" />
+                </p:column>
+                <!-- Batch -->
+                <p:column style="width: 130px;">
+                  <f:facet name="header"><h:outputText style="font-weight: bold;" value="Batch" /></f:facet>
+                  <h:outputText value="#{prod.productBatchId.batchNo}" />
+                </p:column>                  
+
+                <!-- MRP -->
+                <p:column>
+                  <f:facet name="header"><h:outputText value="MRP" title="MRP"/></f:facet>
+                  <h:outputText value="#{prod.productBatchId.valueMrp}" />
+                </p:column>            
+
+                <p:ajax event="itemSelect" process="@this" partialSubmit="true" update="lbl6 lbl8 lbl10 lbl12"
+                        listener="#{stockAdjustmentView.productSelectEventHandler(stock, rowIndex)}"/>
+              </p:autoComplete>              
+            </p:column>
+
+            <p:column id="col3">
+              <f:facet name="header"><h:outputText id="lbl5" value="Batch" title="Batch"/></f:facet>
+              <h:outputText id="lbl6" value="#{stock.productDetailId.productBatchId.batchNo}" />
+            </p:column>
+
+            <p:column id="col4">
+              <f:facet name="header"><h:outputText id="lbl7" value="Exp.Date" title="Expiry Date"/></f:facet>
+              <h:outputText id="lbl8" value="#{sysRuntimeView.dateToMMYY(stock.productDetailId.productBatchId.expiryDateActual)}" />
+            </p:column>
+
+            <p:column id="col5">
+              <f:facet name="header"><h:outputText id="lbl9" value="Purchased Qty" title="Purchased Quantity"/></f:facet>              
+              <h:outputText id="lbl10" value="#{stock.quantityPurchased}" />
+            </p:column>
+
+            <p:column id="col6">
+              <f:facet name="header"><h:outputText id="lbl11" value="Available Qty" title="Available Quantity"/></f:facet>              
+              <h:outputText id="lbl12" value="#{stock.quantityAvailable}" />
+            </p:column>
+
+            <p:column id="col8">
+              <f:facet name="header"><h:outputText id="lbl14" value="Damaged Qty" title="Damaged Quantity"/></f:facet>              
+              <h:outputText id="lbl15" value="#{stock.quantityDamaged}" />
+            </p:column>
+
+            <p:column id="col9">
+              <f:facet name="header"><h:outputText id="lbl16" value="Damaged Actual Qty" title="Damaged Actual Quantity"/></f:facet>              
+              <p:inputNumber id="txt3" value="#{stock.quantityDamagedActual}" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{stock.maxDamagedActualQty eq null?0:stock.maxDamagedActualQty}" minValue="0" >
+              </p:inputNumber>              
+            </p:column>
+
+            <!-- Action Icons -->
+            <p:column headerText="" id="col10">              
+              <p:commandButton id="b3" process="@this" value="" update="dt1" icon="fa fa-trash" tabindex="-1"
+                               style="color: mediumvioletred;" actionListener="#{stockAdjustmentDamagedView.actionDeleteStockAdjustmentDamagedItem(main, stock)}">
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </p:column>
+          </p:dataTable>
+        </h:panelGroup>
+
+        <p:remoteCommand name="insertOrUpdateStockAdjustmentDamagedItem" actionListener="#{stockAdjustmentDamagedView.actionInsertOrUpdateStockAdjustmentDamagedItem(main)}"
+                         process="f1" update="dt1 txt1 cal1" />
+
+        <script>
+          //<![CDATA[
+          function submitForm(params) {
+            insertOrUpdateStockAdjustmentDamagedItem([{name: 'rownumber', value: params[2]}]);
+            $('#dt1\\:0\\:ac1_input').focus();
+            return false;
+          }
+          //]]>
+        </script>
+
+
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="stockAdjustmentDamagedTable" var="stockAdjustmentDamagedVar" widgetVar="stockAdjustmentDamagedWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{stockAdjustmentDamagedView.stockAdjustmentDamagedLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{stockAdjustmentDamagedVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{stockAdjustmentDamagedView.stockAdjustmentDamagedSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column sortBy="#{stockAdjustmentDamagedVar.referenceNo}" field="scm_stock_adjustment_damaged.reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>          
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(stockAdjustmentDamagedVar.referenceNo)}" 
+                         process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{stockAdjustmentDamagedView.stockAdjustmentDamaged}" value="#{stockAdjustmentDamagedVar}" />            
+          </p:commandLink>
+        </p:column>
+
+        <!-- Entry Date -->
+        <p:column sortBy="#{stockAdjustmentDamagedVar.entryDate}" field="scm_stock_adjustment_damaged.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(stockAdjustmentDamagedVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(stockAdjustmentDamagedVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(stockAdjustmentDamagedVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(stockAdjustmentDamagedVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(stockAdjustmentDamagedVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(stockAdjustmentDamagedVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

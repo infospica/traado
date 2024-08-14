@@ -1,0 +1,461 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:o="http://omnifaces.org/ui">
+  <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+    <ui:param name="label" value="#{lang.purchaseOrder}" />
+    <ui:param name="ids" value="purchaseOrderGst" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="rendered" value="false" />
+
+    <ui:define name="afterForm">
+      <p:tabView id="potabsGst"  prependId="false" dynamic="true" cache="false" activeIndex="#{purchaseOrderView.activeIndex}" styleClass="materialTabs" >
+        <p:tab title="#{lang.purchaseOrder}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="purchaseOrderTabGst" />
+            <ui:param name="cols" value="4" />
+            <ui:param name="rendered" value="true" />            
+            <ui:param name="deleteFormMenu" value="#{purchaseOrderView.isDraft()}" />
+            <ui:param name="reset" value="#{purchaseOrderView.isDraft()}" />
+
+            <ui:define name="deleteForm" >
+              <p:commandButton action="#{purchaseOrderView.deletePurchaseOrder(main)}" value="#{lang.delete}" onclick="wdgOff('purchaseOrderTabGstWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+            </ui:define>
+            <ui:define name="save" >
+              <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+              <p:commandButton id="saveBtnGst" value="#{lang.saveAsDraft}" actionListener="#{purchaseOrderView.savePurchaseOrder(main,sysConstant.DRAFT)}"
+                               process="f1" update="f1"  styleClass="btn btn-info" rendered="#{purchaseOrderView.isDraft()}" >
+              </p:commandButton>
+
+              <p:commandButton id="saveBtnConfirmGst" value="#{lang.confirm}" styleClass="btn btn-info"
+                               actionListener="#{purchaseOrderView.savePurchaseOrder(main,sysConstant.CONFIRMED)}" process="f1" update="f1"
+                               rendered="#{purchaseOrderView.draft and main.edit}">
+                <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+              </p:commandButton>
+
+              <h:commandButton id="saveBtnConfirmPlanGst" value="#{lang.create} #{lang.shipmentPlan}" immediate="true" styleClass="btn btn-info"
+                               actionListener="#{purchaseOrderView.switchToShipment}"
+                               rendered="#{purchaseOrderView.isConfirmed()}" >
+                <f:ajax execute="f1" render="f1"/>
+              </h:commandButton>
+            </ui:define>
+            <ui:define name="menu1" >              
+            </ui:define>
+
+            <ui:define name="formRight" >
+
+              <div class="p-t-10">
+                <!-- Vendor Name -->
+                <h:outputText value="#{lang.vendor} #{lang.colon} " />
+                <h:panelGroup>
+                  <p:outputLabel style="color: dodgerblue;" value="#{accountUtilView.getVendorName(purchaseOrderView.account)}"  />
+                </h:panelGroup>
+                <p:spacer width="5" />
+
+                <!-- Trade Profile -->
+                <h:outputText value="#{lang.tradeProfile} #{lang.colon} " />
+                <h:panelGroup>
+                  <p:outputLabel style="color: dodgerblue;" value="#{accountUtilView.getTradeProfileTitle(purchaseOrderView.account)}" id="ctradetypeGst" />
+                </h:panelGroup>
+                <p:spacer width="5" />
+
+                <!-- Vendor GSTIN -->
+                <h:outputText value="#{lang.gstin} #{lang.colon} " />
+                <h:panelGroup>
+                  <p:outputLabel style="color: dodgerblue;" value="#{accountUtilView.getGstin(purchaseOrderView.account)}" styleClass="text-uppercase"  />
+                </h:panelGroup>
+
+              </div>
+            </ui:define>
+
+            <!-- Purchase Order Number -->
+            <p:outputLabel value="#{lang.purchaseOrder} #{lang.no}" />
+            <h:panelGroup layout="block">
+              <h:outputLabel styleClass="txtView  p-x-5" value="#{purchaseOrderView.purchaseOrder.purchaseOrderNo}" />
+            </h:panelGroup>
+
+            <!-- Total Outstanding -->
+            <p:outputLabel value="#{lang.totalOutstanding}" />
+            <h:panelGroup layout="block">
+              <h:outputLabel styleClass="txtView p-x-5" id="osGst" value="0.000" />
+            </h:panelGroup>
+
+            <!-- Purchase Order Date-->
+            <p:outputLabel value="#{lang.purchaseOrder} #{lang.date}" for="purchaseOrderDateGst" />
+            <h:panelGroup layout="block">
+              <p:calendar value="#{purchaseOrderView.purchaseOrder.purchaseOrderDate}" pattern="#{lang.datePattern}"
+                          disabled="#{purchaseOrderView.confirmed}" maxdate="#{userRuntimeView.getToday()}"
+                          required="true" requiredMessage="#{lang.purchaseOrder} #{lang.date} #{lang.isRequired}"
+                          validator="#{sysRuntimeView.dateLteToday}"
+                          styleClass="test" converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}"
+                          maxlength="29" id="purchaseOrderDateGst" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+
+          </ui:decorate>
+          <h:panelGroup layout="block" styleClass="row" >
+            <h:panelGroup layout="block"  styleClass="col-md-12">
+              <h:panelGroup id="poItemsTableDivGst" styleClass="card p-a-0"  layout="block" >
+                <p:importConstants type="spica.constant.AccountingConstant" var="accountingConstant" />
+                <div class="table-responsive">
+                  <h:panelGroup layout="block" id="purchaseOrderTableDivGst" styleClass="table-responsive" pt:data-fast-input="true">
+                    <p:remoteCommand name="insertOrUpdatePurchaseOrderItem" actionListener="#{purchaseOrderView.actionInsertOrUpdatePurchaseOrderItem(main)}"
+                                     process="f1" update="purchaseOrderTableDivGst" oncomplete="refreshDatatable();" />
+
+                    <p:remoteCommand name="updateInvoiceSummery" process="@this" update="purchaseOrderItemTableGst:invoiceSummarydivGst" />
+
+                    <p:focus context="purchaseOrderItemTableGst" id="focusIdGst" />
+
+                    <p:dataTable id="purchaseOrderItemTableGst" var="purchaseOrderItemVar" widgetVar="purchaseOrderItemWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                                 rowIndexVar="rowIndex" value="#{purchaseOrderView.purchaseOrderItemList}" >
+
+                      <p:column width="61" style="text-align: center;">
+                        <f:facet name="header"><h:outputText value="Sno" title="Serail Numner"/></f:facet>
+                        <h:outputText value="#{rowIndex + 1}" />
+                      </p:column>
+
+                      <!-- Product -->
+                      <p:column>
+                        <f:facet name="header"><h:outputText value="Product" /></f:facet>
+                        <h:panelGroup layout="block" id="productDivGst" >
+                          <h:outputText value="#{purchaseOrderItemVar.productId.productName}" rendered="#{!purchaseOrderView.draft}" />
+                          <p:autoComplete id="productIdGst" styleClass="fw" value="#{purchaseOrderItemVar.productId}" completeMethod="#{purchaseOrderView.completeProduct}"
+                                          inputStyleClass="fw" 
+                                          converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative"
+                                          cache="true" queryDelay="200" maxResults="30" title="#{purchaseOrderItemVar.productId.productName}"                                          
+                                          rendered="#{purchaseOrderView.draft}"
+                                          var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+                            <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                            <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                            <f:attribute name="productId" value="#{purchaseOrderItemVar.productId.id}"/>
+                            <p:ajax event="itemSelect" listener="#{purchaseOrderView.productSelectEvent(purchaseOrderItemVar)}"
+                                    process="productDivGst" update="productBatchDivGst currentQtyGst orderPricePerPieceGst lastLandingPricePerPieceGst" ></p:ajax>
+                          </p:autoComplete>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Batch -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.batch}" />
+                        </f:facet>
+                        <h:panelGroup layout="block" id="productBatchDivGst" >
+                          <h:outputText value="#{purchaseOrderItemVar.productBatchId.batchNo}" rendered="#{!purchaseOrderView.draft}" />
+                          <p:selectOneMenu value="#{purchaseOrderItemVar.productSummary}" styleClass="fw"  id="productBatchIdGst" panelStyle="width:550px" var="batchVar"
+                                           rendered="#{purchaseOrderView.draft}"
+                                           converter="omnifaces.SelectItemsConverter">
+                            <f:selectItems value="#{purchaseOrderView.completeProductDetail(main, purchaseOrderItemVar)}" var="e"
+                                           itemValue="#{e}" itemLabel="#{e.batch ne null ? e.batch : e.productName}" />
+                            <p:column>
+                              <f:facet name="header"><h:outputText value="Name" /></f:facet>
+                              <h:outputText value="#{batchVar.productName}" />
+                            </p:column>
+                            <p:column>
+                              <f:facet name="header"><h:outputText value="Batch" /></f:facet>
+                              <h:outputText value="#{batchVar.batch}" />
+                            </p:column>
+                            <p:column>
+                              <f:facet name="header"><h:outputText value="Pack Size" /></f:facet>
+                              <h:outputText value="#{batchVar.packSize}" />
+                            </p:column>
+                            <p:column>
+                              <f:facet name="header"><h:outputText value="Expiry" /></f:facet>
+                              <h:outputText value="#{batchVar.expiryDate}" />
+                            </p:column>
+                            <p:column>
+                              <f:facet name="header"><h:outputText value="MRP" /></f:facet>
+                              <h:outputText value="#{batchVar.mrpValue}" />
+                            </p:column>
+                            <p:ajax event="itemSelect" process="productBatchDivGst" update="currentQtyGst orderPricePerPieceGst lastLandingPricePerPieceGst"
+                                    listener="#{purchaseOrderView.productBatchSelectEvent}" />
+                          </p:selectOneMenu>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Purchase Requisition Number -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.purchaseReq} #{lang.no}" />
+                        </f:facet>
+                        <h:outputText id="purchaseReqNoGst" value="#{purchaseOrderItemVar.purchaseReqItemId.purchaseRequisitionId.requisitionNo}"  />
+                      </p:column>
+
+                      <!-- Product Quantity -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.qty}" />
+                        </f:facet>
+                        <h:panelGroup layout="block" id="productQtyDivGst">
+                          <h:outputText value="#{purchaseOrderItemVar.qtyRequired}" rendered="#{!purchaseOrderView.draft}" />
+                          <p:inputNumber id="productQtyGst" value="#{purchaseOrderItemVar.qtyRequired}" size="10" minValue="0" maxlength="9" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999"
+                                         decimalPlaces="0"  styleClass="fw" rendered="#{purchaseOrderView.draft}"
+                                         autocomplete="off" >
+                            <p:ajax event="change" process="productQtyDivGst" update="totalGst" listener="#{purchaseOrderView.totalBlurEvent(purchaseOrderItemVar)}"
+                                    oncomplete="updateInvoiceSummery();"/>
+                          </p:inputNumber>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Product Suggested Quantity -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.qtySuggested}" />
+                        </f:facet>
+                        <h:outputText id="currentQtyGst" value="#{appView.number(purchaseOrderItemVar.qtySuggested)}" />                        
+                      </p:column>
+
+                      <!-- Product Purchase Rate -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.purchase} #{lang.rate}" />
+                        </f:facet>
+                        <h:panelGroup layout="block" id="orderPricePerPiecedivGst">
+                          <h:outputText value="#{purchaseOrderItemVar.orderPricePerPiece}" rendered="#{!purchaseOrderView.draft}" />
+                          <p:inputNumber id="orderPricePerPieceGst" value="#{purchaseOrderItemVar.orderPricePerPiece}" size="10" minValue="0.0" maxlength="9" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="999999999"
+                                         rendered="#{purchaseOrderView.draft}"
+                                         decimalPlaces="2"  styleClass="fw" autocomplete="off" >
+                            <p:ajax event="change" process="orderPricePerPiecedivGst" update="totalGst" listener="#{purchaseOrderView.totalBlurEvent(purchaseOrderItemVar)}"
+                                    oncomplete="updateInvoiceSummery();"/>
+                          </p:inputNumber>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Product Landing Price -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.landingPrice}" />
+                        </f:facet>
+                        <h:outputText id="lastLandingPricePerPieceGst" value="#{appView.decimal(purchaseOrderItemVar.lastLandingPricePerPiece)}" />
+                      </p:column>
+
+                      <!-- Net Value -->
+                      <p:column>
+                        <f:facet name="header">
+                          <h:outputText value="#{lang.value}" />
+                        </f:facet>
+                        <h:outputText id="totalGst" value="#{appView.decimal(purchaseOrderItemVar.netValue)}"  />
+                      </p:column>
+                      <!-- Action Icons -->
+                      <p:column headerText="">
+                        <p:commandButton process="@this" value="" update="purchaseOrderItemTableGst" icon="fa fa-trash" tabindex="-1"
+                                         rendered="#{purchaseOrderView.draft}"
+                                         actionListener="#{purchaseOrderView.actionDeletePurchaseOrderItem(main, purchaseOrderItemVar)}">
+                          <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                        </p:commandButton>
+                      </p:column>
+
+
+                      <f:facet name="footer">
+                        <h:panelGroup layout="block" id="invoiceSummarydivGst">
+                          <p:panelGrid>
+                            <p:row>
+                              <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Items :</p:column>
+                              <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{purchaseOrderView.purchaseOrderItemList.size()}</p:column>
+                              <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Qty :</p:column>
+                              <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{purchaseOrderView.purchaseOrder.productNetQuantity}</p:column>
+                              <p:column style="font-weight: bold;"></p:column>
+                              <p:column style="font-weight: bold;"></p:column>
+                              <p:column style="font-weight: bold;"></p:column>
+                              <p:column style="font-weight: bold;"></p:column>
+                              <p:column style="font-weight: bold;"></p:column>
+                            </p:row>
+                          </p:panelGrid>
+
+                          <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >
+                            <h:panelGroup layout="block">
+                              <p:panelGrid>
+                                <p:row>
+                                  <p:column style="font-weight: bold;">GST %</p:column>
+                                  <p:column style="font-weight: bold;">Item Count</p:column>
+                                  <p:column style="font-weight: bold;">Goods Value</p:column>
+                                  <p:column style="font-weight: bold;">Taxable</p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">CGST %</p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">Value</p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">SGST %</p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">Value</p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{accountUtilView.isInterStatePurchase(purchaseOrderView.account)}">GST Value</p:column>
+                                </p:row>
+                                <p:row>
+                                  <ui:repeat value="#{purchaseOrderView.purchaseOrder.invoiceGroup}" var="group">
+                                    <p:row>
+                                      <p:column style="font-weight: bold;">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                                      <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                                      <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                                      <p:column style="font-weight: bold;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                                      <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">
+                                        #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                                      </p:column>
+                                      <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">
+                                        #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                                      </p:column>
+                                      <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">
+                                        #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                                      </p:column>
+                                      <p:column style="font-weight: bold;" rendered="#{accountUtilView.isIntraStatePurchase(purchaseOrderView.account)}">
+                                        #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                                      </p:column>
+                                      <p:column style="font-weight: bold;" rendered="#{accountUtilView.isInterStatePurchase(purchaseOrderView.account)}">
+                                        #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                                      </p:column>
+                                    </p:row>
+                                  </ui:repeat>
+                                </p:row>
+                              </p:panelGrid>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="text-right">
+                              <p:panelGrid columns="2" >
+                                <h:panelGroup>Goods Value :</h:panelGroup>
+                                <h:panelGroup>
+                                  <h:outputText value="#{purchaseOrderView.purchaseOrder.goodsValue eq null ? '0.00' : appView.decimal(purchaseOrderView.purchaseOrder.goodsValue)}" />
+                                </h:panelGroup>
+                                <h:panelGroup>GST Value. :</h:panelGroup>
+                                <h:panelGroup>
+                                  <h:outputText value="#{purchaseOrderView.purchaseOrder.taxValue eq null ? '0.00' : appView.decimal(purchaseOrderView.purchaseOrder.taxValue)}" />
+                                </h:panelGroup>
+                                <h:panelGroup>Net Amount :</h:panelGroup>
+                                <h:panelGroup>
+                                  <h:outputText value="#{purchaseOrderView.purchaseOrder.netAmount eq null ? '0.00' : appView.decimal(purchaseOrderView.purchaseOrder.netAmount)}" />
+                                </h:panelGroup>
+                              </p:panelGrid>
+                            </h:panelGroup>
+                          </p:panelGrid>
+                        </h:panelGroup>
+                      </f:facet>
+                    </p:dataTable>
+                  </h:panelGroup>
+                </div>
+              </h:panelGroup>
+            </h:panelGroup>
+
+            <style>
+              .vtop{vertical-align: top;}
+            </style>
+            <script>
+              //<![CDATA[
+              function submitForm(params) {
+                insertOrUpdatePurchaseOrderItem([{name: 'rownumber', value: params[2]}]);
+                $('#purchaseOrderItemTableGst\\:0\\:productIdGst_input').focus();
+                return false;
+              }
+
+              function refreshDatatable() {
+                page.refresh();
+              }
+
+              $(document).ready(function (e) {
+                refreshDatatable();
+              });
+
+
+              //]]>
+            </script>
+          </h:panelGroup>
+
+        </p:tab>
+
+        <!--Shipment Plan-->
+        <p:tab title="#{lang.shipmentPlan}" id="shipmentPlanDivGst" disabled="#{purchaseOrderView.draft}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="purchaseShipmentPlanGst" />
+            <ui:param name="rendered" value="true" />            
+            <ui:define name="more"/>
+            <ui:define name="reset"/>
+            <!--<ui:param name="search" value="false" />-->
+            <ui:define name="menuContentCenterList">
+              <h:panelGroup >
+                <p:commandButton value="#{lang.split1}" actionListener="#{purchaseOrderView.shipmentPlan(1)}" update="purchaseShipmentPlanTableGst" process="@this"
+                                 immediate="true" styleClass="btn btn-primary" rendered="#{!purchaseOrderView.confirmedAndPlanned}">
+                  <f:setPropertyActionListener target="#{purchaseOrderView.split1}" value="1" />
+                </p:commandButton>
+
+                <p:commandButton value="#{lang.split2}" actionListener="#{purchaseOrderView.shipmentPlan(2)}" update="purchaseShipmentPlanTableGst" process="@this"
+                                 immediate="true" styleClass="btn btn-primary" rendered="#{!purchaseOrderView.confirmedAndPlanned}">
+                  <f:setPropertyActionListener target="#{purchaseOrderView.split2}" value="2" />
+                </p:commandButton>
+
+                <p:commandButton value="#{lang.split3}" actionListener="#{purchaseOrderView.shipmentPlan(3)}" update="purchaseShipmentPlanTableGst" process="@this"
+                                 immediate="true" styleClass="btn btn-primary" rendered="#{!purchaseOrderView.confirmedAndPlanned}">
+                  <f:setPropertyActionListener target="#{purchaseOrderView.split3}" value="3" />
+                </p:commandButton>
+              </h:panelGroup>
+            </ui:define>
+
+            <ui:define name="menuleft">
+              <h:commandButton value="#{lang.saveAsDraft}" styleClass="btn btn-info" action="#{purchaseOrderView.saveShipmentPlan(main,1)}" 
+                               rendered="#{!purchaseOrderView.confirmedAndPlanned}">
+                <f:ajax execute="shipmentPlanDivGst" render="f1"/>
+              </h:commandButton>
+
+              <h:commandButton value="#{lang.confirm}" styleClass="btn btn-info" action="#{purchaseOrderView.saveShipmentPlan(main,2)}" rendered="#{!purchaseOrderView.confirmedAndPlanned}">
+                <f:ajax execute="shipmentPlanDivGst" render="f1"/>
+              </h:commandButton>
+
+            </ui:define>
+
+            <h:panelGrid columns="5" style="width:100%; text-align: right">
+              <p:calendar value="#{purchaseOrderView.datePlan}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}"
+                          inputStyle="background: inherit;border: none;"
+                          maxlength="29" showButtonPanel="true" navigator="true" mask="true" disabled="true" />
+
+              <p:calendar value="#{purchaseOrderView.datePlan}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}"
+                          inputStyle="background: inherit;border: none;"
+                          maxlength="29" showButtonPanel="true" navigator="true" mask="true" disabled="true"/>
+
+              <p:calendar value="#{purchaseOrderView.datePlan1}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}"
+                          maxlength="29" id="Dateplan1Gst" showButtonPanel="true" navigator="true" mask="true" placeholder="#{lang.shipmentDate1}" required="true" requiredMessage="#{lang.date} #{lang.isRequired}" 
+                          disabled="#{purchaseOrderView.confirmedAndPlanned}"/>
+
+              <p:calendar value="#{purchaseOrderView.datePlan2}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}"
+                          maxlength="29" id="datePlan2Gst" showButtonPanel="true" navigator="true" mask="true" placeholder="#{lang.shipmentDate2}" disabled="#{purchaseOrderView.confirmedAndPlanned}"/>
+
+              <p:calendar value="#{purchaseOrderView.datePlan3}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}"
+                          maxlength="29" id="datePlan3Gst" showButtonPanel="true" navigator="true" mask="true" placeholder="#{lang.shipmentDate3}" disabled="#{purchaseOrderView.confirmedAndPlanned}"/>
+            </h:panelGrid>
+
+            <p:dataTable id="purchaseShipmentPlanTableGst" var="purchaseShipmentPlanVar" widgetVar="purchaseShipmentPlanWidget" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" value="#{purchaseOrderView.getPurchaseShipmentPlanList(main)}" rowHover="true" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('purchaseShipmentPlanWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <!-- Product Name -->
+              <p:column headerText="#{lang.productName}" sortBy="#{purchaseShipmentPlanVar.productName}" filterBy="#{purchaseShipmentPlanVar.productName}" filterStyleClass="hidden">
+                <h:outputText value="#{appView.display(purchaseShipmentPlanVar.productName)}" title="#{appView.title(purchaseShipmentPlanVar.productName)}" escape="false"/>
+              </p:column>
+
+              <!-- Actual Quantity -->
+              <p:column headerText="#{lang.qty}" sortBy="#{purchaseShipmentPlanVar.qtyRequired}" field="qty" style="text-align: right">
+                <h:outputText value="#{appView.number(purchaseShipmentPlanVar.qtyRequired)}" escape="false"/>
+              </p:column>
+
+              <!-- Split 1 Qty -->
+              <p:column headerText="#{lang.qty1}" sortBy="#{purchaseShipmentPlanVar.qty1}" field="qty1" style="text-align: right">
+                <p:inputNumber value="#{purchaseShipmentPlanVar.qty1}" 
+                               minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" maxlength="9" decimalPlaces="0"
+                               disabled="#{!purchaseOrderView.isSplitPlan1() and !purchaseOrderView.isSplitPlan2() and !purchaseOrderView.isSplitPlan3()}" readonly="#{purchaseOrderView.confirmedAndPlanned}"/>
+              </p:column>
+
+              <!-- Split 2 Qty -->
+              <p:column headerText="#{lang.qty2}" sortBy="#{purchaseShipmentPlanVar.qty2}" field="qty2" style="text-align: right">
+                <p:inputNumber value="#{purchaseShipmentPlanVar.qty2}"
+                               minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" maxlength="9" decimalPlaces="0"
+                               disabled="#{purchaseOrderView.isSplitPlan1() or !purchaseOrderView.isSplitPlan2() and !purchaseOrderView.isSplitPlan3()}" readonly="#{purchaseOrderView.confirmedAndPlanned}"/>
+              </p:column>
+
+              <!-- Split 3 Qty -->
+              <p:column headerText="#{lang.qty3}" sortBy="#{purchaseShipmentPlanVar.qty3}" field="qty3" style="text-align: right">
+                <p:inputNumber value="#{purchaseShipmentPlanVar.qty3}"
+                               minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" maxlength="9" decimalPlaces="0"
+                               disabled="#{!purchaseOrderView.isSplitPlan3()}" readonly="#{purchaseOrderView.confirmedAndPlanned}"/>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+      </p:tabView>
+    </ui:define>    
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{bankView.switchBank(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.bank}" />
+    <ui:param name="ids" value="bank" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{bankView.deleteBank(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('bankWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{bankView.cloneBank(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{bankView.deleteBank(main)}" value="#{lang.delete}" onclick="wdgOff('bankWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{bankView.saveBank(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.name}" for="name" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{bankView.bank.name}" validator="wawo.WhiteSpaceValidator" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" id="name" />
+        <p:message for="name" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{bankView.bank.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
+                       thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(bankView.bank.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(bankView.bank.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(bankView.bank.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(bankView.bank.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(bankView.bank.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="bankTable" var="bankVar" widgetVar="bankWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{bankView.bankLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{bankVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{bankView.bankSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />        
+        <p:column  sortBy="#{bankVar.name}" field="name" filterBy="#{bankVar.name}" filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+            <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(bankVar.name)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{bankView.bank}" value="#{bankVar}" />
+          </p:commandLink>            
+        </p:column>   
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(bankVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(bankVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(bankVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(bankVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(bankVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>   
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

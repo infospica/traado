@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+  #{accountGroupDocPrefixView.switchAccountGroupDocPrefix(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="Doc Prefix" />
+    <ui:param name="subLabel" value="#{accountGroupDocPrefixView.accountGroupDocPrefix.prefixTypeId.title}" />    
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="accountGroupDocPrefix" />
+    <ui:param name="more" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{accountGroupDocPrefixView.accountGroupDocPrefixReturn}"
+                       oncomplete="parent.accountGroupListReturned();closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountGroupDocPrefixView.deleteAccountGroup(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountGroupWidgetDelConf')"
+                       process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountGroupDocPrefixView.cloneAccountGroupDocPrefix(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()"
+                  icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountGroupDocPrefixView.deleteAccountGroup(main)}" value="#{lang.delete}" onclick="wdgOff('accountGroupWidgetDel')"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{accountGroupDocPrefixView.saveAccountGroupDocPrefix(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="leftLeftList" >
+      <h:commandButton action="#{accountGroupDocPrefixView.insertAccountGroupDetails(main)}" value="#{lang.select}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <!-- Invoice Prefix -->
+      <p:outputLabel value="#{lang.prefix}" for="docPrefix" />      
+      <h:panelGroup>
+        <p:inputText value="#{accountGroupDocPrefixView.accountGroupDocPrefix.docPrefix}" required="true" requiredMessage="#{lang.invoicePrefix} #{lang.isRequired}" 
+                     id="docPrefix" />
+        <p:message for="docPrefix" display="text" />        
+      </h:panelGroup>
+
+      <!-- Invoice Number Counter -->
+      <p:outputLabel value="#{lang.sequence}" for="docNumberCounter" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountGroupDocPrefixView.accountGroupDocPrefix.docNumberCounter}" converterMessage="#{lang.invoiceNoCounter} #{lang.invalidNumber}" 
+                       decimalPlaces="0"
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="docNumberCounter" />
+        <p:message for="docNumberCounter" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.padding}" for="padding" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountGroupDocPrefixView.accountGroupDocPrefix.padding}" converterMessage="#{lang.padding} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="padding" />
+        <p:message for="padding" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.yearSequence}" for="yearSequence" />
+      <h:panelGroup id="yearSequenceDiv">
+        <p:selectOneRadio id="yearSequence" value="#{accountGroupDocPrefixView.accountGroupDocPrefix.yearSequence}">
+          <f:selectItem itemLabel="#{lang.none}" itemValue="#{0}" />
+          <f:selectItem itemLabel="#{lang.currentYear}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.financialYear}" itemValue="#{2}" />
+          <p:ajax process="yearSequenceDiv" update="yearPaddingLabel yearPaddingDiv yearStartLabel yearStartDiv" listener="#{accountGroupDocPrefixView.yearSequenceChangeHandler}"  />
+        </p:selectOneRadio>
+        <p:message for="yearSequence" display="text"/>
+      </h:panelGroup>
+
+      <h:panelGroup id="yearPaddingLabel">
+        <p:outputLabel value="#{lang.yearPadding}" for="yearPadding" rendered="#{accountGroupDocPrefixView.yearSequence}" />
+      </h:panelGroup>
+      <h:panelGroup id="yearPaddingDiv">
+        <p:selectOneRadio id="yearPadding" value="#{accountGroupDocPrefixView.accountGroupDocPrefix.yearPadding}" rendered="#{accountGroupDocPrefixView.yearSequence}" >
+          <f:selectItem itemLabel="#{lang.twoDigits}" itemValue="#{2}" />
+          <f:selectItem itemLabel="#{lang.fourDigits}" itemValue="#{4}" />
+          <p:ajax update="yearPaddingLabel yearPaddingDiv"  />
+        </p:selectOneRadio>
+        <p:message for="yearPadding" display="text" />
+      </h:panelGroup>
+
+       <h:panelGroup id="yearStartLabel">
+        <p:outputLabel value="#{lang.startYearOnlyLabel}" for="yearStart" rendered="#{accountGroupDocPrefixView.yearSequence}" />
+      </h:panelGroup>
+      <h:panelGroup id="yearStartDiv">
+        <p:selectOneRadio id="yearStart" value="#{accountGroupDocPrefixView.accountGroupDocPrefix.startYearOnly}" rendered="#{accountGroupDocPrefixView.yearSequence}" >
+          <f:selectItem itemLabel="#{lang.startYearOnly}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.startEndYear}" itemValue="#{0}" />
+          <p:ajax update="yearStartLabel yearStartDiv"  />
+        </p:selectOneRadio>
+        <p:message for="yearStart" display="text" />
+      </h:panelGroup>
+      
+      
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="accountGroupStatusId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{accountGroupDocPrefixView.accountGroupDocPrefix.statusId}" completeMethod="#{accountGroupDocPrefixView.statusAuto}" converter="wawo.LookupIntConverter"
+                        required="true" requiredMessage="#{lang.status} #{lang.isRequired}" id="accountGroupStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}"
+                        emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                        forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
+        </p:autoComplete><p:message for="accountGroupStatusId" display="text" />
+      </h:panelGroup>
+
+      <!-- Sort Order -->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" rendered="false" />
+      <h:panelGroup rendered="false">
+        <p:inputNumber value="#{accountGroupDocPrefixView.accountGroupDocPrefix.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder"  thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+      
+      <h:panelGroup></h:panelGroup>
+      <h:panelGroup></h:panelGroup>
+    </ui:define>    
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,60 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:p="http://primefaces.org/ui"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+  <div class="wrapTop" onclick="$(this).slideUp();
+      return false;">
+    <h:panelGroup layout="block" class="ui-messages ui-widget" id="errorMessage" rendered="#{facesContext.validationFailed}">
+      <p:effect type="bounce" event="load" delay="1000"  />
+      <div class="ui-messages-error ui-corner-all" >
+        <a  class="ui-messages-close ignoreLoad"
+            href="#" >
+          <span class="ui-icon ui-icon-close"></span></a>
+        <span class="ui-messages-error-icon"></span>
+        <ul>
+          <li>
+            <span class="ui-messages-error-summary">
+              Correct the validation errors.
+            </span>
+          </li>
+        </ul>
+      </div>
+    </h:panelGroup>
+  </div>
+
+  <div id="message" class="wrapTop">
+    <div onclick="$(this).slideUp(); return false;">
+      <p:messages  closable="true" rendered="#{!facesContext.validationFailed}" styleClass=""  >
+               <p:autoUpdate/>
+        <p:effect type="bounce" event="load" delay="1000"  >
+          <!--          <p:autoUpdate />-->
+        </p:effect>
+    </p:messages>
+    </div>
+  </div>
+  <div id="messages" class="messages wrapTop"></div>
+
+  <!--
+  
+    <h:panelGroup layout="block" class="ui-growl ui-widget" id="messages_container" style="z-index: 2003;" rendered="#{facesContext.validationFailed}">
+      <div aria-live="polite" class="ui-growl-item-container ui-state-highlight ui-corner-all ui-helper-hidden ui-shadow"
+           style="display: block;">
+        <div class="ui-growl-item">
+          <div style="display:none" class="ui-growl-icon-close ui-icon ui-icon-closethick"></div>
+          <span class="ui-growl-image ui-growl-image-error"></span>
+          <div class="ui-growl-message">
+            <span class="ui-growl-title"> Correct the validation errors.</span><p></p></div>
+          <div style="clear: both;"></div></div></div>
+  </h:panelGroup>
+  
+  <style>
+    .test{
+      z-index: 2022 !important;
+    }
+  </style>
+  <p:growl  id="messages"  class="test" autoUpdate="true" rendered="#{!facesContext.validationFailed}" life="20000"   />
+  -->
+</ui:composition>

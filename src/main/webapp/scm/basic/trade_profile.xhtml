@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{tradeProfileView.switchTradeProfile(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.tradeProfile}" />
+    <ui:param name="ids" value="tradeProfile" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{tradeProfileView.deleteTradeProfile(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('tradeProfileWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{tradeProfileView.cloneTradeProfile(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{tradeProfileView.deleteTradeProfile(main)}" value="#{lang.delete}" onclick="wdgOff('tradeProfileWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{tradeProfileView.saveTradeProfile(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"   rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Title -->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText value="#{tradeProfileView.tradeProfile.title}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" />
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <!-- Trade Level -->
+      <p:outputLabel value="#{lang.tradeLevel}" for="tradeLevel" />
+      <h:panelGroup>
+        <p:inputNumber value="#{tradeProfileView.tradeProfile.tradeLevel}" converterMessage="#{lang.tradeLevel} #{lang.invalidNumber}" decimalPlaces="0"
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="tradeLevel" />
+        <p:message for="tradeLevel" display="text"/>
+      </h:panelGroup>
+
+      <!-- Sort Order -->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{tradeProfileView.tradeProfile.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator=""
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(tradeProfileView.tradeProfile.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(tradeProfileView.tradeProfile.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(tradeProfileView.tradeProfile.lastModifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(tradeProfileView.tradeProfile.lastModifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="tradeProfileTable" var="tradeProfileVar" widgetVar="tradeProfileWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{tradeProfileView.tradeProfileLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{tradeProfileVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{tradeProfileView.tradeProfileSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true" 
+                   draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false">
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column  sortBy="#{tradeProfileVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+            <p:commandLink action="#{main.setViewType(editform)}" value="#{tradeProfileVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{tradeProfileView.tradeProfile}" value="#{tradeProfileVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{tradeProfileVar.tradeLevel}" field="trade_level" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.tradeLevel}" title="#{lang.tradeLevel}"/></f:facet>
+          <h:outputText value="#{appView.number(tradeProfileVar.tradeLevel)}" escape="false" />
+        </p:column>
+<!--        <p:column  sortBy="#{tradeProfileVar.sortOrder}" field="sort_order" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+          <h:outputText value="#{appView.number(tradeProfileVar.sortOrder)}" escape="false" />
+        </p:column>-->
+        <p:column exportable="false"> 
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(tradeProfileVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(tradeProfileVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(tradeProfileVar.lastModifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(tradeProfileVar.lastModifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(tradeProfileVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

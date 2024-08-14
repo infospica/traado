@@ -1,0 +1,313 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" >
+  #{consignmentReceiptView.switchConsignmentReceipt(main,viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">    
+    <ui:param name="label" value="#{main.isEdit() ? consignmentReceiptView.consignment.consignmentNo : lang.consignmentReceipt}"/>
+    <ui:param name="subLabel" value="#{main.isEdit() ? lang.receipt : null}"/>
+    <ui:param name="navLabel" value="#{main.isEdit() ? consignmentReceiptView.consignment.consignmentStatusId.title : null}" />
+    <ui:param name="ids" value="consignmentReceipt" />
+    <!--    <ui:param name="more" value="false"/>
+        <ui:param name="reset" value="false"/>-->
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" 
+                       actionListener="#{consignmentReceiptView.consignmentPopupClose()}"
+                       oncomplete="parent.consignmentReturned();closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />   
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton id="saveBtn" value="#{lang.save}" styleClass="btn btn-info" action="#{consignmentReceiptView.saveConsignmentReceiptInfo(main)}" 
+                       rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"/>
+      </h:commandButton>
+      <h:commandButton actionListener="#{consignmentReceiptView.saveConsignmentReceiptInfoClose(main)}" onclick="toTop();"  value="#{lang.save} #{lang.andSymbol} #{lang.close}" styleClass="btn btn-info" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup}"><f:ajax execute="f1" render="f1"/>
+      </h:commandButton>
+
+    </ui:define>
+    <ui:define name="formRight" >
+      <p:commandButton id="expense" value="#{lang.expense}" styleClass="R btn btn-info" actionListener="#{consignmentReceiptView.showExpense(main)}"  immediate="true" process="@this" partialSubmit="true"/>
+    </ui:define>    
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  prependId="false" dynamic="true" cache="false" styleClass="materialTabs">
+        <!--Consignment Tab-->
+        <p:tab title="#{lang.consignment} #{lang.receipt}" id="consignmentTab" >
+
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml" >
+            <ui:param name="ids" value="consignment" /> 
+            <ui:param name="cols" value="4" />
+            <ui:param name="styleClass" value="#{sysRuntimeView.getGrid4()}" />
+
+            <!--Consignment-->
+            <p:outputLabel value="#{lang.consignmentNo}" for="consignmentId" rendered="#{main.isNew()}"/>
+            <h:panelGroup rendered="#{main.isNew()}">
+              <p:selectOneMenu value="#{consignmentReceiptView.selectedConsignment}"  id="consignmentId"
+                               styleClass="fw" tabindex="0"
+                               converter="omnifaces.SelectItemsConverter">                
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{consignmentReceiptView.consignmentInfo(main)}" var="con" itemValue="#{con}" itemLabel="#{con.consignmentNo}" />
+                <p:ajax event="itemSelect" listener="#{consignmentReceiptView.details}" 
+                        update="consignmentDate consignorCst consignorTin consignmentVendorId consignorAddress
+                        consignorPhone1 consignorPhone2 consignorPhone3 consignorEmail condatediv"/>
+              </p:selectOneMenu>
+
+              <p:message for="consignmentId" display="text"/>
+            </h:panelGroup>
+
+            <!--Consignment Number-->
+            <p:outputLabel value="#{lang.consignmentNo}" for="consignmentNo" rendered="#{main.isEdit()}" />
+            <h:panelGroup rendered="#{main.isEdit()}">
+              <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consignmentNo}" maxlength="100" id="consignmentNo" autocomplete="off"/>
+              <p:message for="consignmentNo" display="text"/>
+            </h:panelGroup>
+
+            <!--Consignment Date-->
+            <p:outputLabel value="#{lang.consignmentDate}" for="consignmentDate" />
+            <h:panelGroup layout="block" id="condatediv">              
+              <p:calendar value="#{consignmentReceiptView.consignment.consignmentDate}" pattern="#{lang.datePattern}"
+                          converterMessage="#{lang.consignmentDate} #{lang.invalidDate}" 
+                          maxlength="29" required="true" requiredMessage="#{lang.consignmentDate} #{lang.isRequired}"
+                          id="consignmentDate" showButtonPanel="true" autocomplete="off"
+                          navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}"/>
+              <p:message for="consignmentDate" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.noOfInvoice}" for="noOfInvoice" />
+            <h:panelGroup>
+                <p:inputNumber styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.noOfInvoice}" maxlength="10" id="noOfInvoice" 
+                               autocomplete="off" required="true" requiredMessage="#{lang.noOfInvoice} #{lang.isRequired}" maxValue="9999" minValue="1" decimalPlaces="0" />
+              <p:message for="noOfInvoice" display="text"/>
+            </h:panelGroup> 
+
+            <p:outputLabel value="#{lang.lrNo}" for="lrNo" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.receiptNo}" id="lrNo" autocomplete="off"
+                           validator="wawo.WhiteSpaceValidator" required="true" requiredMessage="#{lang.lrNo} #{lang.isRequired}" />
+              <p:message for="lrNo" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.consignmentStatus}" for="consignmentConsignmentStatusId" />
+            <h:panelGroup>
+              <p:selectOneMenu value="#{consignmentReceiptView.consignment.consignmentStatusId}"  required="true" requiredMessage="#{lang.consignmentStatus} #{lang.isRequired}" 
+                               id="consignmentConsignmentStatusId" converter="omnifaces.SelectItemsConverter">
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{consignmentReceiptView.consignmentStatus()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              </p:selectOneMenu><p:message for="consignmentConsignmentStatusId" display="text" />
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.receipt} #{lang.copy}" for="documentPath" />
+            <h:panelGroup id="documentPathPart">
+              <h:inputFile value="#{consignmentReceiptView.documentPathPart}"  maxlength="200" id="documentPath"/>
+              <p:commandButton rendered="#{not empty consignmentReceiptView.consignmentDetail.receiptReturnFilePath}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this" 
+                               oncomplete="hide('documentPathLink')" update="documentPathPart" partialSubmit="true" immediate="true"  style="width:30px">
+                <f:setPropertyActionListener target="#{consignmentReceiptView.documentPathPart}" value="#{appIo.getRemoveFile()}" />
+              </p:commandButton>
+              <p:spacer width="5"/>
+              <p:commandLink value="#{appIo.fileName(consignmentReceiptView.consignmentDetail.receiptReturnFilePath)}" ajax="false" id="documentPathLink" class="ignoreLoad" >
+                <p:fileDownload value="#{appIo.downloadPrivate(consignmentReceiptView.consignmentDetail.receiptReturnFilePath)}" />
+              </p:commandLink>
+              <p:message for="documentPath" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.nonReimbursableExpense}" for="lrAmount" />
+            <h:panelGroup>
+              <p:inputNumber styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.totalExpenseAmount}" 
+                             autocomplete="off" converterMessage="#{lang.lrAmount} #{lang.invalidNumber}" decimalPlaces="2" id="lrAmount" readonly="true"
+                            onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" />
+              <p:message for="lrAmount" display="text"/>
+            </h:panelGroup>            
+
+            <p:outputLabel value="#{lang.receiptNote}" for="receiptNote" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{consignmentReceiptView.consignmentDetail.receiptNote}" cols="100" rows="3" maxlength="2000" id="receiptNote" autoResize="false" 
+                                required="true" requiredMessage="#{lang.receiptNote} #{lang.isRequired}"/>
+              <p:message for="receiptNote" display="text"/>
+            </h:panelGroup>
+          </ui:decorate>
+
+          <!--Consignor Details-->
+          <div class="row">
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="conTab" />
+                <ui:param name="label" value="#{lang.consignor}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <p:outputLabel value="#{lang.supplier}"/>
+                <h:panelGroup id="consignmentVendorId">
+                  <h:outputLabel styleClass="txtView" value="#{consignmentReceiptView.consignment.vendorId.vendorName}"/>
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentReceiptView.consignment.vendorId.gstNo}"   id="consignorGst" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.tinabbr}" value="#{lang.tin}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentReceiptView.consignment.consignorTin}"  id="consignorTin" title="#{lang.tinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.cstRegNumber}" title="#{lang.cstRegistrationNumber}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentReceiptView.consignment.consignorCst}"  id="consignorCst" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.address}" for="consignorAddress" />
+                <h:panelGroup>
+                  <p:inputTextarea  styleClass="fw" value="#{consignmentReceiptView.consignment.consignorAddress}" cols="100" rows="3" maxlength="500" id="consignorAddress" autoResize="false" />
+                  <p:message for="consignorAddress" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone1}" for="consignorPhone1" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consignorPhone1}" maxlength="20" id="consignorPhone1" />
+                  <p:message for="consignorPhone1" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone2}" for="consignorPhone2" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consignorPhone2}" maxlength="20" id="consignorPhone2" />
+                  <p:message for="consignorPhone2" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone3}" for="consignorPhone3" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consignorPhone3}" maxlength="20" id="consignorPhone3" />
+                  <p:message for="consignorPhone3" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.email}" for="consignorEmail" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consignorEmail}" validator="wawo.EmailValidator" maxlength="200" id="consignorEmail" />
+                  <p:message for="consignorEmail" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+
+            <!--Consignee Details-->
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="csiTab" />
+                <ui:param name="label" value="#{lang.consignee}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <p:outputLabel value="#{lang.company}" />
+                <h:panelGroup >
+                  <h:outputLabel  styleClass="txtView p-x-5" value="#{userRuntimeView.company.companyName}" />
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.gstinabbr}" value="#{lang.gstin}" rendered="#{userRuntimeView.isGstRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isGstRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5 text-uppercase" value="#{consignmentReceiptView.consignment.companyId.gstNo}"   id="consigneeGst" title="#{lang.gstinabbr}" />
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.tinabbr}"  value="#{lang.tin}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentReceiptView.consignment.consigneeTin}"  title="#{lang.tinabbr}" id="consigneeTin" />
+                </h:panelGroup>
+
+                <p:outputLabel title="#{lang.cstRegistrationNumber}" value="#{lang.cstRegNumber}" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup rendered="#{userRuntimeView.isVatRegime()}">
+                  <h:outputLabel styleClass="txtView p-x-5" value="#{consignmentReceiptView.consignment.consigneeCst}"  title="#{lang.cstRegNumber}" id="consigneeCst" />
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.address}" for="consigneeAddress" />
+                <h:panelGroup>
+                  <p:inputTextarea  styleClass="fw" value="#{consignmentReceiptView.consignment.consigneeAddress}" cols="100" rows="3" maxlength="500" id="consigneeAddress" autoResize="false" />
+                  <p:message for="consigneeAddress" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone1}" for="consigneePhone1" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consigneePhone1}" maxlength="20" id="consigneePhone1" />
+                  <p:message for="consigneePhone1" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone2}" for="consigneePhone2" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consigneePhone2}" maxlength="20" id="consigneePhone2" />
+                  <p:message for="consigneePhone2" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.phone3}" for="consigneePhone3" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consigneePhone3}" maxlength="20" id="consigneePhone3" />
+                  <p:message for="consigneePhone3" display="text"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{lang.email}" for="consigneeEmail" />
+                <h:panelGroup>
+                  <p:inputText styleClass="fw" value="#{consignmentReceiptView.consignment.consigneeEmail}" validator="wawo.EmailValidator" maxlength="200" id="consigneeEmail" />
+                  <p:message for="consigneeEmail" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+          </div>
+        </p:tab>
+      </p:tabView>
+    </ui:define>
+    <ui:define name="list">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:dataTable id="consignmentReceiptTable" var="consignmentReceiptVar" widgetVar="consignmentReceiptWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{consignmentReceiptView.consignmentReceiptLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{consignmentReceiptVar.id}" rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" 
+                   paginator="true" 
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{consignmentReceiptView.consignmentReceiptSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" 
+                   paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column sortBy="#{consignmentReceiptVar.consignmentId.consignmentNo}" field="consignmentNo">
+          <f:facet name="header">
+            <h:outputText value="#{lang.consignmentNo}" title="#{lang.consignmentNo}"/>
+          </f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{consignmentReceiptVar.consignmentId.consignmentNo}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{consignmentReceiptView.consignmentDetail}" value="#{consignmentReceiptVar}" />
+          </p:commandLink>
+        </p:column>
+        
+        <p:column sortBy="#{consignmentReceiptVar.consignmentId.consignmentDate}" field="title">
+          <f:facet name="header">
+            <h:outputText value="#{lang.consignmentDate}" title="#{lang.consignmentDate}"/>
+          </f:facet>
+          <h:outputText value="#{appView.date(consignmentReceiptVar.consignmentId.consignmentDate)}" escape="false" />
+        </p:column>
+        
+        <p:column sortBy="#{consignmentReceiptVar.receiptNo}" field="receipt_note">
+          <f:facet name="header">
+            <h:outputText value="#{lang.lrNo}" title="#{lang.lrNo}"/>
+          </f:facet>
+          <h:outputText value="#{appView.display(consignmentReceiptVar.receiptNo)}" title="#{appView.title(consignmentReceiptVar.receiptNo)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{consignmentReceiptVar.consignmentId.consignmentStatusId.title}" field="title">
+          <f:facet name="header">
+            <h:outputText value="#{lang.receipt} #{lang.status}" title="#{lang.receipt} #{lang.status}"/>
+          </f:facet>
+          <h:outputText value="#{appView.display(consignmentReceiptVar.consignmentId.consignmentStatusId.title)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{consignmentReceiptVar.receiptNote}" field="receipt_note">
+          <f:facet name="header">
+            <h:outputText value="#{lang.receiptNote}" title="#{lang.receiptNote}"/>
+          </f:facet>
+          <h:outputText value="#{appView.display(consignmentReceiptVar.receiptNote)}" title="#{appView.title(consignmentReceiptVar.receiptNote)}" escape="false" />
+        </p:column>
+         
+        <p:column exportable="false" styleClass="w-60">
+          <f:facet name="header">
+            <h:outputText value="#{lang.expense}" title="#{lang.expense}"/>
+          </f:facet>
+          <p:commandButton id="expense1" icon="fa fa-dollar" title="#{lang.expense}" styleClass="btn btn-default" actionListener="#{consignmentReceiptView.showExpense(consignmentReceiptVar.consignmentId)}" immediate="true" process="@this" partialSubmit="true"/>
+        </p:column>
+
+        <p:column  exportable="false" styleClass="w-60">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">            
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

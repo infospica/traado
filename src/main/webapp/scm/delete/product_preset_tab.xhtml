@@ -1,0 +1,219 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  <h:panelGroup layout="block" id="#{ids}ProductPresetDiv">
+    <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">          
+      <ui:param name="label" value="#{lang.productPacking}"/>
+      <ui:param name="ids" value="#{ids}prodPre"/> 
+      <ui:param name="grid" value="false"/>
+      <ui:define name="defaultCommand"/>
+      <ui:define name="menuleft" >
+        <h:commandButton action="#{productView.saveProductPreset(main)}"  value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{!productView.isProductEntry()}">
+          <f:ajax execute="f1" render="f1"/>
+        </h:commandButton>
+      </ui:define>
+
+      <ui:define name="subAfter" >
+<!--        <div data-fast-input="true">-->
+          <p:panelGrid id="#{ids}productPacking"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid4}">
+            <f:facet name="header">
+              <p:row>
+                <p:column colspan="2">#{lang.tertiaryPacking}</p:column>
+                <p:column colspan="2">#{lang.secondaryPacking}</p:column>
+                <p:column >#{lang.primaryPacking}</p:column>
+                <p:column colspan="4">#{lang.primaryDimension}</p:column>
+                <p:column colspan="2">#{lang.defaults} #{lang.packing}</p:column>
+
+              </p:row>
+            </f:facet>
+
+            <p:row>
+              <p:column >
+                <h:panelGroup layout="block">
+
+                  <p:selectOneMenu value="#{productView.productPreset.packTertiary}" 
+                                   id="#{ids}productPresetPackTertiary" converter="omnifaces.SelectItemsConverter">
+                    <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}"/>
+                    <f:selectItems value="#{productView.productPackingTertiary(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                    <p:ajax event="itemSelect" listener="#{productView.itemSelectEvent}" update="#{ids}productPresetPackSecondary #{ids}packDefaultDiv #{ids}secQtyDiv #{ids}groupQtyDiv 
+                            #{ids}unitDiv"/>
+                  </p:selectOneMenu>
+                  <p:message for="#{ids}productPresetPackTertiary" display="text" />
+                </h:panelGroup>
+              </p:column>
+
+              <p:column >
+                <h:panelGroup id="#{ids}secQtyDiv" layout="block">
+                  <p:inputNumber styleClass="fw" value="#{productView.productPreset.packTertiarySecondaryQty}" converterMessage="#{lang.qty} #{lang.invalidNumber}" 
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="7" id="#{ids}packTertiarySecondaryQty" readonly ="#{!productView.isTertiaryPacking()}"
+                                 required="true" requiredMessage="#{lang.qty} #{lang.isRequired} #{lang.isRequired}" size="7"/>
+                  <p:message for="#{ids}packTertiarySecondaryQty" display="text"/>
+                </h:panelGroup>
+              </p:column>
+
+
+              <p:column >
+                <h:panelGroup layout="block">
+
+                  <p:selectOneMenu value="#{productView.productPreset.packSecondary}" 
+                                   id="#{ids}productPresetPackSecondary" converter="omnifaces.SelectItemsConverter">
+                    <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}"/>
+                    <f:selectItems value="#{productView.productPackingSecondary(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                    <p:ajax event="itemSelect" listener="#{productView.itemSelectEvent}" update=" #{ids}packSecondaryPrimaryQty #{ids}productPresetPackPrimary #{ids}packDefaultDiv 
+                            #{ids}groupQtyDiv #{ids}contentQtyDiv #{ids}unitDiv" />
+                  </p:selectOneMenu>
+                  <p:message for="#{ids}productPresetPackSecondary" display="text" />
+                </h:panelGroup>
+              </p:column>
+
+              <p:column>
+                <h:panelGroup id="#{ids}unitQtyDiv" layout="block">
+                  <p:inputNumber styleClass="fw" value="#{productView.productPreset.packSecondaryPrimaryQty}" converterMessage="#{lang.qty} #{lang.invalidNumber}" 
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="7" id="#{ids}packSecondaryPrimaryQty" 
+                                 required="true" requiredMessage="#{lang.qty} #{lang.isRequired}"
+                                 readonly="#{!productView.isSecondaryPacking()}" size="7" valueChangeListener="#{productView.onChangeSecondaryPrimaryQty}">
+                    <p:ajax update="#{ids}unitDiv" process="@this"/>
+                  </p:inputNumber>
+                  <p:message for="#{ids}packSecondaryPrimaryQty" display="text"/>
+                </h:panelGroup>
+
+              </p:column>
+
+              <p:column >
+                <h:panelGroup layout="block">
+                  <p:selectOneMenu value="#{productView.productPreset.packPrimary}" 
+                                   id="#{ids}productPresetPackPrimary" converter="omnifaces.SelectItemsConverter">
+                    <f:selectItem itemValue="#{null}" itemLabel="#{lang.noSelection}"/>
+                    <f:selectItems value="#{productView.productPackingPrimary(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                    <p:ajax event="itemSelect" listener="#{productView.itemSelectEvent}" process="@this" update="#{ids}packDefaultDiv #{ids}dimensionDiv #{ids}groupQtyDiv 
+                            #{ids}contentQtyDiv #{ids}unitDiv"/>
+                  </p:selectOneMenu>
+
+                  <p:message for="#{ids}productPresetPackPrimary" display="text" />
+                </h:panelGroup>
+              </p:column>
+
+              <p:column >
+                <h:panelGroup id="#{ids}dimensionDiv" layout="block">
+
+                  <p:selectOneMenu styleClass="fw" value="#{productView.productPreset.packPrimaryDimension}" 
+                                   id="#{ids}packPrimaryDimension" rendered="#{productView.isPrimaryPackingBottle()}" disabled="true">
+
+                    <f:selectItem itemValue="1" itemLabel="1"/>
+
+                  </p:selectOneMenu>
+                  <p:selectOneMenu styleClass="fw" value="#{productView.productPreset.packPrimaryDimension}" 
+                                   id="#{ids}packPrimaryDimension1" rendered="#{productView.isPrimaryPacking()}">
+                    <f:selectItem itemValue="2" itemLabel="2" />
+                    <f:selectItem itemValue="3" itemLabel="3" />
+                    <p:ajax event="itemSelect" listener="#{productView.itemSelectEvent}" update="#{ids}groupQtyDiv #{ids}contentQtyDiv #{ids}unitDiv
+                            #{ids}primaryDimensionUnitQty"/>
+                  </p:selectOneMenu>
+                  <p:message for="#{ids}packPrimaryDimension" display="text"/>
+                </h:panelGroup>
+              </p:column>
+
+              <p:column>
+                <h:panelGroup id="#{ids}groupQtyDiv" layout="block">
+                  <p:inputNumber styleClass="fw" value="#{productView.productPreset.primaryDimensionGroupQty}" converterMessage="#{lang.qty} #{lang.invalidNumber}" 
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="7" id="#{ids}primaryDimensionGroupQty" 
+                                 readonly="#{!(productView.isNotPrimary() and productView.isDimensionThree() and productView.isPrimaryPacking())}"
+                                 required="true" requiredMessage="#{lang.qty} #{lang.isRequired}" size="6"  valueChangeListener="#{productView.onChangeGrpQty}">
+
+                    <p:ajax update="#{ids}unitDiv" process="@this"/>
+                  </p:inputNumber>
+                  <p:message for="#{ids}primaryDimensionGroupQty" display="text"/>
+                </h:panelGroup>
+
+              </p:column>
+
+              <p:column>
+
+                <h:panelGroup id="#{ids}unitDiv" layout="block">
+
+                  <p:inputNumber styleClass="fw" value="#{productView.productPreset.primaryDimensionUnitQty}"  
+
+                                 converterMessage="#{lang.qty} #{lang.invalidNumber}" 
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="7" id="#{ids}primaryDimensionUnitQty" 
+                                 readonly="#{!productView.renderUnitQty()}" size="6" required="true" requiredMessage="#{lang.qty} #{lang.isRequired}">
+
+                  </p:inputNumber>
+                  <p:message for="#{ids}primaryDimensionUnitQty" display="text"/>
+                </h:panelGroup>   
+
+              </p:column>
+
+              <p:column>
+                <h:panelGroup id="#{ids}contentQtyDiv" layout="block">
+                  <p:outputLabel styleClass="fw" value="#{productView.productPreset.primaryDimensionContentQty} #{productView.productPreset.primaryDimensionContentQtyUnit}" 
+                                 id="#{ids}primaryDimensionContentQty" />
+                </h:panelGroup>
+              </p:column>
+
+              <p:column colspan="2">
+                <h:panelGroup id="#{ids}packDefaultDiv" layout="block">
+
+                  <p:selectOneRadio id="#{ids}productPresetPackPurchaseDefault" value="#{productView.productPreset.packPurchaseDefault}" converter="omnifaces.SelectItemsConverter"
+                                    columns="1">
+                    <!--layout="grid"-->
+                    <f:selectItems value="#{productView.selectedPackingList}" var="c" itemLabel="#{c.title}" itemValue="#{c}"/>
+                  </p:selectOneRadio>
+                  <p:message for="#{ids}productPresetPackPurchaseDefault" display="text" />
+
+                </h:panelGroup> 
+              </p:column>
+            </p:row>
+          </p:panelGrid>
+<!--        </div>-->
+      </ui:define>
+    </ui:decorate>
+
+    <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+      <ui:param name="rendered" value="#{productView.isTradeTypeSS()}" /> 
+      <ui:param name="ids" value="#{ids}productMargin" /> 
+      <ui:param name="label" value="#{lang.margin}"/>
+
+      <p:outputLabel value="#{lang.marginPercentage}" for="#{ids}marginPercentage" />
+      <h:panelGroup>
+
+        <p:inputNumber styleClass="fw" value="#{productView.productPreset.marginPercentage}" converterMessage="#{lang.marginPercentage} #{lang.invalidNumber}" 
+                       decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="#{ids}marginPercentage"
+                       required="true" requiredMessage="#{lang.marginPercentage} #{lang.isRequired}"/>
+        <h:outputText value="(#{userRuntimeView.contract.marginPercentage} #{appView.percentageSymbol})" rendered="#{productView.marginPercentValue()}"/>
+        <p:message for="#{ids}marginPercentage" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.vendorReservePercent}" for="#{ids}vendorReservePercentage" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{productView.productPreset.vendorReservePercentage}" converterMessage="#{lang.vendorReservePercent} #{lang.invalidNumber}" 
+                       decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="#{ids}vendorReservePercentage"/>
+        <h:outputText value="(#{userRuntimeView.contract.vendorReservePercent} #{appView.percentageSymbol})" rendered="#{productView.vendorReservePercentageValue()}"/>
+        <p:message for="#{ids}vendorReservePercentage" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.ptrMarginPercent}" for="#{ids}ptrMarginPercentage" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{productView.productPreset.ptrMarginPercentage}" converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}" 
+                       decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="#{ids}ptrMarginPercentage"/>
+        <h:outputText value="(#{userRuntimeView.contract.ptrMarginPercent} #{appView.percentageSymbol})" rendered="#{productView.ptrMarginPercentageValue()}"/>
+        <p:message for="#{ids}ptrMarginPercentage" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.ptsMarginPercent}" for="#{ids}ptsMarginPercentage" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{productView.productPreset.ptsMarginPercentage}" converterMessage="#{lang.ptsMarginPercent} #{lang.invalidNumber}" 
+                       decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="#{ids}ptsMarginPercentage"/>
+        <h:outputText value="(#{userRuntimeView.contract.ptsMarginPercent} #{appView.percentageSymbol})" rendered="#{productView.ptsMarginPercentageValue()}"/>
+        <p:message for="#{ids}ptsMarginPercentage" display="text"/>
+      </h:panelGroup>
+
+    </ui:decorate>
+  </h:panelGroup>
+  <script>
+//    $('.ui-selectonemenu .ui-helper-hidden-accessible select, .ui-selectonemenu .ui-helper-hidden-accessible input').on('change click keypress', function(e){
+//      console.log(e)
+//      $('[data-fast-input="true"]').fastInput('init');
+//      
+//    });
+//    $('[data-fast-input="true"]').fastInput('init');
+  </script>
+</ui:composition>

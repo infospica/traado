@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{salesReturnFromPurReturnView.switchSalesReturnFromPurReturn(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesReturn}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <!--<ui:param name="navLabel" value="#{lang.product}" />-->
+    <ui:param name="ids" value="purchaseReturn" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+    <ui:param name="search" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" actionListener="#{salesReturnFromPurReturnView.salesReturnFromPurReturnPopupClose()}" oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" id="prStockItemContainer" >
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="" />
+          <ui:define name="menuright">    
+            <!--Select and Close Button-->
+            <p:commandButton actionListener="#{salesReturnFromPurReturnView.addSalesReturnListfromPurReturn(main)}" title="#{lang.select}"
+                             onclick="return preSelect('salesInvoiceWidget')" oncomplete="unblock();" onstart="block();"
+                             styleClass="btn btn-primary" value="#{lang.select}" >
+            </p:commandButton>
+          </ui:define>
+
+          <p:dataTable id="purchaseReturnTable" var="purchaseReturnVar" widgetVar="purchaseReturnWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       lazy="true" value="#{salesReturnFromPurReturnView.purchaseReturnLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesInvoiceVar.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                       selection="#{salesReturnFromPurReturnView.purchaseReturnSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+            <p:column selectionMode="single" exportable="false" />
+            <!-- Invoice No -->
+            <p:column sortBy="#{purchaseReturnVar.invoiceNo}" field="scm_purchase_return.invoice_no">
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}" escape="false" />
+              </f:facet>
+              <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(purchaseReturnVar.invoiceNo)}" process="@this" update="f1" immediate="true"
+                             onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                <f:setPropertyActionListener target="#{purchaseReturnView.purchaseReturn}" value="#{purchaseReturnVar}" />
+              </p:commandLink>
+              <h:outputText  title="#{appView.title(purchaseReturnVar.invoiceNo)}" escape="false" />
+            </p:column>
+
+            <!-- Invoice Date -->
+            <p:column sortBy="#{purchaseReturnVar.invoiceDate}" field="invoice_date" >
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}" escape="false" />
+              </f:facet>
+              <h:outputText value="#{appView.date(purchaseReturnVar.invoiceDate)}" escape="false" />
+            </p:column>
+
+
+            <!-- Category -->
+            <p:column sortBy="#{purchaseReturnVar.purchaseReturnStockCat.title}" field="scm_purchase_return.purchase_return_stock_cat">
+              <f:facet name="header"><h:outputText value="#{lang.category}" title="#{lang.category}"/></f:facet>
+              <h:outputText value="#{appView.display(purchaseReturnVar.purchaseReturnStockCat.title)}" title="#{appView.title(purchaseReturnVar.purchaseReturnStockCat.title)}" escape="false" />
+            </p:column>
+
+            <!-- Invoice Amount -->
+            <p:column sortBy="#{purchaseReturnVar.invoiceAmount}" field="invoice_amount" style="text-align: right">
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}" escape="false" />
+              </f:facet>
+              <h:outputText value="#{appView.decimal(purchaseReturnVar.invoiceAmount)}" escape="false" />
+            </p:column>
+
+          </p:dataTable>
+          <p:dialog widgetVar="emptyTable" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+            <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+            <p:commandButton value="#{lang.btnOk}" onclick="wdgOff('emptyTable')" type="button" title="#{lang.btnYes}" />
+          </p:dialog>
+          <script>
+            //<![CDATA[
+            function preSelect(widget) {
+              var rowcount = PF(widget).getSelectedRowsCount();
+              if (rowcount == 0) {
+                PF('emptyTable').show();
+                return false;
+              }
+              return true;
+            }
+            //]]>
+          </script>
+        </ui:decorate>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</html>

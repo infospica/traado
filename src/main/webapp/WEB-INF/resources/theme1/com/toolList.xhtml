@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+  <ui:insert name="toolList">
+    <h:panelGroup class="bar-T" rendered="#{main.isList() and toolList eq null ? true : toolList}" layout="block" >
+      <div class="L">
+        <ui:insert name="leftLeftList" />
+        <h:panelGroup styleClass="searchBox m m-r-5" rendered="#{search eq null ? true : search}"  >
+          <p:inputText styleClass="fw" id="#{ids}Search" value="#{main.pageData.searchKeyWord}" placeholder="#{lang.search}"  />
+<!--          <script>$(document).ready(function() { searchHighlight('#{ids}Search'); }); </script>-->
+          <p:commandButton styleClass="btn" onclick="block()" oncomplete="PF('#{ids}Widget').filter();unblock();" process="#{ids}Search,@this" title="#{lang.search}" id="btnSkw#{ids}" partialSubmit="true" icon="fa fa-search" iconPos="left" >
+            <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+          </p:commandButton>
+          <ui:insert name="defaultCommand" >
+            <p:defaultCommand target="btnSkw#{ids}"/>
+          </ui:insert>
+        </h:panelGroup>
+        <ui:insert name="newList" >
+          <h:commandButton  rendered="#{(newList eq null ? true : newList) and userRuntimeView.privilege.add==true}"  action="#{main.setViewType(newform)}" value="#{lang.newform}" immediate="true" onclick="toTop()" styleClass="btn btn-info">
+            <f:ajax execute="@this" render="f1" resetValues="true"/>
+            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+          </h:commandButton>
+        </ui:insert>        
+      </div>
+      <div class="L">
+        <ui:insert name="leftRightList" />
+      </div>
+      <div class="R">
+        <ui:insert name="rightList" />
+      </div>
+      <ui:insert name="toolCommon" />
+      <ui:insert name="more" >
+        <div class="L g" style="#{padding eq null ? 'padding-left: 5%' : padding}">         
+          <p:commandButton id="#{ids}dynaButton" rendered="#{more eq null ? true : more}" type="button" icon="fa fa-angle-down" value="#{lang.action}" iconPos="down" styleClass="btn btn-default"/>
+          <p:menu overlay="true" trigger="#{ids}dynaButton" my="left top" at="left bottom">
+            <ui:insert name="moreMenuTopList" />
+            <p:submenu label="Current Page">
+                <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad" ><p:dataExporter type="xls" target="#{ids}Table" fileName="#{userRuntimeView.exportFileName(masterReportView.fileName)}" pageOnly="true" postProcessor="#{excelExportView.postProcessXLS}"  /></p:menuitem>              
+              <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{ids}" pageOnly="true"  /></p:menuitem>
+            </p:submenu>
+            <p:submenu label="All Pages">
+              <p:menuitem value="Export"  immediate="true" icon="fa fa-file-excel-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.export==true}" styleClass="ignoreLoad"><p:dataExporter type="xls" target="#{ids}Table" fileName="#{userRuntimeView.exportFileName(masterReportView.fileName)}" pageOnly="false" postProcessor="#{excelExportView.postProcessXLS}"/></p:menuitem>
+              <p:menuitem value="Print" icon="fa fa-file-pdf-o" iconPos="left" ajax="false" rendered="#{userRuntimeView.privilege.print==true}" styleClass="ignoreLoad"><p:dataExporter type="pdf" target="#{ids}Table" fileName="#{ids}" pageOnly="false"  /></p:menuitem>
+            </p:submenu>
+            <ui:insert name="menu2" />
+            <p:separator /> 
+            <p:menuitem value="#{lang.delete}" rendered="#{(deleteListMenu eq null ? true : deleteListMenu) and userRuntimeView.privilege.delete==true}"  onclick="return preListSelect('#{ids}Widget', 'wdgOk', '#{ids}WidgetDelConf')" oncomplete="wdgOff('#{ids}WidgetDelConf')" immediate="true" process="#{ids}L" update="#{ids}L" iconPos="left" icon="fa fa-trash" />
+          </p:menu>
+        </div>
+      </ui:insert>
+    </h:panelGroup>
+  </ui:insert>
+</ui:composition>

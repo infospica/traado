@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <!--<ui:param name="subLabel" value="#{lang.health}" />-->
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="navLabel" value="#{lang.health}" />
+    <ui:param name="ids" value="customerHealthPopUp" />
+    <!--<ui:param name="columnClasses" value="#{sysRuntimeView.grid2}" />-->
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+    <ui:param name="search" value="false" />
+    
+    <ui:define name="more" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+    
+    <ui:define name="form">
+    </ui:define>
+    
+    <ui:define name="afterForm">  
+      <h:panelGroup layout="block" styleClass="row">
+        <h:panelGroup layout="block" styleClass="col-md-12">
+          <ui:include src="customer_health.xhtml" />
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>  

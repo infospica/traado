@@ -1,0 +1,181 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{taxCodeView.switchTaxCode(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.taxCode}" />
+    <ui:param name="ids" value="taxCode" />    
+    <ui:param name="toolForm" value="#{taxCodeView.taxCode.parentId eq null ? 'true' : 'false'}" />    
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{taxCodeView.deleteTaxCode(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('taxCodeWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{taxCodeView.cloneTaxCode(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{taxCodeView.deleteTaxCode(main)}" value="#{lang.delete}" onclick="wdgOff('taxCodeWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save">
+      <h:commandButton rendered="#{taxCodeView.taxCode.parentId eq null}" action="#{taxCodeView.saveTaxCode(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" >
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>
+
+    <ui:define name="form">
+
+      <!-- Code -->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{taxCodeView.taxCode.code}" maxlength="50" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title"
+                     >
+        </p:inputText>
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <!-- Tax Head -->
+      <p:outputLabel value="#{lang.taxHead}" for="taxCodeTaxHeadId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{taxCodeView.taxCode.taxHeadId}"  id="taxCodeTaxHeadId" converter="omnifaces.SelectItemsConverter"
+                         required="true" requiredMessage="#{lang.taxHead} #{lang.isRequired}" styleClass="fw">
+          <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+          <f:selectItems value="#{taxCodeView.taxHeadAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.head}" />
+          <p:ajax event="itemSelect" immediate="true" process="@this" update="countryDiv taxCodeStateDiv abatementPercentageDiv" listener="#{taxCodeView.taxHeadSelectEvent}" />
+        </p:selectOneMenu>
+        <p:message for="taxCodeTaxHeadId" display="text" />
+      </h:panelGroup>
+
+      <!-- Country -->
+      <p:outputLabel value="#{lang.country}" />
+      <h:panelGroup id="countryDiv">
+        <p:inputText value="#{taxCodeView.country.countryName}" disabled="true" styleClass="fw" />        
+      </h:panelGroup>
+
+      <!-- State -->
+      <p:outputLabel value="#{lang.state}" for="taxCodeStateId"/>
+      <h:panelGroup id="taxCodeStateDiv">
+        <p:autoComplete  value="#{taxCodeView.taxCode.stateId}" completeMethod="#{taxCodeView.stateAuto}" converter="wawo.LookupIntConverter"   
+                         dropdown="true" id="taxCodeStateId" var="s" itemValue="#{s}" itemLabel="#{s.stateName}" 
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>          
+        </p:autoComplete>
+        <p:message for="taxCodeStateId" display="text" />
+      </h:panelGroup>
+
+      <!-- Rate Percentage -->
+      <p:outputLabel value="#{lang.tax} (#{lang.percentageSymbol})" for="percentage" />
+      <h:panelGroup>
+        <p:inputNumber value="#{taxCodeView.taxCode.ratePercentage}" converterMessage="#{lang.percentage} #{lang.invalidNumber}" decimalPlaces="3" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" maxlength="6" required="true" requiredMessage="#{lang.tax} #{lang.percentage} #{lang.isRequired}" 
+                       id="percentage" symbolPosition="s"/>
+        <p:message for="percentage" display="text"/>
+      </h:panelGroup>
+
+      <!-- Abatement Percentage -->
+      <p:outputLabel value="#{lang.abatement} (#{lang.percentageSymbol})" for="abatement" />
+      <h:panelGroup id="abatementPercentageDiv">
+        <p:inputNumber value="#{taxCodeView.taxCode.abatementPercentage}" converterMessage="#{lang.abatementPercentage} #{lang.invalidNumber}" decimalPlaces="2" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" maxlength="5" id="abatement" symbolPosition="s"/>
+        <p:message for="abatement" display="text"/>
+      </h:panelGroup>
+
+      <!-- Status -->
+      <p:outputLabel value="#{lang.status}" for="taxCodeStatusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{taxCodeView.taxCode.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
+                         id="taxCodeStatusId">
+          <f:selectItems value="#{taxCodeView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="taxCodeStatusId" display="text" />
+      </h:panelGroup>            
+
+      <!-- Sort Order -->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{taxCodeView.taxCode.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>   
+
+      <!--Display color-->
+      <p:outputLabel value="#{lang.displayColor}" for="displayColor" />
+      <h:panelGroup>
+        <p:colorPicker value="#{taxCodeView.taxCode.displayColor}" id="displayColor" mode="inline"/>
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(taxCodeView.taxCode.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(taxCodeView.taxCode.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(taxCodeView.taxCode.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(taxCodeView.taxCode.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(taxCodeView.taxCode.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="taxCodeTable" var="taxCodeVar" widgetVar="taxCodeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{taxCodeView.taxCodeLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{taxCodeVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{taxCodeView.taxCodeSelected}" rowSelectMode="checkbox" rowHover="true" reflow="true"
+                   paginatorAlwaysVisible="true" paginatorPosition="bottom" scrollable="false">
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Code -->
+        <p:column  sortBy="#{taxCodeVar.code}" field="code" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>          
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{taxCodeVar.code}" process="@this" update="f1" immediate="true" onstart="block()" 
+                         oncomplete="unblock()" title="#{lang.editMe}" style="#{taxCodeVar.parentId ne null ? 'color: #222 !important;' : ''}">
+            <f:setPropertyActionListener target="#{taxCodeView.taxCode}" value="#{taxCodeVar}" />
+          </p:commandLink>
+        </p:column>
+        <!-- Parent -->
+        <p:column  sortBy="#{taxCodeVar.parentId.code}" field="parent_id.code" >
+          <f:facet name="header"><h:outputText value="#{lang.parent}" title="#{lang.parent}"/></f:facet>
+          <h:outputText value="#{appView.display(taxCodeVar.parentId.code)}" title="#{appView.title(taxCodeVar.parentId.code)}" escape="false" />
+        </p:column>
+        <!-- Rate Percentage -->
+        <p:column  sortBy="#{taxCodeVar.ratePercentage}" field="ratePercentage" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.tax} #{lang.percentageSymbol}" title="#{lang.tax}"/></f:facet>
+          <h:outputText value="#{appView.decimal(taxCodeVar.ratePercentage)} #{appView.percentageSymbol} " escape="false" />
+        </p:column>
+
+        <!-- Abatement Percentage -->
+        <p:column  sortBy="#{taxCodeVar.abatementPercentage}" field="abatementPercentage" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.abatement} #{lang.percentageSymbol}" title="#{lang.abatementPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(taxCodeVar.abatementPercentage)} #{taxCodeVar.abatementPercentage ne null ? appView.percentageSymbol : ''} " escape="false" />
+        </p:column>       
+
+        <!-- Display color -->
+        <p:column  field="display_color">
+          <f:facet name="header"><h:outputText value="#{lang.displayColor}" title="#{lang.displayColor}"/></f:facet>
+          <h:outputText styleClass="label" style="background-color: ##{taxCodeVar.displayColor}" value="#{taxCodeVar.displayColor}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column  sortBy="#{taxCodeVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(taxCodeVar.statusId.title)}" title="#{appView.title(taxCodeVar.statusId.title)}" rendered="#{taxCodeVar.statusId.id==1}" escape="false"/>
+          <h:outputText value="#{appView.display(taxCodeVar.statusId.title)}" title="#{appView.title(taxCodeVar.statusId.title)}" rendered="#{taxCodeVar.statusId.id==3}" style="color:grey" escape="false"/>
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(taxCodeVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(taxCodeVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(taxCodeVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(taxCodeVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(taxCodeVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

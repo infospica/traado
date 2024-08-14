@@ -1,0 +1,114 @@
+$prFont:'roboto regular';//"Roboto","Helvetica","Arial",sans-serif
+$secFont:'roboto regular';
+$prFontB:'roboto bold';
+$prFontT:'roboto thin';
+$prFontM:'roboto medium';
+
+$prHeadFont: $prFontT;
+$prLabelFont:$prFontM;
+
+$baseFontSize: 13px;
+$base-font-size: $baseFontSize;
+
+$Clr0:#000;
+$ClrF:#FFF;
+
+$Clr1: #009688;//#0090d6//#009688//#6f0707//#0090d6//#14a0e8
+$Clr2:#09AB10;//#8abb50
+$Clr3:#fff;
+$Clr4:#ddd;///*cccc99*/
+$Clr5:#f97659;
+$Clr6:#333;
+
+$Txt:#333;
+$BG:#F5F5F5; //#FAFAFA//#FCFCFC//#F9F9F9;//oldBGlight:/*#ECF0F5;*/
+$BG-dark: #666;
+
+$Link: $Clr1;
+
+$odd:#EEF0F0;
+
+$icoBgHover:#eee;
+
+$prColor:$Clr1;
+$scColor:$Clr5;
+
+$prLink:$Link;
+$prLinkHover: #f6390f;
+
+$prBrdr:lighten($Clr4, 0%);
+$Brdr:$prBrdr;
+
+$prBtnBrdr: transparent;
+$prBtnTxt:$Clr3;
+$prBtn:$Clr1;
+
+$prBtnHover:darken($prBtn,15%);
+$prBtnTxtHover:$prBtnTxt;
+
+$prInputBrdr: #aaa;
+$prInputBrdrFocus: $Clr1;
+
+$black:#000;
+
+$lgtGray:#EEE;
+
+$prBgHead:transparent;
+///*$hdrHgt:120px;*/
+
+$hdrMenuColor:#bcbcbc;
+$hdrMenuFocus:$Clr5;
+
+$img:"../img";
+$font:"../font";
+
+///*Side Bar*/
+$sideMinHgt:320px;
+$sideWdt:220px;
+
+///*bsVars*/
+$brand-primary:	darken($Clr1,5%);
+$brand-success:	$Clr2;
+
+$brand-info:	#0090D6;//lighten($Clr1,20%);
+
+$brand-warning: #f0ad4e;
+$brand-danger:  $Clr5;
+
+$colorType:
+	"default"	#666	#fff,
+	"primary"	$brand-primary	#fff,
+	"success"	$brand-success	#fff,
+	"info"	$brand-info	#fff,
+	"warning"	#f0ad4e	#fff,
+	"danger"	darken($brand-danger,15%)	#fff
+;
+
+$bgColor:
+	"default"	#fff	$Txt,
+	"primary"	$brand-primary	#fff,
+	"success"	$brand-success	#fff,
+	"info"	$brand-info	#fff,
+	"warning"	#f0ad4e	#fff,
+	"danger"	darken($brand-danger,15%)	#fff
+;
+
+$alertColors:
+	"primary"	$brand-primary,
+	"success"	darken($brand-success,15%),
+	"info"	$brand-info,
+	"warning"	darken($brand-warning,15%),
+	"error"	darken($brand-danger,20%)
+;
+
+$navbar-default-bg: $Clr1;
+$navbar-default-brand-color: $Clr3;
+$navbar-default-link-color: $navbar-default-brand-color;
+$navbar-default-link-hover-color:$navbar-default-brand-color;
+$navbar-default-link-active-color: $navbar-default-brand-color;
+$navbar-default-link-hover-bg: darken($navbar-default-bg, 6.5%) !default;
+$navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%) !default;
+
+$table-border-color:#ECECEC;
+
+$navbar-height:45px;///*50px*/

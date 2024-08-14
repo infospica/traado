@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{purchaseReturnItemView.switchPurchaseReturnItem(main,main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReturn}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="navLabel" value="#{purchaseReturnItemView.parentPurchaseReturn.purchaseReturnStockCat.title}" />
+    <ui:param name="ids" value="purchaseReturnItem" />
+    <ui:param name="deleteListMenu" value="false" />    
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" actionListener="#{purchaseReturnItemView.purchaseReturnItemPopupClose}" oncomplete="parent.purchaseReturnItemPopupReturned(); closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- Commodity -->
+      <h:panelGroup id="commodityLabel" rendered="#{purchaseReturnItemView.purchaseReturnNonMovingAndNearExpiry}">
+        <p:outputLabel value="#{lang.commodity}" for="purchaseReturnCommodityId" />
+      </h:panelGroup>
+
+      <h:panelGroup id="purchaseReturnCommodityDiv" rendered="#{purchaseReturnItemView.purchaseReturnNonMovingAndNearExpiry}">
+        <p:selectOneMenu value="#{purchaseReturnItemView.parentPurchaseReturn.commodityId}"  id="purchaseReturnCommodityId"
+                         required="true" requiredMessage="#{lang.commodity} #{lang.isRequired}"
+                         converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+          <f:selectItems value="#{purchaseReturnItemView.selectVendorCommodity()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          <p:ajax event="itemSelect" update="productTypeLabel purchaseReturnProductTypeIdDiv prStockItemContainer" immediate="true" 
+                  listener="#{purchaseReturnItemView.listenerCommodityItemSelect}" />
+        </p:selectOneMenu>
+        <p:message for="purchaseReturnCommodityId" display="text" />
+      </h:panelGroup>
+
+      <!-- Product type -->
+      <h:panelGroup id="productTypeLabel">
+        <p:outputLabel value="#{lang.productType}" for="purchaseReturnProductTypeId"
+                       rendered="#{purchaseReturnItemView.purchaseReturnNonMovingAndNearExpiry and purchaseReturnItemView.parentPurchaseReturn.commodityId ne null}" />
+      </h:panelGroup>
+      <h:panelGroup id="purchaseReturnProductTypeIdDiv" >
+        <p:selectOneRadio value="#{purchaseReturnItemView.parentPurchaseReturn.productTypeId}"  id="purchaseReturnProductTypeId"
+                          converter="omnifaces.SelectItemsConverter" rendered="#{purchaseReturnItemView.purchaseReturnNonMovingAndNearExpiry}"
+                          required="true" requiredMessage="#{lang.productType} #{lang.isRequired}" layout="grid" columns="2"
+                          disabled="#{purchaseReturnItemView.parentPurchaseReturn.productTypeId.id!=null}">
+          <f:selectItems value="#{purchaseReturnItemView.productType()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          <p:ajax event="valueChange" update="purchaseReturnStockItemTable loadButtonDiv" listener="#{purchaseReturnItemView.listenerProductTypeValueChange}" />
+        </p:selectOneRadio>
+        <p:message for="purchaseReturnProductTypeId" display="text" />
+      </h:panelGroup>
+
+      <!-- Load button -->
+      <h:panelGroup layout="block" id="loadButtonDiv">
+        <h:commandButton value="#{lang.load}" rendered="#{purchaseReturnItemView.purchaseReturnNonMovingAndNearExpiry and purchaseReturnItemView.parentPurchaseReturn.commodityId ne null}"
+                         action="#{purchaseReturnItemView.actionLoadPurchaseRetunStockItems(main)}" styleClass="btn btn-info" >
+          <f:ajax render="f1" execute="purchaseReturnItemF" />
+        </h:commandButton>
+      </h:panelGroup>
+
+      <h:panelGroup >
+        <p:outputLabel value=""/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" id="prStockItemContainer" >
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="#{lang.purchaseReturnItem}" />
+          <ui:define name="menuleft">
+            <p:commandButton actionListener="#{purchaseReturnItemView.insertPurchaseReturnItems(main)}" title="#{lang.select}" 
+                             onclick="return preListSelect('purchaseReturnStockItemWidget', 'wdgOk', null);"
+                             icon="fa fa-check" iconPos="left" styleClass="btn btn-default" value="#{lang.select}" 
+                             oncomplete="parent.purchaseReturnItemPopupReturned();closePopup()" update="purchaseReturnStockItemTable" >
+            </p:commandButton>
+          </ui:define>
+          <p:dataTable id="purchaseReturnStockItemTable"
+                       var="purchaseReturnStockItemVar"
+                       widgetVar="purchaseReturnStockItemWidget"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{purchaseReturnItemView.purchaseReturnStockItemList}"
+                       rowKey="#{purchaseReturnStockItemVar.stockId}"                                              
+                       selection="#{purchaseReturnItemView.purchaseReturnStockItem}">
+
+            <p:ajax event="toggleSelect" />
+            <p:ajax event="rowSelectCheckbox" />
+            <p:ajax event="rowUnselectCheckbox" />
+            <p:column selectionMode="multiple" />
+
+            <!-- Batch No-->
+            <p:column headerText="#{lang.batchNumber}" sortBy="#{purchaseReturnStockItemVar.batchNo}" >
+              <h:outputText value="#{purchaseReturnStockItemVar.batchNo}"  escape="false" />
+            </p:column>
+
+            <!-- Expiry Date -->
+            <p:column headerText="#{lang.expiryDate}" sortBy="#{purchaseReturnStockItemVar.expiryDateActual}" >
+              <h:outputText value="#{sysRuntimeView.dateToMMYY(purchaseReturnStockItemVar.expiryDateActual)}"  escape="false" />
+            </p:column>
+
+            <!-- Purchase Date -->
+            <p:column headerText="#{lang.purchase} #{lang.date}" >
+              <h:outputText value="#{appView.date(purchaseReturnStockItemVar.expiryDateActual)}"  escape="false" />
+            </p:column>
+
+            <!-- Landing Rate -->
+            <p:column headerText="#{lang.landingRateCompany}" style="text-align: right" >
+              <h:outputText value="#{purchaseReturnStockItemVar.landingRateCompany}"  escape="false" />
+            </p:column>
+
+            <!-- Value -->
+            <p:column headerText="#{lang.value}" style="text-align: right" >
+              <h:outputText value="#{appView.decimal(purchaseReturnItemView.getValue(purchaseReturnStockItemVar))}"  escape="false" />
+            </p:column>
+
+            <!-- Available Quantity -->
+            <p:column headerText="#{lang.actualQty}" style="text-align: right" >
+              <h:outputText value="#{purchaseReturnStockItemVar.quantityAvailable}"  escape="false" />
+            </p:column>
+
+            <!-- Return Quantity -->
+            <p:column headerText="#{lang.retrunQty}" styleClass="bg-warning">
+              <p:inputNumber value="#{purchaseReturnStockItemVar.qty}" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{purchaseReturnStockItemVar.quantityAvailable eq null? 0 : purchaseReturnStockItemVar.quantityAvailable}" >
+                <p:ajax event="blur" update="purchaseReturnStockItemTable" />
+              </p:inputNumber>              
+            </p:column>
+          </p:dataTable>
+        </ui:decorate>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</html>

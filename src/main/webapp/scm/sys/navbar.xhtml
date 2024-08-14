@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:f="http://xmlns.jcp.org/jsf/core" 
+                xmlns:h="http://xmlns.jcp.org/jsf/html" 
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+  <h:form id="f" prependId="false" >    
+    <header class="header">
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <h:panelGroup rendered="#{!userRuntimeView.appUser.userProfileId.preferedMenu}" >
+            <a class="navbar-brand" href="#{request.contextPath}/theme1/main" style="min-width: initial;padding-top: 12px; background: transparent; height: 49px; color: inherit;">ICE</a>
+          </h:panelGroup>
+          <div class="respMenu">
+            <ul class="nav navbar-nav navbar-left">
+              <h:panelGroup rendered="#{userRuntimeView.appUser.userProfileId.preferedMenu}"> 
+                <li class="menuToggler" data-toggle="mainSideBar">
+                  <a class="ignoreLoad" href="javascript:;">
+                    <span class="fa fa-bars"></span>
+                  </a>
+                </li>
+              </h:panelGroup>
+              <li>
+                <p:commandLink class="ignoreLoad" id="sbMenuBtn" process="@this" update="recentId" rendered="#{!userRuntimeView.appUser.userProfileId.preferedMenu}" 
+                               onclick="PF('overLayMenu').show('#{component.clientId}');"  >                     
+                  <i class="fa fa-bars" style="color: #FFF;"></i>
+                </p:commandLink>
+              </li>
+            </ul>
+
+            <h:panelGroup id="globalAccount" layout="block" styleClass="navbar-form navbar-left highlight" >
+              <p:selectOneMenu rendered="#{userRuntimeView.accountRender}" value="#{userRuntimeView.account}" var="a" filter="true" filterMatchMode="contains" 
+                               converter="omnifaces.SelectItemsConverter"  height="450">
+                <f:selectItems  var="acc" value="#{userRuntimeView.navAccountList}" itemLabel="#{acc.vendorId.vendorName}" itemValue="#{acc}" />
+                <p:ajax event="itemSelect" update="f1" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" listener="#{main.pageData.setSearchKeyWord(null)}" />
+                <p:column styleClass="w-340 #{a.accountId ne null?'dullTxt':''} ">
+                  <p:fragment rendered="#{a.accountId ne null}">
+                    <h:outputText value="&#160;&#160;&#160;#{a.vendorId.vendorName}" styleClass="fa fa-angle-right fw"  title="#{lang.secondary} #{lang.account}" />
+                  </p:fragment>  
+                  <p:fragment rendered="#{a.accountId eq null}">
+                    <h:outputText value="#{a.vendorId.vendorName}"  />
+                  </p:fragment>
+                </p:column>
+                <p:column styleClass="w-40 #{a.accountId ne null?'dullTxt':''}">
+                  <p:fragment rendered="#{a.accountId ne null}">
+                    <h:outputText value="&#160;&#160;&#160;#{a.accountCode}"    />                     
+                  </p:fragment>
+                  <p:fragment rendered="#{a.accountId eq null}">
+                    <h:outputText value="&#160;&#160;&#160;#{a.accountCode}"  />                      
+                  </p:fragment>
+                </p:column>
+                <p:column styleClass="w-140 #{a.accountId ne null?'dullTxt':''}"><h:outputText value="#{a.companyTradeProfileId.title}"  /></p:column>
+
+              </p:selectOneMenu>
+
+              <p:selectOneMenu var="e" rendered="#{userRuntimeView.accountGroupRender}" value="#{userRuntimeView.accountGroup}" filter="true" filterMatchMode="contains" 
+                               converter="omnifaces.SelectItemsConverter" height="450">
+                <f:selectItems  var="accGroup" value="#{userRuntimeView.accountGroupList}" itemLabel="#{accGroup.groupName}" itemValue="#{accGroup}" />
+                <p:ajax event="itemSelect" update="f1" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" listener="#{main.pageData.setSearchKeyWord(null)}" />
+                <p:column style="width: 350px;">
+                  <h:outputText value="#{e.groupName}"  />
+                </p:column>
+                <p:column style="width: 50px;">
+                  <h:outputText value="#{e.groupCode}"  />                          
+                </p:column>
+                <p:column style="width: 50px;">
+                  <p:fragment rendered="#{e.isDefault eq 0}">
+                    <i class="fa fa-th" title="#{lang.custom} #{lang.accountGroup}" ></i>
+                  </p:fragment>
+                  <p:fragment rendered="#{e.isDefault eq 1}">
+                    <!--<i class="fa fa-square-o" style="color:#CCC;" ></i>-->
+                  </p:fragment>
+                </p:column>
+              </p:selectOneMenu>
+            </h:panelGroup>     
+
+            <ul class="nav navbar-nav navbar-left">
+              <li>
+                <p:commandLink  rendered="#{userRuntimeView.appUser.userProfileId.preferedMenu}" id="recentMenuBtn" process="@this" update="recentId" class="ignoreLoad" 
+                                onclick="PF('overLayMenu').show('#{component.clientId}');" >
+
+                  <i class="fa fa-history" style="color: #FFF;"></i>
+                </p:commandLink>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">                      
+              <li class="dropdown user">
+                <a href="javascript:;" class="dropdown-toggle ignoreLoad" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  <span class="avatar"><i class="fa fa-user"></i></span><span class="welcome">#{userRuntimeView.appUser.name}</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><p:commandLink  action="#{userRuntimeView.showUserSetting}" 
+                                      process="@this" immediate="true" 
+                                      styleClass="ignoreLoad" onstart="block()" oncomplete="unblock()" >
+                      <i class="fa fa-fw fa-cog"></i> #{lang.user} #{lang.settings}
+                    </p:commandLink>
+                  </li>                         
+                  <li role="separator" class="divider"></li>
+                  <li> 
+                    <p:commandLink  action="#{userRuntimeView.logoutUser}" process="@this" immediate="true" styleClass="ignoreLoad" >
+                      <i class="fa fa-fw fa-sign-out"></i> #{lang.logout} 
+                    </p:commandLink>
+                  </li>
+                  <li role="separator" class="divider"></li>  
+                </ul>
+              </li>
+            </ul>            
+            <div class="navbar-form navbar-right highlight" role="search">
+              <h:panelGroup id="globalCompanyDiv">
+                <p:selectOneMenu id="globalCompany" value="#{userRuntimeView.company}" required="true" requiredMessage="#{lang.company} #{lang.isRequired}" 
+                                 converter="omnifaces.SelectItemsConverter" >
+                  <f:selectItems value="#{userRuntimeView.getCompanyList(main)}" var="e" itemValue="#{e}" itemLabel="#{e.companyName}" />
+                  <p:ajax event="change" process="@this" update="globalfinancialYearDiv globalAccount f1" listener="#{userRuntimeView.changeCompanyListener(main)}" onstart="block()" oncomplete="unblock()" />
+                </p:selectOneMenu>
+              </h:panelGroup>
+            </div>
+            <div class="navbar-form navbar-right highlight" role="search">
+              <h:panelGroup id="globalfinancialYearDiv">
+                <p:selectOneMenu id="globalfinancialYear" value="#{userRuntimeView.company.currentFinancialYear}" converter="omnifaces.SelectItemsConverter" >
+                  <f:selectItems value="#{userRuntimeView.company.companyFinancialYearList}" var="fy" itemLabel="#{fy.financialYearId.title}" itemValue="#{fy.financialYearId}" />
+                  <p:ajax event="itemSelect" process="@this" update="globalAccount f1" listener="#{userRuntimeView.changeCompanyListener(main)}" onstart="block()" oncomplete="unblock()"  />
+                </p:selectOneMenu>
+              </h:panelGroup>
+            </div>
+            <div class="nav navbar-form navbar-right">
+              <p:commandButton icon="fa fa-calculator" styleClass="btn" actionListener="#{userRuntimeView.viewCalc()}" immediate="true" process="@this" update="@none" title="Calculator" />
+              <!--                      <h:panelGroup id="favGrpId" >
+                                      <p:commandButton icon="fa fa-star-o" styleClass="btn" actionListener="#{userRuntimeView.addOrRemoveFav(main)}" immediate="true" process="@this" update="favGrpId fluidDivMenuId" title="#{lang.favorite}" 
+                                                       rendered="#{!userRuntimeView.isFavorite()}"  />
+                                      <p:commandButton icon="fa fa-star" styleClass="btn" actionListener="#{userRuntimeView.addOrRemoveFav(main)}" immediate="true" process="@this" update="favGrpId fluidDivMenuId" title="#{lang.favorite}"
+                                                       rendered="#{userRuntimeView.isFavorite()}"  />
+                                    </h:panelGroup>
+                                    <h:panelGroup id="messangerGrpId">
+                                      <p:commandButton icon="fa fa-envelope-o" id="messanger" styleClass="btn" immediate="true" process="@this" update="favGrpId" title="Notification" />
+                                    </h:panelGroup>-->
+            </div>
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
+    </header>   
+  </h:form>
+<!--  <script src="#{request.contextPath}/theme1/js/masonry.js" type="text/javascript" ></script>
+  <script>
+                                  $('.grid').masonry({
+                                    itemSelector: '.grid-item'
+
+                                  });
+  </script>-->
+</ui:composition>

@@ -1,0 +1,559 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  #{userProfileView.switchUserProfile(main, main.viewType)}
+  #{userProfileView.setCompanyFlag(0)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userProfileView.popupTitle}" />
+    <ui:param name="subLabel" value="#{lang.employee}" />
+    <ui:param name="labelOnly" value="#{userProfileView.company.flag == 2}" />
+
+    <ui:param name="ids" value="userProfile" />
+    <ui:param name="pageBasic" value="false" />
+    <ui:define name="defaultCommand" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{userProfileView.userProfileDialogClose}"
+                       oncomplete="parent.userProfilePopupReturned();closePopup();"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{userProfileView.deleteUserProfile(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('userProfileWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{userProfileView.cloneUserProfile(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{userProfileView.deleteUserProfile(main)}" value="#{lang.delete}" onclick="wdgOff('userProfileWidgetDel')"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{userProfileView.saveUserProfile(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+
+    <ui:define name="leftLeftList" >
+      <p:commandButton actionListener="#{userProfileView.insertUserProfileContact(main)}" onclick="return preListSelect('userProfileWidget', 'wdgOk', null);"
+                       title="#{lang.select}"
+                       oncomplete="parent.userProfilePopupReturned();closePopup()" rendered="#{main.popup and main.isList()}"
+                       icon="fa fa-check"  iconPos="left" styleClass="btn btn-default" value="#{lang.select}">
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="afterForm">
+
+      <p:panelGrid columns="4" rendered="#{main.isForm()}" layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid4}">
+
+        <!-- Name -->
+        <p:outputLabel value="#{lang.name}" for="name" />
+        <h:panelGroup>
+          <p:inputText tabindex="1" value="#{userProfileView.userProfile.name}" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}" 
+                       id="name" style="position: relative" styleClass="fw" autocomplete="off">
+            <p:ajax event="blur" listener="#{userProfileView.createUserCode}" update="userCodeDIV" />
+          </p:inputText>
+          <p:message for="name" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- User Code -->
+        <p:outputLabel value="#{lang.userCode}" for="userCode" rendered="#{userProfileView.isCompanyUserProfile()}"/>
+        <h:panelGroup rendered="#{userProfileView.isCompanyUserProfile()}" id="userCodeDIV">
+          <p:inputText value="#{userProfileView.userProfile.userCode}" maxlength="20" required="true" requiredMessage="#{lang.userCode} #{lang.isRequired}" id="userCode"
+                       style="position: relative" styleClass="fw" tabindex="2" autocomplete="off"/>
+          <p:message for="userCode" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Pan No -->
+        <p:outputLabel value="#{lang.pan} #{lang.no} " for="pan" title="#{lang.panabbr}" rendered="#{!userProfileView.vendorUserProfile}" />
+        <p:outputLabel value="#{lang.pan} #{lang.no} " for="panno" title="#{lang.panabbr}" rendered="#{userProfileView.vendorUserProfile}"/>
+        <h:panelGroup>
+          <p:inputText tabindex="7" value="#{userProfileView.userProfile.panNo}" maxlength="10" id="pan" autocomplete="off"
+                       rendered="#{!userProfileView.vendorUserProfile}"
+                       required="true" requiredMessage="#{lang.pan} #{lang.isRequired}" validator="spica.scm.validators.PanCardValidator"
+                       styleClass="fw text-uppercase" style="position: relative" validatorMessage="Invalid PAN or PAN is missing.">
+          </p:inputText>
+          <p:inputText tabindex="7" value="#{userProfileView.userProfile.panNo}" maxlength="10" id="panno" autocomplete="off"
+                       rendered="#{userProfileView.vendorUserProfile}"
+                       validator="spica.scm.validators.PanCardValidator"
+                       styleClass="fw text-uppercase" style="position: relative" validatorMessage="Invalid PAN or PAN is missing.">
+          </p:inputText>
+          <p:message for="pan" display="text" styleClass="fw" />
+          <p:message for="panno" display="text" styleClass="fw" />
+        </h:panelGroup>       
+
+        <!-- Email -->
+        <p:outputLabel value="#{lang.email}" for="email" />
+        <h:panelGroup>
+          <p:inputText tabindex="8" value="#{userProfileView.userProfile.email}" maxlength="50" required="true" requiredMessage="#{lang.email} #{lang.isRequired}"
+                       id="email" validator="wawo.EmailValidator" styleClass="fw" style="position: relative" autocomplete="off"/>
+          <p:message for="email" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Department -->
+        <p:commandLink immediate="true" actionListener="#{popUpView.showDepartment(null)}">
+          <p:outputLabel value="#{lang.department}" for="userProfileDepartmentIdCompany"/>
+        </p:commandLink>
+        <h:panelGroup id="departmentDIV">
+          <p:selectOneMenu tabindex="3" value="#{userProfileView.userProfile.departmentId}" required="true" requiredMessage="#{lang.department} #{lang.isRequired}"
+                           id="userProfileDepartmentIdCompany" converter="omnifaces.SelectItemsConverter" rendered="#{userProfileView.isCompanyUserProfile()}"
+                           styleClass="fw">
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.department}" />
+            <f:selectItems value="#{userProfileView.selectCompanyDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+            <p:ajax event="itemSelect" update="userProfileDesignationId" listener="#{userProfileView.departmentSelectEvent}" process="departmentDIV" />
+          </p:selectOneMenu>
+
+          <p:selectOneMenu tabindex="3" value="#{userProfileView.userProfile.departmentId}" converter="omnifaces.SelectItemsConverter"
+                           required="true" requiredMessage="#{lang.department} #{lang.isRequired}" id="userProfileDepartmentIdVendor" 
+                           rendered="#{userProfileView.isVendorUserProfile()}"
+                           style="position: relative" styleClass="fw" >
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.department}" />
+            <f:selectItems value="#{userProfileView.selectVendorDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+            <p:ajax event="itemSelect" update="userProfileDesignationId" listener="#{userProfileView.departmentSelectEvent}" process="departmentDIV" />
+          </p:selectOneMenu>
+
+          <p:selectOneMenu tabindex="3" value="#{userProfileView.userProfile.departmentId}" converter="omnifaces.SelectItemsConverter"
+                           required="true" requiredMessage="#{lang.department} #{lang.isRequired}" id="userProfileDepartmentIdCustomer" 
+                           rendered="#{userProfileView.isCustomerUserProfile()}"
+                           style="position: relative" styleClass="fw">
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.department}" />
+            <f:selectItems value="#{userProfileView.selectCustomerDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+            <p:ajax event="itemSelect" update="userProfileDesignationId" listener="#{userProfileView.departmentSelectEvent}" process="departmentDIV" />
+          </p:selectOneMenu>
+
+          <p:selectOneMenu tabindex="4" value="#{userProfileView.userProfile.departmentId}" converter="omnifaces.SelectItemsConverter"
+                           required="true" requiredMessage="#{lang.department} #{lang.isRequired}" id="userProfileDepartmentIdTransporter" 
+                           rendered="#{userProfileView.isTransporterUserProfile()}"
+                           style="position: relative" styleClass="fw">
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.department}" />
+            <f:selectItems value="#{userProfileView.selectTransporterDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+            <p:ajax event="itemSelect" update="userProfileDesignationId" listener="#{userProfileView.departmentSelectEvent}" process="departmentDIV" />
+          </p:selectOneMenu>
+        </h:panelGroup>
+
+        <!-- Phone 1 -->
+        <p:outputLabel value="#{lang.phone1}" for="phone1" />
+        <h:panelGroup>
+          <p:inputText  tabindex="9" value="#{userProfileView.userProfile.phone1}" maxlength="13" autocomplete="off"
+                        required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone1"
+                        validator="wawo.WhiteSpaceValidator" styleClass="fw" style="position: relative">
+            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+          </p:inputText>
+          <p:message for="phone1" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Designation -->
+        <p:commandLink immediate="true" actionListener="#{popUpView.showDesignation(null)}">
+          <p:outputLabel value="#{lang.designation}" for="userProfileDesignationId"/>
+        </p:commandLink>
+        <h:panelGroup id="designationDiv">
+          <p:selectOneMenu tabindex="3" value="#{userProfileView.userProfile.designationId}" converter="omnifaces.SelectItemsConverter"
+                           required="true" requiredMessage="#{lang.designation} #{lang.isRequired}" id="userProfileDesignationId" style="position: relative" styleClass="fw">
+            <f:selectItem itemValue="#{null}" itemLabel="#{lang.select} #{lang.designation}" />
+            <f:selectItems value="#{userProfileView.selectDesignationByDepartment(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+            <p:ajax event="itemSelect" update="userProfileDesignationId" process="designationDiv" />
+          </p:selectOneMenu>
+          <p:message for="userProfileDesignationId" display="text" />
+        </h:panelGroup>
+
+        <!-- Phone 2 -->
+        <p:outputLabel value="#{lang.phone2}" for="phone2" />
+        <h:panelGroup>
+          <p:inputText tabindex="10" value="#{userProfileView.userProfile.phone2}" maxlength="13" validatorMessage="#{lang.errorInvalidPhoneNo}" 
+                       id="phone2" styleClass="fw" style="position: relative" autocomplete="off">
+            <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+          </p:inputText>
+          <p:message for="phone2" display="text" styleClass="fw" />
+        </h:panelGroup>
+
+        <!-- Address 1 -->
+        <p:outputLabel value="#{lang.address1}" for="address1" />
+        <h:panelGroup>
+          <p:inputTextarea tabindex="5" value="#{userProfileView.userProfile.address1}" cols="100" rows="3" maxlength="500"
+                           id="address1" autoResize="false" styleClass="fw" style="position: relative"/>
+          <p:message for="address1" display="text"/>
+        </h:panelGroup>
+
+        <!-- Address 2 -->
+        <p:outputLabel value="#{lang.address2}" for="address2" />
+        <h:panelGroup>
+          <p:inputTextarea tabindex="11" value="#{userProfileView.userProfile.address2}" cols="100" rows="3" maxlength="500" id="address2" autoResize="false" styleClass="fw" style="position: relative"/>
+          <p:message for="address2" display="text"/>
+        </h:panelGroup>
+
+        <!-- Create Login -->
+        <p:outputLabel for="createLogin" value="Create Login" />
+        <h:panelGroup>
+          <p:selectOneRadio tabindex="6" id="createLogin" value="#{userProfileView.loginVal}">
+            <f:selectItem itemLabel="YES" itemValue="1" />
+            <f:selectItem itemLabel="NO" itemValue="0" />
+            <p:ajax listener="#{userProfileView.createLoginSelectEventHandler}" update="userRole lbl" />
+          </p:selectOneRadio>
+        </h:panelGroup>
+
+        <!-- Services -->
+<!--        <p:outputLabel value="#{lang.services}" for="servicesId" rendered="#{userProfileView.company.flag eq 2}"/>
+        <h:panelGroup id="servicesListDiv" rendered="#{userProfileView.company.flag eq 2}">
+          <p:autoComplete  multiple="true" value="#{userProfileView.servicesList}" completeMethod="#{userProfileView.salesAgentServicesAuto(main, filter)}"
+                           converter="wawo.LookupIntConverter" cache="true" tabindex="12"
+                           validator="#{userProfileView.salesAgentServicesValidation}"
+                           id="servicesId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                           queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                           style="position: relative" styleClass="fw">
+            <f:attribute name="clazz" value="#{scmLookupView.servicesClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.servicesById()}"/>
+            <p:ajax event="itemSelect" listener="#{userProfileView.onServicesSelect}" update="@this" />
+            <p:ajax event="itemUnselect" process="servicesListDiv" immediate="true" listener="#{userProfileView.onServicesUnSelect}" />
+          </p:autoComplete><p:message for="servicesId" display="text" />
+        </h:panelGroup>-->
+
+        <!-- Status -->
+        <p:outputLabel value="#{lang.status}" for="userProfileStatusId"/>
+        <h:panelGroup>
+          <p:selectOneMenu tabindex="13" value="#{userProfileView.userProfile.statusId}" converter="omnifaces.SelectItemsConverter" required="true"
+                           requiredMessage="#{lang.status} #{lang.isRequired}"  styleClass="fw"
+                           id="userProfileStatusId">
+            <f:selectItems value="#{userProfileView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+          </p:selectOneMenu>
+          <p:message for="userProfileStatusId" display="text" />
+        </h:panelGroup>
+
+        <!-- Role -->
+        <h:panelGroup id="lbl">
+          <p:outputLabel value="#{lang.role}" for="roles" rendered="#{userProfileView.isLoginCreated() and userProfileView.isCompanyLogin()}"/>
+        </h:panelGroup>
+        <h:panelGroup id="userRole" >
+          <p:selectManyCheckbox id="roles" rendered="#{userProfileView.isLoginCreated() and userProfileView.isCompanyLogin()}" value="#{userProfileView.roleSelected}"
+                                converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.role} #{lang.isRequired}">
+            <f:selectItems value="#{sysLookupView.roleCompany(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+          </p:selectManyCheckbox>
+          <p:message for="roles" />
+        </h:panelGroup>
+
+        <!--      <h:panelGrid columns="2" id="matchGrid" cellpadding="5">    -->
+        <!--      <h:panelGroup id="pwd">
+                <p:outputLabel value="#{lang.password}" for="password" rendered="#{userProfileView.isLoginCreated()}"/>
+              </h:panelGroup>
+              <h:panelGroup id="passwordDiv" >
+                <p:password value="#{userProfileView.password}" maxlength="50" required="true" requiredMessage="#{lang.password} #{lang.isRequired}"
+                             id="password" rendered="#{userProfileView.isLoginCreated()}" match="cpassword"/>
+                <p:message for="password" />
+              </h:panelGroup>
+
+              <h:panelGroup id="cpwd">
+                <p:outputLabel value="#{lang.confirm} #{lang.password}" for="cpassword" rendered="#{userProfileView.isLoginCreated()}"/>
+              </h:panelGroup>
+              <h:panelGroup id="cpasswordDiv" >
+                <p:password value="#{userProfileView.confPassword}" maxlength="50" required="true" requiredMessage="#{lang.confirm} #{lang.password} #{lang.isRequired}"
+                             id="cpassword" rendered="#{userProfileView.isLoginCreated()}"/>
+                <p:message for="cpassword" />
+              </h:panelGroup>-->
+      </p:panelGrid>
+    </ui:define>
+    <ui:define name="after">
+      <h:panelGroup styleClass="row">
+        <h:panelGroup layout="block" id="benefitTypeDiv" styleClass="col-md-6" rendered="#{main.isForm() and userProfileView.company.flag == 2}">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+            <ui:param name="label" value="#{lang.contractRemunerationTerms}" />
+            <ui:param name="ids" value="contractBenefit" />
+            <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+            <!-- Commission Applicable On -->
+            <p:outputLabel value="#{lang.commissionApplicableOn}" for="commissionApplicableOn" />
+            <h:panelGroup >
+              <p:selectOneMenu value="#{userProfileView.salesAgent.commissionApplicableOn}"  id="commissionApplicableOn" styleClass="fw"
+                               required="true" requiredMessage="#{lang.commissionApplicableOn} #{lang.isRequired}"
+                               >
+                <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                <f:selectItems value="#{userProfileView.listCommissionOn}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax listener="#{accountView.ajaxBehaviorEventHandler}"/>
+              </p:selectOneMenu>
+              <p:message for="commissionApplicableOn" display="text"/>
+            </h:panelGroup>
+
+            <!-- Commission By Range -->
+            <p:outputLabel value="#{lang.commissionByRange}"/>
+            <h:panelGroup >
+              <p:selectOneRadio value="#{userProfileView.salesAgent.commissionByRange}" immediate="true">
+                <f:selectItems value="#{userProfileView.selectItemYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax listener="#{userProfileView.ajaxBehaviorEventHandler}"
+                        oncomplete="refreshDatatable();"
+                        update="commissionValuePercentDiv commissionValuePercentLabel commissionValueFixedDiv commissionValueFixedLabel rangeDiv scmSalesAgentContractCommTable"/>
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Commission Value -->
+            <p:outputLabel value=""/>
+            <h:panelGroup id="commissionValueId">
+              <p:selectOneRadio value="#{userProfileView.salesAgent.commissionType}">
+                <f:selectItems value="#{userProfileView.listCommissionValueType}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                <p:ajax listener="#{userProfileView.commissionValueSelectEventHandler}"
+                        update="commissionValuePercentDiv commissionValuePercentLabel commissionValueFixedDiv commissionValueFixedLabel rangeDiv"/>
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Commission Value Fixed -->
+            <h:panelGroup id="commissionValueFixedLabel">
+              <p:outputLabel styleClass="perc" value="#{lang.commissionValueFixed}" for="commissionValueFixed"
+                             rendered="#{userProfileView.isFixedCommissionByRange()}"  />
+            </h:panelGroup>
+            <h:panelGroup id="commissionValueFixedDiv" >
+              <p:inputNumber converterMessage="#{lang.commissionValueFixed} #{lang.invalidNumber}"
+                             decimalPlaces="2" styleClass="fw" required="true" requiredMessage="#{lang.commissionValueFixed} #{lang.isRequired}"
+                             rendered="#{userProfileView.isFixedCommissionByRange()}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commissionValueFixed"
+                             value="#{userProfileView.salesAgent.commissionValueFixed}"
+                             />
+              <p:message for="commissionValueFixed" display="text"/>
+            </h:panelGroup>
+
+            <!-- Commission Value Percent -->
+            <h:panelGroup id="commissionValuePercentLabel">
+              <p:outputLabel value="#{lang.commissionValuePercent}" for="commissionValuePercent"
+                             rendered="#{userProfileView.isPercentageCommissionByRange()}" />
+            </h:panelGroup>
+
+            <h:panelGroup id="commissionValuePercentDiv">
+              <p:inputNumber converterMessage="#{lang.commissionValuePercent} #{lang.invalidNumber}"
+                             rendered="#{userProfileView.isPercentageCommissionByRange()}"
+                             decimalPlaces="2" styleClass="fw" required="true" requiredMessage="#{lang.commissionValuePercent} #{lang.isRequired}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="commissionValuePercent"
+                             value="#{userProfileView.salesAgent.commissionValuePercentage}"
+                             />
+              <p:message for="commissionValuePercent" display="text"/>
+            </h:panelGroup>
+
+          </ui:decorate>
+        </h:panelGroup>
+
+        <h:panelGroup id="rangeDiv" rendered="#{main.isForm() and userProfileView.company.flag == 2}">
+          <h:panelGroup layout="block" styleClass="row" rendered="#{userProfileView.isCommisionByRange()}">
+            <h:panelGroup layout="block" id="TypeDiv" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="label" value="#{lang.commissionByRange}" />
+                <ui:param name="cols" value="1" />
+                <ui:define name="menuleft">
+                  <p:commandButton id="addNewSalesAgentCommision" action="#{userProfileView.addNewSalesAgentCommision}" oncomplete="refreshDatatable();"
+                                   update="salesAgentCommisionRangeDiv" process="TypeDiv" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info">
+                  </p:commandButton>
+                </ui:define>
+
+                <h:panelGroup layout="block" id="salesAgentCommisionRangeDiv">
+                  <h:inputHidden value="#{userProfileView.currentRow}" id='rownum' />
+                  <p:remoteCommand actionListener="#{userProfileView.actionInsertOrUpdateSalesAgentCommissionRange(main)}" process="salesAgentCommisionRangeDiv"
+                                   update="salesAgentCommisionRangeDiv"  name="saveSalesAgentCommisionRange" oncomplete="refreshDatatable();" />
+
+                  <h:panelGroup layout="block" pt:data-fast-input="true" styleClass="table-responsive">
+                    <p:dataTable id="scmSalesAgentContractCommTable" var="scmSalesAgentContractCommVar" widgetVar="scmSalesAgentContractCommWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                                 value="#{userProfileView.salesAgent.salesAgentContractComm}" rowIndexVar="rowIndex" rows="#{main.pageData.pageSize}" rowKey="#{scmSalesAgentContractCommVar.id}"
+                                 rowHover="true" reflow="false">
+
+                      <!-- Range From -->
+                      <p:column headerText="#{lang.rangeFrom}">
+                        <h:panelGroup id="rangeFromDiv">
+                          <p:inputNumber id="rangeFrom" value="#{scmSalesAgentContractCommVar.rangeFrom}"  minValue="0"
+                                         required="true" requiredMessage="#{lang.rangeFrom} #{lang.isRequired}"
+                                         validator="#{userProfileView.validateRangeFrom}" decimalPlaces="0"
+                                         onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+                            <p:ajax event="change" update="rangeTo" process="rangeFromDiv"  />
+                          </p:inputNumber>
+
+                          <h:inputHidden value="#{rowIndex}" id="serailNo" />
+
+                          <p:message for="rangeFrom" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Range To -->
+                      <p:column headerText="#{lang.rangeTo}">
+                        <h:panelGroup id="rangeToDiv">
+                          <p:inputNumber id="rangeTo" value="#{scmSalesAgentContractCommVar.rangeTo}"  minValue="0"
+                                         required="#{userProfileView.rangeToRequired(rowIndex)}" requiredMessage="#{lang.rangeTo} #{lang.isRequired}"
+                                         validator="#{userProfileView.validateRangeTo}" decimalPlaces="0"
+                                         onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+                            <p:ajax event="change" update="rangeTo" process="rangeToDiv"  />
+                          </p:inputNumber>
+                          <p:message for="rangeTo" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Value Fixed -->
+                      <p:column headerText="#{lang.valueFixed}" rendered="#{userProfileView.isFixedCommissionValue()}">
+                        <h:panelGroup>
+                          <p:inputNumber id="valueFixed" value="#{scmSalesAgentContractCommVar.valueFixed}"  minValue="0.0"
+                                         required="true" requiredMessage="#{lang.valueFixed} #{lang.isRequired}"
+                                         styleClass="submit_item fw" 
+                                         onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="9999999" maxlength="7" autocomplete="off">
+                          </p:inputNumber>
+                          <p:message for="valueFixed" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Value Percentage -->
+                      <p:column headerText="#{lang.valuePercentage}" rendered="#{userProfileView.isPercentageCommissionValue()}">
+                        <h:panelGroup>
+                          <p:inputNumber id="valuePercentage" value="#{scmSalesAgentContractCommVar.valuePercentage}" minValue="0.0"
+                                         required="true" requiredMessage="#{lang.valuePercentage} #{lang.isRequired}"
+                                         styleClass="submit_item fw" 
+                                         onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="100.00" maxlength="5" autocomplete="off">
+                          </p:inputNumber>
+                          <p:message for="valuePercentage" display="text"/>
+                        </h:panelGroup>
+                      </p:column>
+
+                      <!-- Action Column -->
+                      <p:column style="width:40px" >
+                        <p:commandButton  process="@this" update="scmSalesAgentContractCommTable" partialSubmit="true"
+                                          tabindex="-1"
+                                          actionListener="#{userProfileView.deleteContractCommissionRange(main, scmSalesAgentContractCommVar)}"   title="Delete" iconPos="left" icon="fa fa-trash" >
+                          <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                        </p:commandButton>
+                      </p:column>
+
+                    </p:dataTable>
+                  </h:panelGroup>
+                  <script>
+                    setFocus();
+                  </script>
+                </h:panelGroup>
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <script>
+            //<![CDATA[
+            function refreshDatatable() {
+              page.refresh();
+            }
+
+            function submitForm(params) {
+              saveSalesAgentCommisionRange([{name: 'rownumber', value: params[2]}]);
+              return false;
+            }
+
+            function setFocus() {
+              var r = $('#rownum').val();
+              if (!isNaN(r)) {
+                var nextRow = parseInt(r) + 1;
+                console.log('NextRow :' + nextRow);
+                $('#scmSalesAgentContractCommTable\\:' + nextRow + '\\:rangeFrom_input').focus();
+              }
+
+            }
+
+            $(document).ready(function (e) {
+              refreshDatatable();
+            });
+            //]]>
+          </script>
+        </h:panelGroup>
+      </h:panelGroup>
+
+
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(userProfileView.userProfile.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(userProfileView.userProfile.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(userProfileView.userProfile.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(userProfileView.userProfile.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="userProfileTable" var="userProfileVar" widgetVar="userProfileWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{userProfileView.userProfileLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{userProfileVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{userProfileView.userProfileSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column headerText="#{lang.userCode}" sortBy="#{userProfileVar.userCode}" field="user_code" >
+          <f:facet name="header"><h:outputText value="#{lang.userCode}" title="#{lang.userCode}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{userProfileVar.userCode}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{userProfileView.userProfile}" value="#{userProfileVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column headerText="#{lang.vendorName}" sortBy="#{userProfileVar.vendorId.vendorName}" field="vendor_id.vendor_name" rendered="#{userProfileView.isVendorUserProfile()}">
+          <f:facet name="header"><h:outputText value="#{lang.vendorName}" title="#{lang.vendorName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.vendorId.vendorName)}" title="#{appView.title(userProfileVar.vendorId.vendorName)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.customerName}" sortBy="#{userProfileVar.customerId.customerName}" field="customer_id.customer_name" rendered="#{userProfileView.isCustomerUserProfile()}">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.customerId.customerName)}" title="#{appView.title(userProfileVar.customerId.customerName)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.transporterName}" sortBy="#{userProfileVar.transporterId.transporterName}" field="transporter_id.transporter_name" rendered="#{userProfileView.isTransporterUserProfile()}">
+          <f:facet name="header"><h:outputText value="#{lang.transporterName}" title="#{lang.transporterName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.transporterId.transporterName)}" title="#{appView.title(userProfileVar.transporterId.transporterName)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.companyName}" sortBy="#{userProfileVar.companyId.companyName}" field="company_id.company_name" rendered="false" >
+          <f:facet name="header"><h:outputText value="#{lang.companyName}" title="#{lang.companyName}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.companyId.companyName)}" title="#{appView.title(userProfileVar.companyId.companyName)}" escape="false" />
+        </p:column>
+<!--              <p:column headerText="#{lang.userCode}" sortBy="#{userProfileVar.userCode}" field="user_code">
+          <h:outputText value="#{appView.display(userProfileVar.userCode)}" title="#{appView.title(userProfileVar.userCode)}" escape="false" />
+        </p:column>-->
+        <p:column headerText="#{lang.name}" sortBy="#{userProfileVar.name}" field="name">
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.name)}" title="#{appView.title(userProfileVar.name)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.department}" sortBy="#{userProfileVar.departmentId.title}" field="department_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.department}" title="#{lang.department}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.departmentId.title)}" title="#{appView.title(userProfileVar.departmentId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.designation}" sortBy="#{userProfileVar.designationId.title}" field="designation_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.designation}" title="#{lang.designation}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.designationId.title)}" title="#{appView.title(userProfileVar.designationId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.phone} #{lang.sno}" sortBy="#{userProfileVar.phone1}" field="phone_1">
+          <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.phone1)}" title="#{appView.title(userProfileVar.phone1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.email}" sortBy="#{userProfileVar.email}" field="email">
+          <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.email)}" title="#{appView.title(userProfileVar.email)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.status}" sortBy="#{userProfileVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+
+          <h:outputText value="#{appView.display(userProfileVar.statusId.title)}" title="#{appView.title(userProfileVar.statusId.title)}" rendered="#{userProfileVar.statusId.id==1}" escape="false" />
+          <h:outputText value="#{appView.display(userProfileVar.statusId.title)}" title="#{appView.title(userProfileVar.statusId.title)}" rendered="#{userProfileVar.statusId.id==3}" style="color:grey" escape="false" />
+        </p:column>
+<!--        <p:column headerText="#{lang.action}" >
+          <p:commandButton value="#{lang.reset} #{lang.password}" action="#{userProfileView.resetPassword()}"/>
+        </p:column>-->
+        <p:column>
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.status}"/></f:facet>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(userProfileVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(userProfileVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(userProfileVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(userProfileVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(userProfileVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>
+

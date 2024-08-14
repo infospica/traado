@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >      
+       
+      <p:panelGrid id="nonJournalFixed" styleClass="mDataTable fw"  rendered="#{!journalView.filterJournal.isJournal() and !journalView.filterJournal.isContra()}" >
+          <p:row>
+            <p:column styleClass="w-60 text-left">
+              <h:outputText styleClass="label" value="#{journalView.accountingTransactionDetail.debit gt 0 ? lang.by : journalView.accountingTransactionDetail.credit gt 0 ? lang.to : '' }" escape="false" style="background-color: #{journalView.accountingTransactionDetail.debit gt 0 ? AccountingConstant.COLOR_DR : journalView.accountingTransactionDetail.credit gt 0 ? AccountingConstant.COLOR_CR : ''}"/>
+            </p:column>
+            <p:column styleClass="#{main.isEdit()?'editLinks':''}">
+              <p:commandLink styleClass="fw" id="linkNJF" actionListener="#{popUpView.showLedgerBalance(journalView.accountingTransactionDetail.accountingLedgerId)}" value="#{journalView.accountingTransactionDetail.accountingLedgerId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.view} #{lang.ledger}" rendered="#{main.isEdit() and !journalView.editable and (journalView.isCreditFixed() or journalView.isDebitFixed())}"/>
+              <p:autoComplete value="#{journalView.accountingTransactionDetail.accountingLedgerId}" completeMethod="#{journalView.accountingLedgerPaymentAuto}" converter="wawo.LookupIntConverter"
+                              required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}" id="ledgerId" placeholder="#{lang.select} #{journalView.getTopPlaceholder()} #{lang.ledger}"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="false" dynamic="true" cacheTimeout="3000" styleClass="fw" rendered="#{(main.isNew() or journalView.editable) and (journalView.isCreditFixed() or journalView.isDebitFixed())}" scrollHeight="600">
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect" listener="#{journalView.showBalanceAndAccountGroup(main, journalView.accountingTransactionDetail)}" process="@this ledgerId" update="balDiv accountGroupDiv" partialSubmit="true"  />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>              
+              <p:message for="ledgerId" display="text" />
+            </p:column> 
+            <p:column styleClass="w-100 text-right">
+              <h:panelGroup id="balDiv" >
+                <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_DR}" value="#{appView.decimal(journalView.accountingTransactionDetail.accountingLedgerId.balanceDebit)}"  rendered="#{journalView.accountingTransactionDetail.accountingLedgerId.balanceDebit ne null}"/>
+                <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_CR}" value="#{appView.decimal(journalView.accountingTransactionDetail.accountingLedgerId.balanceCredit)}"  rendered="#{journalView.accountingTransactionDetail.accountingLedgerId.balanceCredit ne null}"/>
+              </h:panelGroup>
+            </p:column>            
+            <p:column styleClass="w-180 text-right">
+              <h:outputText value="#{appView.decimal(journalView.accountingTransactionDetail.credit)}" rendered="#{journalView.accountingTransactionDetail.credit gt 0}" />    
+              <h:outputText value="#{appView.decimal(journalView.accountingTransactionDetail.debit)}" rendered="#{journalView.accountingTransactionDetail.debit gt 0}" />  
+            </p:column>
+            <p:column styleClass="w-40 text-right">
+              <h:outputText value="#{lang.cr}" styleClass="fw" rendered="#{journalView.accountingTransactionDetail.credit gt 0}" />    
+              <h:outputText value="#{lang.dr}" styleClass="fw" rendered="#{journalView.accountingTransactionDetail.debit gt 0}"  />  
+            </p:column>
+            <p:column styleClass="w-220 text-right">
+              <p:inputText value="#{journalView.accountingTransactionDetail.narration}" id="tlineNote" placeholder="#{lang.note}"   styleClass="fw" rendered="#{journalView.isCreditFixed() or journalView.isDebitFixed()}"/>
+            </p:column>
+          </p:row>
+        </p:panelGrid>
+
+        <p:dataTable id="njTable" var="njVar" widgetVar="njWidget" tableStyleClass="mDataTable mDataTable-center noHeader noFooter fw editLinks"
+                     value="#{journalView.getJournalList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{njVar.id}"  
+                     rowHover="true" reflow="false"  scrollable="false" rowIndexVar="index" rendered="#{journalView.isCreditFixed() or journalView.isDebitFixed()}">
+          <p:column styleClass="w-60 text-left" >
+            <h:outputText styleClass="label" value="#{njVar.debit ne null ? lang.by : njVar.credit ne null ? lang.to : ''}" escape="false" style="background-color: #{njVar.debit ne null ? AccountingConstant.COLOR_DR : njVar.credit ne null ? AccountingConstant.COLOR_CR : ''}"/>
+          </p:column>
+          <p:column  >
+            <h:panelGroup id="ledgerDiv" >
+              <p:commandLink id="linkNJF2" actionListener="#{popUpView.showLedgerBalance(njVar.accountingLedgerId)}" value="#{njVar.accountingLedgerId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.view} #{lang.ledger}" rendered="#{main.isEdit() and !journalView.editable}"/>
+              <p:autoComplete value="#{njVar.accountingLedgerId}" completeMethod="#{journalView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"
+                              required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}" id="ledgerId" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dynamic="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="30"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" rendered="#{(main.isNew() or journalView.editable) and index eq 0}" scrollHeight="600" placeholder="#{(journalView.filterJournal.isExpenses() or journalView.filterJournal.isDebitNote() or journalView.filterJournal.isCreditNote()) ? lang.expense : (journalView.filterJournal.isPayment() or journalView.filterJournal.isReceipt()) ? lang.party : (journalView.filterJournal.isSales()) ? lang.sales : (journalView.filterJournal.isPurchase()) ? lang.purchase : ''}">
+                <p:ajax event="itemSelect" listener="#{journalView.showBalanceAndAccountGroup(main, njVar)}" process="@this" update="njTable accountGroupDiv partyLedgerId"  partialSubmit="true" />
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>              
+              </p:autoComplete>
+              <p:message for="ledgerId" display="text" />
+              <!-- payment -receeipt tds -->
+              <p:autoComplete id="ledgerId2" value="#{njVar.accountingLedgerId}" completeMethod="#{journalView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"                              
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dynamic="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="30"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" rendered="#{(main.isNew() or journalView.editable ) and index gt 0 and (journalView.filterJournal.isPayment() or journalView.filterJournal.isReceipt())}" scrollHeight="600" placeholder="#{lang.party}, #{lang.tds}">
+                <p:ajax event="itemSelect" listener="#{journalView.showBalanceAndAddRowPayment(main, njVar)}" process="@this accountGroupDiv" update="njTable accountGroupDiv partyLedgerId"  partialSubmit="true" />
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>              
+              </p:autoComplete>
+              <p:message for="ledgerId2" display="text" />
+
+
+              <p:autoComplete id="ledgerTaxId" value="#{njVar.accountingLedgerId}" completeMethod="#{journalView.accountingLedgerTaxAuto}" converter="wawo.LookupIntConverter" 
+                              var="e2" itemValue="#{e2}" itemLabel="#{e2.title}" emptyMessage="#{lang.noResult}" dynamic="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="30" placeholder="#{lang.tax}"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" rendered="#{(main.isNew() or journalView.editable) and index gt 0 and index lt 3 and (journalView.filterJournal.isPurchase() or journalView.filterJournal.isSales() or journalView.filterJournal.isExpenses())}" scrollHeight="600" >
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect" listener="#{journalView.showBalanceAndComputeTax(main, njVar)}" process="@this" update="balDiv2 debitDiv creditDiv"  partialSubmit="true" />
+                <p:column style="width: 300px;"><h:outputText value="#{e2.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e2.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e2.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>              
+              <p:message for="ledgerTaxId" display="text" />
+              <!-- Condition was only on dr cr so commented                        
+              <p:autoComplete id="ledgerDrCrTaxId" value="#{njVar.accountingLedgerId}" completeMethod="#{journalView.accountingLedgerTaxAuto}" converter="wawo.LookupIntConverter" 
+                                                          var="e2" itemValue="#{e2}" itemLabel="#{e2.title}" emptyMessage="#{lang.noResult}" dynamic="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="30" placeholder="#{lang.tax}"
+                                            converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" rendered="#{index gt 0 and main.isEdit() and (journalView.filterJournal.isDebitNote() or journalView.filterJournal.isCreditNote())}" scrollHeight="600" >
+                              <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                              <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                              <p:ajax event="itemSelect" listener="#{journalView.showBalanceAndComputeTax(main, njVar)}" process="@this" update="balDiv2 debitDiv creditDiv"  partialSubmit="true" />
+                              <p:column style="width: 300px;"><h:outputText value="#{e2.title}" /></p:column>
+                              <p:column style="width: 150px;"><h:outputText value="#{e2.accountingGroupId.title}" /></p:column>
+                              <p:column style="width: 150px;"><h:outputText value="#{e2.accountingGroupId.parentId.title}" /></p:column>
+                            </p:autoComplete>              
+                            <p:message for="ledgerDrCrTaxId" display="text" />-->
+
+              <p:autoComplete id="roundOffId" value="#{njVar.accountingLedgerId}" completeMethod="#{journalView.ledgerRoundOffAuto}" converter="wawo.LookupIntConverter"
+                              var="e2" itemValue="#{e2}" itemLabel="#{e2.title}" emptyMessage="#{lang.noResult}" dynamic="true" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="30" placeholder="#{lang.roundOff}"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" rendered="#{(main.isNew() or journalView.editable) and index gt 2 and (journalView.filterJournal.isPurchase() or journalView.filterJournal.isSales() or journalView.filterJournal.isExpenses())}" scrollHeight="600" >
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect"  process="@this" update="balDiv2 debitDiv"  partialSubmit="true" />
+                <p:column style="width: 300px;"><h:outputText value="#{e2.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e2.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e2.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>              
+              <p:message for="roundOffId" display="text" />
+            </h:panelGroup>
+          </p:column>  
+          <p:column styleClass="w-100 text-right">
+            <h:panelGroup id="balDiv2" >
+              <h:inputHidden value="#{njVar.accountingLedgerId.balanceDebit}" rendered="#{njVar.accountingLedgerId.balanceDebit ne null}"/>
+              <h:inputHidden value="#{njVar.accountingLedgerId.balanceCredit}" rendered="#{njVar.accountingLedgerId.balanceCredit ne null}"/>
+              <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_DR}" value="#{appView.decimal(njVar.accountingLedgerId.balanceDebit)}"  rendered="#{njVar.accountingLedgerId.balanceDebit ne null}"/>
+              <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_CR}" value="#{appView.decimal(njVar.accountingLedgerId.balanceCredit)}"  rendered="#{njVar.accountingLedgerId.balanceCredit ne null}"/>
+            </h:panelGroup>
+          </p:column>
+          <p:column styleClass="w-180 text-right" >
+            <h:panelGroup id="viewDiv" layout="block" rendered="#{main.isEdit() and !journalView.editable}"> 
+              <h:outputText value="#{appView.decimal((njVar.debit gt 0 or njVar.debit lt 0 ) ? njVar.debit : (njVar.credit gt 0 or njVar.credit lt 0)? njVar.credit : 0)}" />
+            </h:panelGroup>
+            <h:panelGroup id="debitDiv" layout="block" rendered="#{(main.isNew() or journalView.editable) and journalView.isCreditFixed()}">            
+              <p:inputNumber value="#{njVar.debit}" converterMessage="#{lang.debit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="debit" styleClass="fw" rendered="#{index == 0}" >
+                <p:ajax event="blur" listener="#{journalView.actionOpenDetailItemPopup(main, njVar)}" process="entryDate1 debitDiv ledgerDiv narration balDiv2" partialSubmit="true"/>
+              </p:inputNumber>
+              <p:message for="debit" display="text"/>
+              <p:inputNumber value="#{njVar.debit}" converterMessage="#{lang.debit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="debitTax" styleClass="fw" rendered="#{index gt 0 and (journalView.filterJournal.isPurchase() or journalView.filterJournal.isExpenses())}" >
+                <p:ajax event="change" process="debitDiv ledgerDiv narration balDiv2"  partialSubmit="true" />
+              </p:inputNumber> 
+
+              <!--TDS for Payment -->
+              <p:message for="debitTax" display="text"/>
+              <p:inputNumber value="#{njVar.debit}" converterMessage="#{lang.debit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="debitTax2" styleClass="fw" rendered="#{index gt 0 and journalView.filterJournal.isPayment() and njVar.credit eq null}" >
+                <p:ajax event="change" listener="#{journalView.showBalanceAndAddRow(main, njVar)}" process="debitDiv ledgerDiv narration balDiv2" update="njTable" partialSubmit="true" />
+              </p:inputNumber>           
+              <p:message for="debitTax2" display="text"/> 
+              <p:inputNumber value="#{njVar.credit}" converterMessage="#{lang.credit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="creditTds" styleClass="fw" rendered="#{index gt 0 and (journalView.filterJournal.isPayment()) and njVar.credit ne null}" >
+                <p:ajax event="change" listener="#{journalView.showBalanceAndAddRow(main, njVar)}" process="debitDiv ledgerDiv narration balDiv2" update="njTable" partialSubmit="true" />
+              </p:inputNumber>   
+
+              <p:message for="creditTds" display="text"/> 
+              <!--<h:outputText value="#{njVar.debit}" rendered="#{main.isEdit() and index gt 0 and (journalView.filterJournal.isCreditNote())}" />-->
+            </h:panelGroup>
+
+            <!--          </p:column>  
+                      <p:column  styleClass="w-180 text-right" rendered="#{journalView.filterJournal.isSales() or journalView.filterJournal.isDebitNote()}">-->
+            <h:panelGroup id="creditDiv" layout="block" rendered="#{(main.isNew() or journalView.editable) and (journalView.filterJournal.isSales() or journalView.filterJournal.isDebitNote())}">
+              <p:inputNumber  value="#{njVar.credit}" converterMessage="#{lang.credit} #{lang.invalidNumber}" decimalPlaces="2"
+                              onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="credit" styleClass="fw" rendered="#{index == 0}" >
+                <p:ajax event="blur"  listener="#{journalView.actionOpenDetailItemPopup(main, njVar)}" process="entryDate1 creditDiv ledgerDiv narration balDiv2"/>
+              </p:inputNumber>
+              <p:message for="credit" display="text"/>
+              <p:inputNumber  value="#{njVar.credit}" converterMessage="#{lang.credit} #{lang.invalidNumber}" decimalPlaces="2"
+                              onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999"  id="creditTax" styleClass="fw" rendered="#{index gt 0 and (journalView.filterJournal.isSales())}" >
+                <p:ajax event="change" process="creditDiv ledgerDiv ledgerDiv balDiv2"  />
+              </p:inputNumber>              
+              <p:message for="creditTax" display="text"/>     
+              <h:outputText value="#{njVar.credit}" rendered="#{main.isEdit() and index gt 0 and (journalView.filterJournal.isDebitNote())}" />
+       <!--                    <p:inputNumber  value="#{njVar.credit}" converterMessage="#{lang.credit} #{lang.invalidNumber}" decimalPlaces="2"
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999"  id="creditTax2" styleClass="fw" rendered="#{index gt 0 and (journalView.filterJournal.isPayment())}" >
+                     <p:ajax event="change" listener="#{journalView.addNewTaxRaw()}" process="njTable" update="njTable" />
+                   </p:inputNumber>              
+                   <p:message for="creditTax2" display="text"/>-->
+            </h:panelGroup>
+            <!--          </p:column>
+                      <p:column  styleClass="w-180 text-right" rendered="#{journalView.filterJournal.isReceipt() }">-->
+            <h:panelGroup id="creditDivRec" layout="block" rendered="#{(main.isNew() or journalView.editable) and journalView.filterJournal.isReceipt()}">
+              <p:inputNumber value="#{njVar.credit}" converterMessage="#{lang.credit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="creditRec" styleClass="fw" rendered="#{index == 0}" >
+                <p:ajax event="blur" process="entryDate1 creditDivRec ledgerDiv narration balDiv2" listener="#{journalView.actionOpenDetailItemPopup(main, njVar)}" />
+              </p:inputNumber>
+              <p:message for="creditRec" display="text"/>
+            </h:panelGroup>
+          </p:column>  
+          <p:column styleClass="w-40 text-right">
+            <h:outputText styleClass="fw" value="#{njVar.debit ne null ? lang.dr : njVar.credit ne null ? lang.cr : ''}" escape="false" />
+          </p:column>
+          <p:column   styleClass="w-220 text-right">
+            <p:inputText  value="#{njVar.narration}" id="tlineNote"  styleClass="fw"/>
+          </p:column>
+        </p:dataTable>       
+</ui:composition>

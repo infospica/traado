@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesAgentContractView.switchSalesAgentContract(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesAgentContract}" />
+    <ui:param name="ids" value="salesAgentContract" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesAgentContractView.deleteSalesAgentContract(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesAgentContractWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesAgentContractView.cloneSalesAgentContract(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesAgentContractView.deleteSalesAgentContract(main)}" value="#{lang.delete}" onclick="wdgOff('salesAgentContractWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesAgentContractView.saveSalesAgentContract(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  rendered="#{userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true}"/></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+
+        <p:outputLabel value="#{lang.salesAgentContractCompanyId}" for="salesAgentContractCompanyId"/><h:panelGroup>
+          <p:autoComplete value="#{salesAgentContractView.salesAgentContract.companyId}" completeMethod="#{salesAgentContractView.companyAuto}" converter="wawo.LookupIntConverter"   id="salesAgentContractCompanyId" var="e" itemValue="#{e}" itemLabel="#{e.companyName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.companyClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.companyById()}"/>
+        </p:autoComplete><p:message for="salesAgentContractCompanyId" display="text" /></h:panelGroup>
+
+        <p:outputLabel value="#{lang.salesAgentContractAccountGroupId}" for="salesAgentContractAccountGroupId"/><h:panelGroup>
+          <p:autoComplete value="#{salesAgentContractView.salesAgentContract.accountGroupId}" completeMethod="#{salesAgentContractView.accountGroupAuto}" converter="wawo.LookupIntConverter"   id="salesAgentContractAccountGroupId" var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>
+        </p:autoComplete><p:message for="salesAgentContractAccountGroupId" display="text" /></h:panelGroup>
+        <p:outputLabel value="#{lang.validFrom}" for="validFrom" />
+        <h:panelGroup><p:calendar value="#{salesAgentContractView.salesAgentContract.validFrom}" pattern="#{lang.datePattern}" converterMessage="#{lang.validFrom} #{lang.invalidDate}" maxlength="29" id="validFrom" showButtonPanel="true" navigator="true" mask="true"/><p:message for="validFrom" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.validTo}" for="validTo" />
+        <h:panelGroup><p:calendar value="#{salesAgentContractView.salesAgentContract.validTo}" pattern="#{lang.datePattern}" converterMessage="#{lang.validTo} #{lang.invalidDate}" maxlength="29" id="validTo" showButtonPanel="true" navigator="true" mask="true"/><p:message for="validTo" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.commissionApplicableOn}" for="commissionApplicableOn" />
+        <h:panelGroup><p:inputNumber value="#{salesAgentContractView.salesAgentContract.commissionApplicableOn}" converterMessage="#{lang.commissionApplicableOn} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="commissionApplicableOn" /><p:message for="commissionApplicableOn" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.commissionValueFixed}" for="commissionValueFixed" />
+        <h:panelGroup><p:inputNumber value="#{salesAgentContractView.salesAgentContract.commissionValueFixed}" converterMessage="#{lang.commissionValueFixed} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commissionValueFixed" /><p:message for="commissionValueFixed" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.commissionValuePercentage}" for="commissionValuePercentage" />
+        <h:panelGroup><p:inputNumber value="#{salesAgentContractView.salesAgentContract.commissionValuePercentage}" converterMessage="#{lang.commissionValuePercentage} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commissionValuePercentage" /><p:message for="commissionValuePercentage" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.commissionByRange}" for="commissionByRange" />
+        <h:panelGroup><p:inputNumber value="#{salesAgentContractView.salesAgentContract.commissionByRange}" converterMessage="#{lang.commissionByRange} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="commissionByRange" /><p:message for="commissionByRange" display="text"/></h:panelGroup>
+
+        <p:outputLabel value="#{lang.salesAgentContractSalesAgentContractStatId}" for="salesAgentContractSalesAgentContractStatId"/><h:panelGroup>
+          <p:autoComplete value="#{salesAgentContractView.salesAgentContract.salesAgentContractStatId}" completeMethod="#{salesAgentContractView.salesAgentContractStatAuto}" converter="wawo.LookupIntConverter"   id="salesAgentContractSalesAgentContractStatId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.salesAgentContractStatClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.salesAgentContractStatById()}"/>
+        </p:autoComplete><p:message for="salesAgentContractSalesAgentContractStatId" display="text" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+        <h:panelGroup><p:inputText value="#{salesAgentContractView.salesAgentContract.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.lastModifiedBy}" for="lastModifiedBy" />
+        <h:panelGroup><p:inputText value="#{salesAgentContractView.salesAgentContract.lastModifiedBy}" maxlength="200" id="lastModifiedBy" /><p:message for="lastModifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+        <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+        <h:panelGroup><p:calendar value="#{salesAgentContractView.salesAgentContract.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.lastModifeidAt}" for="lastModifeidAt" />
+        <h:panelGroup><p:calendar value="#{salesAgentContractView.salesAgentContract.lastModifeidAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.lastModifeidAt} #{lang.invalidDate}" maxlength="29" id="lastModifeidAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="lastModifeidAt" display="text"/></h:panelGroup>
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="salesAgentContractTable" var="salesAgentContractVar" widgetVar="salesAgentContractWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+        lazy="true" value="#{salesAgentContractView.salesAgentContractLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesAgentContractVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+        selection="#{salesAgentContractView.salesAgentContractSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{salesAgentContractVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{salesAgentContractVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{salesAgentContractView.salesAgentContract}" value="#{salesAgentContractVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.companyName}" sortBy="#{salesAgentContractVar.companyId.companyName}" field="company_id.company_name"><h:outputText value="#{appView.display(salesAgentContractVar.companyId.companyName)}" title="#{appView.title(salesAgentContractVar.companyId.companyName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.groupName}" sortBy="#{salesAgentContractVar.accountGroupId.groupName}" field="account_group_id.group_name"><h:outputText value="#{appView.display(salesAgentContractVar.accountGroupId.groupName)}" title="#{appView.title(salesAgentContractVar.accountGroupId.groupName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.validFrom}" sortBy="#{salesAgentContractVar.validFrom}" field="valid_from" ><h:outputText value="#{appView.dateTime(salesAgentContractVar.validFrom)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.validTo}" sortBy="#{salesAgentContractVar.validTo}" field="valid_to" ><h:outputText value="#{appView.dateTime(salesAgentContractVar.validTo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.commissionApplicableOn}" sortBy="#{salesAgentContractVar.commissionApplicableOn}" field="commission_applicable_on" style="text-align: right"><h:outputText value="#{appView.number(salesAgentContractVar.commissionApplicableOn)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.commissionValueFixed}" sortBy="#{salesAgentContractVar.commissionValueFixed}" field="commission_value_fixed" style="text-align: right"><h:outputText value="#{appView.decimal(salesAgentContractVar.commissionValueFixed)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.commissionValuePercentage}" sortBy="#{salesAgentContractVar.commissionValuePercentage}" field="commission_value_percentage" style="text-align: right"><h:outputText value="#{appView.decimal(salesAgentContractVar.commissionValuePercentage)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.commissionByRange}" sortBy="#{salesAgentContractVar.commissionByRange}" field="commission_by_range" style="text-align: right"><h:outputText value="#{appView.number(salesAgentContractVar.commissionByRange)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{salesAgentContractVar.salesAgentContractStatId.title}" field="sales_agent_contract_stat_id.title"><h:outputText value="#{appView.display(salesAgentContractVar.salesAgentContractStatId.title)}" title="#{appView.title(salesAgentContractVar.salesAgentContractStatId.title)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.createdBy}" sortBy="#{salesAgentContractVar.createdBy}" field="created_by"><h:outputText value="#{appView.display(salesAgentContractVar.createdBy)}" title="#{appView.title(salesAgentContractVar.createdBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.lastModifiedBy}" sortBy="#{salesAgentContractVar.lastModifiedBy}" field="modified_by"><h:outputText value="#{appView.display(salesAgentContractVar.lastModifiedBy)}" title="#{appView.title(salesAgentContractVar.lastModifiedBy)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.createdAt}" sortBy="#{salesAgentContractVar.createdAt}" field="created_at" ><h:outputText value="#{appView.dateTime(salesAgentContractVar.createdAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.lastModifeidAt}" sortBy="#{salesAgentContractVar.lastModifeidAt}" field="last_modifeid_at" ><h:outputText value="#{appView.dateTime(salesAgentContractVar.lastModifeidAt)}" escape="false" /></p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

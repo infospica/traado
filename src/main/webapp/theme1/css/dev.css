@@ -1,0 +1,92 @@
+.ui-dashboard-column{
+  padding-bottom: 0px;
+}
+
+* { box-sizing: border-box; }
+.grid {              
+  max-width: 800px;
+}
+
+/* clearfix */
+.grid:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+/* ---- grid-item ---- */
+
+.grid-item {
+  min-width: 200px;
+  max-width: auto;
+
+  height: auto;
+  float: left;
+  border:none;  
+}
+
+.grid-head{
+  font-size: 17px;
+  font-weight: bold;  
+}
+
+.grid-row{  
+  padding-top: 5px; 
+  padding-right: 10px;
+}
+.oneBtn .ui-state-active {
+  background: #9932CC;
+  background-color: #9932CC;
+
+}
+
+.oneBtn .ui-state-default {
+  background: #CCC;
+  background-color: #CCC;
+}
+
+.composer{
+ 
+  
+  height:auto;
+ 
+}
+.composer.ql-editor{
+  background-color: #FFF;
+}
+.dlgWidget.ui-dialog .ui-widget {
+  
+}
+.dlgWidget.ui-dialog.ui-widget-content .ui-dialog-content{
+  padding:0px; 
+  border:none;
+}
+#comPanel{
+  padding-top:20px;
+}
+.comCtrl{
+  padding:20px;
+  color: #FFF;
+}
+.comCtrl.button{
+  background-color: #000 !important;
+}
+.chips{
+  width:100%;
+}
+.comHeader{
+  background-color: #444;
+  height:40px;
+  padding:10px;
+  
+  color: #FFF !important;
+  font-size: 17px;
+  font-weight: 400;
+}
+.comHeaderLink{
+  color:#FFFFFF;
+  font-size: 17px;
+  font-weight: 300;
+  margin-right: 10px;
+  text-decoration: none;
+}

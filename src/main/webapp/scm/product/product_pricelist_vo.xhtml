@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core" >
+  #{productPricelistView.switchProductPricelist(main, param.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{productPricelistView.accountGroupPriceList.title} - #{lang.priceList}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="productPriceListVo" />
+    <ui:param name="labelOnly" value="true" />
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="more" value="false" />
+
+    <ui:define name="deleteList"/>        
+    <ui:define name="deleteForm"/>
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{productPricelistView.productPriceListVoClose}"                       
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productPricelistView.saveProductPricelistVo(main)}" value="#{lang.save}" onclick="toTop()"                        
+                       styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton> 
+
+      <p:commandButton value="export" styleClass="btn btn-info" ajax="false" icon="fa fa-file-excel-o" iconPos="left" >
+        <p:dataExporter type="xls" target="#{ids}Table" fileName="#{userRuntimeView.exportFileName(masterReportView.fileName)}" 
+                        pageOnly="false" postProcessor="#{excelExportView.postProcessXLS}"/>
+      </p:commandButton>
+
+
+    </ui:define>    
+
+    <ui:define name="formRight" >    
+
+      <h:panelGroup layout="block" styleClass="m-x-5 ib-m">
+        <h:panelGroup layout="block" id="rateCriteriaLbl" styleClass="ib-m m-r-5">
+          <h:outputText value="#{lang.rateDerivationCriterion} " rendered="#{productPricelistView.isNotDefault() and productPricelistView.appliedOn eq 1}"/>
+        </h:panelGroup>
+        <h:panelGroup id="rateCriteriaDiv">
+          <p:selectOneMenu value="#{productPricelistView.rateCriteria}" styleClass="ib-m w-100" rendered="#{productPricelistView.isNotDefault() and productPricelistView.appliedOn eq 1}"                        
+                           converter="omnifaces.SelectItemsConverter">
+            <f:selectItem itemLabel="#{lang.markUp}" itemValue="#{1}" />
+            <f:selectItem itemLabel="#{lang.markDown}" itemValue="#{2}" />  
+            <p:ajax event="itemSelect" process="rateCriteriaDiv" />
+          </p:selectOneMenu>
+        </h:panelGroup>
+      </h:panelGroup>
+
+      <h:panelGroup layout="block" styleClass="m-x-5 ib-m">
+        <h:outputText value="#{lang.variation} " rendered="#{productPricelistView.isNotDefault()}" styleClass="ib-m m-r-5"/>
+        <h:panelGroup layout="block" rendered="#{productPricelistView.isNotDefault()}">
+          <p:inputNumber value="#{productPricelistView.accountGroupPriceList.variationPercentage}" converterMessage="#{lang.defaults} #{lang.price} #{lang.invalidNumber}"
+                         symbolPosition="s" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right ib-m w-100" maxValue="100.00" symbol="#{appView.percentageSymbol} " maxlength="5" id="valuePerc" style="text-align: right"/>
+        </h:panelGroup>
+      </h:panelGroup>      
+
+      <h:panelGroup layout="block" styleClass="m-x-5 ib-m" id="priceTypeId">
+        <p:selectManyCheckbox value="#{productPricelistView.selectedPriceTypes}" rendered="#{productPricelistView.isNotDefault()}" >
+          <f:selectItem itemLabel="#{lang.pts}" itemValue="PTS" />
+          <f:selectItem itemLabel="#{lang.ptr}" itemValue="PTR" />
+          <p:ajax update="priceTypeId" />
+        </p:selectManyCheckbox>
+      </h:panelGroup> 
+
+      <h:outputText value="" styleClass="m-l-5" rendered="#{productPricelistView.isNotDefault()}"/>
+      <h:panelGroup rendered="#{productPricelistView.isNotDefault()}">
+        <p:commandButton action="#{productPricelistView.addPercantageToPTS(main)}" value="#{lang.apply}" onclick="toTop();block();"                        
+                         styleClass="btn btn-primary" update="productPriceListVoTable"  oncomplete="unblock();" >
+
+        </p:commandButton>   
+      </h:panelGroup>
+    </ui:define>
+
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" rendered="#{main.isForm() and main.edit}"  id="lineItemDiv">
+        <h:panelGroup layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" pt:data-fast-input="true">
+          <p:dataTable id="productPriceListVoTable" var="productPriceListVoVar" widgetVar="productPriceListVoWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{productPricelistView.getProductPriceListVoList(main)}"
+                       rowHover="true" reflow="true" >
+            <p:column headerText="#{lang.productName}" sortBy="#{productPriceListVoVar.productName}" field="product_name" style="width:400px;">              
+              <h:outputText value="#{appView.display(productPriceListVoVar.productName)}" title="#{appView.title(productPriceListVoVar.productName)}" escape="false" />
+            </p:column>
+
+            <p:column headerText="#{lang.batchNumber}" sortBy="#{productPriceListVoVar.batchNo}" field="batch_no" >  
+              <h:outputText value="#{appView.display(productPriceListVoVar.batchNo)}" title="#{appView.title(productPriceListVoVar.batchNo)}" escape="false"/>
+            </p:column>
+
+            <p:column headerText="#{lang.expiryDate}" sortBy="#{productPriceListVoVar.expiryDateActual}" field="expiry_daye_actual" >
+              <h:outputText value="#{appView.date(productPriceListVoVar.expiryDateActual)}" title="#{appView.date(productPriceListVoVar.expiryDateActual)}" escape="false"/>
+            </p:column>
+
+            <p:column headerText="#{lang.mrp}" sortBy="#{productPriceListVoVar.valueMrp}" field="value_mrp" style="text-align: right">
+              <h:outputText value="#{appView.decimal(productPriceListVoVar.valueMrp)}" escape="false" />
+            </p:column>
+
+<!--            <p:column headerText="#{lang.landingPrice}" sortBy="#{productPriceListVoVar.landingRate}" field="landing_rate" style="text-align: right">
+<h:outputText value="#{appView.decimal(productPriceListVoVar.landingRate)}" escape="false" />
+</p:column>-->
+
+            <p:column headerText="#{lang.pts}" sortBy="#{productPriceListVoVar.valuePtsPerProdPieceSell}" field="value_pts_per_prod_piece_sell"  
+                      style="text-align: right" rendered="#{productPricelistView.accountGroupPriceList.isDefault ne 1}">
+
+              <p:inputNumber value="#{productPriceListVoVar.valuePtsPerProdPieceSell}" converterMessage="#{lang.defaults} #{lang.price} #{lang.invalidNumber}"
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" symbol="#{appView.currencySymbol} " maxlength="15" id="valuePtsPerProdPieceSell"  
+                             styleClass="fw" style="color:#{(productPriceListVoVar.valuePtsPerProdPieceSell gt productPriceListVoVar.valueMrp)?'red':'black'};"  >
+                <p:ajax process="@this" event="blur" listener="#{productPriceListVoVar.setDataModified(true)}" />
+              </p:inputNumber>                             
+
+            </p:column>
+            <p:column headerText="#{lang.defaults} #{lang.pts}" style="text-align: right">
+              <h:outputLabel value="#{appView.decimal(productPriceListVoVar.defaultprice)}" escape="false" styleClass="disabled" rendered="#{productPricelistView.accountGroupPriceList.isDefault ne 1}" />
+              <p:inputNumber value="#{productPriceListVoVar.defaultprice}"
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{productPriceListVoVar.valueMrp eq null?999999:productPriceListVoVar.valueMrp}" symbol="#{appView.currencySymbol} " maxlength="15" id="defaultPrice"
+                             style="color:#{(productPriceListVoVar.defaultprice gt productPriceListVoVar.valueMrp)?'red':'black'};" 
+                             rendered="#{productPricelistView.accountGroupPriceList.isDefault eq 1}">
+                <p:ajax process="@this" event="blur" listener="#{productPriceListVoVar.setDataModified(true)}" />
+              </p:inputNumber>
+            </p:column>
+            <p:column headerText="#{lang.ptr}" style="text-align: right" rendered="#{productPricelistView.accountGroupPriceList.isDefault ne 1}">
+              <p:inputNumber value="#{productPriceListVoVar.valuePtrPerProdPiece}"
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" symbol="#{appView.currencySymbol} " maxlength="15" id="valuePtrPerProdPieceSell"
+                             style="color:#{(productPriceListVoVar.valuePtsPerProdPieceSell gt productPriceListVoVar.valueMrp)?'red':'black'};" >
+                <p:ajax process="@this" event="blur" listener="#{productPriceListVoVar.setDataModified(true)}" />
+              </p:inputNumber>
+            </p:column>
+            <p:column headerText="#{lang.defaults} #{lang.ptr}" style="text-align: right">              
+              <h:outputLabel value="#{appView.decimal(productPriceListVoVar.defaultPtr)}" escape="false" styleClass="disabled"  rendered="#{productPricelistView.accountGroupPriceList.isDefault ne 1}"/>         
+              <p:inputNumber value="#{productPriceListVoVar.defaultPtr}"
+                             decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{productPriceListVoVar.valueMrp eq null?999999:productPriceListVoVar.valueMrp}" symbol="#{appView.currencySymbol} " maxlength="15" id="defaultPtr"
+                             style="color:#{(productPriceListVoVar.defaultPtr gt productPriceListVoVar.valueMrp)?'red':'black'};" 
+                             rendered="#{productPricelistView.accountGroupPriceList.isDefault eq 1}">
+                <p:ajax process="@this" event="blur" listener="#{productPriceListVoVar.setDataModified(true)}" />
+              </p:inputNumber>
+            </p:column>
+            <p:column headerText="" style="text-align: right">  
+              <p:commandButton id="tagBtn" process="@this"  icon="fa fa-eye" tabindex="-1" update="overlay" actionListener="#{productPricelistView.loadPriceListDetailsList(main, productPriceListVoVar)}"                             
+                               styleClass="btn" oncomplete="PF('overlay').show();">
+                <!--<f:setPropertyActionListener target="#{productPricelistView.productPriceListVo}" value="#{productPriceListVoVar}" />-->
+
+              </p:commandButton>
+              <p:overlayPanel id="overlay" dynamic="true" dismissable="true"  showCloseIcon="true"  widgetVar="overlay" for="tagBtn" showEvent="none" hideEvent="none" at="left" style="width:auto;min-width: 1100px;" >  
+                <p:panelGrid style="height: 90px;">
+                  <f:facet name="header">
+                    <p:row>
+                      <p:column style="text-align: left;width:13%">Invoice No</p:column>
+                      <p:column style="text-align: left;width:13%">Acc. Invoice No</p:column>
+                      <p:column style="text-align: right;width:5%">PTS</p:column>
+                      <p:column style="text-align: right;width:7%" rendered="#{productPriceListVoVar.isDefault==1}">Sch. Disc.</p:column>
+                      <p:column style="text-align: right;width:7%" rendered="#{productPriceListVoVar.isDefault==1}">Prod. Disc.</p:column>
+                      <p:column style="text-align: right;width:9%">Act. Sell Price</p:column>
+                      <p:column style="text-align: right;width:13%">Margin Perc.</p:column>
+                      <p:column style="text-align: right;width:8%">Exp. Land Rate</p:column>
+                      <p:column style="text-align: right;width:8%">Act. Land Rate</p:column>
+                      <p:column style="text-align: right;width:15%">Margin Deviation</p:column>
+                    </p:row>
+                  </f:facet>
+
+                  <ui:repeat value="#{productPricelistView.productPriceListVo.priceListDetailsList}" var="details">
+                    <p:row>
+                      <p:column style="text-align: left;width:13%">
+                        <p:commandLink actionListener="#{popUpView.showPurchaseByDetailId(main, productPriceListVoVar.productEntryDetailId)}" immediate="true" >
+                          <h:outputText value="#{appView.display(details.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+                        </p:commandLink>
+                      </p:column>
+                      <p:column style="text-align: left;width:13%">#{details.accountInvoiceNo}</p:column>
+                      <p:column style="text-align: right;width:5%">#{details.valuePts}</p:column>
+                      <p:column style="text-align: right;width:7%" rendered="#{productPriceListVoVar.isDefault==1}">#{details.schemeDisc}</p:column>
+                      <p:column style="text-align: right;width:7%" rendered="#{productPriceListVoVar.isDefault==1}">#{details.productDisc}</p:column>
+                      <p:column style="text-align: right;width:9%">#{details.acualSellingPrice}</p:column>
+                      <p:column style="text-align: right;width:13%">#{details.marginPercentage}</p:column>
+                      <p:column style="text-align: right;width:8%">#{details.expectedLandingRate}</p:column>
+                      <p:column style="text-align: right;width:8%">#{details.actualLandingRate}</p:column>
+                      <p:column style="text-align: right;width:15%;" rendered="#{productPricelistView.isGain(details.marginDeviationPerPiece)}">#{details.marginDeviationPerPiece} </p:column>
+                      <p:column style="text-align: right;width:15%;color:#C62828" rendered="#{!productPricelistView.isGain(details.marginDeviationPerPiece)}">#{details.marginDeviationPerPiece}</p:column>
+                    </p:row>
+                  </ui:repeat>
+                </p:panelGrid>
+              </p:overlayPanel>
+            </p:column>
+          </p:dataTable>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>    
+
+
+    <ui:define name="list">
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

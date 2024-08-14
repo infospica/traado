@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasicListForm.xhtml">
+    <ui:param name="label" value="importCustomer" />
+    <ui:param name="ids" value="importCustomer" />
+
+    <ui:define name="form">
+      <h:panelGroup >
+        <table>
+          <tr><td style="padding: 10px">
+              <p:commandButton id="import" value="import customer" styleClass="L btn btn-info" actionListener="#{customerImporterView.actionCustomerImport(main)}"  
+                               immediate="false" process="@this" partialSubmit="true"/></td></tr>
+          <tr> <td style="padding: 10px">
+              <p:commandButton id="deleteCompanyBtn" value="delete company" styleClass="btn btn-danger"
+                               immediate="true" process="@this" partialSubmit="true" onclick="PF('dlg1').show();" /></td></tr>
+
+        </table>
+        <h:panelGroup>
+          <p:dialog header="#{lang.confirmationReqruired}" widgetVar="dlg1" modal="true" closeOnEscape="true" draggable="false"  width="550" resizable="false" position="top" positionType="absolute"
+                    responsive="true" >
+            <p:importConstants type="spica.constant.AccountingConstant" var="ACCOUNTING_CONSTANT" />
+            <h:panelGroup>
+              <div style="text-align: left;padding: 5px;">
+                <span style="font-weight: 400 ;color:#{ACCOUNTING_CONSTANT.COLOR_CR}">You are going to remove the company <b>#{userRuntimeView.company.companyName}</b>. Removed company
+                  CANNOT be restored! Are you ABSOLUTELY sure? </span>
+                <br />
+                This action can lead to data loss. To prevent accidental actions we ask you to confirm your intention.
+                Please type <b>DELETE</b> to proceed or close this modal to cancel. 
+              </div>
+            </h:panelGroup>
+            <h:panelGroup id="companyNameField" >
+              <div style="text-align: left;" >
+                  <p:inputText id="companyName"  styleClass="fw" binding="#{company}"  autocomplete="off" >
+                  <p:ajax event="keyup" update="confirmDeleteFragment"/>
+                </p:inputText>
+              </div>
+              <div style="text-align: left; padding-top: 5px;" >
+                <p:fragment id="confirmDeleteFragment">
+                  <p:commandButton id="confirmDelete" value="Confirm" styleClass="btn btn-danger" disabled="#{!(company.value.toUpperCase() eq lang.deleteCap)}"
+                                   actionListener="#{customerImporterView.actionCompanyDelete(main)}" oncomplete="PF('dlg1').hide()"/>
+                </p:fragment>
+              </div>
+              <p:focus context="companyNameField"/>
+            </h:panelGroup>
+          </p:dialog>
+        </h:panelGroup>
+      </h:panelGroup> 
+      <h:panelGroup id="customerDiv">
+        <p:outputLabel value="#{lang.from}" for="customerImportFrom"/>
+        <p:inputText id="txtCustomerImportFrom" value="#{customerImporterView.fromCustomer.customerName}" readonly="true" styleClass="fw" rendered="#{main.edit}" />
+        <p:autoComplete value="#{customerImporterView.fromCustomer}" completeMethod="#{customerImporterView.customerAuto}" converter="wawo.LookupIntConverter"
+                        id="customerImportFrom" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                        required="true" requiredMessage="#{lang.from} #{lang.isRequired}" rendered="#{!main.edit}"
+                        cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                        style="position: relative" styleClass="fw"  >
+          <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+          <p:ajax event="itemSelect"/>
+        </p:autoComplete>
+        <p:outputLabel value="#{lang.to}" for="customerImportTo"/>
+        <p:inputText id="txtCustomerImportTo" value="#{customerImporterView.toCustomer.customerName}" readonly="true" styleClass="fw" rendered="#{main.edit}" />
+        <p:autoComplete value="#{customerImporterView.toCustomer}" completeMethod="#{customerImporterView.customerAuto}" converter="wawo.LookupIntConverter"
+                        id="customerImportTo" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                        required="true" requiredMessage="#{lang.to} #{lang.isRequired}" rendered="#{!main.edit}"
+                        cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                        style="position: relative" styleClass="fw"  >
+          <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+          <p:ajax event="itemSelect"/>
+        </p:autoComplete>
+        <p:commandButton id="transfer" value="transfer" styleClass="L btn btn-info" actionListener="#{customerImporterView.customerTransfer(main)}"  
+                         immediate="true" process="@this" partialSubmit="true"/>
+
+        <h:commandButton  id="a5" action="#{sysRuntimeView.pushDownTime5()}" value="pushDownTime5"><f:ajax /></h:commandButton>
+        <h:commandButton  id="a1" action="#{sysRuntimeView.pushDownTime1()}" value="pushDownTime1"><f:ajax /></h:commandButton>
+
+
+      </h:panelGroup>
+
+      <h:panelGroup >
+        <div style="height: 100px;" />
+      </h:panelGroup>
+      <h:panelGroup >
+        <div style="height: 100px;" />
+      </h:panelGroup>
+
+    </ui:define>
+
+
+
+
+  </ui:decorate>
+</ui:composition>

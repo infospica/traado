@@ -1,0 +1,108 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{stateView.switchState(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.state}" />
+    <ui:param name="ids" value="state" />
+   
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  onclick="closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{stateView.deleteState(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('stateWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{stateView.cloneState(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{stateView.deleteState(main)}" value="#{lang.delete}" onclick="wdgOff('stateWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{stateView.saveState(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+      <!--Country Name-->
+      <p:outputLabel value="#{lang.country}" for="stateCountryId"/><h:panelGroup>
+        <p:autoComplete  value="#{stateView.state.countryId}" completeMethod="#{stateView.countryAuto}" converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.country} #{lang.isRequired}" id="stateCountryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+        </p:autoComplete><p:message for="stateCountryId" display="text" /></h:panelGroup>            
+
+      <!--State Name-->
+      <p:outputLabel value="#{lang.stateName}" for="stateName" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{stateView.state.stateName}" validator="wawo.WhiteSpaceValidator" maxlength="50" required="true" requiredMessage="#{lang.stateName} #{lang.isRequired}" id="stateName" /><p:message for="stateName" display="text"/></h:panelGroup>
+
+
+      <!--State Code-->
+      <p:outputLabel value="#{lang.stateCode}" for="stateCode" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{stateView.state.stateCode}" validator="wawo.WhiteSpaceValidator" maxlength="50" required="true" requiredMessage="#{lang.stateCode} #{lang.isRequired}" id="stateCode" />
+        <p:message for="stateCode" display="text"/>
+      </h:panelGroup>
+
+
+      <!--Sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup><p:inputNumber value="#{stateView.state.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup> 
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(stateView.state.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(stateView.state.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(stateView.state.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(stateView.state.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(stateView.state.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="stateTable" var="stateVar" widgetVar="stateWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{stateView.stateLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{stateVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{stateView.stateSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- State Name -->
+        <p:column  sortBy="#{stateVar.stateName}" field="state_name" >
+          <f:facet name="header"><h:outputText value="#{lang.stateName}" title="#{lang.stateName}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{stateVar.stateName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{stateView.state}" value="#{stateVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Country -->
+        <p:column  sortBy="#{stateVar.countryId.countryName}" field="country_id.country_name" filterBy="#{stateVar.countryId.countryName}" 
+                   filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.country}" title="#{lang.country}"/></f:facet>
+          <h:outputText value="#{appView.display(stateVar.countryId.countryName)}" title="#{appView.title(stateVar.countryId.countryName)}" escape="false" />
+        </p:column>
+
+        <!-- State Code -->
+        <p:column sortBy="#{stateVar.stateCode}" field="scm_state.state_code">
+          <f:facet name="header"><h:outputText value="#{lang.stateCode}" title="#{lang.stateCode}"/></f:facet>
+          <h:outputText value="#{appView.display(stateVar.stateCode)}" title="#{appView.title(stateVar.stateCode)}" escape="false" />
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(stateVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(stateVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(stateVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(stateVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(stateVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

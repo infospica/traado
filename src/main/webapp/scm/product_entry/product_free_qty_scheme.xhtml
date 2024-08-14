@@ -1,0 +1,319 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{productFreeQuantitySchemeView.switchProductFreeQtyScheme(main,main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasicListForm.xhtml">
+
+    <ui:param name="label" value="#{lang.freeQuantityScheme}"/>
+    <ui:param name="subLabel" value="#{productFreeQuantitySchemeView.productName}"/>
+    <ui:param name="labelOnly" value="true"/>   
+    <ui:param name="ids" value="prdEntFrQtySchm" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="toolList" value="true"/>
+    <ui:param name="toolForm" value="true"/>
+    <ui:param name="more" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="navLabel" value=""/>
+    <ui:define name="deleteList" ></ui:define>
+    <ui:define name="deleteForm" ></ui:define>
+    <ui:define name="menu1" ></ui:define>
+    <ui:param name="newList" value="#{!productFreeQuantitySchemeView.productEntryConfirmed}"/>
+    <ui:param name="reset" value="#{!productFreeQuantitySchemeView.productEntryConfirmed}"/>
+
+    <ui:define name="save" >
+      <p:commandButton action="#{productFreeQuantitySchemeView.saveProductFreeQtyScheme(main)}" value="#{lang.save}" onclick="toTop()" 
+                       rendered="#{!productFreeQuantitySchemeView.productEntryConfirmed}"
+                       styleClass="btn btn-primary" update="f1" process="f1">
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" 
+                       actionListener="#{productFreeQuantitySchemeView.productFreeQtySchemePopupClose()}"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default" 
+                       oncomplete="parent.productFreeQtySchemePopupReturned(); closePopup();"
+                       />
+    </ui:define>
+
+    <ui:define name="leftLeftList" >
+      <p:commandButton  immediate="true" partialSubmit="true" actionListener="#{productFreeQuantitySchemeView.insertProductFreeQtyScheme}"
+                        rendered="#{!productFreeQuantitySchemeView.productEntryConfirmed}"
+                        title="#{lang.select}" oncomplete="selectFreeScheme(xhr, status, args);" icon="fa fa-check" iconPos="left" styleClass="btn btn-default" value="#{lang.select}">
+        <f:setPropertyActionListener target="#{productFreeQuantitySchemeView.productFreeSchemeId}" value="#{productFreeQuantitySchemeView.productFreeQtyScheme.id}" />
+      </p:commandButton>
+
+      <p:dialog widgetVar="emptyDatatableVar" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+        <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+        <p:commandButton value="#{lang.btnOk}" onclick="PF('emptyDatatableVar').hide();" type="button" title="#{lang.btnYes}" />
+      </p:dialog>
+
+      <script>
+        //<![CDATA[
+        function selectFreeScheme(xhr, status, args) {
+          var freeid = args.schemeId;
+          if (freeid === '') {
+            PF('emptyDatatableVar').show();
+          } else {
+            parent.productFreeQtySchemePopupReturned();
+            closePopup();
+          }
+        }
+        //]]>
+      </script>
+    </ui:define>
+
+    <ui:define name="list">      
+      <p:dataTable id="productFreeQtySchemeTable"
+                   var="productFreeQtySchemeVar"
+                   widgetVar="productFreeQtySchemeWidget"
+                   tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true"
+                   value="#{productFreeQuantitySchemeView.productFreeQtySchemeLazyModel}"
+                   rows="#{main.pageData.pageSize}"
+                   rowKey="#{productFreeQtySchemeVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize}"
+                   paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productFreeQuantitySchemeView.productFreeQtyScheme}"
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false">
+
+        <p:ajax event="rowSelectRadio" listener="#{productFreeQuantitySchemeView.onRowSelect}" update="prdEntFrQtySchmF"  />
+        <p:column selectionMode="single"/>
+        <!-- Scheme Name -->
+        <p:column headerText="#{lang.schemeName}" sortBy="#{productFreeQtySchemeVar.schemeName}" field="scheme_name" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(productFreeQtySchemeVar.schemeName)}"  process="@this" update="f1"
+                         immediate="true" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productFreeQuantitySchemeView.productFreeQtyScheme}" value="#{productFreeQtySchemeVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Product Batch -->
+        <p:column headerText="#{lang.product} #{lang.batch}" sortBy="#{productFreeQtySchemeVar.productDetailId.batchNo}" field="product_detail_id.batch_no" >
+          <h:outputText value="#{appView.display(productFreeQtySchemeVar.productDetailId.batchNo)}" />
+        </p:column>
+
+        <!-- Benefit -->
+        <p:column headerText="#{lang.benefit}" sortBy="#{productFreeQtySchemeVar.isFreeQtyToCustomer}" field="is_free_qty_to_cusomer" >
+          <h:outputText value="Customer" escape="false" rendered="#{productFreeQtySchemeVar.isFreeQtyToCustomer==1}"/>
+          <h:outputText value="Company" escape="false" rendered="#{productFreeQtySchemeVar.isFreeQtyToCustomer==0}"/>
+        </p:column>
+
+        <!-- Scheme By Range -->
+        <p:column headerText="#{lang.schemeByRange}" sortBy="#{productFreeQtySchemeVar.freeQuantitySchemeByRange}" field="free_quantity_scheme_by_range" >
+          <h:outputText value="Yes" escape="false" rendered="#{productFreeQtySchemeVar.freeQuantitySchemeByRange==1}"/>
+          <h:outputText value="No" escape="false" rendered="#{productFreeQtySchemeVar.freeQuantitySchemeByRange==0}"/>
+        </p:column>
+
+        <!-- Scheme Unit -->
+        <p:column headerText="#{lang.freeQuantitySchemeUnit}" sortBy="#{productFreeQtySchemeVar.freeQuantitySchemeUnitId}" field="free_quantity_scheme_unit" >
+          <h:outputText value="#{appView.display(productFreeQtySchemeVar.freeQuantitySchemeUnitId.title)}" escape="false"/>
+        </p:column>
+
+        <!-- Buy Quantity -->
+        <p:column headerText="#{lang.buyQuantity}" sortBy="#{productFreeQtySchemeVar.freeQtySchemeUnitQtyFor}" field="free_qty_scheme_unit_qty_for" >
+          <h:outputText value="#{appView.number(productFreeQtySchemeVar.freeQtySchemeUnitQtyFor)}" escape="false" />
+        </p:column>
+
+        <!-- Get Quantity -->
+        <p:column headerText="#{lang.getQuantity}" sortBy="#{productFreeQtySchemeVar.freeQtySchemeUnitQtyFree}" field="free_qty_scheme_unit_qty_free" >
+          <h:outputText value="#{appView.number(productFreeQtySchemeVar.freeQtySchemeUnitQtyFree)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.log}"  exportable="false">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(productFreeQtySchemeVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productFreeQtySchemeVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productFreeQtySchemeVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productFreeQtySchemeVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(productFreeQtySchemeVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>      
+
+    </ui:define>
+
+
+    <ui:define name="form">
+      <ui:param name="ids" value="conTab" />
+      <ui:param name="label" value="" />
+
+      <!-- Scheme Name -->
+      <p:outputLabel value="#{lang.schemeName}" for="schemeName" />      
+      <h:panelGroup>
+        <p:inputText value="#{productFreeQuantitySchemeView.productFreeQtyScheme.schemeName}" maxlength="400" required="true" styleClass="fw"
+                     requiredMessage="#{lang.schemeName} #{lang.isRequired}" id="schemeName" />
+        <p:message for="schemeName" display="text"/>
+      </h:panelGroup>
+
+      <!-- Purchase Entry Free Qty Purchase Benefit -->
+      <p:outputLabel value="#{lang.purchaseEntryFreeQtyPurchaseBenefit}" for="isPurchaseBenefit" />
+      <h:panelGroup>
+        <p:selectOneRadio value="#{productFreeQuantitySchemeView.productFreeQtyScheme.isFreeQtyToCustomer}"  id="isPurchaseBenefit" required="true" 
+                          requiredMessage="#{lang.purchaseEntryFreeQtyPurchaseBenefit} #{lang.isRequired}">
+          <f:selectItem itemLabel="#{lang.company}" itemValue="#{0}"/>
+          <f:selectItem itemLabel="#{lang.customer}" itemValue="#{1}"/>
+          <p:ajax listener="#{productFreeQuantitySchemeView.ajaxBehaviorEventHandler}" update="replacementLabel repalcementText schemeByRangeLabel schemeByRangeText
+                  freeQtySchemeUnitQtyForLabel freeQtySchemeUnitQtyForText freeQtySchemeUnitQtyFreeLabel freeQtySchemeUnitQtyFreeText rangeDiv schemeUnitDiv schemeUnitLbl" />
+        </p:selectOneRadio>
+        <p:message for="isPurchaseBenefit" display="text"/>
+      </h:panelGroup>
+
+      <!-- replacement -->
+      <h:panelGroup id="replacementLabel">
+        <p:outputLabel value="#{lang.replacement}" for="replacement" rendered="#{!productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="repalcementText">
+        <p:selectOneRadio value="#{productFreeQuantitySchemeView.productFreeQtyScheme.replacement}"  id="replacement" rendered="#{!productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}"
+                          required="true" requiredMessage="#{lang.replacement} #{lang.isRequired}">
+          <f:selectItem itemLabel="#{lang.yes}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.no}" itemValue="#{0}" />
+        </p:selectOneRadio>
+        <p:message for="replacement" display="text"/>
+      </h:panelGroup>
+
+      <!-- Scheme Unit -->
+      <h:panelGroup id="schemeUnitLbl">
+        <p:outputLabel value="#{lang.freeQuantitySchemeUnit}" for="freeQuantitySchemeUnit" rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}" />
+      </h:panelGroup>
+      <h:panelGroup id="schemeUnitDiv">
+        <p:selectOneMenu styleClass="fw" value="#{productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeUnitId}" converter="omnifaces.SelectItemsConverter"
+                         id="freeQuantitySchemeUnit" required="true" requiredMessage="#{lang.freeQuantitySchemeUnit} #{lang.isRequired}"
+                         rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}">
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+          <f:selectItems value="#{productFreeQuantitySchemeView.lookUpProductPackingUnits(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          <p:ajax event="itemSelect" listener="#{productFreeQuantitySchemeView.updateSchemeType}" immediate="true" update="buyQtyLabel getQtyLabel" />
+        </p:selectOneMenu>
+        <p:message for="freeQuantitySchemeUnit" display="text"/>
+      </h:panelGroup>
+
+      <!-- Scheme By Range -->
+      <h:panelGroup id="schemeByRangeLabel">
+        <p:outputLabel value="#{lang.schemeByRange}" for="schemeByRange" rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="schemeByRangeText">
+        <p:selectOneRadio value="#{productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange}"  id="schemeByRange" rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}"
+                          required="true" requiredMessage="#{lang.schemeByRange} #{lang.isRequired}">
+          <f:selectItem itemLabel="#{lang.yes}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.no}" itemValue="#{0}" />
+          <p:ajax listener="#{productFreeQuantitySchemeView.ajaxBehaviorEventHandlerScheme}" update="freeQtySchemeUnitQtyForLabel
+                  freeQtySchemeUnitQtyForText freeQtySchemeUnitQtyFreeLabel freeQtySchemeUnitQtyFreeText rangeDiv" />
+        </p:selectOneRadio>
+        <p:message for="schemeByRange" display="text"/>
+      </h:panelGroup>
+
+      <!-- Scheme Type -->
+      <h:panelGroup id="freeQtySchemeUnitQtyForLabel">
+        <p:outputLabel value="#{lang.schemeType}" for="freeQtySchemeUnitQtyFor" 
+                       rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"/>
+      </h:panelGroup>
+
+      <!-- Buy quantity -->
+      <h:panelGroup id="freeQtySchemeUnitQtyForText">
+        <p:outputLabel value="#{lang.buy} " rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"  />
+        <p:inputNumber value="#{productFreeQuantitySchemeView.productFreeQtyScheme.freeQtySchemeUnitQtyFor}" maxlength="100"
+                       inputStyle="text-align: center;" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0"
+                       id="freeQtySchemeUnitQtyFor" converterMessage="#{lang.buyQuantity} #{lang.invalidNumber}"
+                       rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"
+                       required="true" requiredMessage="#{lang.buyQuantity} #{lang.isRequired}" />
+        <p:outputLabel value="#{productFreeQuantitySchemeView.schemeUnit}" id="buyQtyLabel" rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"  />
+        <p:message for="freeQtySchemeUnitQtyFor" display="text"/>
+      </h:panelGroup>
+
+      <!-- Empty Label -->
+      <h:panelGroup id="freeQtySchemeUnitQtyFreeLabel">
+        <p:outputLabel value="" rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"/>
+      </h:panelGroup>
+
+      <!-- Get Quantity -->
+      <h:panelGroup id="freeQtySchemeUnitQtyFreeText">
+        <p:outputLabel value="#{lang.get} " rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"  />
+        <p:inputNumber value="#{productFreeQuantitySchemeView.productFreeQtyScheme.freeQtySchemeUnitQtyFree}" converterMessage="#{lang.getQuantity} #{lang.invalidNumber}"
+                       inputStyle="text-align: center;" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="freeQtySchemeUnitQtyFree" 
+                       rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"
+                       required="true" requiredMessage="#{lang.getQuantity} #{lang.isRequired}" />
+        <p:outputLabel value="#{productFreeQuantitySchemeView.schemeUnit}" id="getQtyLabel" rendered="#{productFreeQuantitySchemeView.isPurchasBenefitToCustomer() and !productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.productFreeQtyScheme.freeQuantitySchemeByRange!=null}"  />
+        <p:message for="freeQtySchemeUnitQtyFree" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="after">
+      <h:panelGroup id="rangeDiv" >
+        <h:panelGroup layout="block" styleClass="row" rendered="#{productFreeQuantitySchemeView.renderRangeDiv() and productFreeQuantitySchemeView.isPurchasBenefitToCustomer()}">
+          <h:panelGroup layout="block" id="TypeDiv" styleClass="col-md-12">
+            <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+              <ui:param name="label" value="#{lang.schemeByRange}" />
+              <ui:define name="menuleft">
+                <p:commandButton action="#{productFreeQuantitySchemeView.addNewRange(main)}" update="rangeTableDiv"
+                                 rendered="#{!productFreeQuantitySchemeView.productEntryConfirmed}"
+                                 process="TypeDiv" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info">
+                </p:commandButton>
+              </ui:define>
+
+              <h:panelGroup layout="block" id="rangeTableDiv">
+                <p:dataTable id="prdEntFrQtySchmRangTable" var="prdEntFrQtySchmRangVar" widgetVar="prdEntFrQtySchmRangWidget"
+                             tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                             lazy="true" value="#{productFreeQuantitySchemeView.prodFreeQtySchemeRangeList}" rows="#{main.pageData.pageSize}" rowKey="#{prdEntFrQtySchmRangVar.id}"
+                             rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"
+                             scrollable="false" rowIndexVar="index">
+
+                  <p:column headerText="#{lang.rangeFrom}" sortBy="#{prdEntFrQtySchmRangVar.rangeFrom}" field="range_from" style="text-align: right">
+                    <h:panelGroup>
+                      <p:inputNumber value="#{prdEntFrQtySchmRangVar.rangeFrom}" converterMessage="#{lang.rangeFrom} #{lang.invalidNumber}"
+                                     decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="rangeFrom"                                     
+                                     required="true" requiredMessage="#{lang.rangeFrom} #{lang.isRequired}">                        
+                      </p:inputNumber>
+                      <p:message for="rangeFrom" display="text"/>
+                    </h:panelGroup>
+                  </p:column>
+
+                  <p:column headerText="#{lang.rangeTo}" sortBy="#{prdEntFrQtySchmRangVar.rangeTo}" field="range_to" style="text-align: right">
+                    <h:panelGroup>
+                      <p:inputNumber value="#{prdEntFrQtySchmRangVar.rangeTo}" converterMessage="#{lang.rangeTo} #{lang.invalidNumber}"
+                                     rendered="#{!productFreeQuantitySchemeView.singleRangeList}"
+                                     decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="rangeTo1" />
+                      <p:inputNumber value="#{prdEntFrQtySchmRangVar.rangeTo}" converterMessage="#{lang.rangeTo} #{lang.invalidNumber}"
+                                     required="true" requiredMessage="#{lang.rangeTo} #{lang.isRequired}"
+                                     decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="rangeTo2" rendered="#{productFreeQuantitySchemeView.singleRangeList}" />
+                      <p:message for="rangeTo1" display="text"/>
+                      <p:message for="rangeTo2" display="text"/>
+                    </h:panelGroup>
+                  </p:column>
+
+                  <p:column headerText="#{lang.Free} #{lang.qty}" sortBy="#{prdEntFrQtySchmRangVar.freeQty}" field="free_qty" style="text-align: right">
+                    <h:panelGroup>
+                      <p:inputNumber value="#{prdEntFrQtySchmRangVar.freeQty}" converterMessage="#{lang.Free} #{lang.qty} #{lang.invalidNumber}"
+                                     decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="freeQty"
+                                     required="true" requiredMessage="#{lang.Free} #{lang.qty} #{lang.isRequired}" inputStyleClass="submit_a_#{index}"/>
+                      <p:message for="freeQty" display="text"/>
+                    </h:panelGroup>
+                  </p:column>
+                  <p:column>
+                    <p:commandButton action="#{productFreeQuantitySchemeView.deleteSchemeByRange(main,prdEntFrQtySchmRangVar)}" process="@this"
+                                     value="" update="prdEntFrQtySchmRangTable" icon="fa fa-trash" immediate="true">
+                      <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                    </p:commandButton>
+                  </p:column>
+                </p:dataTable>
+              </h:panelGroup>
+              <script>
+                function setEdit(id) {
+                  $('#' + id + '\\:0\\:editRow > .ui-icon-pencil').trigger('click');
+                }
+                function submitForm(params) {
+                  $('#prdEntFrQtySchmRangTable\\:' + params[2] + '\\:editRow > .ui-icon-check').trigger('click');
+//                     setEdit('prdEntFrQtySchmRangTable');
+                }
+                function pageRefresh() {
+                  page.refresh();
+                }
+              </script>
+            </ui:decorate>
+          </h:panelGroup>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+
+</ui:composition>

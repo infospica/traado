@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+  #{consignmentReceiptDetailView.switchConsignmentReceiptDetail(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{consignmentReceiptDetailView.consignmentReceiptDetail.consignmentCommodityId.consignmentId.consignmentNo}" />
+    <ui:param name="subLabel" value="#{consignmentReceiptDetailView.consignmentReceiptDetail.consignmentCommodityId.commodityName}" />
+    <ui:param name="labelLevel3" value="#{lang.receiptDetail}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="consignmentReceiptPlan" />
+    <ui:define name="more" ></ui:define>
+    <ui:define name="reset"></ui:define>
+    <ui:define name="deleteForm"></ui:define>
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{consignmentReceiptDetailView.consignmentReceiptDetailPopupClose}"
+                       oncomplete="parent.consignmentCommodityPopupReturned(); closePopup()"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="save" >
+      <h:commandButton action="#{consignmentReceiptDetailView.saveConsignmentReceiptDetail(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+          <h:commandButton actionListener="#{consignmentReceiptDetailView.saveConsignmentReceiptDetailClose(main)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" onclick="toTop()"  styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup}"> <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+    </ui:define>
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.good} #{lang.qty}" for="commodityQtyGood" />
+      <h:panelGroup>
+        <p:inputNumber value="#{consignmentReceiptDetailView.consignmentReceiptDetail.commodityQtyGood}" converterMessage="#{lang.good} #{lang.qty} #{lang.invalidNumber}"
+                       decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="commodityQtyGood" autocomplete="off" />
+        <p:message for="commodityQtyGood" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.damaged} #{lang.qty}" for="commodityQtyDamaged" />
+      <h:panelGroup>
+        <p:inputNumber value="#{consignmentReceiptDetailView.consignmentReceiptDetail.commodityQtyDamaged}" converterMessage="#{lang.damaged} #{lang.qty} #{lang.invalidNumber}"
+                       decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="commodityQtyDamaged" autocomplete="off" />
+        <p:message for="commodityQtyDamaged" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.shortage} #{lang.qty}" for="commodityQtyShortage" />
+      <h:panelGroup>
+        <p:inputNumber value="#{consignmentReceiptDetailView.consignmentReceiptDetail.commodityQtyShortage}" converterMessage="#{lang.shortage} #{lang.qty} #{lang.invalidNumber}"
+                       decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="commodityQtyShortage" autocomplete="off" />
+        <p:message for="commodityQtyShortage" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.excess} #{lang.qty}" for="commodityQtyExcess" />
+      <h:panelGroup>
+        <p:inputNumber value="#{consignmentReceiptDetailView.consignmentReceiptDetail.commodityQtyExcess}" converterMessage="#{lang.excess} #{lang.qty} #{lang.invalidNumber}"
+                       decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="commodityQtyExcess" autocomplete="off" />
+        <p:message for="commodityQtyExcess" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+
+  </ui:decorate>
+</html>
+

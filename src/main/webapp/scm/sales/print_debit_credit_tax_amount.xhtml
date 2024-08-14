@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"> 
+  <div style="width:100%; border:solid 1px #000;border-top-style: none;" >
+    <table style="width:100%;border-collapse: collapse;" border="0">
+      <tr>
+        <td style="width:73%;" align="left" valign="top">
+          <div style="width:100%;border: solid 1px #000000;border-top-style: none;border-bottom-style: none;border-left-style: none;">
+            <table style="font-size:7.5px;">
+              <tr style="font-size: 7.5px;">
+                <td align="left" style="width:150px;">
+                  Total items: <span class="data"><b>#{debitCreditNotePrintView.debitCreditNoteItemList.size()}</b></span> 
+                </td>
+                <td> 
+
+                </td>
+                <td> </td>
+              </tr>
+            </table>
+          </div>
+          <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1}">
+            <table border="0" style="width:100%; border-left-style: none;" >
+              <tr class="data"  style="font-size: 7.5px;border-collapse: collapse;">
+                <td class="cellTable" align="center" style="border-left-style: none;" >GST %</td>
+                <td class="cellTable" align="center" >Item Count</td> 
+                <td class="cellTable" align="center" >Taxable</td>                              
+                <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                  <td class="cellTable" align="center" >CGST%</td>  
+                </p:fragment>
+                <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                  <td class="cellTable" align="center" >Value</td>  
+                </p:fragment>
+                <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                  <td class="cellTable" align="center" >SGST%</td>  
+                </p:fragment>
+                <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                  <td class="cellTable" align="center" >Value</td>  
+                </p:fragment>
+                <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1}">
+                  <td class="cellTable" align="center" >GST Value</td>  
+                </p:fragment>              
+                <td class="cellTable" align="center" >Net Value</td>
+              </tr>
+              <ui:repeat value="#{debitCreditNotePrintView.debitCreditNote.invoiceGroup}" var="group">
+                <tr class="data" style="font-size: 7.5px;">
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;" >#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}&#160;</td>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;" >#{group.productQuantity eq null ? '0' : group.productQuantity}&#160;</td>                  
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}&#160;</td>
+                  <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                    <td class="verticalLine" style="padding-top:2px;text-align: right;">#{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, AccountingConstant.TAX_TYPE_CGST).ratePercentage)}&#160;</td>
+                  </p:fragment>
+                  <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                    <td class="verticalLine" style="padding-top:2px;text-align: right;">#{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}&#160;</td>
+                  </p:fragment>
+                  <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                    <td class="verticalLine" style="padding-top:2px;text-align: right;">#{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, AccountingConstant.TAX_TYPE_SGST).ratePercentage)}&#160;</td>
+                  </p:fragment>
+                  <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1 and debitCreditNotePrintView.intrastate}">
+                    <td class="verticalLine" align="right" valign="middle">#{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}&#160;</td>
+                  </p:fragment>
+                  <p:fragment rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1}">
+                    <td class="verticalLine" style="padding-top:2px;text-align: right;border-right:1px solid #000;">
+                      #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}&#160;
+                    </td>
+                  </p:fragment>
+                  <td class="verticalLine" style="padding-top:2px;text-align: right;border-right:1px solid #000;">
+                    #{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}&#160;
+                  </td>
+                </tr>
+              </ui:repeat>
+            </table>
+
+          </p:fragment>
+
+
+          <div style="border:1px solid #000000;border-bottom-style: none;border-left-style: none; padding: 5px;min-height: 45px;" class="data" >
+            Invoice Amount in words: <b>
+              <span>#{debitCreditNotePrintView.curencyWords(debitCreditNotePrintView.debitCreditNote.netValue)}&#160; 
+                <h:outputText value="#{lang.only}" rendered="#{debitCreditNotePrintView.debitCreditNote.netValue gt 0}" /> </span>
+            </b><br />
+
+          </div>
+        </td>
+        <td  valign="top">
+          <div class="data" style="padding:5px;border:solid 1px #000;border:none;">
+            <table border="0" style="width:100%;">
+              <tr>
+                <td style="height:12px;"> Taxable Value</td>
+                <td align="right" >
+                  <h:outputText value="#{debitCreditNotePrintView.debitCreditNote.assessableValue eq null ? '0.00' : appView.decimal(debitCreditNotePrintView.debitCreditNote.assessableValue)}" />
+
+                </td>
+              </tr>
+
+              <tr>
+                <td style="height:12px;" >GST Value</td>
+                <td align="right">
+                  <h:panelGroup layout="block" rendered="#{debitCreditNotePrintView.debitCreditNote.taxableInvoice eq 1}">
+                    <h:outputText value="#{debitCreditNotePrintView.debitCreditNote.igstValue eq null ? '0.00' : appView.decimal(debitCreditNotePrintView.debitCreditNote.igstValue)}" />
+                  </h:panelGroup>
+
+                </td>
+              </tr>
+
+              <tr>
+                <td align="right" style="height:12px;" >Total</td>
+                <td align="right">
+                  <h:outputText value="#{debitCreditNotePrintView.debitCreditNote.grandTotal  eq null ? '0.00' : appView.decimal(debitCreditNotePrintView.debitCreditNote.grandTotal)}" />
+                </td>
+              </tr>
+              <tr class="dataTitle">
+                <td style="height:15px; width:70px;font-size: 9px;" ><b> Net Amount</b></td>
+                <td align="right" style="font-size: 9px;"> <b>
+                    <h:outputText value="#{debitCreditNotePrintView.debitCreditNote.netValue eq null ? '0.00' : appView.decimal(debitCreditNotePrintView.debitCreditNote.netValue)}" />
+                  </b></td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</ui:composition>

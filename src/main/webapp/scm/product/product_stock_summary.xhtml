@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{productStockSummaryView.setProductStockSummaryList(null)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.productStock}"/>
+    <ui:param name="ids" value="productStockSummary"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="productStockSummaryST" onkeyup="return callDtFilter(this.value, 'productStockSummary');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="list">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+
+      <p:dataTable id="productStockSummaryTable" var="row" widgetVar="productStockSummaryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{productStockSummaryView.getProductStockSummaryList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.productName}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorPosition="bottom" 
+                   paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                   rowHover="true" reflow="true" paginatorAlwaysVisible="false">
+
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('productStockSummaryWidget').filter();" />
+          </p:outputPanel>
+        </f:facet>
+
+        <p:column sortBy="#{row.productName}" styleClass="w-300" filterBy="#{row.productName}" filterStyleClass="hidden" >
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <p:commandLink action="#{productStockSummaryView.productStockDetailPopup(row)}" value="#{row.productName}" process="@this" immediate="true" title="#{lang.editMe}">
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{row.saleable}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.saleable}" title="#{lang.saleable}"/></f:facet>
+          <h:outputText value="#{appView.number(row.saleable)}" escape="false" />    
+          <f:facet name="footer"><h:outputText value="#{productStockSummaryView.saleable eq 0?null:productStockSummaryView.saleable}" title="#{productStockSummaryView.saleable}"/></f:facet>
+        </p:column>
+
+<!--        <p:column sortBy="#{row.freeSaleable}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.freeSaleable}" title="#{lang.freeSaleable}"/></f:facet>
+          <h:outputText value="#{appView.number(row.freeSaleable)}" escape="false" />
+          <h:outputText value=" (#{appView.number(row.freeBlocked)})" style="color: red;" escape="false" rendered="#{row.freeBlocked gt 0}" />
+        </p:column>-->
+
+        <p:column sortBy="#{row.blocked}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.blocked}" title="#{lang.blocked}"/></f:facet>
+          <h:outputText value="#{appView.number(row.blocked)}" escape="false" />
+          <f:facet name="footer"><h:outputText value="#{productStockSummaryView.blocked eq 0?null:productStockSummaryView.blocked}" title="#{productStockSummaryView.blocked}"/></f:facet>
+        </p:column>
+
+<!--        <p:column sortBy="#{row.freeBlocked}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.freeBlocked}" title="#{lang.freeBlocked}"/></f:facet>
+          <h:outputText value="#{appView.number(row.freeBlocked)}" escape="false" />
+        </p:column>-->
+
+        <p:column sortBy="#{row.damaged}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.damaged}" title="#{lang.damaged}"/></f:facet>
+          <h:outputText value="#{appView.number(row.damaged)}" escape="false" />
+          <f:facet name="footer"><h:outputText value="#{productStockSummaryView.damaged eq 0?null:productStockSummaryView.damaged}" title="#{productStockSummaryView.damaged}"/></f:facet>
+        </p:column>
+
+<!--        <p:column sortBy="#{row.freeDamaged}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.freeDamaged}" title="#{lang.freeDamaged}"/></f:facet>
+          <h:outputText value="#{appView.number(row.freeDamaged)}" escape="false" />
+        </p:column>
+        -->  
+        <p:column sortBy="#{row.expired}" style="text-align: right"  >
+          <f:facet name="header"><h:outputText value="#{lang.expired}" title="#{lang.expired}"/></f:facet>
+          <h:outputText value="#{appView.number(row.expired)}" escape="false" />
+          <f:facet name="footer"><h:outputText value="#{productStockSummaryView.expired eq 0 ?null:productStockSummaryView.expired}" title="#{productStockSummaryView.expired}"/></f:facet>
+        </p:column>
+
+<!--        <p:column sortBy="#{row.freeExpired}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.freeExpired}" title="#{lang.freeExpired}"/></f:facet>
+          <h:outputText value="#{appView.number(row.freeExpired)}" escape="false" />
+        </p:column>-->
+
+        <p:column sortBy="#{row.excess}" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.excess}" title="#{lang.excess}" /></f:facet>
+          <h:outputText value="#{appView.number(row.excess)}" escape="false" />
+          <f:facet name="footer"><h:outputText value="#{productStockSummaryView.excess eq 0 ? null :productStockSummaryView.excess}" title="#{productStockSummaryView.excess}"/></f:facet>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

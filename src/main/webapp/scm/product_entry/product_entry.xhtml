@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{productEntryView.switchProductEntry(main, viewType, openingStock)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{productEntryView.openingStockEntry ? lang.openingStockEntry : lang.invoiceEntry}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? productEntryView.productEntry.invoiceNo : null}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? productEntryView.productEntry.productEntryStatusId.title : null}" />
+    <ui:param name="ids" value="productEntry" />
+    <ui:param name="showForm" value="false" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productEntryView.deleteProductEntry(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productEntryWidgetDelConf')" process="f1" update="f1" 
+                       rendered="#{!productEntryView.tradeClosed}" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productEntryView.cloneProductEntry(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"
+                  rendered="#{!productEntryView.tradeClosed}"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productEntryView.deleteProductEntry(main)}" value="#{lang.delete}" onclick="wdgOff('productEntryWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete"
+                       rendered="#{!productEntryView.tradeClosed}" />
+    </ui:define>
+
+    <ui:define name="save" >
+    </ui:define>   
+    <ui:define name="newList">
+      <h:commandButton action="#{productEntryView.actionNewForm(main)}" immediate="true" value="#{lang.newform}" styleClass="btn btn-info"
+                       rendered="#{!productEntryView.tradeClosed}">
+        <f:ajax execute="f1" render="f1"/>
+      </h:commandButton>
+    </ui:define>
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{productEntryView.dialogClose()}" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="toolbar" />
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >      
+      <p:commandButton id="r2" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{productEntryView.actionResetAllInvoiceEntry(main)}"
+                       rendered="#{userRole.isRoot() and productEntryView.productEntryLazyModel.rowAvailable and !productEntryView.tradeClosed}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>      
+      <p:commandButton id="contractId" value="#{lang.create} #{lang.contact}" styleClass="btn btn-danger" process="@this" update="f1"                       
+                       rendered="#{productEntryView.contractCreate}" actionListener="#{popUpView.showActiveAccountContractWithTab()}" >
+
+      </p:commandButton>
+
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productEntryTable" var="productEntryVar" widgetVar="productEntryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{productEntryView.productEntryLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productEntryVar.id}"
+                   editable="true"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productEntryView.productEntrySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:ajax event="rowEdit" listener="#{productEntryView.accountInvoiceNoEdit(main,productEntryVar)}"/>
+
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column sortBy="#{productEntryVar.invoiceNo}" field="invoice_no">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}"
+                         value="#{appView.display(productEntryVar.invoiceNo)}"
+                         process="@this" update="f1" immediate="true"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productEntryView.productEntry}" value="#{productEntryVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{productEntryVar.accountInvoiceNo}" field="account_invoice_no">
+          <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+          <p:cellEditor>
+            <f:facet name="input">
+              <h:inputText value="#{productEntryVar.accountInvoiceNo}" >
+              </h:inputText>
+            </f:facet>
+            <f:facet name="output">
+              <h:outputText value="#{productEntryVar.accountInvoiceNo}" >
+              </h:outputText>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+        <p:column  sortBy="#{productEntryVar.referenceNo}" rendered ="#{productEntryView.productEntry.companyId.companySettings.enableCompanyPrefix eq 1 }" 
+                   field="reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>
+          <h:outputText value="#{productEntryVar.referenceNo}" escape="false" />
+        </p:column>
+        <p:column headerText="" styleClass="C" style="width:50px;">
+          <p:rowEditor id="editRow" rendered="#{productEntryVar.accountInvoiceNo ne null and userRuntimeView.privilege.resetToDraft==true}" >
+          </p:rowEditor>
+        </p:column>
+
+        <p:column  sortBy="#{productEntryVar.invoiceDate}" field="invoice_date" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.date(productEntryVar.invoiceDate)}" escape="false" />
+        </p:column>
+
+        <p:column  sortBy="#{productEntryVar.productEntryDate}" field="product_entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(productEntryVar.productEntryDate)}" escape="false" />
+        </p:column>
+
+        <p:column  sortBy="#{productEntryVar.invoiceAmountNet}" field="invoice_amount_net" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(productEntryVar.invoiceAmount)}" escape="false" />
+        </p:column>
+
+        <p:column  sortBy="#{productEntryVar.productEntryStatusId.title}" field="product_entry_status.title" width="100" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{productEntryVar.productEntryStatusId.title}" escape="false"  
+                        styleClass="m-r-5 #{sysRuntimeView.statusStyle(productEntryVar.productEntryStatusId.id)}" 
+                        style="background-color: #{sysRuntimeView.statusColor(productEntryVar.productEntryStatusId.id)}"/>          
+
+          <h:outputText value="Tax Variation" escape="false"  
+                        styleClass="label"  rendered="#{productEntryVar.isTaxCodeModified eq 1}"
+                        style="background-color: #f10b0b;"/>
+
+
+        </p:column>
+
+        <!-- Remarks -->
+        <p:column headerText="#{lang.remarks}" sortBy="#{productEntryVar.note}" field="scm_product_entry.note"
+                  style="text-align:left;padding-left: 5px;white-space: normal;" width="300" styleClass="wrap">
+          <h:outputText value="#{appView.display(productEntryVar.note)}" title="#{salesInvoiceVar.note}" />
+        </p:column>
+
+
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(productEntryVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productEntryVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productEntryVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productEntryVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(productEntryVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>   
+  </ui:decorate>
+
+  <ui:fragment rendered="#{main.isForm() and productEntryView.taxCalculator.productEntryForm eq '/scm/product_entry/gst_india/product_entry_gst_india.xhtml'}">    
+    <ui:include src="/scm/product_entry/gst_india/product_entry_gst_india.xhtml" />
+  </ui:fragment>
+
+</ui:composition>

@@ -1,0 +1,167 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesReturnReceiptView.switchSalesReturnReceipt(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesReturnReceipt}" />
+    <ui:param name="ids" value="salesReturnReceipt" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true"
+                       oncomplete="parent.salesReturnReceiptReturned();closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesReturnReceiptView.deleteSalesReturnReceipt(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesReturnReceiptWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesReturnReceiptView.cloneSalesReturnReceipt(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesReturnReceiptView.deleteSalesReturnReceipt(main)}" value="#{lang.delete}" onclick="wdgOff('salesReturnReceiptWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesReturnReceiptView.saveSalesReturnReceipt(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-success"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <!-- Customer -->
+      <p:outputLabel value="#{lang.customer}" for="salesReturnReceiptCustomerId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{salesReturnReceiptView.salesReturnReceipt.customerId}" completeMethod="#{salesReturnReceiptView.customerAuto}" 
+                        converter="wawo.LookupIntConverter"   id="salesReturnReceiptCustomerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" 
+                        emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                        required="true" requiredMessage="#{lang.customer} #{lang.isRequired}"
+                        autocomplete="off" forceSelection="true" styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+        </p:autoComplete>
+        <p:message for="salesReturnReceiptCustomerId" display="text" />
+      </h:panelGroup>            
+
+      <!-- Consignment No -->
+      <p:outputLabel value="#{lang.consignmentNo}" for="consignmentNo" />
+      <h:panelGroup>
+        <p:inputText value="#{salesReturnReceiptView.salesReturnReceipt.consignmentNo}" required="true" requiredMessage="#{lang.consignmentNo} #{lang.isRequired}"
+                     maxlength="200" id="consignmentNo" validator="wawo.WhiteSpaceValidator" />
+        <p:message for="consignmentNo" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Entry Date -->
+      <p:outputLabel value="#{lang.entryDate}" for="entryDate" />
+      <h:panelGroup>
+        <p:calendar value="#{salesReturnReceiptView.salesReturnReceipt.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}" 
+                    maxlength="29" id="entryDate" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"/>
+        <p:message for="entryDate" display="text"/>
+      </h:panelGroup>
+
+      <!-- Debit Note Number -->
+      <p:outputLabel value="#{lang.debitNoteNo}" for="debitNoteNo" />
+      <h:panelGroup>
+        <p:inputText value="#{salesReturnReceiptView.salesReturnReceipt.debitNoteNo}" maxlength="200" id="debitNoteNo" validator="wawo.WhiteSpaceValidator"
+                     required="true" requiredMessage="#{lang.debitNoteNo} #{lang.isRequired}" />
+        <p:message for="debitNoteNo" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Debit Note Date -->
+      <p:outputLabel value="#{lang.debitNoteDate}" for="debitNoteDate" />
+      <h:panelGroup>
+        <p:calendar value="#{salesReturnReceiptView.salesReturnReceipt.debitNoteDate}" pattern="#{lang.datePattern}" required="true" requiredMessage="#{lang.debitNoteDate} #{lang.isRequired}"
+                    converterMessage="#{lang.debitNoteDate} #{lang.invalidDate}" maxlength="29" id="debitNoteDate" showButtonPanel="true" navigator="true" mask="true"/>
+        <p:message for="debitNoteDate" display="text"/>
+      </h:panelGroup>
+
+      <!-- Lr Number --> 
+      <p:outputLabel value="#{lang.lrNo}" for="lrNumber" />
+      <h:panelGroup>
+        <p:inputText value="#{salesReturnReceiptView.salesReturnReceipt.lrNumber}" maxlength="200" id="lrNumber" />
+        <p:message for="lrNumber" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Consignment Note -->
+      <p:outputLabel value="#{lang.note}" for="note" />
+      <h:panelGroup>
+        <p:inputTextarea value="#{salesReturnReceiptView.salesReturnReceipt.note}" cols="100" 
+                         required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"
+                         validator="wawo.WhiteSpaceValidator"
+                         rows="3" maxlength="1000" id="note" autoResize="false" styleClass="fw" />
+        <p:message for="note" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(salesReturnReceiptView.salesReturnReceipt.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(salesReturnReceiptView.salesReturnReceipt.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(salesReturnReceiptView.salesReturnReceipt.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(salesReturnReceiptView.salesReturnReceipt.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(salesReturnReceiptView.salesReturnReceipt.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="salesReturnReceiptTable" var="salesReturnReceiptVar" widgetVar="salesReturnReceiptWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesReturnReceiptView.salesReturnReceiptLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesReturnReceiptVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesReturnReceiptView.salesReturnReceiptSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Consignment No -->
+        <p:column sortBy="#{salesReturnReceiptVar.consignmentNo}" field="scm_sales_return_receipt.consignment_no">
+          <f:facet name="header"><h:outputText value="#{lang.consignmentNo}" title="#{lang.consignmentNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesReturnReceiptVar.consignmentNo)}" 
+                         process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesReturnReceiptView.salesReturnReceipt}" value="#{salesReturnReceiptVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Customer Name -->
+        <p:column sortBy="#{salesReturnReceiptVar.customerId.customerName}" field="customer_id.customer_name">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{appView.display(salesReturnReceiptVar.customerId.customerName)}" title="#{appView.title(salesReturnReceiptVar.customerId.customerName)}" escape="false" />
+        </p:column>
+
+        <!-- Entry Date -->
+        <p:column sortBy="#{salesReturnReceiptVar.entryDate}" field="scm_sales_return_receipt.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(salesReturnReceiptVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <!-- Debit Note No -->
+        <p:column sortBy="#{salesReturnReceiptVar.debitNoteNo}" field="scm_sales_return_receipt.debit_note_no">
+          <f:facet name="header"><h:outputText value="#{lang.debitNoteNo}" title="#{lang.debitNoteNo}"/></f:facet>
+          <h:outputText value="#{appView.display(salesReturnReceiptVar.debitNoteNo)}" title="#{appView.title(salesReturnReceiptVar.debitNoteNo)}" escape="false" />
+        </p:column>
+
+        <!-- Debit Note Date -->
+        <p:column sortBy="#{salesReturnReceiptVar.debitNoteDate}" field="scm_sales_return_receipt.debit_note_date" >
+          <f:facet name="header"><h:outputText value="#{lang.debitNoteDate}" title="#{lang.debitNoteDate}"/></f:facet>
+          <h:outputText value="#{appView.date(salesReturnReceiptVar.debitNoteDate)}" escape="false" />
+        </p:column>
+
+        <!-- Lr Number -->
+        <p:column sortBy="#{salesReturnReceiptVar.lrNumber}" field="scm_sales_return_receipt.lr_number">
+          <f:facet name="header"><h:outputText value="#{lang.lrNo}" title="#{lang.lrNo}"/></f:facet>
+          <h:outputText value="#{appView.display(salesReturnReceiptVar.lrNumber)}" title="#{appView.title(salesReturnReceiptVar.lrNumber)}" escape="false" />
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesReturnReceiptVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesReturnReceiptVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesReturnReceiptVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesReturnReceiptVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesReturnReceiptVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

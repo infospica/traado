@@ -1,0 +1,662 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"> 
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANTS" />
+  <p:fragment rendered="#{invoicePrintView.salesInvoice.printType eq SYSTEM_CONSTANTS.PRINT_SINGLE_LINE}">
+     <tr>
+        <td>
+          <div class="dataTitle" style="text-align: center;border: none;width:100%;">
+            <b>GST INVOICE</b>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="text-align: center;border: solid 1px #000; border-bottom-style: none;width:100%;">
+            <table border="0" style="width:100%;">
+              <tr>
+                <td align="left" valign="top" style="width:250px;">
+                  <div class="data" style="padding-top: 5px;padding-left: 5px;">
+                    <table border="0" >
+                      <tr>
+                        <td colspan="2">
+                          <span class="dataTitle" style="font-size: 11px;text-transform: uppercase;"><b>#{invoicePrintView.salesInvoice.customerId.companyId.companyName}</b> </span><br/>
+                          <span>#{invoicePrintView.salesInvoice.companyAddressId.address}</span><br/>                    
+                          <span>#{invoicePrintView.salesInvoice.companyAddressId.districtId.districtName},</span>
+                          <span>#{invoicePrintView.salesInvoice.companyAddressId.stateId.stateName},&#160;</span>
+                          <span>#{lang.pin}: #{invoicePrintView.companyAddress.pin}</span> <br />
+                                                
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Phone:</td>
+                        <td><h:outputText value="#{invoicePrintView.salesInvoice.companyAddressId.phone1}" /></td>
+                      </tr>
+                      <tr>
+                        <td>GST No.</td>
+                        <td><h:outputText value="#{invoicePrintView.salesInvoice.customerId.companyId.gstNo}" /></td>
+                      </tr>
+                      <tr>
+                        <td style="width:40px;" align="left" valign="top">
+                          FSSAI No.
+                        </td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top">
+                          D.L NO.
+                        </td>
+                        <td valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:150px;">
+                  <div style="text-align: left;">
+                    <span style="font-size: 6.5px;"> Bill To:</span><br />
+                    <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.customerId.customerName}</b></span>
+                  </div>
+                  <div class="data" >
+                    <h:outputText value="#{invoicePrintView.salesInvoice.customerAddressId.address}" 
+                                  rendered="#{invoicePrintView.salesInvoice.customerAddressId.address ne null and invoicePrintView.salesInvoice.customerAddressId.address.length()>1}" />
+                    <h:outputText value=", #{invoicePrintView.salesInvoice.customerAddressId.stateId.stateName}" 
+                                  rendered="#{invoicePrintView.salesInvoice.customerAddressId.stateId.stateName ne null and invoicePrintView.salesInvoice.customerAddressId.stateId.stateName.length()>1}" />
+
+                    <h:outputText escape="false" value=", PIN: #{invoicePrintView.salesInvoice.customerAddressId.pin}"
+                                  rendered="#{invoicePrintView.salesInvoice.customerAddressId.pin ne null and invoicePrintView.salesInvoice.customerAddressId.pin.length()>1}"/>
+
+                    <h:outputText value=", Phone: #{invoicePrintView.salesInvoice.customerAddressId.phone1}"
+                                  rendered="#{invoicePrintView.salesInvoice.customerAddressId.phone1 ne null and invoicePrintView.salesInvoice.customerAddressId.phone1.length()>1}"/>
+
+
+                    <h:outputText value=", Mob: #{invoicePrintView.salesInvoice.customerAddressId.phone2}"
+                                  rendered="#{invoicePrintView.salesInvoice.customerAddressId.phone2 ne null and invoicePrintView.salesInvoice.customerAddressId.phone2.length()>1}" />
+
+
+                    <h:outputText value=", Email :#{invoicePrintView.salesInvoice.customerAddressId.email}"
+                                  rendered="#{invoicePrintView.salesInvoice.customerAddressId.email ne null and invoicePrintView.salesInvoice.customerAddressId.email.length()>1}"/>
+                    <table >
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{invoicePrintView.salesInvoice.customerId.gstNo}</td>
+                      </tr>                                            
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top"> :</td>
+                        <td align="left" valign="top" style="line-height: 80%;" >                            
+                          <p:repeat value="#{invoicePrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat> 
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>                          
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+
+                </td>
+                <td valign="top" align="left">
+                  <h:panelGroup rendered="true">
+                    <div style="padding-left:5px;width: 130px; ">
+                      <div style="text-align: left;">
+                        <span style="font-size: 6.5px;"> Shipping Address:</span><br />
+                        <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.shippingAddressId.customerId.customerName}</b></span>
+                      </div>
+                      <div >
+                        <h:outputText value="#{invoicePrintView.salesInvoice.shippingAddressId.address}," 
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.address ne null and invoicePrintView.salesInvoice.shippingAddressId.address.length()>1}" />
+                        <h:outputText value=", #{invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName}" 
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName ne null and invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName.length()>1}" />                      
+                        <h:outputText value=", PIN: #{invoicePrintView.salesInvoice.shippingAddressId.pin}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.pin ne null and invoicePrintView.salesInvoice.shippingAddressId.pin.length()>1}"/>                      
+                        <h:outputText value=", Phone: #{invoicePrintView.salesInvoice.shippingAddressId.phone1}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.phone1 ne null and invoicePrintView.salesInvoice.shippingAddressId.phone1.length()>1}"/>
+                        <h:outputText value=", Mob: #{invoicePrintView.salesInvoice.shippingAddressId.phone2}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.phone2 ne null and invoicePrintView.salesInvoice.shippingAddressId.phone2.length()>1}" />
+                        <h:outputText value=", Email :#{invoicePrintView.salesInvoice.shippingAddressId.email}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.email ne null and invoicePrintView.salesInvoice.shippingAddressId.email.length()>1}"/>
+
+                      </div>
+                    </div>
+                  </h:panelGroup>
+                </td>
+                <td align="right" valign="top" style="width:190px;">
+                  <div style="padding-left: 2px; padding-top: 5px;padding-right: 2px;">
+                    <table class="data"  border="0">
+                      <tr>
+                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Bill No.</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td style=""><span style="font-size: 10px;"><b>#{invoicePrintView.salesInvoice.invoiceNo}</b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(invoicePrintView.salesInvoice.invoiceDate)}"  /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" width="40"><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(invoicePrintView.getDueDate())}" /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. NO</td>
+                        <td>:</td>
+                        <td ><h:outputText value="#{invoicePrintView.consignmentDetail.exitDocumentNo}"  /></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. DT</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{appView.date(invoicePrintView.consignmentDetail.lrDate)}"  /></td>
+                      </tr>
+                      <tr>                    
+                        <td align="left" valign="top">CARRIER</td>
+                        <td>:</td>
+                        <td ></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">E.Way Bill </td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">No.Date </td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+
+
+  </p:fragment>
+   <p:fragment rendered="#{invoicePrintView.salesInvoice.printType eq SYSTEM_CONSTANTS.PRINT_MULTIPLE_LINE}">
+    <tr>
+        <td>
+          <div style="text-align: center;border: solid 1px #000;width:100%;">
+            <table border="0" style="width:100%;">
+              <tr>
+                  <td align="left" valign="top" style="width:280px;">
+                  <div class="data" style="padding:5px;">
+                    <span class="dataTitle" style="font-size: 10px;text-transform: uppercase;"><b>#{invoicePrintView.salesInvoice.customerId.companyId.companyName}</b> </span><br/>
+                    <span>#{invoicePrintView.salesInvoice.companyAddressId.address}</span><br/>                    
+                    <span>#{invoicePrintView.salesInvoice.companyAddressId.districtId.districtName},</span>
+                    <span>#{invoicePrintView.salesInvoice.companyAddressId.stateId.stateName},&#160;</span>
+                    <span>#{lang.pin}: #{invoicePrintView.companyAddress.pin}</span> <br />
+                    <span>Phone: <span>#{invoicePrintView.salesInvoice.companyAddressId.phone1}</span></span><br />
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:150px;">
+
+                  <div style="padding-right: 5px;padding-left: 10px;padding-top: 5px;" class="data">
+                    <table class="data" style="padding-top: 5px;">
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top"  ><div class="data" style="text-transform: uppercase;" >#{invoicePrintView.salesInvoice.customerId.companyId.gstNo}</div></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;">#{invoicePrintView.salesInvoice.customerId.companyId.panNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>  
+                      </tr>
+                    
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+                <td align="right" valign="top" style="width:250px">
+                  <div style="padding-left: 5px; padding-top: 5px;padding-right: 2px;">
+                    <table class="data" style="padding-top: 5px;" border="0">
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size:10px;"><b>Bill No.</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td ><span style="font-size:10px;"><b>#{invoicePrintView.salesInvoice.invoiceNo}</b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size:10px;"><b><h:outputText value="#{appView.date(invoicePrintView.salesInvoice.invoiceDate)}"  /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td ><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(invoicePrintView.getDueDate())}" /></b></span></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="dataTitle" style="text-align: center;border: solid 1px #000; border-top: none;border-bottom: none;width:100%;padding:5px;">
+            <b>GST INVOICE</b>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="border:solid 1px #000000;border-bottom-style: none;" class="data">
+            <table border="0" style=" width: 100%;">
+              <tr>
+
+                <td style="width:25%;" valign="top">
+                  <div  style="padding-left:5px;">
+                    <div style="text-align: left;">
+                      Bill To:<br />
+                      <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.customerId.customerName}</b></span>
+                    </div>
+                    <div class="data" >
+                      <h:outputText value="#{invoicePrintView.salesInvoice.customerAddressId.address}" 
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.address ne null and invoicePrintView.salesInvoice.customerAddressId.address.length()>1}" />
+                      <h:outputText value=",#{invoicePrintView.salesInvoice.customerAddressId.stateId.stateName}" 
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.stateId.stateName ne null and invoicePrintView.salesInvoice.customerAddressId.stateId.stateName.length()>1}" />
+
+                      <h:outputText escape="false" value=",PIN: #{invoicePrintView.salesInvoice.customerAddressId.pin}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.pin ne null and invoicePrintView.salesInvoice.customerAddressId.pin.length()>1}"/>
+
+                      <h:outputText value=",Phone: #{invoicePrintView.salesInvoice.customerAddressId.phone1}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.phone1 ne null and invoicePrintView.salesInvoice.customerAddressId.phone1.length()>1}"/>
+
+
+                      <h:outputText value=",Mob: #{invoicePrintView.salesInvoice.customerAddressId.phone2}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.phone2 ne null and invoicePrintView.salesInvoice.customerAddressId.phone2.length()>1}" />
+
+
+                      <h:outputText value=",Email :#{invoicePrintView.salesInvoice.customerAddressId.email}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.email ne null and invoicePrintView.salesInvoice.customerAddressId.email.length()>1}"/>
+
+                    </div>
+                  </div>
+                </td>
+                <td style="width:25%;" align="left" valign="top">
+                  <div class="data" style="padding-top:10px;padding-left: 5px;">
+                    <table >
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{invoicePrintView.salesInvoice.customerId.gstNo}</td>
+
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{invoicePrintView.salesInvoice.customerId.panNo}</td>
+
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top"> :</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat> 
+
+                        </td>
+
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">
+                          <p:repeat value="#{invoicePrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>                          
+                        </td>
+                      </tr>
+
+                    </table>
+                  </div>
+                </td>
+                <td style="width:25%;" valign="top">
+
+                  <h:panelGroup rendered="true">
+                    <div style="padding-left:10px;width: 130px; ">
+                      <div style="text-align: left;">
+                        Shipping Address:<br />
+                        <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.shippingAddressId.customerId.customerName}</b></span>
+                      </div>
+                      <div >
+                        <h:outputText value="#{invoicePrintView.salesInvoice.shippingAddressId.address}," 
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.address ne null and invoicePrintView.salesInvoice.shippingAddressId.address.length()>1}" />
+                        <h:outputText value=" #{invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName}" 
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName ne null and invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName.length()>1}" />                      
+                        <h:outputText value=", PIN: #{invoicePrintView.salesInvoice.shippingAddressId.pin}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.pin ne null and invoicePrintView.salesInvoice.shippingAddressId.pin.length()>1}"/>                      
+                        <h:outputText value=", Phone: #{invoicePrintView.salesInvoice.shippingAddressId.phone1}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.phone1 ne null and invoicePrintView.salesInvoice.shippingAddressId.phone1.length()>1}"/>
+                        <h:outputText value=", Mob: #{invoicePrintView.salesInvoice.shippingAddressId.phone2}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.phone2 ne null and invoicePrintView.salesInvoice.shippingAddressId.phone2.length()>1}" />
+                        <h:outputText value=", Email :#{invoicePrintView.salesInvoice.shippingAddressId.email}"
+                                      rendered="#{invoicePrintView.salesInvoice.shippingAddressId.email ne null and invoicePrintView.salesInvoice.shippingAddressId.email.length()>1}"/>
+
+
+                      </div>
+                    </div>
+                  </h:panelGroup>
+                </td>
+                <td style="width:25%;" align="left" valign="top">
+                  <div class="data" style="padding-top:10px;padding-left: 10px;">
+                    <table border="0" >
+
+                      <tr>
+                        <td align="left" valign="top">L.R. NO</td>
+                        <td>:</td>
+                        <td ><h:outputText value="#{invoicePrintView.consignmentDetail.exitDocumentNo}"  /></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. DT</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{appView.date(invoicePrintView.consignmentDetail.lrDate)}"  /></td>
+                      </tr>
+                      <tr>                    
+                        <td align="left" valign="top">CARRIER</td>
+                        <td>:</td>
+                        <td ></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">E.Way Bill <br/> No.Date</td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+
+
+  </p:fragment>
+  
+  <p:fragment rendered="#{invoicePrintView.salesInvoice.printType eq SYSTEM_CONSTANTS.PRINT_PORTRAIT}">
+     
+        <p:fragment rendered="#{invoicePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP}" >
+        <tr>
+          <td>
+            <div class="dataTitle" style="text-align: center;border: none;width:100%;padding-bottom:5px;">
+              <b>GST INVOICE</b>
+            </div>
+          </td>
+        </tr>
+      </p:fragment> 
+      <tr>
+        <td>          
+          <div  style="text-align: center;border: solid 1px #000;width:100%;">
+            <table border="0" style="width:100%;">
+              <tr>
+                <td align="left" valign="top" style="width:220px;">
+                  <div class="data" style="padding:5px;">
+                    <span class="dataTitle" style="font-size: 10px;"><b>#{invoicePrintView.salesInvoice.customerId.companyId.companyName}</b> </span><br/>
+                    <span>#{invoicePrintView.salesInvoice.companyAddressId.address}</span><br/>                    
+                    <span>#{invoicePrintView.salesInvoice.companyAddressId.districtId.districtName},</span>
+                    <span>#{invoicePrintView.salesInvoice.companyAddressId.stateId.stateName},&#160;</span>
+                    <span>#{lang.pin}: #{invoicePrintView.companyAddress.pin}</span> <br />
+                    <span>Phone: <span>#{invoicePrintView.salesInvoice.companyAddressId.phone1}</span></span><br />
+                   
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:190px;">
+                  <div style="padding-right: 5px;padding-left: 30px;padding-top: 5px;" class="data">
+                    <table class="data" style="padding-top: 5px;">
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top"><div class="data" style="text-transform: uppercase;" >#{invoicePrintView.salesInvoice.customerId.companyId.gstNo}</div></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;">#{invoicePrintView.salesInvoice.customerId.companyId.panNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>  
+                      </tr>                     
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+                <td align="right" valign="top" style="">
+                  <div style="padding-top: 5px;width:100%;padding-right:5px;">
+                    <table class="data"  border="0">
+                      <tr>
+                        <td align="left" valign="top" style="width:40px;"><span style="font-size: 10px;"><b>Bill No.</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b>#{invoicePrintView.salesInvoice.invoiceNo}</b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(invoicePrintView.salesInvoice.invoiceDate)}"  /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(invoicePrintView.getDueDate())}" /></b></span></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <p:fragment rendered="#{invoicePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_MIDDLE}" >
+        <tr>
+          <td>
+            <div class="dataTitle" style="text-align: center;border: solid 1px #000; border-top: none;border-bottom: none;width:100%;padding:5px;">
+              <b>GST INVOICE</b>
+            </div>
+          </td>
+        </tr>
+      </p:fragment> 
+      <tr>
+        <td >
+          
+          <div style="border:solid 1px #000000;border-bottom-style: none;
+               #{invoicePrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP?'border-top-style: none;':''}" class="data">
+            <table border="0" style="font-size: 7px;">
+              <tr>
+                <td valign="top" style="width:27%;">
+                  <div  style="padding-left:5px;">
+                    <div style="text-align: left;">
+                      Bill To:<br />
+                      <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.customerId.customerName}</b></span>
+                    </div>
+                    <div class="data" >
+                      <h:outputText value="#{invoicePrintView.salesInvoice.customerAddressId.address}" 
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.address ne null and invoicePrintView.salesInvoice.customerAddressId.address.length()>1}" />
+                      <h:outputText value=", #{invoicePrintView.salesInvoice.customerAddressId.stateId.stateName}" 
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.stateId.stateName ne null and invoicePrintView.salesInvoice.customerAddressId.stateId.stateName.length()>1}" />
+
+                      <h:outputText escape="false" value=", PIN: #{invoicePrintView.salesInvoice.customerAddressId.pin}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.pin ne null and invoicePrintView.salesInvoice.customerAddressId.pin.length()>1}"/>
+
+                      <h:outputText value=", Phone: #{invoicePrintView.salesInvoice.customerAddressId.phone1}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.phone1 ne null and invoicePrintView.salesInvoice.customerAddressId.phone1.length()>1}"/>
+
+
+                      <h:outputText value=", Mob: #{invoicePrintView.salesInvoice.customerAddressId.phone2}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.phone2 ne null and invoicePrintView.salesInvoice.customerAddressId.phone2.length()>1}" />
+
+
+                      <h:outputText value=", Email :#{invoicePrintView.salesInvoice.customerAddressId.email}"
+                                    rendered="#{invoicePrintView.salesInvoice.customerAddressId.email ne null and invoicePrintView.salesInvoice.customerAddressId.email.length()>1}"/>
+                    </div>
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:25%;">
+                  <div class="data" style="padding-top:10px;padding-left: 5px;">
+                    <table >
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{invoicePrintView.salesInvoice.customerId.gstNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top"> PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{invoicePrintView.salesInvoice.customerId.panNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top"> :</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat> 
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{invoicePrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" >
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>                          
+                        </td>
+                      </tr>
+
+                    </table>
+                  </div>
+                </td>
+                <td valign="top" style="width:25%;">
+                  <h:panelGroup rendered="true">
+                    <div style="padding-left:10px;width: 130px; font-size: 8px;">
+                      <div style="text-align: left;">
+                        Shipping Address:<br />
+                        <span class="dataTitle"><b>#{invoicePrintView.salesInvoice.shippingAddressId.customerId.customerName}</b></span>
+                      </div>
+                      <div >
+                        <h:outputLabel value="#{invoicePrintView.salesInvoice.shippingAddressId.address}," 
+                                       rendered=", #{invoicePrintView.salesInvoice.shippingAddressId.address ne null and invoicePrintView.salesInvoice.shippingAddressId.address.length()>1}" />
+                        <h:outputLabel value="#{invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName}" 
+                                       rendered="#{invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName ne null and invoicePrintView.salesInvoice.shippingAddressId.stateId.stateName.length()>1}" />                      
+                        <h:outputLabel value=", PIN: #{invoicePrintView.salesInvoice.shippingAddressId.pin}"
+                                       rendered="#{invoicePrintView.salesInvoice.shippingAddressId.pin ne null and invoicePrintView.salesInvoice.shippingAddressId.pin.length()>1}"/>                      
+                        <h:outputLabel value=", Phone: #{invoicePrintView.salesInvoice.shippingAddressId.phone1}"
+                                       rendered="#{invoicePrintView.salesInvoice.shippingAddressId.phone1 ne null and invoicePrintView.salesInvoice.shippingAddressId.phone1.length()>1}"/>
+                        <h:outputLabel value=", Mob: #{invoicePrintView.salesInvoice.shippingAddressId.phone2}"
+                                       rendered="#{invoicePrintView.salesInvoice.shippingAddressId.phone2 ne null and invoicePrintView.salesInvoice.shippingAddressId.phone2.length()>1}" />
+                        <h:outputLabel value=", Email :#{invoicePrintView.salesInvoice.shippingAddressId.email}"
+                                       rendered="#{invoicePrintView.salesInvoice.shippingAddressId.email ne null and invoicePrintView.salesInvoice.shippingAddressId.email.length()>1}"/>
+
+                      </div>
+                    </div>
+                  </h:panelGroup>
+                </td>
+                <td align="left" valign="top" style="width:23%;">
+                  <div class="data" style="padding-top:10px;padding-left: 10px;">
+                    <table border="0" >
+                      <tr>
+                        <td align="left" valign="top">L.R. NO</td>
+                        <td>:</td>
+                        <td > <h:outputText value="#{invoicePrintView.consignmentDetail.exitDocumentNo}"  /></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. DT</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{appView.date(invoicePrintView.consignmentDetail.lrDate)}"  /> </td>
+                      </tr>
+                      <tr>                    
+                        <td align="left" valign="top">CARRIER</td>
+                        <td>:</td>
+                        <td ></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">E.Way Bill <br/> No.Date</td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      
+      
+  </p:fragment>
+</ui:composition>

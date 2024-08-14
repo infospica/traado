@@ -1,0 +1,170 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{ageWiseStockAnalysisView.setAgeWiseStockAnalysisList(null)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="ageWiseStockAnalysis"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="more" />
+    <ui:define name="newList">
+      <!--<p:inputText styleClass="fw" id="ageWiseStockAnalysisST" onkeyup="return callDtFilter(this.value, 'ageWiseStockAnalysis');"  placeholder="#{lang.search}"/>-->
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="rightList">
+      <table>
+        <tr>
+          <td>
+            <h:panelGroup id="accountGroupDiv" rendered="true">
+              <p:autoComplete id='accountGroup'  value="#{ageWiseStockAnalysisView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" 
+                              converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                              
+                              title="#{lang.accountGroup}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+                <p:column style="width:250px;">
+                  <h:outputText value="#{e.groupName}" />
+                </p:column>
+                <p:column style="width: 40px;">
+                  <h:outputText value="#{e.groupCode}" />
+                </p:column>
+                <p:column style="width: 50px;">
+                  <p:fragment rendered="#{e.isDefault eq 0}">
+                    <i class="fa fa-users" style="color:#000;"></i>
+                  </p:fragment>
+                  <p:fragment rendered="#{e.isDefault eq 1}">
+                    <i class="fa fa-users" style="color:#CCC;" ></i>
+                  </p:fragment>
+                </p:column>
+                <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv f1" listener="#{ageWiseStockAnalysisView.accountGroupSelectEvent}"
+                        onstart="block()" oncomplete="unblock()" />
+              </p:autoComplete>                
+            </h:panelGroup>  
+          </td>
+          <td>
+            <h:panelGroup id="accountDiv" >
+              <p:autoComplete id='account'  value="#{ageWiseStockAnalysisView.filterParameters.account}" completeMethod="#{ageWiseStockAnalysisView.accountAuto}" converter="wawo.LookupIntConverter" 
+                              var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                              converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                              title="#{lang.accountNumber}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+                <p:column style="width: 200px;">
+                  <h:outputText value="#{e.vendorId.vendorName}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.accountCode}" />
+                </p:column>
+                <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+                  <h:outputText value="#{e.companyTradeProfileId.title}" />
+                </p:column>
+                <p:ajax event="itemSelect" immediate="true" process="@this accountGroupDiv" update="f1 ageWiseStockAnalysisTable" onstart="block()" oncomplete="unblock()" />
+              </p:autoComplete>
+            </h:panelGroup>
+          </td>
+          <td>
+            <h:panelGroup styleClass="L" >   
+              <p:commandButton actionListener="#{ageWiseStockAnalysisView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate f1"  styleClass="btn"
+                               onclick="block()" oncomplete="unblock"/>
+              <p:commandButton actionListener="#{ageWiseStockAnalysisView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate f1" styleClass="btn" 
+                               onclick="block()" oncomplete="unblock" />
+              <!--From Date-->
+              <p:calendar id="fromDate" value="#{ageWiseStockAnalysisView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                          required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();"
+                          converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" 
+                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                          maxdate="#{ageWiseStockAnalysisView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: ageWiseStockAnalysisView.filterParameters.today}" >
+                <p:ajax event="dateSelect" process="@this" listener="#{ageWiseStockAnalysisView.setAgeWiseStockAnalysisList(null)}" update="toDateDiv ageWiseStockAnalysisTable " onstart="block()" oncomplete="unblock()" />
+                <p:ajax event="change" process="@this" listener="#{ageWiseStockAnalysisView.setAgeWiseStockAnalysisList(null)}" update="toDateDiv ageWiseStockAnalysisTable " onstart="block()" oncomplete="unblock()" />
+              </p:calendar>
+              <p:message for="fromDate" display="text" id="fmess"/>
+            </h:panelGroup>
+            <!--To date-->
+            <h:panelGroup styleClass="L" id="toDateDiv">
+              <p:calendar id="toDate" value="#{ageWiseStockAnalysisView.filterParameters.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                          required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select()"
+                          converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{ageWiseStockAnalysisView.filterParameters.fromDate}"
+                          maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  
+                          maxdate="#{ageWiseStockAnalysisView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: ageWiseStockAnalysisView.filterParameters.today}" >
+                <p:ajax event="dateSelect" process="@this" listener="#{ageWiseStockAnalysisView.setAgeWiseStockAnalysisList(null)}" update="ageWiseStockAnalysisTable" onstart="block()" oncomplete="unblock()" />
+              </p:calendar>
+              <p:message for="toDate" display="text" id="tmess"/>
+            </h:panelGroup>
+            <p:commandButton value="#{lang.export}" actionListener="#{ageWiseStockAnalysisView.export(main)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false">
+            </p:commandButton>
+          </td>
+        </tr>
+      </table>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="ageWiseStockAnalysisTable" var="row" widgetVar="ageWiseStockAnalysisWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{ageWiseStockAnalysisView.getAgeWiseStockAnalysisList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('ageWiseStockAnalysisWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.invoiceNo}" field="invoice_no" filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <h:outputText value="#{appView.display(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.productEntryDate}" field="product_entry_date" filterBy="#{row.productEntryDate}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.product} #{lang.entryDate}" title="##{lang.product} #{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.display(row.productEntryDate)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.currentQty}" field="current_qty" style="text-align: right" filterBy="#{row.currentQty}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.currentQty}" title="#{lang.currentQty}"/></f:facet>
+          <h:outputText value="#{appView.number(row.currentQty)}" escape="false" />
+          <f:facet name="footer">
+            <div style="text-align:right !important; font-weight: bold! important">
+              <h:outputText value="#{appView.number(ageWiseStockAnalysisView.qty)}" />
+            </div>
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.taxableAmount}" field="taxable_amount" style="text-align: right" filterBy="#{row.taxableAmount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.taxable} #{lang.amount}" title="#{lang.taxable} #{lang.amount}"/></f:facet>
+          <h:outputText value="#{appView.number(row.taxableAmount)}" escape="false" />
+          <f:facet name="footer">
+            <div style="text-align:right !important; font-weight: bold! important">
+              <h:outputText value="#{appView.decimal(ageWiseStockAnalysisView.taxableAmount)}" />
+            </div>
+          </f:facet>
+        </p:column>
+
+        <p:column sortBy="#{row.days}" field="days" style="text-align: right" filterBy="#{row.days}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.days}" title="#{lang.days}"/></f:facet>
+          <h:outputText value="#{appView.number(row.days)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.hsnCode}" field="hsn_code" style="text-align: right" filterBy="#{row.hsnCode}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.hsnCode}" title="#{lang.hsnCode}"/></f:facet>
+          <h:outputText value="#{appView.display(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.ratePercentage}" field="rate_percentage" style="text-align: right" filterBy="#{row.ratePercentage}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.ratePercentage}" title="#{lang.ratePercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.ratePercentage)}" escape="false" /></p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

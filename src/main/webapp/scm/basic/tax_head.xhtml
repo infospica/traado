@@ -1,0 +1,176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{taxHeadView.switchTaxHead(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.taxHead}" />
+    <ui:param name="ids" value="taxHead" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{taxHeadView.deleteTaxHead(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('taxHeadWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{taxHeadView.cloneTaxHead(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{taxHeadView.deleteTaxHead(main)}" value="#{lang.delete}" onclick="wdgOff('taxHeadWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{taxHeadView.saveTaxHead(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+
+      <!-- Tax Head -->
+      <p:outputLabel value="#{lang.tax} #{lang.title}" for="head" />
+      <h:panelGroup>
+        <p:inputText value="#{taxHeadView.taxHead.head}" maxlength="200" id="head" 
+                     required="true" requiredMessage="#{lang.tax} #{lang.title} #{lang.isRequired}" styleClass="fw"/>
+        <p:message for="head" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Country Tax (Regime) -->
+      <p:outputLabel value="#{lang.regime}" for="taxHeadCountryTaxId" />
+      <h:panelGroup>
+          <p:selectOneMenu value="#{taxHeadView.taxHead.countryTaxRegimeId}"  id="taxHeadCountryTaxId" converter="omnifaces.SelectItemsConverter"
+                         required="true" requiredMessage="#{lang.regime} #{lang.isRequired}" styleClass="fw">          
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+          <f:selectItems value="#{scmLookupView.countryTaxRegime(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu>
+        <p:message for="taxHeadCountryTaxId" display="text" />
+      </h:panelGroup>
+
+      <!-- Applied On --> 
+      <p:outputLabel value="#{lang.appliedOn}" for="appliedOn" />
+      <h:panelGroup>        
+        <p:selectOneMenu value="#{taxHeadView.taxHead.appliedOn}"  required="true" requiredMessage="#{lang.appliedOn} #{lang.isRequired}"
+                         id="appliedOn" converter="omnifaces.SelectItemsConverter" style="position: relative" styleClass="fw">
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+          <f:selectItems value="#{taxHeadView.selectAppliedOn()}" var="r" itemValue="#{r.intValue}" itemLabel="#{r.itemLabel}" />
+        </p:selectOneMenu>
+        <p:message for="appliedOn" display="text"/>
+      </h:panelGroup>
+
+      <!-- Computed On -->
+      <p:outputLabel value="#{lang.computedOn}" for="computedOn" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{taxHeadView.taxHead.computedOn}"  required="true" requiredMessage="#{lang.computedOn} #{lang.isRequired}"
+                         id="computedOn" converter="omnifaces.SelectItemsConverter" style="position: relative" styleClass="fw">
+          <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+          <f:selectItems value="#{taxHeadView.selectComputedOn()}" var="r" itemValue="#{r.intValue}" itemLabel="#{r.itemLabel}" />
+        </p:selectOneMenu>
+        <p:message for="computedOn" display="text"/>
+      </h:panelGroup>
+
+      <!-- Abatement Percentage -->
+      <p:outputLabel value="#{lang.abatementPercentage}" for="abatementPercentage" />
+      <h:panelGroup>
+        <p:inputNumber value="#{taxHeadView.taxHead.abatementPercentage}" converterMessage="#{lang.abatementPercentage} #{lang.invalidNumber}" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="100"
+                       minValue="0.0" symbol=" #{appView.percentageSymbol}" symbolPosition="s"  maxlength="4" id="abatementPercentage" styleClass="fw" />
+        <p:message for="abatementPercentage" display="text"/>
+      </h:panelGroup>
+
+      <!-- Sort Order --> 
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{taxHeadView.taxHead.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" 
+                       maxlength="5" id="sortOrder" styleClass="fw" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!-- Status -->
+      <p:outputLabel value="#{lang.status}" for="taxHeadStatusId" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{taxHeadView.taxHead.statusId}"  id="taxHeadStatusId" converter="omnifaces.SelectItemsConverter"
+                         required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw">          
+          <f:selectItems value="#{scmLookupView.status(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu>
+        <p:message for="taxHeadStatusId" display="text" />
+      </h:panelGroup>
+      
+      <!--Applied Region-->
+      <p:outputLabel value="#{lang.appliedRegion}" for="taxHeadAppliedRegion"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{taxHeadView.taxHead.appliedRegion}" id="taxHeadAppliedRegion" style="position: relative" styleClass="fw">
+          <f:selectItem itemValue="1" itemLabel="#{lang.appliedRegionCountry}" />
+          <f:selectItem itemValue="2" itemLabel="#{lang.appliedRegionState}" />
+          <f:selectItem itemValue="3" itemLabel="#{lang.appliedRegionCityOrPinOrZip}" />
+        </p:selectOneMenu>
+        <p:message for="taxHeadAppliedRegion" display="text" />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(taxHeadView.taxHead.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(taxHeadView.taxHead.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(taxHeadView.taxHead.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(taxHeadView.taxHead.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(taxHeadView.taxHead.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="taxHeadTable" var="taxHeadVar" widgetVar="taxHeadWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{taxHeadView.taxHeadLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{taxHeadVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{taxHeadView.taxHeadSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Tax Head -->
+        <p:column sortBy="#{taxHeadVar.head}" field="scm_tax_head.head">
+          <f:facet name="header"><h:outputText value="#{lang.head}" title="#{lang.head}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(taxHeadVar.head)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{taxHeadView.taxHead}" value="#{taxHeadVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Regime -->
+        <p:column sortBy="#{taxHeadVar.countryTaxRegimeId.title}" field="country_tax_id.regime">
+          <f:facet name="header"><h:outputText value="#{lang.regime}" title="#{lang.regime}"/></f:facet>
+          <h:outputText value="#{appView.display(taxHeadVar.countryTaxRegimeId.title)}" escape="false" />
+        </p:column>        
+
+        <!-- Applied On -->
+        <p:column sortBy="#{taxHeadVar.appliedOn}" field="scm_tax_head.applied_on" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.appliedOn}" title="#{lang.appliedOn}"/></f:facet>
+          <h:outputText value="#{taxHeadView.displayAppliedOn(taxHeadVar.appliedOn)}" escape="false" />          
+        </p:column>
+
+        <!-- Computed On -->
+        <p:column sortBy="#{taxHeadVar.computedOn}" field="scm_tax_head.computed_on" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.computedOn}" title="#{lang.computedOn}"/></f:facet>
+          <h:outputText value="#{taxHeadView.displayComputedOn(taxHeadVar.computedOn)}" escape="false" />          
+        </p:column>
+
+        <!-- Abatement Percentage -->
+        <p:column sortBy="#{taxHeadVar.abatementPercentage}" field="scm_tax_head.abatement_percentage" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.abatementPercentage}" title="#{lang.abatementPercentage}"/></f:facet>
+          <h:outputText value="#{appView.decimal(taxHeadVar.abatementPercentage)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{taxHeadVar.statusId.title}" field="status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(taxHeadVar.statusId.title)}" title="#{appView.title(taxHeadVar.statusId.title)}" escape="false" />
+        </p:column>
+
+        <!-- Logs -->
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(taxHeadVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(taxHeadVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(taxHeadVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(taxHeadVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(taxHeadVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>   
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

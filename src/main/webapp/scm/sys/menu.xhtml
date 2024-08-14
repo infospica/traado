@@ -1,0 +1,159 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{menuView.switchMenu(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.menu}" />
+    <ui:param name="ids" value="menu" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{menuView.deleteMenu(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('menuWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{menuView.cloneMenu(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{menuView.deleteMenu(main)}" value="#{lang.delete}" onclick="wdgOff('menuWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{menuView.saveMenu(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{menuView.menu.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text"/></h:panelGroup>            
+      <p:outputLabel value="#{lang.pageUrl}" for="pageUrl" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{menuView.menu.pageUrl}" maxlength="200" id="pageUrl" /><p:message for="pageUrl" display="text"/></h:panelGroup>
+      <p:outputLabel value="#{lang.iconPath}" for="iconPath" />
+
+      <h:panelGroup id="iconPathPart">
+        <p:inputText styleClass="fw" value="#{menuView.menu.iconPath}" maxlength="200" id="iconPath" />
+<!--        <h:inputFile value="#{menuView.iconPathPart}"  maxlength="200" id="iconPath"/>
+      <p:commandButton rendered="#{not empty menuView.menu.iconPath}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this" oncomplete="hide('iconPathLink')" update="iconPathPart" partialSubmit="true" immediate="true"  style="width:30px">
+        <f:setPropertyActionListener target="#{menuView.iconPathPart}" value="#{appIo.getRemoveFile()}" />    
+      </p:commandButton><p:spacer width="5"/>
+      <p:commandLink value="#{appIo.fileName(menuView.menu.iconPath)}" ajax="false" id="iconPathLink" >   
+        <p:fileDownload value="#{appIo.downloadPrivate(menuView.menu.iconPath)}" />
+      </p:commandLink>-->
+        <p:message for="iconPath" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.lineBreak}" for="lineBreak" />
+      <h:panelGroup>
+        <p:inputNumber value="#{menuView.menu.lineBreak}" converterMessage="#{lang.lineBreak} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="lineBreak" />
+        <p:message for="lineBreak" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{menuView.menu.description}" cols="100" rows="3" maxlength="500" id="description" autoResize="false" />
+        <p:message for="description" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.parentMenu}" for="menuParentId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{menuView.menu.parentId}" completeMethod="#{menuView.menuAuto}" converter="wawo.LookupIntConverter"   id="menuParentId" var="pm" itemValue="#{pm}" 
+                         itemLabel="#{pm.parentId eq null ? pm.title : pm.title - parentId.title }" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
+                         style="position: relative" >
+          <f:attribute name="clazz" value="#{sysLookupView.menuClass()}"/>
+          <f:attribute name="byid" value="#{sysLookupView.menuById()}"/>
+          <p:ajax event="itemSelect" listener="#{menuView.itemSelectEvent}" update="chkLblDiv chkDiv" />
+        </p:autoComplete>
+        <p:message for="menuParentId" display="text" />
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{menuView.menu.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.status}" for="status" />
+      <h:panelGroup>
+        <p:inputNumber value="#{menuView.menu.status}" converterMessage="#{lang.status} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="status" />
+        <p:message for="status" display="text"/>
+      </h:panelGroup>            
+      <h:panelGroup id="chkLblDiv">
+        <p:outputLabel value="#{lang.privilege}" for="privilege" rendered="#{menuView.menu.parentId!=null}"/>
+      </h:panelGroup>
+      <h:panelGroup id="chkDiv">
+        <p:selectManyCheckbox id="privilege" value="#{menuView.selectedPrivilege}" layout="responsive" columns="3" 
+                              converter="omnifaces.SelectItemsConverter" 
+                              required="true" requiredMessage="#{lang.privilege} #{lang.isRequired}" rendered="#{menuView.menu.parentId!=null}">
+          <f:selectItems value="#{scmLookupView.privilage(main)}" var="type" itemLabel="#{type.title}" itemValue="#{type}" />
+        </p:selectManyCheckbox>
+        <p:message for="privilege" />
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(menuView.menu.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(menuView.menu.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(menuView.menu.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(menuView.menu.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="menuTable" var="menuVar" widgetVar="menuWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{menuView.menuLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{menuVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{menuView.menuSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{menuVar.id}" field="id"  >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{menuVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{menuView.menu}" value="#{menuVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.menu}" sortBy="#{menuVar.title}" field="title">
+          <f:facet name="header"><h:outputText value="#{lang.menu}" title="#{lang.menu}"/></f:facet>
+
+          <h:outputText value="#{appView.display(menuVar.title)}" title="#{appView.title(menuVar.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.pageUrl}" sortBy="#{menuVar.pageUrl}" field="page_url" style="width:300px">
+                    <f:facet name="header"><h:outputText value="#{lang.pageUrl}" title="#{lang.pageUrl}"/></f:facet>
+
+          <h:outputText value="#{appView.display(menuVar.pageUrl)}" title="#{appView.title(menuVar.pageUrl)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.iconPath}" sortBy="#{menuVar.iconPath}" field="icon_path">
+                    <f:facet name="header"><h:outputText value="#{lang.iconPath}" title="#{lang.iconPath}"/></f:facet>
+
+          <h:outputText value="#{appView.display(menuVar.iconPath)}" title="#{appView.title(menuVar.iconPath)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.lineBreak}" sortBy="#{menuVar.lineBreak}" field="line_break" style="text-align: right">
+                    <f:facet name="header"><h:outputText value="#{lang.lineBreak}" title="#{lang.lineBreak}"/></f:facet>
+
+          <h:outputText value="#{appView.number(menuVar.lineBreak)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.description}" sortBy="#{menuVar.description}" field="description">
+                    <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+
+          <h:outputText value="#{appView.display(menuVar.description)}" title="#{appView.title(menuVar.description)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.parentMenu}" sortBy="#{menuVar.parentId.title}" field="parent_id.title">
+                    <f:facet name="header"><h:outputText value="#{lang.parentMenu}" title="#{lang.parentMenu}"/></f:facet>
+
+          <h:outputText value="#{appView.display(menuVar.parentId.title)}" title="#{appView.title(menuVar.parentId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.sortOrder}" sortBy="#{menuVar.sortOrder}" field="sort_order" style="text-align: right">
+                    <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+
+          <h:outputText value="#{appView.number(menuVar.sortOrder)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.status}" sortBy="#{menuVar.status}" field="status" style="text-align: right">
+                    <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+
+          <h:outputText value="#{appView.number(menuVar.status)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.log}" exportable="false">
+                    <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(menuVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(menuVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(menuVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(menuVar.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

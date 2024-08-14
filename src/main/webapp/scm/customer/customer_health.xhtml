@@ -1,0 +1,264 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:p="http://primefaces.org/ui"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+  <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+  <div style="padding-bottom:15px;">    
+    <h:panelGroup >
+      <h:panelGroup layout="block" styleClass="row">
+        <h:panelGroup layout="block" styleClass="col-md-12" style="padding-bottom: 5px;text-align: right;">
+
+          <h:panelGroup id="accountGroupComboDiv">
+            <p:selectOneMenu var="e"  value="#{customerView.accountGroup}" converter="omnifaces.SelectItemsConverter" height="450">
+              <f:selectItem itemLabel="#{lang.accountGroup}" itemValue="#{null}" />
+              <f:selectItems  var="accGroup" value="#{customerView.getAccountGroupList()}" itemLabel="#{accGroup.groupName}" itemValue="#{accGroup}" />
+              <p:ajax event="itemSelect" update="customerHealthBox customerHealthTableDiv salesAgentDiv" process="@this" onstart="block()" oncomplete="unblock()" listener="#{customerView.reset()}" />
+              <p:column style="width: 350px;">
+                <h:outputText value="#{e.groupName}"  />
+              </p:column>
+              <p:column style="width: 50px;">
+                <h:outputText value="#{e.groupCode}"  />                          
+              </p:column>
+              <p:column style="width: 50px;">
+                <p:fragment rendered="#{e.isDefault eq 0}">
+                  <i class="fa fa-th" title="#{lang.custom} #{lang.accountGroup}" ></i>
+                </p:fragment>
+                <p:fragment rendered="#{e.isDefault eq 1}">
+                  <!--<i class="fa fa-square-o" style="color:#CCC;" ></i>-->
+                </p:fragment>
+              </p:column>
+            </p:selectOneMenu>
+          </h:panelGroup>
+          <h:panelGroup id="salesAgentDiv">
+            <p:selectOneMenu var="e" value="#{customerView.salesAgent}"  converter="omnifaces.SelectItemsConverter" height="450">
+              <f:selectItem itemLabel="#{lang.salesAgent}" itemValue="#{null}" />
+              <f:selectItems  var="vendor" value="#{customerView.getSalesAgentList(main)}" itemLabel="#{vendor.name}" itemValue="#{vendor}" />
+              <p:ajax event="itemSelect" update="customerHealthBox customerHealthTableDiv" process="@this" onstart="block()" oncomplete="unblock()" listener="#{customerView.reset()}" />
+              <p:column style="width: 350px;">
+                <h:outputText value="#{e.name}"  />
+              </p:column>              
+            </p:selectOneMenu>
+          </h:panelGroup>
+
+        </h:panelGroup>
+
+      </h:panelGroup>
+    </h:panelGroup>
+    <h:panelGroup id="customerHealthBox" >
+      #{customerView.getSalesHealthStatus(main)}
+      #{customerView.loadRelatedChequeEntryList(main)}
+      #{customerView.outStandingByCustomer(main)}
+      <h:panelGroup layout="block" styleClass="row">
+        <h:panelGroup layout="block" styleClass="col-md-2">
+          <h:panelGroup>
+            <div style="padding:20px;background:#65afc4;border-radius: 5px;color:#FFFFFF;font-size:15px;height:110px;">
+              <div>
+                <div style="font-size:16px;padding-top:5px; font-weight: bold;"> #{lang.last} #{lang.three} #{lang.months} </div>
+                <div style="font-size:16px;padding-top:5px;"><h:outputText value="#{lang.sales} " /></div>
+                <div style="font-size:24px;padding-top:10px;font-weight: bold;"> #{appView.decimal(customerView.customerHealth.lastThreeMonths)}</div>
+              </div>                    
+            </div>
+          </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup layout="block" styleClass="col-md-2">
+          <h:panelGroup>
+            <div style="padding:20px;background:#7E57C2;border-radius: 5px;font-size:15px;color:#FFF;height:110px;">
+              <div>
+
+                <div style="font-size:16px;padding-top:5px; font-weight: bold;"> #{lang.last} #{lang.month} </div>
+                <div style="font-size:16px;padding-top:5px;"><h:outputText value="#{lang.sales} " /></div>
+                <div style="font-size:24px;padding-top:10px;font-weight: bold;"> #{appView.decimal(customerView.customerHealth.previousMonth)}</div>                      
+
+              </div>                      
+            </div>
+          </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup layout="block" styleClass="col-md-2">
+          <h:panelGroup>  
+            <div style="padding:20px;background:linear-gradient(256deg, #8fb56f 0%, #a3be8c 100%);border-radius: 5px;font-size:15px;color:#FFF;height:110px;">
+              <div>
+                <div style="font-size:16px;padding-top:5px; font-weight: bold;"> #{lang.current} #{lang.month} </div>
+                <div style="font-size:16px;padding-top:5px;"><h:outputText value="#{lang.sales} " /></div>
+                <div style="font-size:24px;padding-top:10px;font-weight: bold;"> #{appView.decimal(customerView.customerHealth.currentMonth)}</div>
+              </div> 
+            </div>
+          </h:panelGroup>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" styleClass="col-md-2">
+          <h:panelGroup>
+            <div style="padding:20px;background:linear-gradient(45deg,#FF5370,#ff869a);border-radius: 5px;font-size:15px;color:#FFF;height:110px;">
+              <div>
+                <div style="font-size:16px;padding-top:5px; font-weight: bold;"> #{lang.outstanding} </div>
+                <div style="font-size:16px;padding-top:5px;"><h:outputText value="#{lang.amount} " /></div>
+                <div style="font-size:24px;padding-top:10px;font-weight: bold;"> #{appView.decimal(customerView.balance)}</div>
+              </div>                    
+
+            </div>
+          </h:panelGroup>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" styleClass="col-md-2">
+          <h:panelGroup>
+            <div style="padding:20px;background:linear-gradient(256deg, #a4719b 0%, #b48ead 100%);border-radius: 5px;font-size:15px;color:#FFF;height:110px;">                   
+              <div>
+                <div style="font-size:16px;padding-top:5px; font-weight: bold;"> #{lang.chequeInHand} </div>
+                <div style="font-size:16px;padding-top:5px;"><h:outputText value="#{lang.amount} " /></div>
+                <div style="font-size:24px;padding-top:10px;font-weight: bold;"> #{appView.decimal(customerView.crLineTotal)}</div>
+              </div>                                        
+            </div>
+          </h:panelGroup>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" styleClass="col-md-2">
+          <h:panelGroup>
+            <div style="padding:20px;background:linear-gradient(45deg,#4099ff,#73b4ff);border-radius: 5px;font-size:15px;color:#FFF;height:110px;">
+              <div>
+                <div style="font-size:16px;padding-top:5px; font-weight: bold;"> #{lang.balance} </div>
+                <div style="font-size:16px;padding-top:5px;"><h:outputText value="#{lang.amount} " /></div>
+                <div style="font-size:24px;padding-top:10px;font-weight: bold;"> #{appView.decimal(customerView.balance - customerView.crLineTotal)}</div>
+              </div>                   
+
+            </div>
+          </h:panelGroup>
+        </h:panelGroup>              
+      </h:panelGroup>
+    </h:panelGroup>
+  </div>
+
+  <h:panelGroup layout="block" styleClass="row" id="customerHealthTableDiv">
+    <h:panelGroup layout="block" styleClass="col-md-6" rendered="#{customerView.customerOutstandingList.size() gt 0}">
+
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="ids" value="outstanding" />
+        <ui:param name="label" value="#{lang.outstanding} #{lang.amount} " />
+        <ui:param name="search" value="false" />
+        <ui:define name="menuleft">
+          <h:panelGroup style="padding-left:30px;">
+            <p:commandButton value="#{lang.ledger}" styleClass="btn btn-info" 
+                             actionListener="#{customerView.actionOutStandingAmount(main)}" process="@this"
+                             />
+          </h:panelGroup>
+        </ui:define>
+        <h:panelGroup id="outStandingList">
+          <p:dataTable value="#{customerView.customerOutstandingList}" id="outstandingTable" var="row" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                       rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" >
+            <f:facet name="header">
+              <p:outputPanel styleClass="hidden" >
+                <p:inputText id="globalFilter"  onkeyup="return PF('customerOutstandingWidget').filter()" />
+              </p:outputPanel>
+            </f:facet>
+            <p:column  headerText="#{lang.agentName}" sortBy="#{row.agentName}"  filterBy="#{row.agentName}" filterStyleClass="hidden">
+              <h:outputText value="#{appView.display(row.agentName)}" title="#{appView.title(row.agentName)}" escape="false" />
+            </p:column>
+<!--                <p:column  headerText="#{lang.district}" sortBy="#{row.district}"  filterBy="#{row.district}" filterStyleClass="hidden">
+              <h:outputText value="#{appView.display(row.district)}" title="#{appView.title(row.district)}" escape="false" />
+            </p:column>-->
+            <p:column headerText="#{lang.invoiceNo}" sortBy="#{row.invoiceno}"  filterBy="#{row.invoiceno}" filterStyleClass="hidden">
+              <p:commandLink value="#{appView.title(row.invoiceno)}" title="#{appView.title(row.invoiceno)}" immediate="true" rendered="#{row.invoiceno ne null}" onclick="block()" oncomplete="unblock();"
+                             actionListener="#{popUpView.showCustomerOutstandingRefer(row.entityId,row.entityTypeId,row.tranId)}"  process="@this" />
+
+            </p:column>
+            <p:column headerText="#{lang.invoiceDate}" sortBy="#{row.invoicedate}"  filterBy="#{row.invoicedate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.invoicedate)}" escape="false" /></p:column>
+            <p:column headerText="#{lang.billAmount}" sortBy="#{row.invoiceamount}"  style="text-align: right" filterBy="#{row.invoiceamount}" filterStyleClass="hidden">
+              <h:outputText value="#{appView.decimal(row.invoiceamount)}" escape="false" />
+              <f:facet name="footer">
+                <div style="text-align: right;">
+                  <h:outputText style="text-align: right;" value="#{appView.decimal(customerView.billAmount)}" />
+                </div>
+              </f:facet>
+            </p:column>
+            <p:column headerText="#{lang.received} #{lang.amount}" style="text-align: right" sortBy="#{appView.decimal(row.receivedAmount)}">
+              <h:outputText value="#{appView.decimal(row.receivedAmount)}" rendered="#{row.receivedAmount gt 0}" />
+              <f:facet name="footer">
+                <div style="text-align: right;">
+                  <h:outputText value="#{appView.decimal(customerView.receivedAmount)}"  />
+                </div>
+              </f:facet>
+            </p:column>
+            <p:column headerText="#{lang.receivable} #{lang.amount}" style="text-align: right" sortBy="#{appView.decimal(row.oustandingamount)}">
+              <h:outputText value="#{appView.decimal(row.oustandingamount)}" />
+              <f:facet name="footer">
+                <div style="text-align: right;">
+                  <h:outputText value="#{appView.decimal(customerView.balance)}" />
+                </div>
+              </f:facet>
+            </p:column>
+            <p:column headerText="Cumulative" sortBy="#{row.oustandingamount}"  style="text-align: right" filterBy="#{row.oustandingamount}" filterStyleClass="hidden">          
+              <h:outputText value="#{appView.decimal(row.cumulativeAmount)}"  />  
+            </p:column>  
+            <p:column  sortBy="#{row.daysoutstanding}"  style="text-align: right" 
+                       filterBy="#{row.daysoutstanding}" filterStyleClass="hidden" >          
+              <f:facet name="header">
+                <h:outputText value="#{lang.outstanding} #{lang.days}" title="#{lang.outstanding} #{lang.days}" />
+              </f:facet>
+              <h:outputText value="#{appView.display(row.daysoutstanding)}"  />  
+            </p:column> 
+          </p:dataTable>
+        </h:panelGroup>
+        <p:dialog id="outstandingDlg" header="#{lang.oustandingAmount}" 
+                  widgetVar="outstandingWdg" dynamic="true" closable="true" closeOnEscape="true" modal="true"  height="600">
+          <ui:include src="/scm/accounting/payable_receivable_report.xhtml" />
+        </p:dialog> 
+      </ui:decorate>
+    </h:panelGroup>
+
+    <h:panelGroup layout="block" styleClass="col-md-6" rendered="#{customerView.relatedChequeEntryList.size() gt 0}" >              
+
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="ids" value="cheque" />
+        <ui:param name="label" value="#{lang.chequeInHand}" />
+        <ui:param name="search" value="false" />
+        <!--<ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />-->                           
+
+        <p:dataTable value="#{customerView.relatedChequeEntryList}" var="chequeEntryVar" widgetVar="chequeEntryWidget" 
+                     rows="#{main.pageData.pageSize}" paginator="true"
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100"
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks" rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  >
+          <p:ajax event="page" oncomplete="unblock();" />
+          <p:column styleClass="w-80" sortBy="#{chequeEntryVar.entryDate}" field="fin_cheque_entry.entry_date" >
+            <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+              #{appView.date(chequeEntryVar.entryDate)}
+          </p:column>
+          <p:column sortBy="#{chequeEntryVar.bankId}" field="fin_cheque_entry.bank_id.title" >
+            <f:facet name="header"><h:outputText value="#{lang.bank}" title="#{lang.bank}"/></f:facet>
+            <h:outputText value="#{appView.display(chequeEntryVar.bankId.name)}" escape="false" />
+          </p:column>
+          <p:column  sortBy="#{chequeEntryVar.chequeNo}" field="fin_cheque_entry.cheque_no" >
+            <f:facet name="header"><h:outputText value="#{lang.chequeNO}" title="#{lang.chequeNO}"/></f:facet>
+              #{chequeEntryVar.chequeNo}
+          </p:column>
+          <p:column  sortBy="#{chequeEntryVar.chequeDate}" field="fin_cheque_entry.cheque_date" >
+            <f:facet name="header"><h:outputText value="#{lang.chequeDate}" title="#{lang.chequeDate}"/></f:facet>
+              #{appView.date(chequeEntryVar.chequeDate)}
+          </p:column>
+          <p:column  sortBy="#{chequeEntryVar.statusId}" field="fin_cheque_entry.statusId">
+            <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+            <h:outputText title="#{chequeEntryVar.parentId ne null ? lang.represent : ''}" value="#{appView.display(chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED ? lang.received : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_ISSUED ? lang.deposited : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECONCILED ? lang.cleared : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE ? lang.dishonoured : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_RESUBMITTED ? lang.represent : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RETURNED ? lang.returned :  chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_HIDE ? lang.dishonoured : lang.cancelled )}"  escape="false" />
+          </p:column>
+          <p:column  sortBy="#{chequeEntryVar.amount}" field="fin_cheque_entry.amount" style="text-align: right">
+            <f:facet name="header" ><h:outputText value="#{lang.amount}" title="#{lang.amount}"/></f:facet>
+            <h:outputText styleClass="text-right" value="#{appView.decimal(chequeEntryVar.amount)}" escape="false" />
+          </p:column>
+          <p:column style="text-align: right" sortBy="#{chequeEntryVar.crLine}"> 
+            <f:facet name="header"><span title="#{lang.balance}">#{lang.balance}</span></f:facet>
+            <span class="label" style="background-color: #{AccountingConstant.COLOR_DR}">#{appView.decimal(chequeEntryVar.crLine)}</span>                    
+          </p:column>
+          <!--                <p:column styleClass="w-40 text-right">
+                            <f:facet name="header" ><h:outputText  value="#{lang.dueDays}" title="#{lang.dueDays}"/></f:facet>         
+                            <h:outputText  value="#{chequeEntryVar.chequeDate eq null ? lang.undatedCheque :customerView.daysRemaining(chequeEntryVar)}" title="#{chequeEntryVar.chequeDate eq null ? lang.undatedCheque:''}" escape="false" />
+                          </p:column>-->
+        </p:dataTable>
+
+      </ui:decorate>
+
+    </h:panelGroup>
+
+  </h:panelGroup>
+
+</ui:composition>

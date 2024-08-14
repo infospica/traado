@@ -1,0 +1,241 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{salesAgentClaimView.switchSalesAgentClaim(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesAgent} #{lang.claim}" />
+    <ui:param name="ids" value="vendorClaim" />
+    <ui:param name="search" value="false" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? salesAgentClaimView.draftLabel : null}" />
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesAgentClaimView.deleteSalesAgentClaim(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('vendorClaimWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{salesAgentClaimView.dialogClose()}" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="moreForm" >
+      <p:outputLabel value="#{lang.ledger}" for="ledgerId" />
+      <p:autoComplete value="#{salesAgentClaimView.salesAgentClaim.ledgerId}" completeMethod="#{salesAgentClaimView.accountingLedgerSalesAgentAuto}" converter="wawo.LookupIntConverter"
+                      required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}" id="ledgerId"
+                      var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="25"
+                      converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" dropdown="false" disabled="true"   >
+        <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+        <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+        <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+          <h:outputText value="#{e.title}" />
+        </p:column>
+        <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+          <h:outputText value="#{e.accountingGroupId.title}" />
+        </p:column>
+        <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+          <h:outputText value="#{e.accountingGroupId.parentId.title}" />
+        </p:column>
+      </p:autoComplete>
+    </ui:define>
+    <ui:define name="more" >
+
+    </ui:define>
+    <ui:define name="reset" >
+
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesAgentClaimView.deleteSalesAgentClaim(main)}" value="#{lang.delete}" onclick="wdgOff('vendorClaimWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesAgentClaimView.saveSalesAgentClaim(main, 2)}" value="#{lang.draft}" onclick="toTop()" styleClass="btn btn-success" rendered="#{salesAgentClaimView.draft}"><f:ajax execute="f1" render="f1"/></h:commandButton>
+      <h:commandButton action="#{salesAgentClaimView.saveSalesAgentClaim(main, 1)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-info" rendered="#{salesAgentClaimView.draft}"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+    </ui:define>
+    <ui:define name="leftLeftList" >
+      <div class="L">
+<!--        <p:selectOneMenu id="acount" value="#{salesAgentClaimView.selectedAccount}" converter="omnifaces.SelectItemsConverter">
+          <f:selectItems  value="#{salesAgentClaimView.accountList}" var="item" itemLabel="#{item.accountTitle}" itemValue="#{item}" />
+          <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{salesAgentClaimView.accountFilter}" update="claimobjectsTableList"  />
+        </p:selectOneMenu>  -->
+        <p:autoComplete value="#{salesAgentClaimView.salesAgent}" completeMethod="#{salesAgentClaimView.scmUserProfileAuto}" converter="wawo.LookupIntConverter"
+                        required="true" requiredMessage="#{lang.salesAgentCommisionClaimUserProfileId} #{lang.isRequired}" id="userProfileId"
+                        var="e" itemValue="#{e}" itemLabel="#{e.name}" emptyMessage="#{lang.noResult}" dropdown="true"
+                        cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" placeholder="#{lang.select} #{lang.salesAgent}" >
+          <f:attribute name="clazz" value="#{scmLookupView.userProfileClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.userProfileById()}"/>
+          <p:ajax event="itemSelect" process="userProfileId" immediate="true" update="newClaimDiv claimobjectsTableList" />
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.name}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.userCode}" />
+          </p:column>
+        </p:autoComplete>
+      </div>
+      <h:panelGroup layout="block" styleClass="L" id="newClaimDiv" >
+        <p:commandButton id="newClaimBtn" type="button" icon="fa fa-angle-down" value="#{lang.newform}" iconPos="down" styleClass="btn btn-primary" rendered="#{salesAgentClaimView.salesAgent ne null}"/>
+        <p:menu overlay="true" trigger="newClaimBtn" my="left top" at="left bottom" styleClass="w-80"  >
+          <c:forEach var="claimMonth" items="#{salesAgentClaimView.generateClaimMonths(main)}">
+            <p:menuitem  immediate="true" update="f1" value="#{claimMonth.claimMonthName}-#{claimMonth.claimYear}" actionListener="#{salesAgentClaimView.newClaim(main,claimMonth)}">
+            </p:menuitem>
+
+          </c:forEach>
+        </p:menu>
+      </h:panelGroup>
+    </ui:define>
+
+
+    <ui:define name="rightList" >
+
+<!--      <p:selectOneMenu id="month" value="#{salesAgentClaimView.selectedMonth}" >
+        <f:selectItem itemLabel="#{lang.all}" itemValue="#{0}" />
+        <f:selectItems  value="#{salesAgentClaimView.monthsMap.entrySet()}" var="item" itemLabel="#{item.value}" itemValue="#{item.key}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{salesAgentClaimView.monthFilter}" update="claimobjectsTableList" />
+      </p:selectOneMenu>        -->
+<!--      <p:selectOneMenu id="year" value="#{salesAgentClaimView.selectedYear}" >
+        <f:selectItem itemValue="2017" itemLabel="2017" />
+        <f:selectItem itemValue="2018" itemLabel="2018" />
+        <f:selectItems  value="{userRuntimeView.getYearList()}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{salesAgentClaimView.yearFilter}" update="claimobjectsTableList"/>
+      </p:selectOneMenu>
+      <p:selectOneMenu id="month" value="#{salesAgentClaimView.selectedMonth}" >
+        <f:selectItems  value="#{userRuntimeView.monthsFiscalMap.entrySet()}" var="item" itemLabel="#{item.value}" itemValue="#{item.key}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{salesAgentClaimView.monthFilter}" update="claimobjectsTableList"/>
+      </p:selectOneMenu>          -->
+    </ui:define>
+    <ui:define name="newList" ></ui:define>
+    <ui:define name="afterForm">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:dataTable id="claimobjectsTable" var="row" widgetVar="claimobjectsWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{salesAgentClaimView.getClaim()}" rowKey="#{row.id}"
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+
+        <p:column headerText="#{lang.invoiceNo}" ><h:outputText value="#{appView.display(row.salesInvoiceId.invoiceNo)}" title="#{appView.title(row.salesInvoiceId.invoiceNo)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.date}" ><h:outputText value="#{appView.date(row.createdAt)}" title="#{appView.date(row.createdAt)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.amount}" style="text-align: right;"><h:outputText value="#{appView.decimal(row.invoiceAmount)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.commission}" style="text-align: right;"><h:outputText value="#{appView.decimal(row.claimAmount)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.approved} #{lang.commission}" style="text-align: right;"><p:inputNumber value="#{row.approvedAmount}"  /></p:column>
+        <p:columnGroup type="footer">
+          <p:row>
+            <p:column  style="text-align:right" footerText="" />
+            <p:column  style="text-align:right" footerText="" />
+            <p:column  style="text-align:right" footerText="" />
+            <p:column  style="text-align:right" footerText="Total:" />
+            <p:column   style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(salesAgentClaimView.salesAgentClaim.totalAmountClaim)}" ></p:column>
+            <p:column footerText="" />
+          </p:row>
+        </p:columnGroup>
+      </p:dataTable>
+      <div class="bar">
+        <h:panelGroup layout="block" styleClass="R">
+          <p:panelGrid  >
+            <f:facet name="header">
+              <p:row>
+                <p:column ></p:column>
+                <p:column ></p:column>
+                <p:column></p:column>
+              </p:row>
+            </f:facet>
+            <p:row><p:column>
+                <h:panelGroup id="taxCodeIgstLabel" >
+                  <p:outputLabel value="#{lang.add} #{lang.tax}" for="servicesTaxCodeIgstId"/>
+                </h:panelGroup>
+              </p:column>
+              <p:column>
+                <h:panelGroup id="taxCodeIgstDiv">
+                  <p:selectOneMenu value="#{salesAgentClaimView.salesAgentClaim.taxCodeIgstId}"  converter="omnifaces.SelectItemsConverter" id="servicesTaxCodeIgstId"
+                                   styleClass="fw">
+                    <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+                    <f:selectItems value="#{salesAgentClaimView.taxCodeSalesAgentAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.code}"  />
+                    <p:ajax event="itemSelect" listener="#{salesAgentClaimView.addIgst(salesAgentClaimView.salesAgentClaim)}" process="taxCodeIgstDiv" update="taxCodeIgstAmount totalgst totalClaimedAmont"/>
+                  </p:selectOneMenu>
+                  <p:message for="servicesTaxCodeId" display="text" />
+                </h:panelGroup>
+              </p:column>
+              <p:column styleClass="t-r">
+                <h:panelGroup id="taxCodeIgstAmount" style="text-align: right;" >
+                  <h:outputText value="#{appView.decimal(salesAgentClaimView.salesAgentClaim.gstAmountClaim)}"/>
+                </h:panelGroup>
+              </p:column>
+            </p:row>
+            <p:row><p:column></p:column><p:column></p:column><p:column styleClass="t-r">
+                <h:panelGroup id="totalgst" >
+                  <h:outputText value="#{appView.decimal(salesAgentClaimView.salesAgentClaim.totalAmountClaim+salesAgentClaimView.salesAgentClaim.gstAmountClaim)}" />
+                </h:panelGroup>
+
+              </p:column></p:row>
+            <p:row><p:column >
+                <h:panelGroup id="taxCodeLabel" >
+                  <p:outputLabel value="#{lang.less} #{lang.tds}" for="servicesTaxCodeId"/>
+                </h:panelGroup>
+              </p:column>
+              <p:column>
+                <h:panelGroup id="taxCodeDiv">
+                  <p:selectOneMenu value="#{salesAgentClaimView.salesAgentClaim.taxCodeId}"  converter="omnifaces.SelectItemsConverter" id="servicesTaxCodeId"
+                                   styleClass="fw">
+                    <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+                    <f:selectItems value="#{salesAgentClaimView.taxCodeAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.code}"  />
+                    <p:ajax event="itemSelect" listener="#{salesAgentClaimView.lessTds(salesAgentClaimView.salesAgentClaim)}" process="taxCodeDiv" update="taxCodeLessTdsAmount totalClaimedAmont"/>
+                  </p:selectOneMenu>
+                  <p:message for="servicesTaxCodeId" display="text" />
+                </h:panelGroup>
+              </p:column>
+              <p:column styleClass="t-r">
+
+                <h:panelGroup id="taxCodeLessTdsAmount" >
+                  <h:outputText value="#{appView.decimal(salesAgentClaimView.salesAgentClaim.tdsAmountClaim)}"/>
+                </h:panelGroup>
+              </p:column></p:row>
+
+
+            <p:row><p:column>
+                <h:panelGroup>
+                  <p:outputLabel value="#{lang.commission} #{lang.claim}" />
+                </h:panelGroup>
+              </p:column><p:column></p:column><p:column styleClass="t-r">
+                <h:panelGroup id="totalClaimedAmont" >
+                  <p:outputLabel value="#{appView.decimal((salesAgentClaimView.salesAgentClaim.totalAmountClaim+salesAgentClaimView.salesAgentClaim.gstAmountClaim)-salesAgentClaimView.salesAgentClaim.tdsAmountClaim)}" />
+                </h:panelGroup>
+              </p:column></p:row>
+
+
+
+
+          </p:panelGrid>
+        </h:panelGroup>
+      </div>
+
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="claimobjectsTableList" var="vendorClaimVar" widgetVar="vendorClaimWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesAgentClaimView.salesAgentClaimLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{vendorClaimVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesAgentClaimView.vendorClaimSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('claimobjectsWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+<!--        <p:column headerText="#{lang.invoiceNo}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(vendorClaimVar.salesInvoiceId.invoiceNo)}" process="@this" update="f1" immediate="true"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesAgentClaimView.salesAgentClaim}" value="#{vendorClaimVar}" />
+          </p:commandLink>
+        </p:column>-->
+        <p:column headerText="#{lang.salesAgent}">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(vendorClaimVar.salesAgentId.name)}" process="@this" update="f1" immediate="true"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesAgentClaimView.salesAgentClaim}" value="#{vendorClaimVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.code}"><h:outputText value="#{appView.display(vendorClaimVar.salesAgentId.userCode)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.date}">
+            <p:calendar value="#{vendorClaimVar.createdAt}" pattern="MM/yyyy" showOn="off" mask="true"
+                      converterMessage="#{lang.expiryDateActual} #{lang.invalidDate}" maskSlotChar="mm/yyyy"
+                      maxlength="29" id="expiryDateActual" disabled="true">
+          </p:calendar>
+        </p:column>
+        <p:column headerText="#{lang.amount}" style="text-align: right;"><h:outputText value="#{appView.decimal(vendorClaimVar.invoiceAmountTotal)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.commission}" style="text-align: right;"><h:outputText value="#{appView.decimal(vendorClaimVar.claimAmountTotal)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.approved} #{lang.commission}" style="text-align: right;"><h:outputText value="#{appView.decimal(vendorClaimVar.approvedAmountTotal)}" /></p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

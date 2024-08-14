@@ -1,0 +1,167 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+    <ui:param name="rendered" value="#{main.isEdit()}" />
+    <ui:param name="label" value="#{productView.product.productName} / #{lang.productDetail}" />
+    <p:dataTable id="productDetailTable" var="productDetailVar" widgetVar="productDetailWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                 value="#{productView.productDetailList}" rowHover="true" reflow="true" editable="true">
+
+      <p:ajax event="rowEdit" update="productDetailTable" listener="#{productDetailView.onRowEdit}"/>
+
+      <f:facet name="header">
+        <p:outputPanel styleClass="hidden" >
+          <p:inputText id="globalFilter"  onkeyup="return PF('productDetailWidget').filter()" />
+        </p:outputPanel>
+      </f:facet>
+
+      <!-- Batch -->
+      <p:column headerText="#{lang.batch} #{lang.no}" sortBy="#{productDetailVar.batchNo}" field="batch_no">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(productDetailVar.batchNo)}" title="#{appView.title(productDetailVar.batchNo)}" escape="false" />
+          </f:facet>
+          <f:facet name="input"> 
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{productDetailVar.batchNo}" maxlength="100" required="true" requiredMessage="#{lang.batch} #{lang.no} #{lang.isRequired}" id="batchNo" />
+              <p:message for="batchNo" display="text"/>
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <!-- Expiry Date -->
+      <p:column headerText="#{lang.expiryDate}" sortBy="#{productDetailVar.expiryDateActual}" field="expiry_date_actual" >
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{sysRuntimeView.dateToMMYY(productDetailVar.expiryDateActual)}" escape="false" />
+          </f:facet>
+          <f:facet name="input"> 
+            <h:panelGroup>
+              <p:calendar value="#{productDetailVar.expiryDateActual}" pattern="#{lang.datePattern}" converterMessage="#{lang.expiryDate} #{lang.invalidDate}" 
+                          maxlength="29" id="expiryDateActual" showButtonPanel="true" navigator="true" mask="true" styleClass="fw"/>
+              <p:message for="expiryDateActual" display="text"/>
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <!-- MRP -->
+      <p:column headerText="#{lang.mrp}" sortBy="#{productDetailVar.valueMrp}" field="value_mrp" style="text-align: right">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.decimal(productDetailVar.valueMrp)}" escape="false" />
+          </f:facet>
+          <f:facet name="input"> 
+            <h:panelGroup>
+              <p:inputNumber styleClass="fw" value="#{productDetailVar.valueMrp}" converterMessage="#{lang.mrp} #{lang.invalidNumber}" decimalPlaces="2" 
+                            onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" requiredMessage="#{lang.mrp} #{lang.isRequired}" 
+                             id="valueMrp" />
+              <p:message for="valueMrp" display="text"/>
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <!-- Available Quantity -->
+      <p:column headerText="#{lang.quantity}" style="text-align: right">
+        <h:outputText value="#{productDetailVar.quantityAvailable}" escape="false" />
+      </p:column>
+
+      <!-- Available Free Quantity -->
+      <p:column headerText="#{lang.Free} #{lang.quantity}" style="text-align: right">
+        <h:outputText value="#{productDetailVar.quantityFreeAvailable}" escape="false" />
+      </p:column>
+
+      <!-- Status -->
+<!--      <p:column headerText="#{lang.status}" sortBy="#{productDetailVar.prodDetailStatusId.title}" field="prod_detail_status_id.title">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(productDetailVar.prodDetailStatusId.title)}" title="#{appView.title(productDetailVar.prodDetailStatusId.title)}" escape="false" />
+          </f:facet>
+          <f:facet name="input"> 
+            <h:panelGroup>
+              <p:autoComplete styleClass="fw" value="#{productDetailVar.prodDetailStatusId}" completeMethod="#{productDetailView.prodDetailStatusAuto}" 
+                              converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.productDetail} #{lang.status} #{lang.isRequired}" 
+                              id="productDetailProdDetailStatusId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" 
+                              cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  
+                              style="position: relative" >
+                <f:attribute name="clazz" value="#{scmLookupView.prodDetailStatusClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.prodDetailStatusById()}"/>
+              </p:autoComplete>
+              <p:message for="productDetailProdDetailStatusId" display="text" />
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>-->
+
+      <!-- Row Edit -->
+      <p:column style="width:50px;">
+        <p:rowEditor id="editRow" />
+      </p:column>
+
+      <!-- Action Icon and Logs -->
+      <p:column headerText="#{lang.action}" style="text-align: center;">
+        <p:commandButton id="priceListBtn" icon="fa fa-eye" title="View Price List" action="#{productView.getProductDetailPriceList(productDetailVar)}" 
+                         oncomplete="PF('priceListDlg').show();" update="priceListTable">
+        </p:commandButton>
+
+        <p:commandButton id="deleteBtn" icon="fa fa-trash" title="#{lang.delete}" action="#{productView.deleteProductDetail(main, productDetailVar)}" 
+                         update="priceListTable">
+          <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+        </p:commandButton>
+
+        <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+          <ui:define name="cby">#{appView.display(productDetailVar.createdBy)}</ui:define>
+          <ui:define name="cat">#{appView.dateTime(productDetailVar.createdAt)}</ui:define>
+          <ui:define name="uby">#{appView.display(productDetailVar.modifiedBy)}</ui:define>
+          <ui:define name="uat">#{appView.dateTime(productDetailVar.modifiedAt)}</ui:define>
+          <ui:define name="id">#{appView.display(productDetailVar.id)}</ui:define>
+        </ui:decorate>        
+      </p:column>
+
+    </p:dataTable>
+
+    <!-- Product Price List Pop-up -->
+    <p:dialog header="#{lang.priceList}" widgetVar="priceListDlg" modal="true" dynamic="true" closable="true" >      
+
+      <p:dataTable id="priceListTable" var="priceVar" widgetVar="priceWidget"
+                   value="#{productView.getProductDetailPriceListList()}" rowHover="true" reflow="false"  
+                   tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+
+        <p:ajax event="rowEdit" listener="#{productView.onRowEdit}" update="priceListTable"/>
+
+        <!-- Product Price List Name -->
+        <p:column headerText="#{lang.productPricelist}" field="account_group_price_list_id.title">
+          <h:outputText value="#{appView.display(priceVar.accountGroupPriceListId.title)}" escape="false"/>
+        </p:column>
+
+        <!-- Product Name -->
+        <p:column headerText="#{lang.productName}" field="account_group_price_list_id.product_detail_id.product_name">
+          <h:outputText value="#{appView.display(priceVar.productDetailId.productBatchId.productId.productName)}" escape="false"/>
+        </p:column>
+
+        <!-- Product Rate -->
+        <p:column headerText="Price" field="value_pts_per_prod_piece_sell"> 
+          <p:cellEditor>
+            <f:facet name="output">
+              <h:outputText value="#{appView.decimal(priceVar.valuePtsPerProdPieceSell)}" escape="false"  />
+            </f:facet>
+            <f:facet name="input"> 
+              <h:panelGroup>
+                <p:inputNumber styleClass="fw" value="#{priceVar.valuePtsPerProdPieceSell}" converterMessage="#{lang.price} #{lang.invalidNumber}" decimalPlaces="2" 
+                              onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" requiredMessage="#{lang.price} #{lang.isRequired}" 
+                               id="valuePrice" />
+                <p:message for="valuePrice" display="text"/>
+              </h:panelGroup>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+        <!-- Row Edit -->
+        <p:column>
+          <p:rowEditor/>
+        </p:column>
+
+      </p:dataTable>
+    </p:dialog>
+  </ui:decorate>
+</ui:composition>

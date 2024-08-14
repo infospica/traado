@@ -1,0 +1,759 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  #{purchaseReturnView.setPurchaseReturnItemSelected(null)}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReturn}" />
+    <ui:param name="ids" value="purchaseReturnGst" />
+    <ui:param name="rendered" value="#{main.isForm()}" />
+    <ui:param name="deleteFormMenu" value="#{purchaseReturnView.draft}" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="more" value="#{purchaseReturnView.draft}" />
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{purchaseReturnView.deletePurchaseReturn(main)}" value="#{lang.delete}" onclick="wdgOff('purchaseReturnWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{purchaseReturnView.clonePurchaseReturn(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <h:commandButton action="#{purchaseReturnView.savePurchaseReturn(main,sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
+                       rendered="#{purchaseReturnView.draft}"  >
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <p:commandButton action="#{purchaseReturnView.savePurchaseReturn(main,sysConstant.CONFIRMED)}" value="#{lang.confirm}" onclick="toTop()" styleClass="btn btn-warning"
+                       rendered="#{purchaseReturnView.draft and main.edit}" process="f1" update="f1" onstart="block();" oncomplete="unblock();" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:commandButton action="#{purchaseReturnView.savePurchaseReturn(main,sysConstant.CONFIRMED_AND_PACKED)}" value="#{lang.confirm} #{lang.andSymbol} #{lang.packed}" onclick="toTop()"
+                       styleClass="btn btn-primary" rendered="#{purchaseReturnView.confirmed}" process="f1" update="f1" onstart="block();" oncomplete="unblock();">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <h:commandButton action="#{purchaseReturnView.switchToShipping(main)}" value="#{purchaseReturnView.consignment != null ? lang.view +=' '+= lang.consignment : lang.create +=' '+= lang.consignment}"
+                       onclick="toTop()" styleClass="btn btn-primary" rendered="#{purchaseReturnView.confirmedAndPacked}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <p:commandButton id="rsiBtn" value="Related Items" styleClass="btn btn-info" process="@this" update="@this"
+                       type="button" rendered="#{!purchaseReturnView.draft and userRole.isRoot() and main.edit}" >
+      </p:commandButton>
+
+      <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{purchaseReturnView.actionResetPurchaseReturn(main)}" onstart="block();" oncomplete="unblock();"
+                       rendered="#{!purchaseReturnView.draft and main.edit and userRuntimeView.privilege.resetToDraft==true and !purchaseReturnView.tradeClosed}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+      <!-- Print -->
+      <p:commandButton value="#{lang.print}" actionListener="#{purchaseReturnView.printLandscape(main, sysConstant.PDF_ITEXT)}"
+                       rendered="#{main.edit}"
+                       immediate="true"  process="@this"  styleClass="btn btn-info">
+      </p:commandButton>  
+      <p:commandButton value="#{lang.print} A4" actionListener="#{purchaseReturnView.printPortrait(main, sysConstant.PDF_ITEXT)}"
+                       rendered="#{main.edit}"
+                       immediate="true"  process="@this"  styleClass="btn btn-info">
+      </p:commandButton> 
+      <h:panelGroup style="padding-left:10px;"  rendered="#{!main.isNew()}" >
+        <p:commandButton value=" Export" actionListener="#{purchaseReturnView.export(main)}" immediate="true" styleClass="btn btn-info" 
+                         ajax="false" icon="fa fa-file-excel-o" iconPos="left"   />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="formRight" >   
+      <!--<p:panelGrid columns="2">-->
+      <h:panelGroup styleClass="L">
+        <div class="p-t-10">          
+          <!-- next document number -->
+          <span><h:outputText  value="#{lang.next} #{lang.documentNo} #{lang.colon} " rendered="#{purchaseReturnView.draft }" />  </span>
+          <p:outputLabel styleClass="m-r-10" value="#{purchaseReturnView.nextInvoiceNumber}" style="color:#900;" 
+                         rendered="#{purchaseReturnView.draft }" />
+          <p:spacer width="5" />
+
+          <!-- Vendor Name -->
+          <span>#{lang.vendor} #{lang.colon} </span>
+          <label style="color: dodgerblue;" class="m-r-10">#{accountUtilView.getVendorName(userRuntimeView.account)}</label>
+          <p:spacer width="5" />
+
+          <!-- Trade Profile -->
+          <span>#{lang.tradeProfile} #{lang.colon} </span>
+          <label style="color: dodgerblue;" class="m-r-10">#{accountUtilView.getTradeProfileTitle(userRuntimeView.account)}</label>
+          <p:spacer width="5" />
+
+          <!-- GSTIN -->
+          <span>#{lang.gstin} #{lang.colon} </span>
+          <label style="color: dodgerblue;" class="m-r-10 text-uppercase">#{accountUtilView.getGstin(userRuntimeView.account)}</label>
+        </div>
+      </h:panelGroup>
+      <h:panelGroup rendered="#{!main.isNew()}">
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-left"  disabled="#{!purchaseReturnView.isPreviousButton()}" title="Previous #{lang.salesInvoice}"
+                         actionListener="#{purchaseReturnView.nextOrPreviousInvoice(main,-1)}" immediate="true" update="f1" onclick="block();" oncomplete="unblock();" />
+        <p:commandButton styleClass="btn btn-info" icon="fa fa-chevron-right" iconPos="right" disabled="#{!purchaseReturnView.isNextButton()}" title="#{lang.next} #{lang.salesInvoice}"
+                         actionListener="#{purchaseReturnView.nextOrPreviousInvoice(main,1)}" immediate="true" update="f1" onclick="block();" oncomplete="unblock();" />
+      </h:panelGroup>
+      <!--</p:panelGrid>-->
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+
+      <h:panelGroup rendered="#{main.isForm()}" styleClass="m-x--10" >
+        <h:panelGroup layout="block" styleClass="table-responsive" id="invoiceHeaderDiv">
+          <p:panelGrid styleClass="ui-panelgrid-blank form-horizontal" style="margin-bottom: 10px;" id="invoiceDetailsDiv" columnClasses="#{sysRuntimeView.grid4}" >
+            <f:facet name="header">
+              <p:row>
+                <p:column>
+                  <p:outputLabel value="#{lang.invoiceNo}" for="invoiceNo" />
+                </p:column>
+                <p:column>
+                  <p:outputLabel value="#{lang.returnDate}" for="entryDate" />
+                </p:column>
+                <p:column>
+                  <p:outputLabel value="#{lang.invoiceDate}" for="invoiceDate" />
+                </p:column>                
+                <p:column>
+                  <p:outputLabel value="#{lang.invoiceAmountNet}" for="invoiceNetAmount" />
+                </p:column>
+                <p:column>
+                  <p:outputLabel value="#{lang.gstNo} #{lang.value}" for="invoiceGstValue"/>
+                </p:column>
+                <p:column>
+                  <p:outputLabel value="#{lang.invoiceAmount}" for="invoiceAmount" />
+                </p:column>
+                <p:column>
+                  <p:outputLabel value="#{lang.note}" for="note" >
+                    <i class="fa fa-print"></i>
+                  </p:outputLabel>
+                </p:column>
+                <p:column>
+                  <p:outputLabel value="#{lang.remarks}" for="remarks" />
+                </p:column>
+              </p:row>
+            </f:facet>
+            <p:row>
+              <!-- Invoice No -->
+              <p:column >
+                <p:inputText id="invoiceNo" styleClass="form-control prNum" value="#{purchaseReturnView.purchaseReturn.invoiceNo}" title="#{lang.invoiceNo}" disabled="true"/>
+              </p:column>
+
+              <!-- Entry Date -->
+              <p:column>
+                <p:calendar value="#{purchaseReturnView.purchaseReturn.entryDate}" pattern="#{lang.datePattern}" 
+                            maxdate="#{userRuntimeView.maxEntryDate}" mindate="#{userRuntimeView.minEntryDate}"
+                            converterMessage="#{lang.entryDate} #{lang.invalidDate}" title="#{lang.entryDate}" required="true"
+                            requiredMessage="#{lang.entryDate} #{lang.isRequired}" validator="#{sysRuntimeView.dateLteToday}"
+                            maxlength="29" id="entryDate" showButtonPanel="true" navigator="true" mask="true" >
+                  <p:ajax event="change" process="@this" update="@this"/>
+                  <p:ajax event="dateSelect" process="@this" update="@this"/>
+                </p:calendar>
+              </p:column>
+
+              <!-- Invoice Date -->
+              <p:column>
+                <p:calendar value="#{purchaseReturnView.purchaseReturn.invoiceDate}" pattern="#{lang.datePattern}" 
+                            maxdate="#{userRuntimeView.maxEntryDate}" mindate="#{userRuntimeView.minEntryDate}"
+                            converterMessage="#{lang.invoiceDate} #{lang.invalidDate}" title="#{lang.invoiceDate}" validator="#{sysRuntimeView.dateLteToday}"
+                            requiredMessage="#{lang.invoiceDate} #{lang.isRequired}" required="true"
+                            maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true" />
+              </p:column>              
+
+              <!-- Invoice Net Amount -->
+              <p:column >
+                <p:inputNumber value="#{purchaseReturnView.purchaseReturn.assessableValue}" decimalPlaces="2"
+                               title="#{lang.goodsValue}" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999.99" symbol="#{appView.currencySymbol} " maxlength="10" id="invoiceNetAmount" disabled="true">
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Invoice Gst Value -->
+              <p:column >
+                <p:inputNumber value="#{purchaseReturnView.purchaseReturn.invoiceAmountIgst}" decimalPlaces="2"
+                               title="#{lang.gstValue}" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999.99" symbol="#{appView.currencySymbol} " maxlength="10" id="invoiceGstValue" disabled="true">
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Invoice Amount -->
+              <p:column>
+                <p:inputNumber value="#{purchaseReturnView.purchaseReturn.invoiceAmount}" decimalPlaces="2"
+                               title="#{lang.invoiceAmount}" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999.99" symbol="#{appView.currencySymbol} " maxlength="10" id="invoiceAmount" disabled="true">
+                </p:inputNumber>
+              </p:column>
+
+              <!-- Note For Customer -->
+
+              <p:column >
+                <p:inputTextarea value="#{purchaseReturnView.purchaseReturn.noteForCustomerOrSupplier}" placeholder="#{lang.note} (#{lang.print})" 
+                                 rows="1" maxlength="255" id="note" autoResize="false" styleClass="fw" cols="25"/>
+              </p:column>
+              <!-- Remarks -->
+              <p:column >
+                <p:inputTextarea value="#{purchaseReturnView.purchaseReturn.remarks}" title="#{purchaseReturnView.purchaseReturn.remarks}" placeholder="#{lang.remarks}"
+                                 id="remarks" rows="1"  maxlength="255" autoResize="false" styleClass="fw" cols="25"/>
+              </p:column>
+
+            </p:row>
+          </p:panelGrid>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <h:panelGroup layout="block" rendered="#{main.isForm()}"  id="lineItemDiv">
+
+        <p:overlayPanel  id="relatedItemPanel" for="rsiBtn" widgetVar="srPanel" modal="true" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true"
+                         dynamic="false" style="width: 500px;" >
+          <h:panelGroup layout="block">
+            <h:panelGroup id="relatedItemDiv">
+              <p:dataTable id="relatedItemTable" var="relatedItemVar" value="#{purchaseReturnView.relatedItemsList}" tableStyleClass="mDataTable mDataTable-center editLinks"
+                           rows="10" 
+                           paginator="true" paginatorAlwaysVisible="false"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="5,10,15">
+                <p:column headerText="#{lang.invoiceNo}">
+                  <h:outputText value="#{relatedItemVar.invoiceNo}" />
+                </p:column>
+                <p:column headerText="#{lang.invoice} #{lang.type}">
+                  <h:outputText value="#{relatedItemVar.title}" />
+                </p:column>
+              </p:dataTable>
+            </h:panelGroup>
+          </h:panelGroup>
+        </p:overlayPanel>
+
+        <p:remoteCommand name="purchaseReturnConsignmentPopupReturned" update="f1" process="@this" immediate="true" />
+
+        <h:panelGroup layout="block" rendered="#{purchaseReturnView.purchaseReturn.purchaseReturnStatusId.id ge 3}">
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+            <ui:param name="ids" value="packInfo" />
+            <ui:param name="label" value="#{lang.packingInfo}" />
+            <ui:param name="grid" value="false" />
+            <ui:param name="rendered" value="#{!purchaseReturnView.draft}"/>
+
+            <ui:define name="subAfter">
+              <h:panelGroup layout="block" styleClass="form-horizontal">
+                <!-- Primary Packing -->
+                <h:panelGroup layout="block" styleClass="form-group">
+                  <p:outputLabel styleClass="col-md-3 control-label" value="#{lang.noOfBoxes}" for="noOfBoxes" />
+                  <h:panelGroup layout="block" styleClass="col-md-9 ">
+                    <h:panelGroup layout="block" styleClass="flex">
+                      <h:panelGroup layout="block" styleClass="cell-0 w-100">
+                        <p:inputNumber value="#{purchaseReturnView.purchaseReturn.noOfBoxes}" converterMessage="#{lang.noOfBoxes} #{lang.invalidNumber}" decimalPlaces="0"
+                                       styleClass="fw" inputStyle="text-align: center;"
+                                       required="true" requiredMessage="#{lang.noOfBoxes} #{lang.isRequired}" title="#{lang.noOfBoxes}"
+                                       onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999" minValue="0.0" maxlength="10" id="noOfBoxes" readonly="#{purchaseReturnView.isConfirmedAndPacked()}">
+                        </p:inputNumber>
+                        <p:message for="noOfBoxes" display="text" />
+                      </h:panelGroup>
+                    </h:panelGroup>
+                  </h:panelGroup>
+                </h:panelGroup>
+
+                <h:panelGroup layout="block" styleClass="form-group">
+                  <p:outputLabel styleClass="col-md-3 control-label" value="#{lang.weight}" for="weight" />
+                  <h:panelGroup layout="block" styleClass="col-md-9 ">
+                    <h:panelGroup layout="block" styleClass="flex">
+                      <h:panelGroup layout="block" styleClass="cell-0 w-100">
+                        <p:inputNumber value="#{purchaseReturnView.purchaseReturn.weight}" converterMessage="#{lang.weight} #{lang.invalidNumber}" decimalPlaces="3"
+                                       inputStyle="text-align: center;"
+                                       required="true" requiredMessage="#{lang.weight} #{lang.isRequired}" title="#{lang.weight}"
+                                       onfocus="this.select()" inputStyleClass="form-control text-right" maxValue="9999999999" minValue="0.00" maxlength="10" id="weight" readonly="#{purchaseReturnView.isConfirmedAndPacked()}">
+                        </p:inputNumber>
+                        <p:message for="weight" display="text" />
+                      </h:panelGroup>
+                      <h:panelGroup layout="block" styleClass="cell-0 w-80">
+                        <p:selectOneMenu value="#{purchaseReturnView.purchaseReturn.weightUnit}" styleClass="p-t-5" >
+                          <f:selectItem itemLabel="gram" itemValue="g" />
+                          <f:selectItem itemLabel="kilogram" itemValue="kg" />
+                          <f:selectItem itemLabel="metric ton" itemValue="mt" />
+                        </p:selectOneMenu>
+                      </h:panelGroup>
+                    </h:panelGroup>
+                  </h:panelGroup>
+                </h:panelGroup>
+              </h:panelGroup>
+            </ui:define>
+          </ui:decorate>
+        </h:panelGroup>
+
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="ids" value="companyInvestor" />
+          <ui:param name="rendered" value="#{main.isForm()}" />
+          <ui:param name="label" value="#{purchaseReturnView.purchaseReturn.purchaseReturnStockCat.title}" />
+
+          <ui:define name="menuleft">
+
+            <p:commandButton action="#{purchaseReturnView.purchaseReturnItemListPopup(main)}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus"
+                             disabled="#{purchaseReturnView.valueMrpChanged}"
+                             iconPos="left" styleClass="btn btn-info" rendered="#{purchaseReturnView.isDraft()}">
+            </p:commandButton>
+
+            <p:remoteCommand name="purchaseReturnItemPopupReturned" actionListener="#{purchaseReturnView.purchaseReturnItemPopupReturned(main)}"
+                             update="purchaseReturnItemTable invoiceHeaderDiv"  process="@this" immediate="true" oncomplete="refreshDatatable();focusToQty();" />
+
+          </ui:define>
+
+          <h:panelGroup layout="block" id="purchaseReturnItemTableDiv" pt:data-fast-input="true">
+
+            <p:remoteCommand name="updateInvoiceSummery" process="@this" update="purchaseReturnItemTable:invoiceSummarydiv invoiceHeaderDiv" />
+
+            <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" pt:data-fast-input="true" >
+              <p:dataTable id="purchaseReturnItemTable" var="purchaseReturnItemVar" widgetVar="purchaseReturnItemWidget" rowIndexVar="rowIndex"
+                           tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{purchaseReturnView.purchaseReturnItemReplicaList}"
+                           rows="50" 
+                           paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="50,100,150" rowKey="#{purchaseReturnItemVar.invoiceProductKey eq null? purchaseReturnView.getRowKey():purchaseReturnItemVar.invoiceProductKey}" 
+                           rowSelectMode="checkbox" selection="#{purchaseReturnView.purchaseReturnItemSelected}" >
+
+                <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+                <p:ajax event="rowSelectCheckbox"  />
+                <p:ajax event="rowUnselectCheckbox" />
+                <p:ajax event="toggleSelect" />
+                <p:column styleClass="w-60">
+                  <f:facet name="header"><h:outputText value="#{lang.sno}" title="#{lang.serialNumber}"/></f:facet>
+                  <h:outputText value="#{rowIndex + 1}" />
+                </p:column>
+
+                <!-- Product Name -->
+                <p:column headerText="#{lang.product}" styleClass="w-200">
+                 <!-- #{purchaseReturnItemVar.productDetail.productBatchId.productId.id eq null?purchaseReturnView.getRowKey():purchaseReturnItemVar.productDetail.productBatchId.productId.id}- -->
+                  <h:outputText value="#{appView.display(purchaseReturnItemVar.productDetail.productBatchId.productId.productName)}" title="#{purchaseReturnItemVar.productDetail.productBatchId.productId.productName}" escape="false" />
+                </p:column>
+
+                <!-- Batch Number -->
+                <p:column headerText="#{lang.batch}">
+                  #{appView.display(purchaseReturnItemVar.productDetail.productBatchId.batchNo)}
+                </p:column>
+
+                <!-- Expiry Date -->
+                <p:column id="col19" >
+                  <f:facet name="header"><h:outputText id="lbl35" value="#{lang.expiry}" title="#{lang.expiryDateActual}"/></f:facet>
+                  <h:outputText id="txt16" value="#{sysRuntimeView.dateToMMYY(purchaseReturnItemVar.productDetail.productBatchId.expiryDateActual)}" />
+                </p:column>
+
+                <p:column headerText="#{lang.taxPercentage}" style="text-align: right">
+                  #{appView.decimal(purchaseReturnItemVar.taxCode.ratePercentage)}
+                </p:column>
+
+                <!--Reference No-->
+                <p:column id="refCol" >
+                  <f:facet name="header"><h:outputText id="refLbl" value="#{lang.refNo}" title="#{lang.referenceNo}"/></f:facet>
+                  <p:inputText value="#{purchaseReturnItemVar.referenceNo}" maxlength="40" id="refInvoiceNoId" autocomplete="off" 
+                               readonly="#{!purchaseReturnView.draft}"  />
+                </p:column>
+                <p:column style="width:4%;">
+                  <f:facet name="header"><h:outputText value="#{lang.refDate}" title="Reference Date"/></f:facet>
+                  <h:panelGroup id="refDate">
+                    <h:outputText value="#{appView.date(purchaseReturnItemVar.referenceDate)}" rendered="#{!purchaseReturnView.draft}"  />
+                    <p:calendar value="#{purchaseReturnItemVar.referenceDate}" pattern="#{lang.datePattern}" placeholder="dd-mm-yy"                     
+                                converterMessage="#{lang.referenceDate} #{lang.invalidDate}" title="#{lang.referenceDate}" 
+                                rendered="#{purchaseReturnView.draft}" 
+                                maxlength="29" showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}"/>
+                  </h:panelGroup>
+
+                </p:column> 
+
+
+                <!-- Return Quantity -->
+                <p:column headerText="#{lang.retrunQty}" style="text-align: right">
+                  <h:panelGroup layout="block" id="qtyDiv">
+                    <p:inputNumber id="returnQtyId" value="#{purchaseReturnItemVar.quantityReturned}" thousandSeparator="" 
+                                   decimalPlaces="#{purchaseReturnView.purchaseReturn.purchaseReturnStockCat.id eq 1?2:0}" minValue="0"
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="#{purchaseReturnItemVar.actualQty eq null?0: purchaseReturnItemVar.actualQty}" 
+                                   disabled="#{!purchaseReturnView.draft}" style="color:#ed143d;" title="#{lang.packSize} - #{purchaseReturnItemVar.packSize}">
+                      <p:ajax event="change" process="returnQtyId" update="sgst cgst igst goodsValue netValue sDiscValue sDiscPerc txt23 txt24 sDisc invDiscPercValue invDiscValue" listener="#{purchaseReturnView.returnQtyChangeEvent}"
+                              oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>
+
+                <!-- Actual Quantity -->
+                <p:column headerText="#{lang.available} #{lang.qty}" rendered="#{purchaseReturnView.draft}" style="text-align: right">
+                  <span style="color: #108210;text-align: right">#{appView.decimal(purchaseReturnItemVar.actualQty)}</span>
+                </p:column>
+
+                <p:column id="sDisc" styleClass="w-80" style="text-align: right">
+                  <f:facet name="header"><h:outputText id="lbl40" style="color: deepskyblue;" value="#{lang.s}.#{lang.disc}" title="#{lang.schemeDiscountValue}"/></f:facet>
+                  <h:panelGroup layout="block" id="sDiscDiv">
+                    <h:outputText value="#{appView.decimal(purchaseReturnItemVar.schemeDiscountValue)}" rendered="#{!purchaseReturnView.draft}" />
+                    <p:inputNumber id="sDiscValue" value="#{purchaseReturnItemVar.schemeDiscountValue}" rendered="#{purchaseReturnView.draft}"                               
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="3" minValue="0.0" disabled="#{purchaseReturnItemVar.isSchemeDiscountInPercentage eq 1}">
+                      <p:ajax event="change" process="sDiscValue" listener="#{purchaseReturnView.schemeDiscountValueChangeEvent(purchaseReturnItemVar)}" 
+                              update="txt24 sgst cgst igst goodsValue netValue txt23 txt24 sDiscPercValue invDiscPercValue invDiscValue" oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>
+
+                <!-- Discount %  -->
+                <p:column id="sDiscPerc" styleClass="w-60" style="text-align: right">
+                  <f:facet name="header"><h:outputText id="lbl41" style="color: deepskyblue;" value="#{lang.s}.#{lang.discPerc}" title="#{lang.schemeDiscountPercentage}"/></f:facet>
+                  <h:panelGroup layout="block" id="sDiscPercDiv">
+                    <h:outputText value="#{appView.decimal(purchaseReturnItemVar.schemeDiscountPercentage)}" rendered="#{!purchaseReturnView.draft}"   />
+                    <p:inputNumber id="sDiscPercValue" value="#{purchaseReturnItemVar.schemeDiscountPercentage}" rendered="#{purchaseReturnView.draft}"                                  
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" decimalPlaces="3" minValue="0.00" 
+                                   disabled="#{purchaseReturnItemVar.isSchemeDiscountInPercentage eq 2}">
+                      <p:ajax event="change" process="sDiscPercValue" listener="#{purchaseReturnView.schemeDiscountPercChangeEvent(purchaseReturnItemVar)}"
+                              update="txt23 sgst cgst igst goodsValue netValue txt23 txt24 sDiscValue invDiscPercValue invDiscValue" oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>  
+
+                <p:column id="col26" styleClass="w-80" style="text-align: right">
+                  <f:facet name="header"><h:outputText id="lbl42" style="color: cornflowerblue;" value="#{lang.p}.#{lang.disc}" title="#{lang.productDiscountValue}"/></f:facet>
+                  <h:panelGroup layout="block" id="p29">
+                    <h:outputText value="#{appView.decimal(purchaseReturnItemVar.productDiscountValue)}" rendered="#{!purchaseReturnView.draft}"  />
+                    <p:inputNumber id="txt23" value="#{purchaseReturnItemVar.productDiscountValue}" rendered="#{purchaseReturnView.draft}"                               
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="3" minValue="0.0" disabled="#{purchaseReturnItemVar.isProductDiscountInPercentage eq 1}">
+                      <p:ajax event="change" process="txt23" listener="#{purchaseReturnView.productDiscountValueChangeEvent(purchaseReturnItemVar)}"
+                              update="txt24 sgst cgst igst goodsValue netValue invDiscPercValue invDiscValue" oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>
+
+                <!-- Discount %  -->
+                <p:column id="col27" styleClass="w-60" style="text-align: right">
+                  <f:facet name="header"><h:outputText id="lbl43" style="color: cornflowerblue;" value="#{lang.p}.#{lang.discPerc}" title="#{lang.productDiscountPercentage}"/></f:facet>
+                  <h:panelGroup layout="block" id="p30">
+                    <h:outputText value="#{appView.decimal(purchaseReturnItemVar.productDiscountPerc)}" rendered="#{!purchaseReturnView.draft}"  />
+                    <p:inputNumber id="txt24" value="#{purchaseReturnItemVar.productDiscountPerc}" rendered="#{purchaseReturnView.draft}"                                  
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" decimalPlaces="3" minValue="0.00" 
+                                   disabled="#{purchaseReturnItemVar.isProductDiscountInPercentage eq 2}">
+                      <p:ajax event="change" process="txt24" listener="#{purchaseReturnView.productDiscountPercChangeEvent(purchaseReturnItemVar)}"
+                              update="txt23 sgst cgst igst goodsValue netValue invDiscPercValue invDiscValue" oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>  
+
+                <!--Invoice Discount-->
+
+                <p:column id="invDisc" styleClass="w-80" style="text-align: right">
+                  <f:facet name="header"><h:outputText id="invDiscLbl" style="color: coral;" value="#{lang.i}.#{lang.disc}" title="#{lang.invoiceDiscount}"/></f:facet>
+                  <h:panelGroup layout="block" id="invDiscDiv">
+                    <h:outputText value="#{appView.decimal(purchaseReturnItemVar.invoiceDiscountValue)}" rendered="#{!purchaseReturnView.draft}" title="#{lang.product} #{lang.discount}"  />
+                    <p:inputNumber id="invDiscValue" value="#{purchaseReturnItemVar.invoiceDiscountValue}" rendered="#{purchaseReturnView.draft}"                               
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="3" minValue="0.0" disabled="#{purchaseReturnView.isInvoiceDiscountPercentage eq 1}">
+                      <p:ajax event="change" process="invDiscValue" listener="#{purchaseReturnView.invoiceDiscountValueChangeEvent(purchaseReturnItemVar)}"
+                              update="txt24 sgst cgst igst goodsValue netValue invDiscPercValue" oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>
+
+                <!-- Invoice Discount %  -->
+                <p:column id="invDiscPerc" styleClass="w-60" style="text-align: right">
+                  <f:facet name="header"><h:outputText id="invDiscPercLbl" style="color: coral;" value="#{lang.i}.#{lang.discPerc}" title="#{lang.invoiceDiscount} #{lang.percentage}"/></f:facet>
+                  <h:panelGroup layout="block" id="invDiscPercDiv">
+                    <h:outputText value="#{appView.decimal(purchaseReturnItemVar.invoiceDiscountPercentage)}" rendered="#{!purchaseReturnView.draft}" />
+                    <p:inputNumber id="invDiscPercValue" value="#{purchaseReturnItemVar.invoiceDiscountPercentage}" rendered="#{purchaseReturnView.draft}"                                  
+                                   onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" decimalPlaces="3" minValue="0.00" 
+                                   disabled="#{purchaseReturnView.isInvoiceDiscountPercentage eq 2}">
+                      <p:ajax event="change" process="invDiscPercValue" listener="#{purchaseReturnView.invoiceDiscountPercChangeEvent(purchaseReturnItemVar)}"
+                              update="txt23 sgst cgst igst goodsValue netValue invDiscValue" oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column> 
+
+                <!-- Rate -->
+                <p:column headerText="#{lang.rate}">
+                  <h:panelGroup layout="block" id="rateDiv">
+                    <p:inputNumber id="rate" value="#{purchaseReturnItemVar.valueRate}" size="10" autocomplete="off" 
+                                   decimalPlaces="#{purchaseReturnView.purchaseReturn.decimalPrecision}"
+                                   styleClass="fw" >
+                      <p:ajax event="change" process="rateDiv" update="sgst cgst igst goodsValue netValue txt23 txt24" listener="#{purchaseReturnView.returnQtyChangeEvent}"
+                              oncomplete="updateInvoiceSummery();" />
+                    </p:inputNumber>                
+                  </h:panelGroup>
+                </p:column>              
+
+                <p:column headerText="#{lang.sgst}" rendered="#{!purchaseReturnView.igstTransaction}">
+                  <h:outputText id="sgst" value="#{appView.decimal(purchaseReturnItemVar.valueSgst)}" />
+                </p:column>
+
+                <p:column headerText="#{lang.cgst}" rendered="#{!purchaseReturnView.igstTransaction}">
+                  <h:outputText id="cgst" value="#{appView.decimal(purchaseReturnItemVar.valueSgst)}" />
+                </p:column>
+
+                <p:column headerText="#{lang.igst}" rendered="#{purchaseReturnView.igstTransaction}">
+                  <h:outputText id="igst" value="#{appView.decimal(purchaseReturnItemVar.valueIgst)}" />
+                </p:column>
+
+                <!-- MRP -->
+                <p:column id="col34" styleClass="w-60">
+                  <f:facet name="header"><h:outputText id="lbl50" value="#{lang.mrp}" title="#{lang.maximumRetailPrice}"/></f:facet>
+                  <h:outputText id="txt31" value="#{appView.decimal(purchaseReturnItemVar.valueMrp)}" />
+                </p:column>
+
+                <!-- Goods value -->
+                <p:column headerText="#{lang.goodsValue}">
+                  <h:outputText id="goodsValue" value="#{appView.decimal(purchaseReturnItemVar.valueGoods)}" />
+                </p:column>
+
+                <!-- Total -->
+                <p:column headerText="#{lang.netAmount}">
+                  <h:outputText id="netValue" value="#{appView.decimal(purchaseReturnItemVar.valueNet)}" />
+                </p:column>
+
+                <!-- Status -->
+                <p:column headerText="#{lang.status}">
+                  <h:outputText value="#{appView.display(purchaseReturnItemVar.purchaseReturnItemStatus.title)}"
+                                title="#{appView.title(purchaseReturnItemVar.purchaseReturnItemStatus.title)}" escape="false" />
+                </p:column>
+                <p:column style="text-align: left;width: 30px">
+                  <f:facet name="header">
+                    <p:commandButton id="b6" process="@this" icon="fa fa-trash" tabindex="-1"  styleClass="btn" update="purchaseReturnItemTable"
+                                     rendered="#{purchaseReturnView.draft}" style="color: mediumvioletred;" oncomplete="refreshDatatable();"
+                                     actionListener="#{purchaseReturnView.deletePurchaseReturnItems(main)}" title="Delete Purchase Return Items"
+                                     >
+                      <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                    </p:commandButton>              
+                  </f:facet>
+                  <p:commandButton id="tagBtn" icon="fa fa-eye"   actionListener="#{purchaseReturnView.loadPurchaseHistoryList(main, purchaseReturnItemVar)}"
+                                   update="purchaseHistoryTable" process="@this">
+                  </p:commandButton>
+
+                  <!--Purchase History-->
+
+                  <h:panelGroup layout="block" id="purchaseHistoryDiv">
+                    <p:overlayPanel for="tagBtn" hideEffect="fade" showEvent="click" hideEvent="click" at="left" style="width:auto;min-width: 800px;" > 
+                      <p:dataTable id="purchaseHistoryTable" var="detail" widgetVar="purchaseHistoryWidget"
+                                   value="#{purchaseReturnView.purchaseHistoryList}" rowHover="true" reflow="false"  
+                                   tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+                        <p:column>
+                          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}"/></f:facet>
+                          <p:commandLink actionListener="#{popUpView.showPurchase(detail.id)}" immediate="true" rendered="#{detail.isSalesReturnInvoice eq 0}">
+                            <h:outputText  value="#{appView.display(detail.invoiceNo)}" title="#{detail.invoiceNo}" />
+                          </p:commandLink>
+                          <h:outputText  value="#{appView.display(detail.invoiceNo)}" title="#{detail.invoiceNo}" rendered="#{detail.isSalesReturnInvoice eq 1}" />
+                        </p:column>  
+
+                        <p:column>
+                          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}"/></f:facet>
+                          <h:outputText  value="#{appView.date(detail.invoiceDate)}" title="#{detail.invoiceDate}" />
+                        </p:column> 
+
+                        <p:column>
+                          <f:facet name="header"><h:outputText value="#{lang.disc}" style="text-align: right; color: deepskyblue;" title="#{lang.schemeDiscount}"/></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.schemeDiscount)}" title="#{detail.schemeDiscount}" style="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}" />
+                        </p:column> 
+
+                        <p:column>
+                          <f:facet name="header"><h:outputText value="#{lang.discPerc}" style="text-align: right; color: deepskyblue;" title="#{lang.schemeDiscountPercentage}"/></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.schemeDiscountPercentage)}" title="#{detail.schemeDiscountPercentage}" style="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}" />
+                        </p:column> 
+
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.disc}" style="text-align: right;color: cornflowerblue" title="#{lang.productDiscount}" /></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.productDiscount)}" title="#{detail.productDiscount}" style="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}" />
+                        </p:column> 
+
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.discPerc}" style="text-align: right;color: cornflowerblue" title="#{lang.productDiscountPercentage}"/></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.productDiscountPercentage)}" title="#{detail.productDiscountPercentage}" style="color:#{productEntryDetailVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}" />
+                        </p:column> 
+
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.disc}" style="text-align: right;color: coral;" title="#{lang.invoiceDiscount}" /></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.invoiceDiscount)}" title="#{detail.invoiceDiscount}" />
+                        </p:column> 
+
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.discPerc}" style="text-align: right;color: coral;" title="#{lang.invoiceDiscount} #{lang.percentage}" /></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.invoiceDiscountPercentage)}" title="#{detail.invoiceDiscountPercentage}" />
+                        </p:column> 
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.rate}"/></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.rate)}" title="#{detail.rate}" />
+                        </p:column> 
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.landingPrice}" /></f:facet>
+                          <h:outputText  value="#{appView.decimal(detail.landRate)}" title="#{detail.landRate}" />
+                        </p:column > 
+                        <p:column style="text-align: right" >
+                          <f:facet name="header"><h:outputText value="#{lang.qty}" /></f:facet>
+                          <h:outputText  value="#{appView.number(detail.qty)}" title="#{detail.qty}" />
+                        </p:column> 
+                      </p:dataTable>
+                    </p:overlayPanel>
+                  </h:panelGroup>
+                </p:column>
+                <p:column id="col35" selectionMode="multiple" exportable="false" rendered="#{purchaseReturnView.draft}"/>
+
+                <f:facet name="footer">
+
+                  <h:panelGroup layout="block" id="invoiceSummarydiv">
+                    <p:panelGrid styleClass="noHover noBorder">
+                      <p:row>
+                        <p:column style="font-weight: bold; text-align: right; width:100px !important;">#{lang.totalItems} :</p:column>
+                        <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{purchaseReturnView.purchaseReturnItemReplicaList.size()}</p:column>
+                        <p:column style="font-weight: bold; text-align: right; width:95px !important;">#{lang.totalQty} </p:column>
+                        <p:column style="font-weight: bold; text-align: left; width:55px !important;">#{appView.decimal(purchaseReturnView.purchaseReturn.productNetQuantity)}</p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;">
+
+                        </p:column>
+                      </p:row>
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >
+                      <h:panelGroup layout="block">
+                        <h:panelGroup layout="block">
+                          <p:panelGrid styleClass="bordered">
+                            <p:row>
+                              <p:column style="font-weight: bold;">#{lang.gstPerc}</p:column>
+                              <p:column style="font-weight: bold;">#{lang.itemCount}</p:column>
+                              <p:column style="font-weight: bold;">#{lang.goodsValue}</p:column>
+                              <p:column style="font-weight: bold;">#{lang.taxable}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.cgstPerc}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.value}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.sgstPerc}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.value}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{purchaseReturnView.igstTransaction}">#{lang.gstValue}</p:column>
+                            </p:row>
+                            <p:row>
+                              <ui:repeat value="#{purchaseReturnView.purchaseReturn.invoiceGroup}" var="group">
+                                <p:row>
+                                  <p:column style="font-weight: bold;">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                                  <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                                  <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                                  <p:column style="font-weight: bold;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">
+                                    #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                                  </p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">
+                                    #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                                  </p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">
+                                    #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, accountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                                  </p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">
+                                    #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                                  </p:column>
+                                  <p:column style="font-weight: bold;" rendered="#{purchaseReturnView.igstTransaction}">
+                                    #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                                  </p:column>
+                                </p:row>
+                              </ui:repeat>
+                            </p:row>
+                          </p:panelGrid>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" style="height: 25px;">
+
+                        </h:panelGroup>
+                        <!--HSN Summary-->    
+                        <h:panelGroup layout="block">
+                          <p:panelGrid styleClass="bordered">
+                            <p:row >
+                              <p:column colspan="#{!purchaseReturnView.igstTransaction?7:4}" >HSN SUMMARY</p:column>
+                            </p:row>
+                            <p:row>
+                              <p:column style="font-weight: bold;text-align: left" >#{lang.hsnSacCode}</p:column>
+                              <p:column style="font-weight: bold;">#{lang.taxableValue}</p:column>
+                              <p:column style="font-weight: bold;">#{lang.taxPercentage}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.cgstPerc}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.value}</p:column>
+                              <p:column style="font-weight: bold;" rendered="##{!purchaseReturnView.igstTransaction}">#{lang.sgstPerc}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{lang.value}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{purchaseReturnView.igstTransaction}">#{lang.total} #{lang.taxAmount}</p:column>
+                            </p:row>
+                            <ui:repeat value="#{purchaseReturnView.getHsnList()}" var="hsn">
+                              <p:row>
+                                <p:column style="font-weight: bold;text-align: left" >#{hsn.value.hsnCode eq null ? '' : hsn.value.hsnCode}</p:column>
+                                <p:column style="font-weight: bold;">#{hsn.value.taxableValue eq null ? '' : appView.decimal(hsn.value.taxableValue)}</p:column>
+                                <p:column style="font-weight: bold;">#{hsn.value.taxRate eq null ? '' : appView.decimal(hsn.value.taxRate)}</p:column>
+                                <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{hsn.value.cgstRate eq null ? '' : appView.decimal(hsn.value.cgstRate)}</p:column>
+                                <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{hsn.value.cgstValue eq null ? '' : appView.decimal(hsn.value.cgstValue)}</p:column>
+                                <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{hsn.value.sgstRate eq null ? '' : appView.decimal(hsn.value.sgstRate)}</p:column>
+                                <p:column style="font-weight: bold;" rendered="#{!purchaseReturnView.igstTransaction}">#{hsn.value.sgstValue eq null ? '' : appView.decimal(hsn.value.sgstValue)}</p:column>
+                                <p:column style="font-weight: bold;" rendered="#{purchaseReturnView.igstTransaction}">#{hsn.value.taxValue eq null ? '' : appView.decimal(hsn.value.taxValue)}</p:column>
+                              </p:row>
+                            </ui:repeat>
+                          </p:panelGrid>
+                        </h:panelGroup>
+                      </h:panelGroup>
+
+                      <h:panelGroup layout="block" styleClass="text-right">
+                        <p:panelGrid columns="2" layout="grid">
+                          <!-- Goods Value -->
+                          <h:panelGroup>#{lang.goodsValue} :</h:panelGroup>
+                          <h:panelGroup>
+                            <h:outputText value="#{purchaseReturnView.purchaseReturn.invoiceAmountNet eq null ? '0.00' : appView.decimal(purchaseReturnView.purchaseReturn.invoiceAmountNet)}" />
+                          </h:panelGroup>
+
+                          <!-- Taxable Value -->
+                          <h:panelGroup>#{lang.taxable} :</h:panelGroup>
+                          <h:panelGroup>
+                            <h:outputText value="#{purchaseReturnView.purchaseReturn.assessableValue eq null ? '0.00' : appView.decimal(purchaseReturnView.purchaseReturn.assessableValue)}" />
+                          </h:panelGroup>
+
+                          <!-- GST Value -->
+                          <h:panelGroup>#{lang.gstValue} :</h:panelGroup>
+                          <h:panelGroup style="border-bottom:1px solid;" layout="block">
+                            <h:outputText value="#{purchaseReturnView.purchaseReturn.invoiceAmountIgst eq null ? '0.00' : appView.decimal(purchaseReturnView.purchaseReturn.invoiceAmountIgst)}" />
+                          </h:panelGroup>
+
+                          <!-- Grand Total -->
+                          <h:panelGroup>#{lang.total} :</h:panelGroup>
+                          <h:panelGroup>
+                            <h:outputText value="#{purchaseReturnView.purchaseReturn.grandTotal eq null ? '0.00' : appView.decimal(purchaseReturnView.purchaseReturn.grandTotal)}" />
+                          </h:panelGroup>
+
+                          <!-- Round Off -->
+                          <h:panelGroup>#{lang.roundOff} :</h:panelGroup>
+                          <h:panelGroup layout="block" style="border-bottom:1px solid;">
+                            <h:outputText value="#{purchaseReturnView.purchaseReturn.invoiceRoundOff eq null ? '0.00' : appView.decimal(purchaseReturnView.purchaseReturn.invoiceRoundOff)}" />
+                          </h:panelGroup>
+
+                          <!-- Net Amount -->
+                          <h:panelGroup>#{lang.netAmount} :</h:panelGroup>
+                          <h:panelGroup>
+                            <h:outputText value="#{purchaseReturnView.purchaseReturn.invoiceValue eq null ? '0.00' : appView.decimal(purchaseReturnView.purchaseReturn.invoiceValue)}" />
+                          </h:panelGroup>
+                        </p:panelGrid>
+                      </h:panelGroup>
+                    </p:panelGrid>
+                  </h:panelGroup>
+                </f:facet>
+              </p:dataTable>
+            </h:panelGroup>
+          </h:panelGroup>
+          <style>
+            .vtop{vertical-align: top;}
+          </style>
+
+          <script>
+            //<![CDATA[
+            function focusToQty() {
+              $('#purchaseReturnItemTable\\:0\\:returnQtyId_input').focus();
+            }
+
+            function refreshDatatable() {
+              page.refresh();
+            }
+
+            $(document).ready(function (e) {
+              refreshDatatable();
+            });
+
+            //]]>
+          </script>
+
+        </ui:decorate>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

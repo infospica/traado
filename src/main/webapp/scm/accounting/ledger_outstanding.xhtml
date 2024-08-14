@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.constant.AccountingConstant" var="ACCOUNTING_CONSTANT" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.ledger} #{lang.outstanding}"/>
+    <ui:param name="ids" value="ledgerOutstanding" />
+    <ui:param name="labelOnly" value="true" />
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="ledgerOutstandingST" onkeyup="return callDtFilter(this.value, 'ledgerOutstanding');"  placeholder="#{lang.search}"/>
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" oncomplete="closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="form">
+
+
+    </ui:define>
+    <ui:define name="leftRightList">
+      <h:panelGroup >
+        <p:autoComplete id="accountingGroup"  value="#{trialBalanceReportView.accountingGroup}" completeMethod="#{trialBalanceReportView.accountingGroupAuto}" 
+                        converter="wawo.LookupIntConverter" styleClass="fw"
+                        var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" scrollHeight="300"
+                        converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountingGroupCombo}" autocomplete="off" forceSelection="true"                              
+                        title="#{lang.accountGroup}">
+          <f:attribute name="clazz" value="#{scmLookupView.accountingGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingGroupById()}"/>        
+          <p:column style="width:250px;">
+            <h:outputText value="#{e.title}" />
+          </p:column>
+          <p:ajax event="itemSelect" process="accountingGroup" update="ledgerOutstandingTable" onstart="block()" oncomplete="unblock()"
+                  listener="#{trialBalanceReportView.setLedgerOutstandingList(null)}"/>
+        </p:autoComplete>                
+      </h:panelGroup>  
+    </ui:define>
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
+      <p:dataTable id="ledgerOutstandingTable" widgetVar="ledgerOutstandingWidget" var="ledgerOutstandingVar" value="#{trialBalanceReportView.loadLedgerOutstanding(main)}"                   
+                   rows="#{main.pageData.pageSize}" rowKey="#{trialBalanceReportVar.id}" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                   >
+        <p:ajax event="page" oncomplete="unblock();" />
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('ledgerOutstandingWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column headerText="#{lang.ledger} " sortBy="#{ledgerOutstandingVar.ledger}" filterBy="#{ledgerOutstandingVar.ledger}" >
+          <p:commandLink  actionListener="#{popUpView.showLedgerBalance(ledgerOutstandingVar.accountingLedgerId)}" onclick="block();" oncomplete="unblock()">
+            <h:outputText value="#{ledgerOutstandingVar.ledger}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.ledger} #{lang.group}" sortBy="#{ledgerOutstandingVar.ledgerGroup}" filterBy="#{ledgerOutstandingVar.ledgerGroup}" >
+          <h:outputText value="#{ledgerOutstandingVar.ledgerGroup}" />
+        </p:column>
+        <p:column headerText="#{lang.ledger} #{lang.balance}" sortBy="#{ledgerOutstandingVar.ledgerBalance}" style="text-align: right;" filterBy="#{ledgerOutstandingVar.ledgerBalance}" >
+          <h:outputText value="#{appView.decimal(ledgerOutstandingVar.ledgerBalance)}" />
+
+        </p:column>
+        <p:column  headerText="#{lang.outstanding} #{lang.amount}" sortBy="#{ledgerOutstandingVar.outstanding}" style="text-align: right;" filterBy="#{ledgerOutstandingVar.outstanding}" >
+          <h:outputText value="#{appView.decimal(ledgerOutstandingVar.outstanding)}" />
+
+        </p:column>
+        <p:column headerText="#{lang.balance}"  style="text-align: right;" sortBy="#{ledgerOutstandingVar.balance}" filterBy="#{ledgerOutstandingVar.balance}" >
+          <h:outputText value="#{appView.decimal(ledgerOutstandingVar.balance)}" styleClass="label" style="background-color: #{ACCOUNTING_CONSTANT.COLOR_CR};" 
+                        rendered="#{ledgerOutstandingVar.balance gt 1 or ledgerOutstandingVar.balance eq 1}" />        
+          <h:outputText value="#{appView.decimal(ledgerOutstandingVar.balance)}" styleClass="label" style="background-color: #{ACCOUNTING_CONSTANT.COLOR_CR};" 
+                        rendered="#{ledgerOutstandingVar.balance lt -1 or ledgerOutstandingVar.balance eq -1}" />   
+          <h:outputText value="#{appView.decimal(ledgerOutstandingVar.balance)}" 
+                        rendered="#{ledgerOutstandingVar.balance gt 0 and ledgerOutstandingVar.balance lt 1}" />   
+
+        </p:column>
+
+      </p:dataTable>
+
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

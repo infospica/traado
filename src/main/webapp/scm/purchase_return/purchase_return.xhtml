@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  #{purchaseReturnView.switchPurchaseReturn(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReturn}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? purchaseReturnView.purchaseReturn.invoiceNo : null}" />
+    <ui:param name="navLabel" value="#{main.edit ? purchaseReturnView.purchaseReturn.purchaseReturnStatusId.title : null}" />
+    <ui:param name="ids" value="purchaseReturn" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="more" value="#{purchaseReturnView.draft}" />
+    <ui:param name="showForm" value="false" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{purchaseReturnView.deletePurchaseReturn(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('purchaseReturnWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{purchaseReturnView.clonePurchaseReturn(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" 
+                  iconPos="left" rendered="#{!purchaseReturnView.tradeClosed}"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{purchaseReturnView.deletePurchaseReturn(main)}" value="#{lang.delete}" onclick="wdgOff('purchaseReturnWidgetDel')" partialSubmit="true" 
+                       process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" rendered="#{!purchaseReturnView.tradeClosed}"/>
+    </ui:define>
+
+    <ui:define name="save" >
+    </ui:define>
+
+    <ui:define name="newList">
+      <p:commandButton id="accountBtn" type="button" value="#{lang.newform}" immediate="true" partialSubmit="true" process="@this" update="accountPanel" 
+                       styleClass="btn btn-info" rendered="#{!purchaseReturnView.tradeClosed}" >
+      </p:commandButton>
+      <p:overlayPanel id="accountPanel" for="accountBtn" hideEffect="fade" showEvent="click" hideEvent="click" showCloseIcon="true" dynamic="false" style="width:auto">
+
+        <!--Account Title-->
+        <h:panelGroup layout="block" style="width:auto">
+          <h:outputText value="#{lang.account} : " />
+          <p:outputLabel value="#{appView.display(userRuntimeView.account.accountTitle)}" />
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <!-- Purchase Return on -->
+          <h:outputText value="#{lang.purchaseReturn} #{lang.on}" />
+          <p:selectOneRadio value="#{purchaseReturnView.purchaseReturnStockCat}"  id="purchaseReturnPurchaseReturnStockCat"
+                            converter="omnifaces.SelectItemsConverter">
+            <f:selectItems value="#{scmLookupView.purchaseReturnStockCat(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+          </p:selectOneRadio>
+        </h:panelGroup>
+
+        <!-- Action Buttons -->
+        <h:panelGroup layout="block" style="width:auto">
+          <br />
+          <h:commandButton action="#{purchaseReturnView.actionNewPurchaseReturn(main)}" value="#{lang.create}" styleClass="btn btn-primary">
+            <f:ajax execute="accountPanel" render="@parent f1 globalAccount"/>
+          </h:commandButton>
+          <h:commandButton value="#{lang.close}" styleClass="btn btn-primary">
+          </h:commandButton>
+        </h:panelGroup>
+
+      </p:overlayPanel>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseReturnTable" var="purchaseReturnVar" widgetVar="purchaseReturnWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{purchaseReturnView.purchaseReturnLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseReturnVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{purchaseReturnView.purchaseReturnSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Invoice No -->
+        <p:column sortBy="#{purchaseReturnVar.invoiceNo}" field="scm_purchase_return.invoice_no">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(purchaseReturnVar.invoiceNo)}" process="@this" update="f1" immediate="true" onstart="block()"
+                         oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{purchaseReturnView.purchaseReturn}" value="#{purchaseReturnVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column  sortBy="#{purchaseReturnVar.referenceNo}" rendered ="#{purchaseReturnView.purchaseReturn.companyId.companySettings.enableCompanyPrefix eq 1 }" 
+                   field="scm_purchase_return.reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>
+          <h:outputText value="#{purchaseReturnVar.referenceNo}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Date -->
+        <p:column sortBy="#{purchaseReturnVar.invoiceDate}" field="scm_purchase_return.invoice_date" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.date(purchaseReturnVar.invoiceDate)}" escape="false" />
+        </p:column>
+
+        <!-- Purchase Return Category -->
+        <p:column sortBy="#{purchaseReturnVar.purchaseReturnStockCat.title}" field="purchase_return_stock_cat.title">
+          <f:facet name="header"><h:outputText value="#{lang.category}" title="#{lang.title}"/></f:facet>
+          <h:outputText value="#{appView.display(purchaseReturnVar.purchaseReturnStockCat.title)}" title="#{appView.title(purchaseReturnVar.purchaseReturnStockCat.title)}" escape="false" />
+        </p:column>
+
+        <!-- No of Boxes -->
+        <p:column sortBy="#{purchaseReturnVar.noOfBoxes}" field="scm_purchase_return.no_of_boxes">
+          <f:facet name="header"><h:outputText value="#{lang.noOfBoxes}" title="#{lang.noOfBoxes}"/></f:facet>
+          <h:outputText value="#{appView.display(purchaseReturnVar.noOfBoxes)}" title="#{appView.title(purchaseReturnVar.noOfBoxes)}" escape="false" />
+        </p:column>
+
+        <!-- Weight -->
+        <p:column sortBy="#{purchaseReturnVar.weight}" field="scm_purchase_return.weight">
+          <f:facet name="header"><h:outputText value="#{lang.weight}" title="#{lang.weight}"/></f:facet>
+          <h:outputText value="#{appView.display(purchaseReturnVar.weight)}" title="#{appView.title(purchaseReturnVar.weight)}" escape="false" />
+        </p:column>
+
+        <!-- Invoice Amount -->
+        <p:column sortBy="#{purchaseReturnVar.invoiceAmount}" field="scm_purchase_return.invoice_amount">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceAmount}" title="#{lang.tax}"/></f:facet>
+          <h:outputText value="#{appView.decimal(purchaseReturnVar.invoiceAmount)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{purchaseReturnVar.purchaseReturnStatusId.title}" field="purchase_return_status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.title}"/></f:facet>          
+          <h:outputText value="#{appView.display(purchaseReturnVar.purchaseReturnStatusId.title)}" title="#{appView.title(purchaseReturnVar.purchaseReturnStatusId.title)}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(purchaseReturnVar.purchaseReturnStatusId.id)}" style="background-color: #{sysRuntimeView.statusColor(purchaseReturnVar.purchaseReturnStatusId.id)}"/>          
+        </p:column>
+
+        <!-- Remarks -->
+        <p:column headerText="#{lang.remarks}" sortBy="#{purchaseReturnVar.remarks}" field="sscm_purchase_return.remarks"
+                  style="text-align:left;padding-left: 5px;white-space: normal;" width="300" styleClass="wrap">
+          <h:outputText value="#{appView.display(purchaseReturnVar.remarks)}" title="#{purchaseReturnVar.remarks}" />
+        </p:column>
+
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+
+  <ui:fragment rendered="#{main.isForm() and purchaseReturnView.taxCalculator.purchaseReturnForm eq '/scm/purchase_return/purchase_return_gst_india.xhtml'}">
+    <ui:include src="/scm/purchase_return/purchase_return_gst_india.xhtml" />
+  </ui:fragment>
+</ui:composition>

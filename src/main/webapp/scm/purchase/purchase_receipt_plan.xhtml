@@ -1,0 +1,104 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{purchaseReceiptPlanView.switchPurchaseReceiptPlan(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchaseReceiptPlan}" />
+    <ui:param name="ids" value="purchaseReceiptPlan" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{purchaseReceiptPlanView.deletePurchaseReceiptPlan(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('purchaseReceiptPlanWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{purchaseReceiptPlanView.clonePurchaseReceiptPlan(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{purchaseReceiptPlanView.deletePurchaseReceiptPlan(main)}" value="#{lang.delete}" onclick="wdgOff('purchaseReceiptPlanWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{purchaseReceiptPlanView.savePurchaseReceiptPlan(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{purchaseReceiptPlanView.purchaseReceiptPlan.title}" validator="wawo.WhiteSpaceValidator" maxlength="50" 
+                     required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="name" />
+        <p:message for="name" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.purchaseOrder}" for="purchaseReceiptPlanPurchaseOrderId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{purchaseReceiptPlanView.purchaseReceiptPlan.purchaseOrderId}" completeMethod="#{purchaseReceiptPlanView.purchaseOrderAuto}" converter="wawo.LookupIntConverter"   
+                        required="true" requiredMessage="#{lang.purchaseOrder} #{lang.isRequired}" id="purchaseReceiptPlanPurchaseOrderId" var="e" 
+                        itemValue="#{e}" itemLabel="#{e.purchaseOrderNo}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.purchaseOrderClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.purchaseOrderById()}"/>
+        </p:autoComplete>
+        <p:message for="purchaseReceiptPlanPurchaseOrderId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.product} #{lang.id}" for="purchaseReceiptPlanProductId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{purchaseReceiptPlanView.purchaseReceiptPlan.productId}" completeMethod="#{purchaseReceiptPlanView.productAuto}" converter="wawo.LookupIntConverter"   
+                        required="true" requiredMessage="#{lang.product} #{lang.id} #{lang.isRequired}" id="purchaseReceiptPlanProductId" var="e" itemValue="#{e}" itemLabel="#{e.productName}" 
+                        emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" 
+                        forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+        </p:autoComplete>
+        <p:message for="purchaseReceiptPlanProductId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.qty}" for="qtyRequired" />
+      <h:panelGroup>
+        <p:inputNumber value="#{purchaseReceiptPlanView.purchaseReceiptPlan.quantityRequired}" converterMessage="#{lang.qty} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" required="true" requiredMessage="#{lang.qty} #{lang.isRequired}" id="qtyRequired" />
+        <p:message for="qtyRequired" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.expectedDate}" for="expectedDate" />
+      <h:panelGroup>
+        <p:calendar value="#{purchaseReceiptPlanView.purchaseReceiptPlan.expectedDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.expectedDate} #{lang.invalidDate}" 
+                    maxlength="29" id="expectedDate" showButtonPanel="true" navigator="true" mask="true"/>
+        <p:message for="expectedDate" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="purchaseReceiptPlanTable" var="purchaseReceiptPlanVar" widgetVar="purchaseReceiptPlanWidget" tableStyleClass="editLinks"
+                   lazy="true" value="#{purchaseReceiptPlanView.purchaseReceiptPlanLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{purchaseReceiptPlanVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{purchaseReceiptPlanView.purchaseReceiptPlanSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.id}" sortBy="#{purchaseReceiptPlanVar.id}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{purchaseReceiptPlanVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{purchaseReceiptPlanView.purchaseReceiptPlan}" value="#{purchaseReceiptPlanVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.title}" sortBy="#{purchaseReceiptPlanVar.purchaseOrderId.purchaseOrderNo}" field="purchase_order_id.purchase_order_no">
+          <h:outputText value="#{appView.display(purchaseReceiptPlanVar.purchaseOrderId.purchaseOrderNo)}" title="#{appView.title(purchaseReceiptPlanVar.purchaseOrderId.purchaseOrderNo)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.purchaseOrderNo}" sortBy="#{purchaseReceiptPlanVar.purchaseOrderId.purchaseOrderNo}" field="purchase_order_id.purchase_order_no">
+          <h:outputText value="#{appView.display(purchaseReceiptPlanVar.purchaseOrderId.purchaseOrderNo)}" title="#{appView.title(purchaseReceiptPlanVar.purchaseOrderId.purchaseOrderNo)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.productName}" sortBy="#{purchaseReceiptPlanVar.productId.productName}" field="product_id.product_name">
+          <h:outputText value="#{appView.display(purchaseReceiptPlanVar.productId.productName)}" title="#{appView.title(purchaseReceiptPlanVar.productId.productName)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.qty}" sortBy="#{purchaseReceiptPlanVar.quantityRequired}" field="qty_required" style="text-align: right">
+          <h:outputText value="#{appView.number(purchaseReceiptPlanVar.quantityRequired)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.expectedDate}" sortBy="#{purchaseReceiptPlanVar.expectedDate}" field="expected_date" >
+          <h:outputText value="#{appView.dateTime(purchaseReceiptPlanVar.expectedDate)}" escape="false" />
+        </p:column>
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

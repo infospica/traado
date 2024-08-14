@@ -1,0 +1,442 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  <!--#{accountingMainView.init(main)}--> 
+  #{ledgerTransactionView.switchAccountingTransactionDetail(main, viewType)}
+  <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.ledger} #{main.isEdit()?ledgerTransactionView.accountingLedger.accountingGroupId.title:''}" />
+    <ui:param name="ids" value="ledgerTransaction" />
+    <ui:param name="navLabel" value="#{main.isList() ? lang.balance : ledgerTransactionView.accountingLedger.title} #{main.isEdit()?(ledgerTransactionView.ledgerAddress!=null?'>':''):''}
+              #{main.isEdit()?(ledgerTransactionView.ledgerAddress!=null?ledgerTransactionView.ledgerAddress:''):''}" />
+    <ui:param name="pageBasic" value="false" />
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{ledgerTransactionView.deleteAccountingLedger(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountingLedgerWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{ledgerTransactionView.cloneAccountingLedger(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{ledgerTransactionView.deleteAccountingLedger(main)}" value="#{lang.delete}" onclick="wdgOff('accountingLedgerWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    <ui:define name="newList" ></ui:define>
+    <ui:define name="save" >
+<!--       <p:inputText id="searchFrm" onkeyup="return callDtFilter(this.value, 'ledgerTransaction');"  placeholder="#{lang.search}" />-->
+
+      <h:panelGroup styleClass="searchBox m m-r-5"  >
+        <p:inputText styleClass="fw" id="txtLdSearch" value="#{main.pageData.searchKeyWord}" placeholder="#{lang.search}"  />
+        <p:commandButton styleClass="btn" onclick="block()" oncomplete="unblock();" process="txtLdSearch,@this" update="ledgerTransactionTable chequeEntryDiv relatedLedgerList"  title="#{lang.search}" id="btnLdSearch" partialSubmit="true" icon="fa fa-search" iconPos="left" >
+          <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+          <f:setPropertyActionListener target="#{ledgerTransactionView.relatedChequeEntryList}" value="#{null}" />
+          <f:setPropertyActionListener target="#{ledgerTransactionView.ledgerbalanceList}" value="#{null}" />
+          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+        </p:commandButton>
+        <ui:insert name="defaultCommand" >
+          <p:defaultCommand target="btnLdSearch"/>
+        </ui:insert>
+      </h:panelGroup>    
+
+    </ui:define>   
+    <ui:define name="toolCommon" > 
+      <h:panelGroup styleClass="L p-y-5 p-r-30"  >
+        <h:panelGrid columns="3">
+          <p:autoComplete value="#{ledgerTransactionView.accountingLedger}" completeMethod="#{ledgerTransactionView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"
+                          placeholder="#{lang.select} #{lang.ledger} #{lang.to} #{lang.view} #{lang.balance}" valueChangeListener="#{ledgerTransactionView.ledgerValueChanged}"
+                          var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="50" dropdown="true" scrollHeight="600"
+                          converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw w-220" 
+                          required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}"  onfocus="this.select();" >
+            <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+            <p:ajax event="itemSelect" listener="#{ledgerTransactionView.detailAction(main)}" process="@this" update="f1" onstart="block()" oncomplete="unblock()" />
+            <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+            <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+            <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+          </p:autoComplete>
+          <span style="width:10px;"> </span>
+          <p:selectOneMenu value="#{accountingMainView.selectedAccountingGroup}"  converter="omnifaces.SelectItemsConverter" filter="true" var="t" filterMatchMode="contains">
+            <f:selectItem itemLabel="#{lang.all} #{lang.ledger} #{lang.group}" itemValue="#{null}" />
+            <f:selectItems value="#{ledgerTransactionView.accountingGroupAuto('')}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            <p:column styleClass="w-180">
+              <h:outputText value="#{t.title}" />
+            </p:column>
+            <p:column>
+              <h:outputText value="#{t.accountingHeadId.title}" />
+            </p:column>
+            <p:column styleClass="w-180">
+              <h:outputText value="#{t.parentId.title}" />
+            </p:column>
+            <p:ajax event="itemSelect" process="@this" listener="#{ledgerTransactionView.groupFilter}" update="ledgerBalanceTable" /> 
+          </p:selectOneMenu>        
+        </h:panelGrid>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="more" > 
+      <ui:param name="ids" value="ledgerBalance" />
+      <ui:decorate template="/WEB-INF/resources/theme1/com/toolExport.xhtml"/>  </ui:define>
+    <ui:define name="moreForm" >
+      <ui:param name="ids" value="ledgerTransaction" />
+      <h:panelGroup styleClass="p-r-30"  >
+        <p:commandButton actionListener="#{ledgerTransactionView.bankBalance()}" value="#{lang.bankReconciliation}" id="btnBankBalance" styleClass="L btn btn-info" process="@this" immediate="true" partialSubmit="true" update="ledgerTransactionTable chequeEntryDiv" rendered="#{ledgerTransactionView.accountingLedger.isBankAc()}" ></p:commandButton>
+        <p:commandButton actionListener="#{ledgerTransactionView.openBankChargesPopup()}" value="#{lang.bank} #{lang.charges}" id="btnBankCharges" styleClass="L btn btn-info" 
+                         process="@this" immediate="true" partialSubmit="true" update="ledgerTransactionTable chequeEntryDiv" 
+                         rendered="#{ledgerTransactionView.accountingLedger.isBankAc()}" >
+        </p:commandButton>
+
+        <p:commandButton rendered="#{ledgerTransactionView.accountingLedger.debtorsOrCreditors}" value="#{lang.oustandingAmount}" 
+                         actionListener="#{ledgerTransactionView.actionOutStanding(main)}" styleClass="btn btn-info" process="@this" 
+                         update="outstandingDlg" oncomplete="PF('outstandingWdg').show()" >
+        </p:commandButton>
+      </h:panelGroup>
+      <!--      <ui:decorate template="/WEB-INF/resources/theme1/com/toolExport.xhtml"/>-->
+      <p:dialog rendered="#{ledgerTransactionView.accountingLedger.debtorsOrCreditors}" id="outstandingDlg" header="#{lang.oustandingAmount}" widgetVar="outstandingWdg" height="600"
+                position="left top" blockScroll="true" fitViewport="true" dynamic="true" modal="true" resizable="true" responsive="true" closable="true" closeOnEscape="true" styleClass="ignoreLoad">
+        <ui:include src="/scm/accounting/payable_receivable_report.xhtml" />
+      </p:dialog> 
+      <ui:decorate template="/WEB-INF/resources/theme1/com/toolExport.xhtml"/>
+    </ui:define>
+    <ui:define name="reset" ></ui:define>
+    <ui:define name="navRight">
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+      <h:panelGroup styleClass="L"  >        
+        <p:commandButton actionListener="#{ledgerTransactionView.backOrNext(-1, userRuntimeView.company,true)}" icon="fa fa-arrow-circle-left" process="@this fromDate" update="f1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+        <p:commandButton actionListener="#{ledgerTransactionView.backOrNext(1, userRuntimeView.company,true)}" icon="fa fa-arrow-circle-right" process="@this fromDate" update="f1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+        <p:calendar id="fromDate" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}" 
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" 
+                    mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}"
+                    maxlength="10" size="7" showButtonPanel="true" navigator="true" mask="true" onclick="this.select();"  >
+          <p:ajax event="dateSelect" process="@this" listener="#{ledgerTransactionView.onFromDateSelect}" update="f1"/>
+        </p:calendar> <p:message for="fromDate" display="text" id="fmess"/>
+      </h:panelGroup> <h:panelGroup styleClass="L"  >
+        <p:calendar id="toDate" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" 
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" 
+                    mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}"
+                    maxlength="10" size="7" showButtonPanel="true" navigator="true" mask="true" onclick="this.select();" >
+          <p:ajax event="dateSelect" process="@this" listener="#{ledgerTransactionView.onToDateSelect}" update="f1"/>
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" >
+        <p:commandButton actionListener="#{ledgerTransactionView.backOrNext(-1, userRuntimeView.company,false)}" icon="fa fa-arrow-circle-left" process="@this toDate" update="f1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+        <p:commandButton actionListener="#{ledgerTransactionView.backOrNext(1, userRuntimeView.company,false)}" icon="fa fa-arrow-circle-right" process="@this toDate" update="f1" styleClass="btn" onclick="block()" oncomplete="unblock()" />
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="formRight" >
+      <h:panelGroup layout="block" styleClass="L" id="relatedLedgerList" >
+        <p:selectOneMenu value="#{accountingMainView.selectedLedger}"  converter="omnifaces.SelectItemsConverter" filter="true" var="t" filterMatchMode="contains">
+          <f:selectItem itemLabel="#{lang.all} #{lang.ledger}" itemValue="#{null}" />
+          <f:selectItems value="#{ledgerTransactionView.getRelatedLedgerList(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          <p:column >
+            <h:outputText value="#{t.title}" />
+          </p:column>
+          <p:column styleClass="w-180">
+            <h:outputText value="#{t.accountingGroupId.title}" />
+          </p:column>
+          <p:ajax event="itemSelect" process="@this" listener="#{ledgerTransactionView.ledgerFilter}" update="ledgerTransactionTable chequeEntryDiv " /> 
+        </p:selectOneMenu>        
+      </h:panelGroup>
+
+      <!--<h:panelGroup layout="block" styleClass="L" id="selectedAccountGroupDiv">-->
+      <p:selectOneMenu value="#{accountingMainView.selectedAccountGroup}"  id="selectedAccountGroupId" 
+                       rendered="#{ledgerTransactionView.accountingLedger.debtorsOrCreditors}"
+                       converter="omnifaces.SelectItemsConverter" filter="true" var="ag" filterMatchMode="contains">
+        <f:selectItem itemLabel="#{lang.all} #{lang.accountGroup}" itemValue="#{null}" />
+        <f:selectItems value="#{ledgerTransactionView.lookupGroupAuto()}" var="a" itemValue="#{a}" itemLabel="#{a.groupName}" />
+        <p:column styleClass="w-340">
+          <h:outputText value="#{ag.groupName}" />
+        </p:column>
+        <p:column>
+          <h:outputText value="#{ag.groupCode}" />
+        </p:column>     
+        <p:ajax event="itemSelect" process="@this" listener="#{ledgerTransactionView.accountGroupFilter}" update="ledgerTransactionTable chequeEntryDiv" /> 
+<!--          <p:ajax event="itemSelect" process="selectedAccountGroupDiv" listener="#{ledgerTransactionView.accountGroupFilter}" update="ledgerTransactionTable chequeEntryDiv" /> -->
+      </p:selectOneMenu>        
+      <!--</h:panelGroup>-->
+
+    </ui:define>    
+    <ui:define name="afterForm">
+      <!--      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>    -->
+      <p:dataTable id="ledgerTransactionTable" var="row" widgetVar="ledgerTransactionWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{ledgerTransactionView.getLedgerbalanceList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}" 
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  >
+        <!--        <f:facet name="header">
+                  <p:outputPanel styleClass="hidden" >
+                    <p:inputText id="globalFilter"  onkeyup="return PF('ledgerTransactionWidget').filter()"   />
+                  </p:outputPanel>
+                </f:facet>-->
+        <p:ajax event="page" oncomplete="unblock();" />
+        <f:facet name="header">   
+          <span>#{lang.opening}
+            <h:outputText styleClass="label" style="font-size:13px;background-color: #{AccountingConstant.COLOR_DR}" value="#{appView.decimal(ledgerTransactionView.accountingLedger.balanceDebit)}"  />
+            <h:outputText styleClass="label" style="font-size:13px;background-color: #{AccountingConstant.COLOR_CR}" value="#{appView.decimal(ledgerTransactionView.accountingLedger.balanceCredit)}"  />
+            #{lang.balance} 
+            <h:outputText styleClass="label" style="font-size:13px;background-color: #{AccountingConstant.COLOR_DR}" value="#{appView.decimal(ledgerTransactionView.closingBalanceDebit - ledgerTransactionView.closingBalanceCredit)}"  rendered="#{ledgerTransactionView.closingBalanceDebit gt ledgerTransactionView.closingBalanceCredit}"/>
+            <h:outputText styleClass="label" style="font-size:13px;background-color: #{AccountingConstant.COLOR_CR}" value="#{appView.decimal(ledgerTransactionView.closingBalanceCredit - ledgerTransactionView.closingBalanceDebit)}"  rendered="#{ledgerTransactionView.closingBalanceCredit gt ledgerTransactionView.closingBalanceDebit}"/>
+          </span>
+        </f:facet>
+        <p:column styleClass="w-80" sortBy="#{row.entryDate}" filterBy="#{row.entryDate}" filterMatchMode="contains" field="t1.entry_date" >
+          <f:facet name="header">
+            <h:outputText value="#{lang.date}" title="#{lang.date}"/></f:facet>
+          <h:outputText value="#{appView.date(row.entryDate)}" title="#{appView.date(row.entryDate)}"/>
+        </p:column>        
+        <p:column sortBy="#{row.ledgerId}" field="ledger_id" style="text-align:left;padding-left: 5px;white-space: normal;"  styleClass="wrap" >
+          <f:facet name="header"><h:outputText value="#{lang.particulars}" title="#{lang.particulars}"/></f:facet>
+          <p:commandLink rendered="#{row.id ne null}" action="#{main.setViewType(editform)}" value="#{row.trtype eq 'dr' ? row.crTitle:row.drTitle} " process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{appView.title(row.trtype eq 'dr' ? row.crTitle:row.drTitle)}">
+            <f:setPropertyActionListener target="#{ledgerTransactionView.ledgerId}" value="#{row.ledgerId}" />
+            <f:setPropertyActionListener target="#{ledgerTransactionView.relatedChequeEntryList}" value="#{null}" />
+            <f:setPropertyActionListener target="#{ledgerTransactionView.ledgerbalanceList}" value="#{null}" />
+            <f:setPropertyActionListener target="#{main.pageData.searchKeyWord}" value="#{null}" />
+            <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+          </p:commandLink>     
+          <h:outputText rendered="#{row.id eq null}" value="#{row.trtype eq 'dr' ? row.crTitle:row.drTitle} " title="#{appView.title(row.trtype eq 'dr' ? row.crTitle:row.drTitle)}" escape="false" />
+          <h:outputText value="#{row.narration}" title="#{row.narration}" escape="false" />
+        </p:column>      
+        <p:column styleClass="w-80" sortBy="#{row.processedAt}"  filterBy="#{row.processedAt}" field="processed_at">
+          <f:facet name="header"><h:outputText value="#{lang.processed}" title="#{lang.processed}"/></f:facet>
+          <h:outputText value="#{appView.date(row.processedAt)}" title="#{appView.date(row.processedAt)}" escape="false" />
+        </p:column>
+        <p:column styleClass="w-100" sortBy="#{row.voucherType}"  filterBy="#{row.voucherType}" field="voucher_type">
+          <f:facet name="header"><h:outputText value="#{lang.voucherType}" title="#{lang.voucherType}" /></f:facet>    
+          <!--FIXME ARUN-->
+          <p:commandLink rendered="#{row.id ne null}" actionListener="#{ledgerTransactionView.journalDetails(main,row)}"  value="#{appView.display(row.voucherType)}" title="#{lang.view} #{row.documentNumber}"
+                         process="@this" immediate="true" onstart="block()" oncomplete="unblock()"  />
+          <h:outputText rendered="#{row.id eq null}"  value="#{row.voucherType}" title="#{row.voucherType}" escape="false" />
+        </p:column> 
+
+        <p:column sortBy="#{row.refDocumentNo}" styleClass="w-180 text-left" field="ref_document_no"  filterStyleClass="hidden">
+          <f:facet name="header" ><h:outputText value="#{lang.voucherNo}" title="#{lang.voucherNo}" /></f:facet>          
+          <h:outputText value="#{row.refDocumentNo}" title="#{row.refDocumentNo}" />
+          <h:outputText value="#{row.documentNumber}" rendered="#{row.refDocumentNo eq null}" />
+
+        </p:column>
+
+        <p:column styleClass="w-100 text-right" style="text-align: right" headerText="#{lang.debit}" sortBy="#{row.debit}"  filterBy="#{row.debit}" filterStyleClass="hidden" ><h:outputText value="#{appView.decimal(row.debit)}" escape="false" rendered="#{row.trtype eq 'dr'}"/></p:column>
+        <p:column styleClass="w-100 text-right" style="text-align: right" headerText="#{lang.credit}" sortBy="#{row.credit}"  filterBy="#{row.credit}" filterStyleClass="hidden" ><h:outputText value="#{appView.decimal(row.credit)}" escape="false" rendered="#{row.trtype eq 'cr'}"/></p:column>
+        <p:column styleClass="w-120 text-right" style="text-align: right" filterBy="#{row.balanceLine}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.balance}" title="#{lang.balance}" /></f:facet>          
+          <h:outputText styleClass="label" style="background-color: #{row.color}" value="#{row.balanceLine}" title="#{row.balanceLine}" />
+        </p:column>
+        <p:column styleClass="w-40 text-center" sortBy="#{row.dueDays}" filterBy="#{row.dueDays}" filterStyleClass="hidden" >
+          <f:facet  name="header" ><h:outputText value="#{lang.pendingDays}" title="#{lang.pendingDays}" /></f:facet>
+          <h:outputText value="#{row.dueDays}" title="#{row.dueDays}" />
+        </p:column>
+
+<!--        <p:column styleClass="w-100" sortBy="#{row.documentNumber}"  filterBy="#{row.documentNumber}" filterMatchMode="contains" field="t2.document_number" >
+          <f:facet name="header"><h:outputText value="#{lang.voucherNo}" title="#{lang.voucherNo}"/></f:facet>
+          <h:outputText value="#{row.documentNumber}" title="#{lang.view} #{row.documentNumber}" />
+          <p:commandLink  actionListener="#{ledgerTransactionView.journalDetails(main,row)}"  value="#{row.documentNumber}" title="#{lang.view} #{row.documentNumber}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+        </p:column>-->
+        <p:column style="width:50px;" />
+
+<!--        <p:column sortBy="#{row.narration}" filterBy="#{row.narration}" filterMatchMode="contains" filterStyleClass="hidden">
+          <f:facet name="header" ><h:outputText value="#{lang.narration}" title="#{lang.narration}" /></f:facet>          
+          <h:outputText value="#{row.narration}" title="#{row.narration}" />
+        </p:column>-->
+        <p:columnGroup type="footer" >
+          <p:row>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />     
+            <p:column style="text-align:right" footerText="" />     
+            <p:column style="text-align:right" footerText="#{lang.opening}" />
+            <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.accountingLedger.balanceDebit)}" ></p:column>
+            <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.accountingLedger.balanceCredit)}" ></p:column>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+          </p:row> 
+          <p:row>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />     
+            <p:column style="text-align:right" footerText="#{lang.total}" />
+            <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(ledgerTransactionView.debitTotal)}" ></p:column>
+            <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(ledgerTransactionView.creditTotal)}" ></p:column>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+          </p:row>
+          <p:row>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />     
+            <p:column style="text-align:right" footerText="#{ledgerTransactionView.accountingLedger.isBankAc() ? lang.balanceaspercompany:lang.balance}" />
+            <p:column style="text-align:right" footerText="" rendered="#{(ledgerTransactionView.closingBalanceDebit gt ledgerTransactionView.closingBalanceCredit) or ((ledgerTransactionView.closingBalanceDebit - ledgerTransactionView.closingBalanceCredit) eq 0)}" ></p:column>
+            <p:column style="text-align:right" footerText="" rendered="#{(ledgerTransactionView.closingBalanceDebit gt ledgerTransactionView.closingBalanceCredit) or ((ledgerTransactionView.closingBalanceDebit - ledgerTransactionView.closingBalanceCredit) eq 0)}" >
+              <f:facet name="footer" >   
+                <span class="label" style="background-color: #{AccountingConstant.COLOR_DR}">#{appView.decimal(ledgerTransactionView.closingBalanceDebit - ledgerTransactionView.closingBalanceCredit)}</span>
+              </f:facet>
+            </p:column>
+            <p:column style="text-align:right" footerText="" rendered="#{ledgerTransactionView.closingBalanceCredit gt ledgerTransactionView.closingBalanceDebit }">
+              <f:facet name="footer" >   
+                <span class="label" style="background-color: #{AccountingConstant.COLOR_CR}">#{appView.decimal(ledgerTransactionView.closingBalanceCredit - ledgerTransactionView.closingBalanceDebit)}</span>
+              </f:facet>
+            </p:column>
+            <p:column style="text-align:right" footerText="" rendered="#{ledgerTransactionView.closingBalanceCredit gt ledgerTransactionView.closingBalanceDebit}" ></p:column>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="" />
+          </p:row>
+
+
+<!--           <p:row rendered="#{ledgerTransactionView.accountingLedger.isBankAc()}">
+    <p:column colspan="5" style="text-align:right" footerText="#{lang.balanceaspercompany}" />
+    <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.bankBalance.totalAmountDebit - ledgerTransactionView.bankBalance.totalAmountCredit)}" rendered="#{ledgerTransactionView.bankBalance.totalAmountDebit gt ledgerTransactionView.bankBalance.totalAmountCredit}"></p:column>
+    <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.bankBalance.totalAmountCredit - ledgerTransactionView.bankBalance.totalAmountDebit)}" rendered="#{ledgerTransactionView.bankBalance.totalAmountDebit lt ledgerTransactionView.bankBalance.totalAmountCredit}"></p:column>
+    <p:column style="text-align:right" footerText="" />
+  </p:row>-->
+          <p:row rendered="#{ledgerTransactionView.accountingLedger.isBankAc()}">
+            <p:column colspan="5" style="text-align:right" footerText="#{lang.amountnotreflected}" />
+            <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(ledgerTransactionView.debit)}"></p:column>
+            <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(ledgerTransactionView.credit)}"></p:column>
+            <p:column style="text-align:right" footerText="" />   
+          </p:row>
+          <p:row rendered="#{ledgerTransactionView.accountingLedger.isBankAc()}">
+            <p:column colspan="5" style="text-align:right" footerText="#{lang.balanceasperbank}" />
+            <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.processedAmountDebit - ledgerTransactionView.processedAmountCredit)}" rendered="#{ledgerTransactionView.processedAmountDebit gt ledgerTransactionView.processedAmountCredit}"></p:column>
+            <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.processedAmountCredit - ledgerTransactionView.processedAmountDebit)}" rendered="#{ledgerTransactionView.processedAmountDebit lt ledgerTransactionView.processedAmountCredit}"></p:column>
+            <p:column style="text-align:right" footerText="" />
+          </p:row>          
+        </p:columnGroup>      
+      </p:dataTable> 
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="label" value="#{lang.chequeInHand}" />
+        <ui:param name="ids" value="chequeEntry" />
+        <ui:param name="rendered" value="#{main.isForm() and ledgerTransactionView.accountingLedger.debtorsOrCreditors}" />
+        <h:panelGroup id="chequeEntryDiv" >
+          #{ledgerTransactionView.loadRelatedChequeEntryList(main)}
+          <p:dataTable rendered="#{!ledgerTransactionView.getRelatedChequeEntryList().isEmpty()}"  id="chequeEntryTable" var="chequeEntryVar" widgetVar="chequeEntryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       value="#{ledgerTransactionView.getRelatedChequeEntryList()}" rows="#{main.pageData.pageSize}" rowKey="#{chequeEntryVar.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                       rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+            <p:ajax event="page" oncomplete="unblock();" />
+            <p:column styleClass="w-80" sortBy="#{chequeEntryVar.entryDate}" field="fin_cheque_entry.entry_date" >
+              <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+                #{appView.date(chequeEntryVar.entryDate)}
+            </p:column>
+            <p:column sortBy="#{chequeEntryVar.bankId}" field="fin_cheque_entry.bank_id.title" style="text-align:left;padding-left: 5px;white-space: normal;" styleClass="wrap" >
+              <f:facet name="header"><h:outputText value="#{lang.bank}" title="#{lang.bank}"/></f:facet>
+              <h:outputText value="#{appView.display(chequeEntryVar.bankId.name)}" escape="false" /><br />
+              <h:outputText value="#{chequeEntryVar.note}" title="#{chequeEntryVar.note}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-120" sortBy="#{chequeEntryVar.chequeNo}" field="fin_cheque_entry.cheque_no" >
+              <f:facet name="header"><h:outputText value="#{lang.chequeNO}" title="#{lang.chequeNO}"/></f:facet>
+                #{chequeEntryVar.chequeNo}
+            </p:column>
+            <p:column styleClass="w-120" sortBy="#{chequeEntryVar.chequeDate}" field="fin_cheque_entry.cheque_date" >
+              <f:facet name="header"><h:outputText value="#{lang.chequeDate}" title="#{lang.chequeDate}"/></f:facet>
+                #{appView.date(chequeEntryVar.chequeDate)}
+            </p:column>
+
+            <p:column styleClass="w-100" sortBy="#{chequeEntryVar.amount}" field="fin_cheque_entry.amount" style="text-align: right">
+              <f:facet name="header" ><h:outputText value="#{lang.amount}" title="#{lang.amount}"/></f:facet>
+              <h:outputText styleClass="text-right" value="#{appView.decimal(chequeEntryVar.amount)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-120 text-right" style="text-align: right">
+              <f:facet name="header"><span title="#{lang.balance}">#{lang.balance}</span>#{ledgerTransactionView.setCrLineTotal(0.00)}</f:facet>
+              <span class="label" style="background-color: #{AccountingConstant.COLOR_DR}">#{appView.decimal(ledgerTransactionView.getCrLineTotal(chequeEntryVar.amount))}</span>
+            </p:column>
+            <p:column styleClass="w-80 text-right">
+              <f:facet name="header" ><h:outputText  value="#{lang.dueDays}" title="#{lang.dueDays}"/></f:facet>         
+              <h:outputText  value="#{chequeEntryVar.chequeDate eq null ? lang.undatedCheque :ledgerTransactionView.daysRemaining(chequeEntryVar)}" title="#{chequeEntryVar.chequeDate eq null ? lang.undatedCheque:''}" escape="false" />
+            </p:column>
+  <!--          <p:column colspan="" sortBy="#{chequeEntryVar.ledgerId.title}" field="fin_cheque_entry.ledger_id" >
+              <f:facet name="header"><h:outputText value="#{lang.party}" title="#{lang.party}"/></f:facet>
+              <h:outputText value="#{appView.display(chequeEntryVar.ledgerId.title)}" escape="false" />
+            </p:column>-->
+<!--            <p:column  sortBy="#{chequeEntryVar.note}" field="fin_cheque_entry.note" >
+              <f:facet name="header"><h:outputText value="#{lang.note}" title="#{lang.note}"/></f:facet>
+              <h:outputText value="#{chequeEntryVar.note}" title="#{chequeEntryVar.note}" escape="false" />
+            </p:column>-->
+            <p:column styleClass="w-120" sortBy="#{chequeEntryVar.statusId}" field="fin_cheque_entry.statusId">
+              <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+              <h:outputText title="#{chequeEntryVar.parentId ne null ? lang.represent : ''}" value="#{appView.display(chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED ? lang.received : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_ISSUED ? lang.deposited : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECONCILED ? lang.cleared : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE ? lang.dishonoured : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_RESUBMITTED ? lang.represent : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RETURNED ? lang.returned :  chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_HIDE ? lang.dishonoured : lang.cancelled )}"  escape="false" />
+            </p:column>
+            <p:columnGroup type="footer">
+              <p:row>
+                <p:column style="text-align:right" footerText="" />
+                <p:column style="text-align:right" footerText="" />                
+                <p:column style="text-align:right" footerText=" #{lang.balance}" />
+                <p:column style="text-align:right" footerText="" rendered="#{ledgerTransactionView.getIsCreditMore()}" />
+                <p:column style="text-align:right" rendered="#{ledgerTransactionView.getIsCreditMore()}">
+                  <f:facet name="footer" >   
+                    <span class="label" style="background-color: #{AccountingConstant.COLOR_DR}">#{appView.decimal(ledgerTransactionView.getBalanceTotal())}</span>
+                  </f:facet>
+                </p:column>             
+                <p:column style="text-align:right" rendered="#{!ledgerTransactionView.getIsCreditMore()}" >
+                  <f:facet name="footer" >   
+                    <span class="label" style="background-color: #{AccountingConstant.COLOR_CR}">#{appView.decimal(ledgerTransactionView.getBalanceTotal())}</span>
+                  </f:facet>
+                </p:column>
+                <p:column style="text-align:right" footerText="" rendered="#{!ledgerTransactionView.getIsCreditMore()}" />
+                <p:column style="text-align:right" footerText="" />
+                <p:column style="text-align:right" footerText="" />
+                <p:column style="text-align:right" footerText="" />
+              </p:row>          
+            </p:columnGroup>
+          </p:dataTable> 	
+        </h:panelGroup>
+      </ui:decorate>
+
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+        <ui:define name="cby">#{appView.display(ledgerTransactionView.accountingLedger.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(ledgerTransactionView.accountingLedger.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(ledgerTransactionView.accountingLedger.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(ledgerTransactionView.accountingLedger.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(ledgerTransactionView.accountingLedger.id)}</ui:define>
+      </ui:decorate>
+
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="ledgerBalanceTable" var="ledgerTransactionVar" widgetVar="ledgerTransactionWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{ledgerTransactionView.accountingTransactionDetailLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{ledgerTransactionVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" >
+        <p:ajax event="page" oncomplete="unblock();" />
+        <p:column sortBy="#{ledgerTransactionVar.accountingLedgerId.title}" field="t2.title" >
+          <f:facet name="header"><h:outputText value="#{lang.ledger}" title="#{lang.ledger}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(ledgerTransactionVar.accountingLedgerId.title)} " process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{appView.title(ledgerTransactionVar.accountingLedgerId.title)}">
+            <f:setPropertyActionListener target="#{ledgerTransactionView.accountingLedger}" value="#{ledgerTransactionVar.accountingLedgerId}" />
+            <f:setPropertyActionListener target="#{ledgerTransactionView.ledgerbalanceList}" value="#{null}" />
+            <f:setPropertyActionListener target="#{main.pageData.searchKeyWord}" value="#{null}" />
+            <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+          </p:commandLink>
+          <h:outputText rendered="#{ledgerTransactionVar.accountingLedgerId.openingBalance ne null}"  value="#{lang.opening} #{appView.decimal(ledgerTransactionVar.accountingLedgerId.openingBalance)} #{ledgerTransactionVar.accountingLedgerId.isDebitOrCredit eq 1 ? lang.dr : (ledgerTransactionVar.accountingLedgerId.isDebitOrCredit eq 0 ? lang.cr : '') }" escape="false" />
+        </p:column>        
+
+        <p:column sortBy="#{ledgerTransactionVar.accountingLedgerId.accountingGroupId.title}" field="t3.title" >
+          <f:facet name="header"><h:outputText value="#{lang.ledger} #{lang.group}" title="#{lang.ledger} #{lang.group}"/></f:facet>
+          <h:outputText  value="#{appView.display(ledgerTransactionVar.accountingLedgerId.accountingGroupId.title)} " escape="false" />
+        </p:column>   
+        <p:column sortBy="#{ledgerTransactionVar.debit}" field="debit" styleClass="w-180 text-right" style="text-align: right" >
+          <f:facet name="header"><h:outputText value="#{lang.debit}" title="#{lang.debit}"/></f:facet>
+          <h:outputText  value="#{appView.decimal(ledgerTransactionVar.debit)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{ledgerTransactionVar.credit}" field="credit" styleClass="w-180 text-right" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.credit}" title="#{lang.credit}"/></f:facet>
+          <h:outputText value="#{appView.decimal(ledgerTransactionVar.credit)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{ledgerTransactionVar.credit}" field="credit" styleClass="w-180 text-right" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.balance}" title="#{lang.balance}"/></f:facet>
+          <h:outputText value="#{ledgerTransactionVar.getBalance()}" styleClass="label" style="background-color: #{ledgerTransactionVar.isDr() ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}" escape="false" />
+        </p:column>        
+        <p:columnGroup type="footer">
+          <p:row>
+            <p:column style="text-align:right" footerText="" />
+            <p:column style="text-align:right" footerText="Totals: " />
+            <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.debitTotal)}" ></p:column>
+            <p:column style="text-align:right" footerText="#{appView.decimal(ledgerTransactionView.creditTotal)}" ></p:column>
+            <p:column footerText="" style="text-align:right"/>
+          </p:row>
+        </p:columnGroup>
+      </p:dataTable>
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

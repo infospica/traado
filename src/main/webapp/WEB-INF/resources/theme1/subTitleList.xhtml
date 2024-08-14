@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<!--  <ui:include src="com/confirmDialog.xhtml"/>-->
+  <h:panelGroup styleClass="card p-a-0"  layout="block" rendered="#{rendered eq null ? true : rendered}">
+    <div class="bar-T">
+      <div class="L"><p class="h5 head bold ib-m">${label}</p> <ui:insert name="menuleft" /></div>
+      <h:panelGroup layout="block"  styleClass="L m-l-30 " rendered="#{menuright eq null ? true : menuright}" ><ui:insert name="menuright" /></h:panelGroup>
+    </div>
+    <ui:insert />
+  </h:panelGroup>
+</ui:composition>
+
+

@@ -1,0 +1,510 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{productView.switchProduct(main, viewType)} 
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.product}"/>
+    <ui:param name="subLabel" value="#{main.isEdit() ? productView.product.productName : null}"/>
+    <ui:param name="navLabel" value="#{main.isEdit() ? productView.product.productStatusId.title : null}" />
+    <ui:param name="ids" value="product" />
+    <ui:param name="deleteListMenu" value="true" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" oncomplete="closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+
+    <ui:define name="menu1" >
+    </ui:define>
+    <ui:define name="save" >
+      <p:commandButton action="#{productView.actionSaveProductName(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"
+                       rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}" process="productTab" update="f1">        
+      </p:commandButton>    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{productView.activeIndex}" styleClass="materialTabs" rendered="#{main.isForm()}">
+        <p:ajax event="tabChange" onstart="block();" oncomplete="unblock();"  />
+        <p:tab title="#{lang.product}" id="productTab" >          
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="product" />
+            <ui:param name="label" value="productxxxxx"/>
+            <ui:define name ="reset"/>
+            <ui:define name ="moreForm"/>
+
+            <!-- Product Name -->
+            <p:outputLabel value="#{lang.productName}" for="productName" />
+            <h:panelGroup>
+              <p:inputText value="#{productView.product.productName}" maxlength="700" required="true" requiredMessage="#{lang.productName} #{lang.isRequired}"
+                           id="productName" tabindex="1" styleClass="fw" autocomplete="off"  />
+              <p:message for="productName" display="text"/>
+            </h:panelGroup>
+
+            <!-- Commodity -->
+            <p:commandLink  actionListener="#{popUpView.showCommodity(null)}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();">
+              <p:outputLabel value="#{lang.commodity}" for="productCommodityId"/>
+            </p:commandLink>
+            <h:panelGroup id="commodityDiv">
+              <p:inputText value="#{productView.product.commodityId.title}" id="productCommodityId" styleClass="fw"/>
+            </h:panelGroup>
+
+            <!-- Product Category -->
+            <p:commandLink actionListener="#{popUpView.showProductCategory(null)}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();" >
+              <p:outputLabel value="#{lang.productCategory}" for="productProductCategoryId"/>
+            </p:commandLink>
+            <h:panelGroup id="productCategoryDiv">
+              <p:autoComplete value="#{productView.product.productCategoryId}" completeMethod="#{productView.productCategoryAuto}" converter="wawo.LookupIntConverter" tabindex="3"
+                              required="true" requiredMessage="#{lang.productCategory} #{lang.isRequired}" id="productProductCategoryId"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}"  
+                              disabled="#{productView.productDetailExist or !(main.isNew() or (productView.product.commodityId ne null and (userRuntimeView.privilege.editField or userRole.isRoot()))) }"
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" dropdown="true"
+                              autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.productCategoryClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productCategoryById()}"/>
+                <p:ajax event="itemSelect" process="productCategoryDiv" update="categoryExDuty hsnCodeDiv" listener="#{productView.productCategorySelectEventHandler}"/>
+              </p:autoComplete>
+              <p:outputLabel value="#{productView.productCategoryTaxes}" id="categoryExDuty"/>
+              <p:message for="productProductCategoryId" display="text" />
+            </h:panelGroup>
+
+            <!-- Product Type -->
+            <p:commandLink actionListener="#{popUpView.showProductType(null)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.productType}" for="productProductTypeId"/>
+            </p:commandLink>
+            <h:panelGroup id="productTypeDiv">
+              <p:remoteCommand name="productTypeReturned" actionListener="#{productView.productTypeReturned()}" update="productTypeDiv"  process="@this" immediate="true" />
+              <p:selectOneMenu value="#{productView.product.productTypeId}"  id="productProductTypeId" tabindex="4" 
+                               required="true" requiredMessage="#{lang.productType} #{lang.isRequired}"
+                               disabled="#{productView.productDetailExist}"
+                               converter="omnifaces.SelectItemsConverter" styleClass="fw o-100">
+                <f:selectItems value="#{productView.productTypeAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              </p:selectOneMenu>
+              <p:message for="productProductTypeId" display="text" />
+            </h:panelGroup>
+
+            <!-- Product Classification -->
+            <p:commandLink actionListener="#{popUpView.productClassificationOpen(productView.product)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.productClassification}" for="productProductClassificationId"/>
+            </p:commandLink>
+            <h:panelGroup id="productClassificationDiv">
+              <p:autoComplete value="#{productView.product.productClassificationId}" completeMethod="#{productView.productClassificationAuto}"
+                              converter="wawo.LookupIntConverter" id="productProductClassificationId" tabindex="5" dropdown="true"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.productClassificationClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productClassificationById()}"/>
+              </p:autoComplete>
+              <p:message for="productProductClassificationId" display="text" />
+            </h:panelGroup>
+
+            <!-- HSN Code -->
+            <h:panelGroup rendered="#{userRuntimeView.isGstRegime()}">
+              <p:outputLabel value="#{lang.hsnCode}" for="productHsnCode" />
+            </h:panelGroup>
+            <h:panelGroup id="hsnCodeDiv" rendered="#{userRuntimeView.isGstRegime()}">
+              <p:inputText value="#{productView.product.hsnCode}" maxlength="10" tabindex="6" id="productHsnCode" validator="wawo.WhiteSpaceValidator"
+                           required="true" requiredMessage="#{lang.hsnCode} #{lang.isRequired}" autocomplete="off"/>
+              <p:message for="productHsnCode" display="text"/>
+            </h:panelGroup>
+
+            <!-- Chemical Name -->
+            <h:panelGroup id="chNameLblDiv">
+              <p:outputLabel value="#{lang.chemicalName}" for="productNameChemical" rendered="#{productView.isCommodityMedicine()}"/>
+            </h:panelGroup>
+            <h:panelGroup id="chNameTextDiv">
+              <p:inputText value="#{productView.product.productNameChemical}" maxlength="50" tabindex="6" autocomplete="off"
+                           id="productNameChemical" rendered="#{productView.isCommodityMedicine()}"/>
+              <p:message for="productNameChemical" display="text"/>
+            </h:panelGroup>
+
+            <!-- Generic Name -->
+            <h:panelGroup id="geneNameLbltDiv">
+              <p:outputLabel value="#{lang.genericName}" for="productNameGeneric" rendered="#{productView.isCommodityMedicine()}"/>
+            </h:panelGroup>
+            <h:panelGroup id="geneNameTextDiv">
+              <p:inputText value="#{productView.product.productNameGeneric}" maxlength="50" tabindex="7" autocomplete="off"
+                           id="productNameGeneric" rendered="#{productView.isCommodityMedicine()}"/>
+              <p:message for="productNameGeneric" display="text"/>
+            </h:panelGroup>            
+
+            <!-- Pack Size -->
+            <p:outputLabel value="#{lang.packSize}" for="packSize" />
+            <h:panelGroup>
+              <p:inputNumber value="#{productView.product.packSize}" maxlength="6" id="packSize"
+                             readonly="#{productView.productDetailExist}" tabindex="8"  autocomplete="off"
+                             required="true" requiredMessage="#{lang.packSize} #{lang.isRequired}" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999.99"/>
+              <p:outputLabel value="(Eg: 10 for 10 Tab, 100 for 100ml)"/>
+              <p:message for="packSize" display="text"/>
+            </h:panelGroup>
+
+            <!-- Pack Unit -->
+            <p:outputLabel value="#{lang.unit}" for="packUnit" />
+            <h:panelGroup id="productUnitDiv">
+              <p:selectOneMenu value="#{productView.product.productUnitId}"
+                               disabled="#{productView.productBatchExist}" styleClass="o-100" tabindex="9"
+                               id="packUnit" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.unit} #{lang.isRequired}">
+                <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}"/>
+                <f:selectItems value="#{productView.productPackingUnit(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                <p:ajax event="itemSelect" process="@this" update="productPackingDiv" listener="#{productView.productUnitItemSelectEvent}" />
+              </p:selectOneMenu>
+              <p:message for="packUnit" display="text"/>
+            </h:panelGroup>
+
+            <!-- Product Packing -->
+            <p:commandLink actionListener="#{popUpView.showProductPackingOpen(null)}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();">
+              <p:outputLabel value="#{lang.productPacking}" for="productProductPackingDetailId" />
+            </p:commandLink>
+            <h:panelGroup id="productPackingDiv">
+              <p:remoteCommand name="productPackingPopupReturn" actionListener="#{productView.productPackingReturned()}" update="productProductPackingDetailId" process="@this" />
+              <p:selectOneMenu value="#{productView.product.productPackingDetailId}"  id="productProductPackingDetailId" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{lang.productPacking} #{lang.isRequired}" styleClass="fw o-100" tabindex="10" height="400" >
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{productView.lookupProductPackingDetail()}" var="e" itemValue="#{e}" itemLabel="#{e.title} " />   
+              </p:selectOneMenu>
+              <p:message for="productProductPackingDetailId" display="text" />
+            </h:panelGroup>
+
+            <!-- Packing Description -->
+            <p:outputLabel value="#{lang.packageDescription}" for="packDescription"/>
+            <h:panelGroup>
+              <p:inputText value="#{productView.product.packingDescription}" id="packDescription" styleClass="fw" size="40" />
+            </h:panelGroup>
+
+            <!-- Brand -->
+            <p:outputLabel value="#{lang.brand}" for="productBrandId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{productView.product.brandId}"  id="productBrandId" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{lang.brand} #{lang.isRequired}" styleClass="fw o-100" tabindex="11"
+                               disabled="#{productView.productSold}">
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{productView.lookupBrandByCompany()}" var="e" itemValue="#{e}" itemLabel="#{e.name}" />
+              </p:selectOneMenu><p:message for="productBrandId" display="text" />
+            </h:panelGroup>
+
+            <!-- Manufactures -->
+            <p:commandLink actionListener="#{popUpView.showManuFacture(null)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.manufacture}(s)" for="manufactureId"/>
+            </p:commandLink>
+            <h:panelGroup id="manufactureListDiv">
+              <p:autoComplete  multiple="true" value="#{productView.manufactureList}" completeMethod="#{productView.manufactureByCompanyAuto}"
+                               converter="wawo.LookupIntConverter" cache="true" required="true" requiredMessage="#{lang.manufacture} #{lang.isRequired}"
+                               validator="#{productView.productValidation}" tabindex="12"
+                               id="manufactureId" var="manf" itemValue="#{manf}" itemLabel="#{manf.code}" emptyMessage="#{lang.noResult}"
+                               queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                               style="position: relative" styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.manufactureClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.manufactureById()}"/>
+                <p:column style="width:10%">
+                  <h:outputText value="#{manf.code}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{manf.name}" />
+                </p:column>
+                <p:ajax event="itemSelect" listener="#{productView.onManufactureSelect}" update="@this" />
+                <p:ajax event="itemUnselect" process="manufactureListDiv" immediate="true" listener="#{productView.onManufactureUnSelect}" />
+              </p:autoComplete><p:message for="manufactureId" display="text" />
+            </h:panelGroup>
+
+            <!-- Near Expiry Days -->
+            <p:outputLabel  value="#{lang.nearExpiryDays}" for="nearExpiryDays"></p:outputLabel>
+            <h:panelGroup layout="block">
+              <p:inputNumber id="nearExpiryDays" value="#{productView.product.expirySalesDays}" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="120"
+                             tabindex="12" decimalPlaces="0" />
+            </h:panelGroup>
+
+            <!-- Product Status -->
+            <p:outputLabel value="#{lang.productStatus}" for="productProductStatusId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{productView.product.productStatusId}" 
+                               converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}"
+                               id="productProductStatusId" tabindex="13">
+                <f:selectItems value="#{productView.productStatusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+              </p:selectOneMenu>
+              <p:message for="productProductStatusId" display="text" />
+            </h:panelGroup>
+
+            <h:outputLabel value="#{lang.description}" />
+            <h:panelGroup>
+              <p:inputTextarea rows="2" value="#{productView.product.description}" cols="80" maxlength="500" autoResize="false" />
+            </h:panelGroup>
+
+            <h:outputLabel value="#{lang.images}" rendered="#{productView.uploadGallery}"  />
+            <h:panelGroup rendered="#{productView.uploadGallery}" >
+              <div>
+                <p:commandButton  icon="fa fa-image" value="#{lang.manage} #{lang.gallery}" styleClass="btn btn-info" actionListener="#{productView.manageGallery()}" 
+                                  immediate="true" process="@this" />                
+              </div>
+              <p:fragment id="imageFragment">
+                <table>
+                  <tr>
+                    <p:panelGrid columns="2">
+                      <p:repeat value="#{productView.getProductImages(main)}" var="gallery">
+                        <td valign="top" >
+                          <img src="data:image/png;base64, #{gallery.content} " /> 
+                          <p:graphicImage value="data:image/jpg;base64,#{gallery.content}" height="50" width="50" />           
+                        </td>                     
+                      </p:repeat>
+                    </p:panelGrid>
+                  </tr>
+                </table>
+              </p:fragment>
+            </h:panelGroup>
+
+
+
+          </ui:decorate>        
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(productView.product.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productView.product.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productView.product.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productView.product.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:tab>
+
+        <!-- Product Inventory -->
+        <p:tab title="#{lang.inventory}"  id="productInventoryTab" rendered="#{main.edit}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="productInventory" />
+
+            <ui:define name="menuleft">
+            </ui:define>
+
+            <p:dataTable id="productInventoryTable" var="row" widgetVar="productInventoryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{productView.getProductInventory(main)}" rows="10" 
+                         rowsPerPageTemplate="#{main.pageData.pageSize},10,50,100,150" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                         rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('productInventoryWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+
+              <p:column sortBy="#{row.batch}" styleClass="w-300" filterBy="#{row.batch}" filterStyleClass="hidden" >
+                <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="#{lang.batchNo}"/></f:facet>
+                <h:outputText value="#{row.batch}" title="#{row.saleable}"/>
+              </p:column>
+
+              <p:column sortBy="#{row.expiryDate}" filterBy="#{row.expiryDate}" filterStyleClass="hidden" >
+                <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+                <h:outputText value="#{appView.date(row.expiryDate)}" title="#{row.expiryDate}"/>
+              </p:column>
+
+              <p:column sortBy="#{row.mrp}"  filterBy="#{row.mrp}" filterStyleClass="hidden" >
+                <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+                <h:outputText value="#{row.mrp}" title="#{row.mrp}"/>
+              </p:column>
+
+              <p:column sortBy="#{row.saleable}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.saleable}" title="#{lang.saleable}"/></f:facet>
+                <h:outputText value="#{appView.number(row.saleable)}" escape="false" />    
+                <f:facet name="footer"><h:outputText value="#{productView.saleable eq 0?null:productView.saleable}" title="#{productView.saleable}"/></f:facet>
+              </p:column>
+
+              <p:column sortBy="#{row.blocked}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.blocked}" title="#{lang.blocked}"/></f:facet>
+                <h:outputText value="#{appView.number(row.blocked)}" escape="false" />
+                <f:facet name="footer"><h:outputText value="#{productView.blocked eq 0?null:productView.blocked}" title="#{productView.blocked}"/></f:facet>
+              </p:column>
+
+              <p:column sortBy="#{row.damaged}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.damaged}" title="#{lang.damaged}"/></f:facet>
+                <h:outputText value="#{appView.number(row.damaged)}" escape="false" />
+                <f:facet name="footer"><h:outputText value="#{productView.damaged eq 0?null:productView.damaged}" title="#{productView.damaged}"/></f:facet>
+              </p:column>
+
+              <p:column sortBy="#{row.expired}" style="text-align: right"  >
+                <f:facet name="header"><h:outputText value="#{lang.expired}" title="#{lang.expired}"/></f:facet>
+                <h:outputText value="#{appView.number(row.expired)}" escape="false" />
+                <f:facet name="footer"><h:outputText value="#{productView.expired eq 0 ?null:productView.expired}" title="#{productView.expired}"/></f:facet>
+              </p:column>
+
+              <p:column sortBy="#{row.excess}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.excess}" title="#{lang.excess}" /></f:facet>
+                <h:outputText value="#{appView.number(row.excess)}" escape="false" />
+                <f:facet name="footer"><h:outputText value="#{productView.excess eq 0 ? null: productView.excess}" title="#{productView.excess}"/></f:facet>
+              </p:column>
+
+
+              <p:column sortBy="#{row.saleableValue}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.saleable} #{lang.value}" title="#{lang.saleable} #{lang.value}"/></f:facet>
+                <h:outputText value="#{appView.decimal(row.saleableValue)}" escape="false" />    
+                <f:facet name="footer"><h:outputText value="#{productView.saleableValue eq 0?null:appView.decimal(productView.saleableValue)}" title="#{productView.saleableValue}"/></f:facet>
+              </p:column>
+
+              <p:column sortBy="#{row.nonSaleableValue}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.nonSaleable} #{lang.value}" title="#{lang.nonSaleable} #{lang.value}"/></f:facet>
+                <h:outputText value="#{appView.decimal(row.nonSaleableValue)}" escape="false" />    
+                <f:facet name="footer"><h:outputText value="#{productView.nonSaleableValue eq 0?null:appView.decimal(productView.nonSaleableValue)}" title="#{productView.nonSaleableValue}"/></f:facet>
+              </p:column>
+
+              <p:column sortBy="#{row.excessValue}" style="text-align: right" >
+                <f:facet name="header"><h:outputText value="#{lang.excess} #{lang.value}" title="#{lang.excess} #{lang.value}"/></f:facet>
+                <h:outputText value="#{appView.decimal(row.excessValue)}" escape="false" />    
+                <f:facet name="footer"><h:outputText value="#{productView.excessValue eq 0?null:appView.decimal(productView.excessValue)}" title="#{productView.excessValue}"/></f:facet>
+              </p:column>
+
+            </p:dataTable>
+          </ui:decorate>
+
+          <h:panelGroup layout="block" styleClass="row">
+
+            <!--Last Purchase-->
+            <h:panelGroup layout="block" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="rendered" value="#{main.isEdit()}" />
+                <ui:param name="label" value="#{lang.purchaseHistory}" />
+                <p:dataTable id="purchaseHistoryTable" var="row" widgetVar="purchaseHistoryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                             value="#{productView.getLastPurchaseList(main)}" rows="#{main.pageData.pageSize}" 
+                             rowsPerPageTemplate="#{main.pageData.pageSize},50,100,150" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                             rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+
+                  <p:column sortBy="#{row.accountCode}" >
+                    <f:facet name="header"><h:outputText value="#{lang.account}" title="#{lang.account}"/></f:facet>
+                    <h:outputText value="#{row.accountCode}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.invoiceNo}" >
+                    <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+                    <h:outputText value="#{row.invoiceNo}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.invoiceDate}" >
+                    <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+                    <h:outputText value="#{appView.date(row.invoiceDate)}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.qty}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.qty}"/></f:facet>
+                    <h:outputText value="#{row.qty}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.valueRate}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.valueRate}" title="#{lang.valueRate}"/></f:facet>
+                    <h:outputText value="#{appView.decimal(row.valueRate)}" escape="false" />    
+                  </p:column>
+
+                </p:dataTable>
+              </ui:decorate>
+            </h:panelGroup>
+
+            <!--Last Sales-->
+            <h:panelGroup layout="block" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                <ui:param name="rendered" value="#{main.isEdit()}" />
+                <ui:param name="label" value="#{lang.salesHistory}" />
+                <p:dataTable id="salesHistoryTable" var="row" widgetVar="salesHistoryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                             value="#{productView.getLastSalesList(main)}" rows="#{main.pageData.pageSize}" 
+                             rowsPerPageTemplate="#{main.pageData.pageSize},50,100,150" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                             rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+
+                  <p:column sortBy="#{row.accountCode}">
+                    <f:facet name="header"><h:outputText value="#{lang.accountGroup}" title="#{lang.accountGroup}"/></f:facet>
+                    <h:outputText value="#{row.accountCode}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.invoiceNo}">
+                    <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+                    <h:outputText value="#{row.invoiceNo}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.invoiceDate}"  >
+                    <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+                    <h:outputText value="#{appView.date(row.invoiceDate)}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.qty}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.qty}"/></f:facet>
+                    <h:outputText value="#{row.qty}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.qtyFree}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.qtyFree}" title="#{lang.qtyFree}"/></f:facet>
+                    <h:outputText value="#{row.qtyFree}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.schemeDiscountPercentage}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.s} #{lang.discPerc}" title="#{lang.s} #{lang.discPerc}"/></f:facet>
+                    <h:outputText value="#{appView.decimal(row.schemeDiscountPercentage)}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.productDiscountPercentage}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.p} #{lang.discPerc}" title="#{lang.p} #{lang.discPerc}"/></f:facet>
+                    <h:outputText value="#{appView.decimal(row.productDiscountPercentage)}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.invoiceDiscount}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.i} #{lang.disc}" title="#{lang.i} #{lang.disc}"/></f:facet>
+                    <h:outputText value="#{appView.decimal(row.invoiceDiscount)}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.valuePts}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+                    <h:outputText value="#{appView.decimal(row.valuePts)}" escape="false" />    
+                  </p:column>
+
+                  <p:column sortBy="#{row.valueRate}" style="text-align: right" >
+                    <f:facet name="header"><h:outputText value="#{lang.valueRate}" title="#{lang.valueRate}"/></f:facet>
+                    <h:outputText value="#{appView.decimal(row.valueRate)}" escape="false" />    
+                  </p:column>
+
+                </p:dataTable>
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+        </p:tab>
+        <!--Product Profile-->
+        <p:tab title="#{lang.profile}"  id="productProfileTab" rendered="#{main.edit}" >
+
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="productProfile" />
+
+            <ui:define name="menuleft">
+            </ui:define>
+
+            <p:dataTable id="productProfileTable" var="profile" widgetVar="productProfileWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{productView.getProductProfiles(main)}" rows="#{main.pageData.pageSize}" 
+                         rowsPerPageTemplate="#{main.pageData.pageSize},50,100,150" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                         rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('productProfileWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column headerText="#{lang.supplierName}">
+                <div style="overflow-wrap: break-word;white-space: normal;width: 190px;paddimg:10px;">
+                  <h:outputText value="#{profile.suppliername}" title="#{profile.suppliername}" />
+                </div>
+              </p:column>
+              <p:column headerText="#{lang.productPreset}" style="text-align: center;">
+                <p:fragment rendered="#{profile.productpreset eq 1}" > <i class="fa fa-check" aria-hidden="true" style="color:#09a77b;" ></i> </p:fragment>
+                <p:fragment rendered="#{profile.productpreset eq 0}" > <i class="fa fa-times" aria-hidden="true" style="color:#fd4921;" ></i> </p:fragment>
+              </p:column>
+              <p:column headerText="#{lang.productBatch}" style="text-align: center;">
+                <p:fragment rendered="#{profile.productbatch eq 1}" > <i class="fa fa-check" aria-hidden="true" style="color:#09a77b;" ></i> </p:fragment>
+                <p:fragment rendered="#{profile.productbatch eq 0}" > <i class="fa fa-times" aria-hidden="true" style="color:#fd4921;" ></i> </p:fragment>
+              </p:column>
+              <p:column headerText="#{lang.purchase} #{lang.possible}" style="text-align: center;">
+                <p:fragment rendered="#{profile.purchasepossible eq 1}" > <i class="fa fa-check" aria-hidden="true" style="color:#09a77b;" ></i> </p:fragment>
+                <p:fragment rendered="#{profile.purchasepossible eq 0}" ><i class="fa fa-times" aria-hidden="true" style="color:#fd4921;" ></i> </p:fragment>
+              </p:column>
+              <p:column headerText="#{lang.sales} #{lang.channel}">
+                <div style="overflow-wrap: break-word;white-space: normal;width: 200px;paddimg:10px;">
+                  <h:outputText value="#{profile.saleschannel}" title="#{profile.saleschannel}" />
+                </div>
+              </p:column>
+
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+      </p:tabView>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

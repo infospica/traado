@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{purchaseFromSalesView.switchPurchaseFromSales(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.purchase}" />
+    <!--<ui:param name="subLabel" value="#{purchaseFromSalesView.purchaseReturn.purchaseReturnStockCat.title}" />-->
+    <ui:param name="labelOnly" value="#{true}" />
+    <!--<ui:param name="navLabel" value="#{lang.product}" />-->
+    <ui:param name="ids" value="purchaseReturnItem" />
+    <ui:param name="deleteListMenu" value="false" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+    <ui:param name="search" value="false" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" actionListener="#{purchaseFromSalesView.purchaseFromSalesPopupClose()}" oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" id="prStockItemContainer" >
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="" />
+          <ui:define name="menuright">    
+            <!--Select and Close Button-->
+            <p:commandButton actionListener="#{purchaseFromSalesView.addProductEntryListFromSales(main)}" title="#{lang.select}"
+                             onclick="return preSelect('salesInvoiceWidget')" oncomplete="unblock();" onstart="block();"
+                             styleClass="btn btn-primary" value="#{lang.select}" >
+            </p:commandButton>
+          </ui:define>
+
+          <p:dataTable id="salesInvoiceTable" var="salesInvoiceVar" widgetVar="salesInvoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       lazy="true" value="#{purchaseFromSalesView.salesInvoiceLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesInvoiceVar.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                       selection="#{purchaseFromSalesView.salesInvoiceSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+            <p:column selectionMode="single" exportable="false" />
+            <!-- Invoice No -->
+            <p:column sortBy="#{salesInvoiceVar.invoiceNo}" field="scm_sales_invoice.invoice_no">
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}" escape="false" />
+              </f:facet>
+              <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesInvoiceVar.invoiceNo)}" process="@this" update="f1" immediate="true"
+                             onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                <f:setPropertyActionListener target="#{salesInvoiceGstIndiaView.salesInvoice}" value="#{salesInvoiceVar}" />
+              </p:commandLink>
+              <h:outputText  title="#{appView.title(salesInvoiceVar.invoiceNo)}" escape="false" />
+            </p:column>
+
+            <!-- Customer -->
+            <p:column sortBy="#{salesInvoiceVar.customerId.customerName}" field="scm_customer.customer_name">
+              <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+              <h:outputText value="#{appView.display(salesInvoiceVar.customerId.customerName)}" title="#{appView.title(salesInvoiceVar.customerId.customerName)}" escape="false" />
+            </p:column>
+
+            <!-- Invoice Date -->
+            <p:column sortBy="#{salesInvoiceVar.invoiceDate}" field="invoice_date" >
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}" escape="false" />
+              </f:facet>
+              <h:outputText value="#{appView.date(salesInvoiceVar.invoiceDate)}" escape="false" />
+            </p:column>
+
+            <!-- Invoice Amount Net -->
+            <p:column sortBy="#{salesInvoiceVar.invoiceAmountNet}" field="invoice_amount_net" style="text-align: right" rendered="false">
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceAmountNet}" title="#{lang.invoiceAmountNet}" escape="false" />
+              </f:facet>
+              <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountNet)}" escape="false" />
+            </p:column>
+
+            <!-- Invoice Amount GST-->
+            <p:column sortBy="#{salesInvoiceVar.invoiceAmountGst}" field="invoice_amount_gst" style="text-align: right">
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceAmountGst}" title="#{lang.invoiceAmountGst}" escape="false" />
+              </f:facet>
+              <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmountIgst)}" escape="false" />
+            </p:column>
+
+            <!-- Invoice Amount -->
+            <p:column sortBy="#{salesInvoiceVar.invoiceAmount}" field="invoice_amount" style="text-align: right">
+              <f:facet name="header">
+                <h:outputText value="#{lang.invoiceAmount}" title="#{lang.invoiceAmount}" escape="false" />
+              </f:facet>
+              <h:outputText value="#{appView.decimal(salesInvoiceVar.invoiceAmount)}" escape="false" />
+            </p:column>
+
+          </p:dataTable>
+          <!--
+                <p:remoteCommand name="updateRtrnFooter" process="@this" update="purchaseReturnItemTable:rqtyDiv" />
+                <p:remoteCommand name="updateAvlFooter" process="@this" update="purchaseReturnItemTable:aqtyDiv" />-->
+
+          <p:dialog id="productErrorDlg" widgetVar="productErrorDlgVar" header="Products Not Found" resizable="false" showEffect="clip" hideEffect="clip" closeOnEscape="false" modal="true" closable="false">
+            <p:dataTable id="productErrorTable" var="row" widgetVar="productErrorWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{purchaseFromSalesView.productList}" rows="5" rowKey="#{row.id}" 
+                         paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}" 
+                         rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('productErrorWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{row.productName}" field="product_name" filterBy="#{row.productName}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet> 
+                <p:commandLink actionListener="#{popUpView.showProductForClone(row,row.productName)}" immediate="true" >
+                  <h:outputText value="#{appView.display(row.productName)}" title="#{appView.title(row.productName)}" escape="false" />
+                </p:commandLink>
+              </p:column>
+
+              <p:column sortBy="#{row.productNameChemical}" field="product_name_chemical" filterBy="#{row.productNameChemical}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.errors}" title="#{lang.errors}"/></f:facet> 
+                <h:outputText value="#{appView.display(row.productNameChemical)}" title="#{appView.title(row.productNameChemical)}" escape="false" />
+              </p:column>
+            </p:dataTable>
+            <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">
+              <p:commandButton value="#{lang.ok}" onclick="PF('productErrorDlgVar').hide();" styleClass="btn btn-info" oncomplete="unblock();" />
+            </div>
+
+          </p:dialog>
+          <p:dialog widgetVar="emptyTable" header="#{lang.alert}" draggable="no" resizable="no" modal="true">
+            <h:outputText  value="#{lang.dialogEmptyList}" /><br /><br />
+            <p:commandButton value="#{lang.btnOk}" onclick="wdgOff('emptyTable')" type="button" title="#{lang.btnYes}" />
+          </p:dialog>
+          <script>
+            //<![CDATA[
+            function preSelect(widget) {
+              var rowcount = PF(widget).getSelectedRowsCount();
+              if (rowcount == 0) {
+                PF('emptyTable').show();
+                return false;
+              }
+              return true;
+            }
+            //]]>
+          </script>
+        </ui:decorate>
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</html>

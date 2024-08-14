@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:h="http://xmlns.jcp.org/jsf/html"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">  
+  #{customerLicenseView.switchCustomerLicense(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{customerLicenseView.parent.customerName}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? customerLicenseView.customerLicense.licenseKey : lang.license}" />   
+    <ui:param name="ids" value="customerLicense" />
+    <ui:param name="labelOnly" value="#{true}" />
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{customerLicenseView.customerLicenseDocDialogClose}"
+                       oncomplete="parent.customerLicenseDialogReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{customerLicenseView.cloneCustomerLicense(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{customerLicenseView.deleteCustomerLicense(main)}" value="#{lang.delete}" onclick="wdgOff('customerLicenseWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{customerLicenseView.saveCustomerLicense(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+    <ui:define name="form">
+
+      <!-- license Type -->
+      <p:outputLabel value="#{lang.licenseType}" for="customerLicenseLicenseTypeId" />
+      <h:panelGroup>
+        <p:selectOneMenu value="#{customerLicenseView.customerLicense.licenseTypeId}"  required="true" requiredMessage="#{lang.licenseType} #{lang.isRequired}" 
+                         id="customerLicenseLicenseTypeId" converter="omnifaces.SelectItemsConverter" style="position: relative" styleClass="fw">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.licenseType(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        </p:selectOneMenu><p:message for="customerLicenseLicenseTypeId" display="text" />
+      </h:panelGroup>
+
+      <!-- license No-->
+      <p:outputLabel value="#{lang.license} #{lang.no}" for="licenseNo" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerLicenseView.customerLicense.licenseKey}" maxlength="20" required="true" 
+                     requiredMessage="#{lang.license} #{lang.no} #{lang.isRequired}"  autocomplete="off"
+                     id="licenseNo" style="position: relative"/>
+        <p:message for="licenseNo" display="text"/>
+      </h:panelGroup>
+
+      <!--Description-->
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup><p:inputText value="#{customerLicenseView.customerLicense.description}" maxlength="200" 
+                                  id="description" style="position: relative" styleClass="fw"/>
+        <p:message for="description" display="text"/>
+      </h:panelGroup>  
+
+      <!-- issued At-->
+      <p:outputLabel value="#{lang.issuedAt}" for="issuedAt" />
+      <h:panelGroup>
+        <p:calendar value="#{customerLicenseView.customerLicense.issuedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.issuedAt} #{lang.invalidDate}" 
+                    maxlength="29"  id="issuedAt" showButtonPanel="true" navigator="true" mask="true" pages="3"/>
+        <p:message for="issuedAt" display="text"/>
+      </h:panelGroup>
+
+      <!--valid From-->
+      <p:outputLabel value="#{lang.validFrom}" for="validFrom" />
+      <h:panelGroup>
+        <p:calendar value="#{customerLicenseView.customerLicense.validFrom}" pattern="#{lang.datePattern}" converterMessage="#{lang.validFrom} #{lang.invalidDate}" 
+                    maxlength="29" id="validFrom" showButtonPanel="true" navigator="true" mask="true" pages="3"/>
+        <p:message for="validFrom" display="text"/>
+      </h:panelGroup>
+
+      <!--valid To-->
+      <p:outputLabel value="#{lang.validTo}" for="validTo" />
+      <h:panelGroup>
+        <p:calendar value="#{customerLicenseView.customerLicense.validTo}" pattern="#{lang.datePattern}" converterMessage="#{lang.validTo} #{lang.invalidDate}" 
+                    maxlength="29" id="validTo" showButtonPanel="true" navigator="true" mask="true"  pages="3"/>
+        <p:message for="validTo" display="text"/>
+      </h:panelGroup>
+
+      <!--file Path-->
+      <p:outputLabel value="#{lang.filePath}" for="filePath" />
+      <h:panelGroup id="filePathPart">
+        <h:inputFile value="#{customerLicenseView.filePathPart}"  maxlength="200" id="filePath"/>
+        <p:commandButton rendered="#{not empty customerLicenseView.customerLicense.filePath}" icon="fa fa-trash" title="#{lang.deleteFile}" process="@this" oncomplete="hide('filePathLink')" update="filePathPart" partialSubmit="true" immediate="true"  style="width:30px">
+          <f:setPropertyActionListener target="#{customerLicenseView.filePathPart}" value="#{appIo.getRemoveFile()}" />
+        </p:commandButton><p:spacer width="5"/>
+        <p:commandLink value="#{appIo.fileName(customerLicenseView.customerLicense.filePath)}" ajax="false" id="filePathLink" class="ignoreLoad">
+          <p:fileDownload value="#{appIo.downloadPrivate(customerLicenseView.customerLicense.filePath)}" />
+        </p:commandLink>
+        <p:message for="filePath" display="text"/>
+      </h:panelGroup>
+
+      <!--Sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{customerLicenseView.customerLicense.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" 
+                       maxlength="5" id="sortOrder" style="position: relative" styleClass="fw" thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="companyBankStatusId"/>
+      <h:panelGroup>
+          <p:selectOneMenu value="#{customerLicenseView.customerLicense.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+                         id="companyBankStatusId">
+          <f:selectItems value="#{customerLicenseView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="companyBankStatusId" display="text" />
+      </h:panelGroup> 
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(customerLicenseView.customerLicense.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(customerLicenseView.customerLicense.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(customerLicenseView.customerLicense.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(customerLicenseView.customerLicense.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(customerLicenseView.customerLicense.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>      
+</ui:composition>
+

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  <ui:composition template="/theme1/layoutDialog.xhtml" >
+    <ui:define name="content"  >
+      <h:form id="f1" prependId="false">
+        #{main.setViewPath(param.viewPath eq null ? main.viewPath : param.viewPath, param.viewType eq null ? main.viewType : param.viewType)}
+
+        #{companyContactView.switchCompanyContact(main, param.viewType eq null ? main.viewType : param.viewType)}
+        <ui:decorate template="/WEB-INF/resources/theme1/dialogForm.xhtml">
+          <ui:param name="label" value="#{companyContactView.companyContact.companyId.companyName}" />
+          <ui:param name="subLabel" value="#{lang.contact}" />
+          <ui:param name="ids" value="companyContact" />
+
+          <ui:define name="menu1" >
+            <p:menuitem actionListener="#{companyContactView.cloneCompanyContact(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+          </ui:define>
+          <ui:define name="navLeftRight">
+            <p:commandButton actionListener="#{companyContactView.companyContactDialogClose}" value="#{lang.close}" partialSubmit="true" process="@this" immediate="true"  styleClass="btn btn-default"/>
+          </ui:define>
+          <ui:define name="deleteForm" >
+            <p:commandButton action="#{companyContactView.deleteCompanyContact(main)}" value="#{lang.delete}" onclick="wdgOff('companyContactWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+          </ui:define>
+
+          <ui:define name="save" >
+            <h:commandButton action="#{companyContactView.saveCompanyContact(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+              <f:ajax execute="f1" render="f1"  /></h:commandButton>
+          </ui:define>
+
+          <ui:define name="form">
+            <!-- contact Name-->
+            <p:outputLabel value="#{lang.name}" for="contactName" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyContactView.companyContact.personProfileId}" maxlength="50" required="true" requiredMessage="#{lang.contactName} #{lang.isRequired}" id="contactName"
+                           validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="contactName" display="text"/>
+            </h:panelGroup>
+
+            <!--designation-->
+            <p:outputLabel value="#{lang.designation}" for="companyContactDesignationId"/>
+            <h:panelGroup>
+              <p:autoComplete  value="#{companyContactView.companyContact.designationId}" completeMethod="#{companyContactView.designationAuto}" converter="wawo.LookupIntConverter"   
+                               required="true" requiredMessage="#{lang.designation} #{lang.isRequired}" id="companyContactDesignationId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                               emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                               autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.designationClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.designationById()}"/>
+              </p:autoComplete><p:message for="companyContactDesignationId" display="text" />
+            </h:panelGroup>
+
+            <!--phone1-->
+            <p:outputLabel value="#{lang.phone1}" for="phone1" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyContactView.companyContact.phone}" maxlength="10" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" id="phone1"
+                           validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="phone1" display="text"/>
+            </h:panelGroup>
+
+            <!--             phone 2
+                        <p:outputLabel value="#{lang.phone2}" for="phone2" />
+                        <h:panelGroup>
+                          <p:inputText styleClass="fw" value="#{companyContactView.companyContact.phone2}" maxlength="20" id="phone2" /><p:message for="phone2" display="text"/>
+                        </h:panelGroup>
+            
+                         fax 1
+                        <p:outputLabel value="#{lang.fax1}" for="fax1" />
+                        <h:panelGroup>
+                          <p:inputText styleClass="fw" value="#{companyContactView.companyContact.fax1}" maxlength="20" id="fax1" /><p:message for="fax1" display="text"/>
+                        </h:panelGroup>
+            
+                         fax 2
+                        <p:outputLabel value="#{lang.fax2}" for="fax2" />
+                        <h:panelGroup>
+                          <p:inputText styleClass="fw" value="#{companyContactView.companyContact.fax2}" maxlength="20" id="fax2" /><p:message for="fax2" display="text"/>
+                        </h:panelGroup>-->
+
+            <!-- email-->
+            <p:outputLabel value="#{lang.email}" for="email" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{companyContactView.companyContact.email}" maxlength="50" id="email" validator="wawo.EmailValidator"/>
+              <p:message for="email" display="text"/>
+            </h:panelGroup>
+
+            <!--            is Default
+                        <p:outputLabel value="#{lang.isDefault}" for="isDefault" />
+                        <h:panelGroup>
+                          <p:selectOneRadio value="#{companyContactView.companyContact.isDefault}" required="true" requiredMessage="#{lang.isDefault} #{lang.isRequired}" id="isDefault" >
+                            <f:selectItem itemLabel="#{lang.yes}" itemValue="#{one}" />
+                            <f:selectItem itemLabel="#{lang.no}" itemValue="#{zero}" />
+                          </p:selectOneRadio>
+                          <p:message for="isDefault" display="text"/>
+                        </h:panelGroup>-->
+
+            <!--Sort Order-->
+            <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+            <h:panelGroup>
+              <p:inputNumber value="#{companyContactView.companyContact.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
+              <p:message for="sortOrder" display="text"/>
+            </h:panelGroup>
+
+            <!--status-->
+            <p:outputLabel value="#{lang.status}" for="status" />
+            <h:panelGroup>
+              <p:selectOneRadio value="#{companyContactView.companyContact.status}" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" id="status" > 
+                <f:selectItem itemLabel="#{lang.active}" itemValue="#{one}" />
+                <f:selectItem itemLabel="#{lang.inactive}" itemValue="#{zero}"/>
+              </p:selectOneRadio>
+              <p:message for="status" display="text"/>
+            </h:panelGroup>
+
+          </ui:define>
+          <ui:define name="after">
+            <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+              <ui:define name="cby">#{appView.display(companyContactView.companyContact.createdBy)}</ui:define>
+              <ui:define name="cat">#{appView.dateTime(companyContactView.companyContact.createdAt)}</ui:define>
+              <ui:define name="uby">#{appView.display(companyContactView.companyContact.lastModifiedBy)}</ui:define>
+              <ui:define name="uat">#{appView.dateTime(companyContactView.companyContact.lastModifiedAt)}</ui:define>
+            </ui:decorate>
+          </ui:define>
+        </ui:decorate>
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>

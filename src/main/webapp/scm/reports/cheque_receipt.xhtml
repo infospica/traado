@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{chequeReceiptView.reset()}
+
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>    
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+    <ui:param name="id" value="chequeReportList" />
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList" >
+      <h:panelGroup styleClass="L">
+        <h:outputText value="#{lang.date} " />
+        <p:calendar value="#{chequeReceiptView.date}" pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}" maxlength="29"
+                    required="true" requiredMessage="#{lang.date} #{lang.isRequired}" id="today" showButtonPanel="true" navigator="true" mask="true"
+                    mindate="#{userRuntimeView.minDate}" autocomplete="off"  >
+          <p:ajax event="dateSelect" onstart="block();" oncomplete="unblock();" process="@this" listener="#{chequeReceiptView.reset()}" update="chequeReceiptListTable" />
+        </p:calendar>
+      </h:panelGroup>
+      <h:panelGroup styleClass="L">
+        <p:commandButton value="#{lang.cheque} #{lang.present}" actionListener="#{chequeReceiptView.checkPresent(main)}" 
+                         immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false"/>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="list">
+      <h:panelGroup id="chequeReceiptListTable">
+        #{chequeReceiptView.fetchChequeReceiptList(main)}
+        <p:dataTable id="chequeReportListTable" var="cl" widgetVar="chequeReportListWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     rowIndexVar="index" value="#{chequeReceiptView.chequeReciptList}" rows="#{main.pageData.pageSize}" rowKey="#{cl.id}"
+                     scrollHeight="540" rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true"  paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+                     >
+          <p:column headerText="#{lang.slno}">
+            <h:outputText value="#{index+1}" />
+          </p:column>
+          <p:column>
+            <f:facet name="header"><h:outputText value="#{lang.remitter}" /></f:facet>
+            <h:outputText value="#{cl.partyName}" />
+          </p:column>
+          <p:column >
+            <f:facet name="header" > <h:outputText value="#{lang.chequeNO}" /> </f:facet>
+            <h:outputText value="#{cl.chequeNo}" />
+          </p:column>
+          <!--          <p:column>
+                      <f:facet name="header"> <h:outputText value="#{lang.chequeDate}" /> </f:facet>
+                      <h:outputText value="#{appView.date(cl.chequeDate)}" />
+                    </p:column>-->
+          <p:column>
+            <f:facet name="header"><h:outputText value="#{lang.processed} #{lang.date}" /></f:facet>
+            <h:outputText value="#{appView.date(cl.createdAt)}" />
+          </p:column>
+
+          <p:column>
+            <f:facet name="header" > <h:outputText value="#{lang.drawee}" /> </f:facet>
+            <h:outputText value="#{appView.display(cl.drawee)}" />
+          </p:column>
+          <p:column style="text-align: right;" >
+            <f:facet name="header"> <h:outputText value="#{lang.amount}" /> </f:facet>
+            <h:outputText value="#{appView.decimal(cl.amount)}" />
+            <f:facet name="footer"><h:outputText value="#{appView.decimal(chequeReceiptView.totalAmount)}" /></f:facet>
+          </p:column>
+          <p:column style="text-align: right; width: 45px;" >
+            <h:outputText value="" />
+          </p:column>
+        </p:dataTable>
+      </h:panelGroup>
+
+    </ui:define>
+  </ui:decorate>           
+</ui:composition>

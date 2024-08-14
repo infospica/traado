@@ -1,0 +1,659 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{debitCreditNoteView.switchDebitCreditNote(main, viewType, invoiceType, party)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="ids" value="debitCreditNote" />
+    <ui:param name="cols" value="4" />
+    <ui:param name="columnClasses" value="#{sysRuntimeView.grid4}" />
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{debitCreditNoteView.deleteDebitCreditNote(main)}" value="#{lang.btnYes}"
+                       oncomplete="wdgOff('debitCreditNoteWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{debitCreditNoteView.cloneDebitCreditNote(main)}" value="#{lang.clone}"
+                  process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{debitCreditNoteView.deleteDebitCreditNote(main)}" value="#{lang.delete}"
+                       onclick="wdgOff('debitCreditNoteWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <h:panelGroup id="buttonGroup" >
+        <p:commandButton action="#{debitCreditNoteView.saveDebitCreditNote(main, sysConstant.DRAFT)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
+                         rendered="#{main.isNew() or debitCreditNoteView.draft}" process="f1" update="f1">
+          <f:param value="#{sysConstant.DRAFT}" name="status" />        
+        </p:commandButton>
+
+        <p:commandButton action="#{debitCreditNoteView.saveDebitCreditNote(main, sysConstant.CONFIRMED)}" value="#{lang.confirm}"  onclick="toTop()"
+                         process="f1" update="f1" rendered="#{main.edit and debitCreditNoteView.draft}" id="confirmBtn"
+                         styleClass="btn btn-warning">
+          <f:param value="#{sysConstant.CONFIRMED}" name="status" />
+          <p:confirm header="#{lang.confirm}"
+                     message="#{(debitCreditNoteView.taxableDebitCreditNoteExist and debitCreditNoteView.debitCreditNote.taxableInvoice eq 0) ? lang.taxableDibitNoteExist : lang.confirm}" icon="ui-icon-alert" />
+        </p:commandButton>
+        <p:commandButton value="#{lang.resetToDraft}" actionListener="#{debitCreditNoteView.resetToDraft(main)}"
+                         rendered="#{main.edit and !debitCreditNoteView.draft and userRuntimeView.privilege.resetToDraft==true}"
+                         immediate="true" update="buttonGroup"  process="@this"  styleClass="btn btn-info">
+        </p:commandButton> 
+        <p:commandButton value="#{lang.print}" actionListener="#{debitCreditNoteView.createPrintPortrait(sysConstant.PDF_ITEXT)}"
+                         rendered="#{main.edit and !debitCreditNoteView.draft }"
+                         immediate="true"  process="@this"  styleClass="btn btn-info">
+        </p:commandButton> 
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+    <ui:define name="form">      
+      <p:importConstants type="spica.sys.SystemConstants"   var="SYSTEM_CONSTANTS"   />
+      <p:outputLabel value="#{lang.party}" for="ledgerId"/>
+      <h:panelGroup id="ledgerDiv">
+        <p:commandLink id="cl2" actionListener="#{debitCreditNoteView.ledgerPopup(debitCreditNoteView.debitCreditNote.accountingLedgerId)}" process="@this" immediate="true" rendered="#{main.isEdit()}" >
+          #{debitCreditNoteView.debitCreditNote.accountingLedgerId.title}
+        </p:commandLink>
+        <p:autoComplete value="#{debitCreditNoteView.debitCreditNote.accountingLedgerId}"
+                        completeMethod="#{debitCreditNoteView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"
+                        required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}" id="ledgerId"
+                        readonly="#{debitCreditNoteView.supplierDebitCreditNote}"
+                        rendered="#{main.isNew()}"
+                        var="ld" itemValue="#{ld}" itemLabel="#{ld.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="100"
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" scrollHeight="450" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+          <p:column style="width:280px;"><h:outputText value="#{ld.title}" /></p:column>
+          <p:column style="width:130px;"><h:outputText value="#{ld.accountingGroupId.title}" /></p:column>
+          <p:column style="width:130px;"><h:outputText value="#{ld.accountingGroupId.parentId.title}" /></p:column>
+          <p:message for="ledgerId" display="text" />
+          <p:ajax event="itemSelect" listener="#{debitCreditNoteView.ledgerSelectEvent}" process="ledgerDiv" update="invoiceNo" />
+        </p:autoComplete>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.taxable} #{lang.invoice}" for="taxableInvoice"  />
+      <h:panelGroup id="taxableDiv">
+        <p:selectOneRadio id="taxableInvoice" value="#{debitCreditNoteView.debitCreditNote.taxableInvoice}"
+                          layout="grid"  required="true" requiredMessage="#{lang.taxable} #{lang.invoice} #{lang.isRequired}" columns="2">
+          <f:selectItem itemLabel="Yes" itemValue="1" />
+          <!--<f:selectItem itemLabel="No" itemValue="0" />-->
+          <p:ajax event="change" process="taxableDiv" update="debitCreditNoteItemTable" listener="#{debitCreditNoteView.taxableInvoiceChangeEvent}"/>
+        </p:selectOneRadio>
+        <p:message for="taxableInvoice" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.netAmount}" rendered="#{debitCreditNoteView.debitCreditNote.accountGroupId eq null}"  />
+      <p:inputText styleClass="text-right" value="#{appView.decimal(debitCreditNoteView.debitCreditNote.netValue)}" maxlength="100"  readonly="true" rendered="#{debitCreditNoteView.debitCreditNote.accountGroupId eq null}" />
+
+      <p:outputLabel value="#{lang.documentNo}" for="documentNo" />
+      <h:panelGroup id="documentGroup">
+        <p:inputText value="#{debitCreditNoteView.debitCreditNote.documentNo}" maxlength="100" id="documentNo" autocomplete="off"
+                     readonly="true" rendered="#{!(userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root) or debitCreditNoteView.debitCreditNote.confirmedAt eq null}"/>
+        <p:inplace id="invoiceEdit"  event="dblclick" label="#{debitCreditNoteView.debitCreditNote.documentNo}" styleClass="fw" rendered="#{(userRuntimeView.appUser.companyAdmin or userRuntimeView.appUser.root) and debitCreditNoteView.debitCreditNote.confirmedAt ne null}" >
+          <p:inputText value="#{debitCreditNoteView.debitCreditNote.documentNo}"  maxlength="50"  />
+        </p:inplace>  
+        <p:message for="documentNo" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.reference} #{lang.documentNo}" for="invoiceNo" />
+      <h:panelGroup >
+        <p:inputText value="#{debitCreditNoteView.debitCreditNote.invoiceNo}" maxlength="100" id="invoiceNo" autocomplete="off" validator="#{debitCreditNoteView.validateInvoice}" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.entryDate}" for="entryDate" />
+      <h:panelGroup>
+        <p:calendar value="#{debitCreditNoteView.debitCreditNote.entryDate}" pattern="#{lang.datePattern}" mindate="#{userRuntimeView.minEntryDate}"
+                    maxdate="#{userRuntimeView.maxEntryDate}"
+                    converterMessage="#{lang.entryDate} #{lang.invalidDate}" validator="#{sysRuntimeView.dateLteToday}"
+                    maxlength="29" id="entryDate" showButtonPanel="true" navigator="true" mask="true"/>
+        <p:message for="entryDate" display="text"/>
+      </h:panelGroup>     
+
+      <p:outputLabel value="#{lang.reference} #{lang.document} #{lang.date}" for="invoiceDate" />
+      <h:panelGroup>
+        <p:calendar value="#{debitCreditNoteView.debitCreditNote.invoiceDate}" pattern="#{lang.datePattern}" 
+                    autocomplete="off" maxdate="#{userRuntimeView.maxEntryDate}" 
+                    converterMessage="#{lang.document} #{lang.date} #{lang.invalidDate}" maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true"/>
+
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.account}" for="debitCreditNoteAccountId" rendered="#{debitCreditNoteView.isSalesDebitCreditNote()}"  />
+      <h:panelGroup rendered="#{debitCreditNoteView.isSalesDebitCreditNote()}">
+        <p:selectOneMenu value="#{debitCreditNoteView.debitCreditNote.accountId}" required="true" requiredMessage="#{lang.account} #{lang.isRequired}"
+                         id="debitCreditNoteAccountId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+          <f:selectItems value="#{debitCreditNoteView.lookupAccount()}" var="a" itemValue="#{a}" itemLabel="#{a.accountTitle}" /> 
+          <p:ajax event="itemSelect" process="@this" update="documentGroup" onstart="block()" oncomplete="unblock()" />
+        </p:selectOneMenu>
+
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.narration}" for="debitCreditNoteNarrationId"  />
+      <h:panelGroup >
+        <p:inputText value="#{debitCreditNoteView.debitCreditNote.narration}" maxlength="200" id="debitCreditNoteNarrationId" autocomplete="off" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.invoice}"  rendered="#{debitCreditNoteView.invoiceWise}"  />
+      <h:panelGroup  id="salesInvoiceGroup" rendered="#{debitCreditNoteView.invoiceWise and debitCreditNoteView.isCustomerDebitCreditNote()}" >
+        <p:autoComplete value="#{debitCreditNoteView.debitCreditNote.salesInvoice}" completeMethod="#{debitCreditNoteView.selectInvoiceAuto}" converter="wawo.LookupIntConverter"
+                        id="invoiceId" var="i" itemValue="#{i}" itemLabel="#{i.invoiceNo}" autocomplete="off" forceSelection="true" styleClass="fw" 
+                        emptyMessage="#{lang.noResult}" queryDelay="500" maxResults="100" onfocus="this.select()" scrollHeight="400" dropdown="true" >
+          <f:attribute name="clazz" value="#{scmLookupView.salesInvoiceClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.salesInvoiceById()}"/>
+          <p:column style="width:210px;"><h:outputText value="#{i.invoiceNo}" /></p:column>
+          <p:column style="width:120px;"><h:outputText value="#{appView.date(i.invoiceEntryDate)}" /></p:column>
+          <p:column style="width:80px;"><h:outputText value="#{appView.decimal(i.invoiceAmountNet)}" /></p:column>
+          <p:ajax event="itemSelect" process="salesInvoiceGroup" update="debitCreditNoteItemTable"  />
+        </p:autoComplete>
+      </h:panelGroup>
+      <h:panelGroup  id="supplierInvoiceGroup" rendered="#{debitCreditNoteView.invoiceWise and debitCreditNoteView.isSupplierDebitCreditNote()}" >
+        <p:autoComplete value="#{debitCreditNoteView.debitCreditNote.productEntry}" completeMethod="#{debitCreditNoteView.selectInvoiceBySupplierAuto}" converter="wawo.LookupIntConverter"
+                        id="suppProductEnId" var="pe" itemValue="#{pe}" itemLabel="#{pe.accountInvoiceNo}" autocomplete="off" forceSelection="true" styleClass="fw" 
+                        emptyMessage="#{lang.noResult}" queryDelay="500" maxResults="100" onfocus="this.select()" scrollHeight="400" dropdown="true" >
+          <f:attribute name="clazz" value="#{scmLookupView.productEntryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productEntryById()}"/>
+          <p:column style="width:210px;"><h:outputText value="#{pe.accountInvoiceNo}" /></p:column>
+          <p:column style="width:120px;"><h:outputText value="#{appView.date(pe.invoiceDate)}" /></p:column>
+          <p:column style="width:80px;"><h:outputText value="#{appView.decimal(pe.invoiceAmount)}" /></p:column>
+          <p:ajax event="itemSelect" process="@this" update="debitCreditNoteItemTable"  />
+        </p:autoComplete>
+      </h:panelGroup>
+
+
+
+
+      <p:outputLabel value="#{lang.party} #{lang.approvedValue}" for="netAmount" 
+                     rendered="#{(debitCreditNoteView.isSupplierDebitCreditNote() or debitCreditNoteView.supplierSalesbill) and debitCreditNoteView.isConfirmed()}"  />
+      <h:panelGroup id="netAmountDiv" rendered="#{(debitCreditNoteView.isSupplierDebitCreditNote() or debitCreditNoteView.supplierSalesbill) and debitCreditNoteView.isConfirmed()}">
+        <p:inputNumber value="#{debitCreditNoteView.debitCreditNote.confirmedNetValue}" converterMessage="#{lang.netAmount} #{lang.invalidNumber}" decimalPlaces="2"
+                       title="#{lang.invoiceAmount}" validator="#{debitCreditNoteView.validateConfirmedNetValue}"
+                       validatorMessage="#{lang.netAmount} #{lang.isRequired}" immediate="true" readonly="#{debitCreditNoteView.debitCreditNote.confirmedNetValue gt 0}"
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="10" id="netAmount" >
+        </p:inputNumber>        
+        <p:commandButton process="netAmountDiv" icon="fa fa-save" value="save" update="netAmountDiv"
+                         rendered="#{debitCreditNoteView.confirmed and !(debitCreditNoteView.debitCreditNote.confirmedNetValue gt 0)}" styleClass="btn btn-primary"
+                         actionListener="#{debitCreditNoteView.actionSaveDebitCreditNote(main)}">          
+        </p:commandButton>
+        <p:commandButton process="netAmountDiv" icon="fa fa-trash" value="delete" update="netAmountDiv"
+                         styleClass="btn btn-info" 
+                         rendered="#{debitCreditNoteView.confirmed and debitCreditNoteView.isPlatformDeletable(main)}"
+                         actionListener="#{debitCreditNoteView.actionDeletePlatform(main)}">          
+        </p:commandButton>
+
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="after">
+      <div class="table-responsive">
+        <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and main.edit}" id="context" >
+          <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+
+          <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+          <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANT" />
+
+          <h:panelGroup layout="block" id="debitCreditNoteItemTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
+            <p:commandButton action="#{debitCreditNoteView.platformPopup()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left" value=" platform"
+                             styleClass="btn btn-info" rendered="#{debitCreditNoteView.supplierDebitCreditNote and !(main.edit and !debitCreditNoteView.draft) }">
+            </p:commandButton>             
+            <p:dataTable id="debitCreditNoteItemTable" var="debitCreditNoteItemVar" widgetVar="debitCreditNoteItemWidget" rowIndexVar="rowIndex" reflow="true"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" value="#{debitCreditNoteView.debitCreditNoteItemList}">
+
+              <!-- Sno -->
+              <p:column style="text-align: center;width:2%;">
+                <f:facet name="header"><h:outputText value="#{lang.slno}" title="Serial Number"/></f:facet>
+                <h:outputText value="#{rowIndex + 1}" />
+              </p:column>
+              <!-- Product -->
+              <p:column style="width:9%;">
+                <f:facet name="header">
+                  <p:commandLink id="cl2" actionListener="#{debitCreditNoteView.openProduct()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                    #{lang.product}
+                  </p:commandLink>
+                  <h:outputText id="lbl32" value="#{lang.product}" rendered="#{main.popup}" />
+                </f:facet>
+                <h:panelGroup id="productAutoDiv" rendered="#{!debitCreditNoteView.invoiceWise or debitCreditNoteView.isSupplierDebitCreditNote()}">
+                  <p:autoComplete value="#{debitCreditNoteItemVar.productId}" completeMethod="#{debitCreditNoteView.productAuto}" converter="wawo.LookupIntConverter"
+                                  id="productId" var="p" itemValue="#{p}" itemLabel="#{p.productName}" autocomplete="off" forceSelection="true" styleClass="fw"
+                                  emptyMessage="#{lang.noResult}" cache="false" queryDelay="500" maxResults="150" onfocus="this.select()" scrollHeight="400" dropdownMode="true" 
+                                  readonly="#{ debitCreditNoteItemVar.invoiceWise != null and !(ebitCreditNoteView.debitCreditNote.companyId.companySettings.invoiceWise eq debitCreditNoteItemVar.invoiceWise) and debitCreditNoteView.isCustomerDebitCreditNote() }" >
+                    <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                    <p:column><h:outputText value="#{p.productName}"  /></p:column>
+                    <p:ajax event="itemSelect" process="@this" update="serviceAutoDiv categoryAutoDiv hsnCodeDiv salesInvoiceDiv refInvoiceDateDiv debitCreditNoteItemTaxCodeDiv  refInvoiceNoDiv refInvoiceDateDiv sgstAmount cgstAmount igstAmount totalAmount " 
+                            listener="#{debitCreditNoteView.updateHsnCodeByProduct(debitCreditNoteItemVar)}" oncomplete="updateInvoiceSummery();focusToHsn(#{rowIndex});"  />
+                  </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup id="productCustomerInvoiceId" rendered="#{debitCreditNoteView.invoiceWise and debitCreditNoteView.isCustomerDebitCreditNote() }">
+                  <p:selectOneMenu value="#{debitCreditNoteItemVar.productId}" converter="omnifaces.SelectItemsConverter" var="p" height="400"
+                                   disabled="#{debitCreditNoteItemVar.invoiceWise != null and !(ebitCreditNoteView.debitCreditNote.companyId.companySettings.invoiceWise eq debitCreditNoteItemVar.invoiceWise)}" >
+                    <f:selectItem itemLabel="#{lang.select} #{lang.product}" itemValue="#{null}" />
+                    <f:selectItems value="#{debitCreditNoteView.selectProductList(main)}" var="pr" itemValue="#{pr}" itemLabel="#{pr.productName}" />
+                    <p:ajax event="itemSelect" oncomplete="updateInvoiceSummery();focusToHsn(#{rowIndex});" listener="#{debitCreditNoteView.updateLineItemByProduct(debitCreditNoteItemVar)}" 
+                            update="serviceAutoDiv categoryAutoDiv hsnCodeDiv salesInvoiceDiv refInvoiceDateDiv debitCreditNoteItemTaxCodeDiv  refInvoiceNoDiv refInvoiceDateDiv sgstAmount cgstAmount igstAmount totalAmount" />                      
+                    <p:column><h:outputText value="#{p.productName}"  /></p:column>
+                  </p:selectOneMenu>      
+                </h:panelGroup> 
+
+                <h:panelGroup id="productSupplierInvoiceId" rendered="#{debitCreditNoteView.invoiceWise and debitCreditNoteView.isSupplierDebitCreditNote() }">
+                  <p:selectOneMenu value="#{debitCreditNoteItemVar.productId}" converter="omnifaces.SelectItemsConverter" var="p" height="400"
+                                   disabled="#{(debitCreditNoteItemVar.invoiceWise != null 
+                                               and !(ebitCreditNoteView.debitCreditNote.companyId.companySettings.invoiceWise eq debitCreditNoteItemVar.invoiceWise)) and debitCreditNoteView.isCustomerDebitCreditNote() }" >
+                    <f:selectItem itemLabel="#{lang.select} #{lang.product}" itemValue="#{null}" />
+                    <f:selectItems value="#{debitCreditNoteView.selectProductList(main)}" var="pr" itemValue="#{pr}" itemLabel="#{pr.productName}" />
+                    <p:ajax event="itemSelect" oncomplete="updateInvoiceSummery();focusToHsn(#{rowIndex});" listener="#{debitCreditNoteView.updateLineItemByProduct(debitCreditNoteItemVar)}" 
+                            update="serviceAutoDiv categoryAutoDiv hsnCodeDiv salesInvoiceDiv refInvoiceDateDiv debitCreditNoteItemTaxCodeDiv  refInvoiceNoDiv refInvoiceDateDiv sgstAmount cgstAmount igstAmount totalAmount" />                      
+                    <p:column><h:outputText value="#{p.productName}"  /></p:column>
+                  </p:selectOneMenu>      
+                </h:panelGroup> 
+              </p:column>
+              <!-- Service -->
+              <p:column style="width:8%;">
+                <f:facet name="header">
+                  <p:commandLink id="cl3" actionListener="#{debitCreditNoteView.openServices()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                    #{lang.services}
+                  </p:commandLink>
+                </f:facet>
+                <h:panelGroup id="serviceAutoDiv">
+                  <p:autoComplete value="#{debitCreditNoteItemVar.serviceId}" completeMethod="#{debitCreditNoteView.serviceAuto}" converter="wawo.LookupIntConverter"
+                                  id="serviceId" var="s" itemValue="#{s}" itemLabel="#{s.title}" autocomplete="off" forceSelection="true" styleClass="fw" 
+                                  emptyMessage="#{lang.noResult}" queryDelay="500" maxResults="100" onfocus="this.select()" scrollHeight="400" >
+                    <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+                    <p:column style="width:210px;"><h:outputText value="#{s.title}" /></p:column>
+                    <p:column style="width:120px;"><h:outputText value="#{s.hsnSacCode}" /></p:column>
+                    <p:column style="width:80px;"><h:outputText value="#{s.salesTaxCodeId.code}" /></p:column>
+                    <p:ajax event="itemSelect" process="@this" update="productAutoDiv categoryAutoDiv hsnCodeDiv salesInvoiceDiv refInvoiceDateDiv debitCreditNoteItemTaxCodeDiv  refInvoiceNoDiv refInvoiceDateDiv sgstAmount cgstAmount igstAmount totalAmount " 
+                            listener="#{debitCreditNoteView.updateHsnCodeByService(debitCreditNoteItemVar)}" oncomplete="updateInvoiceSummery();focusToHsn(#{rowIndex});" />
+                  </p:autoComplete>
+                </h:panelGroup>
+              </p:column>
+              <!-- Category -->
+              <p:column style="width:8%;">
+                <f:facet name="header">
+                  <p:commandLink id="categoryHeader" actionListener="#{popUpView.showProductCategory(null)}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                    #{lang.category}
+                  </p:commandLink>
+                </f:facet>
+                <h:panelGroup id="categoryAutoDiv">
+                  <p:autoComplete value="#{debitCreditNoteItemVar.productCategoryId}" completeMethod="#{debitCreditNoteView.categoryAuto}" converter="wawo.LookupIntConverter"
+                                  id="categoryId" var="s" itemValue="#{s}" itemLabel="#{s.title}" autocomplete="off" forceSelection="true" styleClass="fw"  
+                                  emptyMessage="#{lang.noResult}" queryDelay="500" maxResults="100" onfocus="this.select()" scrollHeight="400" >
+                    <f:attribute name="clazz" value="#{scmLookupView.productCategoryClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.productCategoryById()}"/>
+                    <p:column style="width:210px;"><h:outputText value="#{s.title}" /></p:column>
+                    <p:column style="width:120px;"><h:outputText value="#{s.hsnCode}" /></p:column>
+                    <p:column style="width:80px;"><h:outputText value="#{s.salesTaxCodeId.code}" /></p:column>
+                    <p:ajax event="itemSelect" process="@this" update="productAutoDiv serviceAutoDiv hsnCodeDiv salesInvoiceDiv refInvoiceDateDiv debitCreditNoteItemTaxCodeDiv  refInvoiceNoDiv refInvoiceDateDiv sgstAmount cgstAmount igstAmount totalAmount " 
+                            listener="#{debitCreditNoteView.updateHsnCodeByCategory(debitCreditNoteItemVar)}" oncomplete="updateInvoiceSummery();focusToHsn(#{rowIndex});" />
+                  </p:autoComplete>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- HSN Code -->
+              <p:column style="width:4%;">
+                <f:facet name="header"><h:outputText value="#{lang.hsnSacCode}" title="HSN / SAC Code"  /></f:facet>
+                <h:panelGroup layout="block" id="hsnCodeDiv" style="width:115px;" >
+                  <p:inputText value="#{debitCreditNoteItemVar.hsnSacCode}" maxlength="15" id="hsnCodeId" autocomplete="off" style="width:115px;" 
+                               onfocus="this.select()"/>
+                </h:panelGroup>
+              </p:column>
+
+              <!--Note--> 
+              <p:column style="width:8%;" >
+                <f:facet name="header"><h:outputText value=" #{lang.note}" title="#{lang.note}" style="padding-left:5px;" >
+                    <i class="fa fa-print" ></i></h:outputText></f:facet>
+                <h:panelGrid id="narrationDiv">
+                  <p:inputText value="#{debitCreditNoteItemVar.description}" maxlength="1000" id="description" />
+                </h:panelGrid>
+              </p:column>
+              <!--invoice-->
+              <p:column style="width:5%;" >
+                <f:facet name="header"><h:outputText value="#{lang.refInvoiceNo}" title="#{lang.invoiceNo}" /></f:facet>
+                <h:panelGroup layout="block" id="salesInvoiceDiv" >
+                  <p:fragment rendered="#{debitCreditNoteView.isCustomerDebitCreditNote() 
+                                          and  (!debitCreditNoteView.invoiceWise)                                           
+                                          and (debitCreditNoteView.getSalesInvoiceList(main,debitCreditNoteItemVar).size() gt 0)  }">
+                    <p:selectOneMenu value="#{debitCreditNoteItemVar.salesInvoiceItemId}" converter="omnifaces.SelectItemsConverter" var="s" height="400" >
+                      <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+                      <f:selectItems value="#{debitCreditNoteItemVar.salesInvoiceItemList}" var="si" itemValue="#{si}" itemLabel="#{si.salesInvoiceId.invoiceNo}" />
+                      <p:ajax event="itemSelect" listener="#{debitCreditNoteView.updateSalesInvoiceRef(debitCreditNoteItemVar)}" update="refInvoiceNoDiv refInvoiceDateDiv" />                      
+                      <p:column style="width:100px;" headerText="#{lang.invoiceNo}">
+                        <h:outputText value="#{s.salesInvoiceId.invoiceNo}" />
+                      </p:column>                     
+                      <p:column style="width:100px;" headerText="#{lang.invoiceDate}">
+                        <h:outputText value="#{appView.date(s.salesInvoiceId.invoiceEntryDate)}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.batchNo}">
+                        <h:outputText value="#{s.batchNo}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.mrp}">
+                        <h:outputText value="#{s.valueMrp}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.expiryDate}">
+                        <h:outputText value="#{appView.date(s.expiryDate)}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.quantity}">
+                        <h:outputText value="#{s.productQty}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.taxCode}">
+                        <h:outputText value="#{s.taxCodeId.code}" />
+                      </p:column>
+                    </p:selectOneMenu>
+                  </p:fragment>
+                  <p:fragment rendered="#{(debitCreditNoteView.isSupplierDebitCreditNote() or debitCreditNoteView.supplierSalesbill) 
+                                          and  (!debitCreditNoteView.invoiceWise) 
+                                          and (debitCreditNoteView.getProductInvoiceList(main,debitCreditNoteItemVar).size() gt 0) }">
+                    <p:selectOneMenu value="#{debitCreditNoteItemVar.productEntryDetailId}" converter="omnifaces.SelectItemsConverter" var="p" height="400" >
+                      <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+                      <f:selectItems value="#{debitCreditNoteItemVar.productEntryDetailList}" var="pe" itemValue="#{pe}" itemLabel="#{pe.productEntryId.invoiceNo}" />
+                      <p:ajax event="itemSelect" listener="#{debitCreditNoteView.updateProductInvoiceRef(debitCreditNoteItemVar)}" update="refInvoiceNoDiv refInvoiceDateDiv" />
+                      <p:column style="width:100px;" headerText="#{lang.invoiceNo}">
+                        <h:outputText value="#{p.productEntryId.invoiceNo}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.documentNo}">
+                        <h:outputText value="#{p.productEntryId.accountInvoiceNo}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.invoiceDate}">
+                        <h:outputText value="#{appView.date(p.productEntryId.invoiceDate)}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.batchNo}">
+                        <h:outputText value="#{p.batchNo}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.mrp}">
+                        <h:outputText value="#{p.valueMrp}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.expiryDate}">
+                        <h:outputText value="#{appView.date(p.expiryDate)}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.quantity}">
+                        <h:outputText value="#{p.productQuantity}" />
+                      </p:column>
+                      <p:column style="width:100px;" headerText="#{lang.taxCode}">
+                        <h:outputText value="#{p.taxCodeId.code}" />
+                      </p:column>
+                    </p:selectOneMenu>
+                  </p:fragment>
+                  <p:fragment rendered="#{(debitCreditNoteView.invoiceWise or (debitCreditNoteItemVar.invoiceWise eq SYSTEM_CONSTANT.SHOW_INVOICE_WISE) ) and !debitCreditNoteView.isSupplierDebitCreditNote() }" >
+                    <h:panelGroup layout="block" id="refInvoiceNoDiv"  >
+                      <p:inputText value="#{debitCreditNoteItemVar.refInvoiceNo}" maxlength="40" id="refInvoiceNoId" autocomplete="off" 
+                                   readonly="true" />
+                    </h:panelGroup>
+                  </p:fragment>                  
+                </h:panelGroup>
+
+              </p:column>             
+
+              <!--               Ref. Invoice No 
+                            <p:column style="width:4%;" rendered="#{(!main.isNew() and !debitCreditNoteView.draft) or (debitCreditNoteView.invoiceWise)}">
+                              <f:facet name="header"><h:outputText value="#{lang.refInvoiceNo}" title="#{lang.refInvoiceNo}"/></f:facet>
+                              <h:panelGroup layout="block" id="refInvoiceNoDiv">
+                                <p:inputText value="#{debitCreditNoteItemVar.refInvoiceNo}" maxlength="40" id="refInvoiceNoId" autocomplete="off" 
+                                             readonly="true" />
+                              </h:panelGroup>
+                            </p:column>-->
+
+              <!-- Ref. Invoice Date -->
+              <p:column style="width:4%;">
+                <f:facet name="header"><h:outputText value="#{lang.refInvoiceDate}" title="#{lang.refInvoiceDate}"/></f:facet>
+                <h:panelGroup layout="block" id="refInvoiceDateDiv" >
+                  <p:inputText value="#{appView.date(debitCreditNoteItemVar.refInvoiceDate)}" maxlength="30" id="refInvoiceDateId" autocomplete="off"
+                               readonly="true"   />                  
+                </h:panelGroup>
+
+              </p:column>            
+
+              <!-- Tax Rate Percentage -->
+              <p:column style="width:4%;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1}">
+                <f:facet name="header"><h:outputText value="#{lang.tax} #{lang.rate}" title="#{lang.tax} #{lang.rate}"/></f:facet>
+                <h:panelGroup id="debitCreditNoteItemTaxCodeDiv">
+                  <p:selectOneMenu value="#{debitCreditNoteItemVar.taxCodeId}"  id="debitCreditNoteItemTaxCodeId" converter="omnifaces.SelectItemsConverter">                  
+                    <f:selectItems value="#{debitCreditNoteView.lookupGstTaxCode(main,debitCreditNoteItemVar)}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+                    <p:ajax event="itemSelect" process="@this" update="sgstAmount cgstAmount igstAmount totalAmount" listener="#{debitCreditNoteView.taxRateSelectEvent(debitCreditNoteItemVar)}"
+                            oncomplete="updateInvoiceSummery();"/>
+                  </p:selectOneMenu>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- Debit Value -->
+              <p:column style="width:5%;">
+                <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+                <h:panelGroup layout="block" id="debitNoteRateDiv">
+                  <p:inputNumber value="#{debitCreditNoteItemVar.taxableValue}" converterMessage="#{lang.taxableValue} #{lang.invalidNumber}" autocomplete="off"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="99999999" minValue="0.0" styleClass="submit_item fw"
+                                 maxlength="18" id="taxableValue">
+                    <p:ajax event="change" process="debitCreditNoteItemTaxCodeId debitNoteRateDiv" 
+                            update="sgstAmount cgstAmount igstAmount totalAmount" oncomplete="updateInvoiceSummery();"
+                            listener="#{debitCreditNoteView.taxableRateBlurEvent(debitCreditNoteItemVar)}" />
+                  </p:inputNumber>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- SGST -->
+              <p:column style="width:5%;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">
+                <f:facet name="header"><h:outputText value="#{lang.sgst}" title="#{lang.sgst}"/></f:facet>
+                <h:panelGroup id="sgstAmount">
+                  <p:inputNumber value="#{debitCreditNoteItemVar.sgstAmount}" converterMessage="#{lang.sgstAmount} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0"
+                                 maxlength="10"  disabled="true"/>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- CGST -->
+              <p:column style="width:5%;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">
+                <f:facet name="header"><h:outputText value="#{lang.cgst}" title="#{lang.cgst}"/></f:facet>
+                <h:panelGroup id="cgstAmount"> 
+                  <p:inputNumber value="#{debitCreditNoteItemVar.cgstAmount}" converterMessage="#{lang.cgstAmount} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0"
+                                 maxlength="10"  disabled="true"/>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- IGST -->
+              <p:column style="width:5%;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and !debitCreditNoteView.debitCreditNote.isLocal()}">
+                <f:facet name="header"><h:outputText value="#{lang.igst}" title="#{lang.igst}"/></f:facet>
+                <h:panelGroup id="igstAmount">
+                  <p:inputNumber value="#{debitCreditNoteItemVar.igstAmount}" converterMessage="#{lang.igstAmount} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0"
+                                 maxlength="10"  disabled="true"/>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- Total -->
+              <p:column style="width:5%;">
+                <f:facet name="header"><h:outputText value="#{lang.total}" title="#{lang.total}"/></f:facet>
+                <p:inputNumber value="#{debitCreditNoteItemVar.netValue}" converterMessage="#{lang.netValue} #{lang.invalidNumber}"
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" minValue="0.0" maxlength="10" id="totalAmount" disabled="true"/>
+              </p:column>
+
+              <!-- Action -->
+              <p:column headerText=" " style="width:2%;">
+                <p:commandButton process="@this" value="" update="debitCreditNoteItemTable" icon="fa fa-trash" tabindex="-1"
+                                 rendered="#{debitCreditNoteView.draft}" style="color: mediumvioletred;"
+                                 actionListener="#{debitCreditNoteView.actionDeleteDebitCreditNoteItem(main, debitCreditNoteItemVar)}">
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </p:column>
+
+              <f:facet name="footer">
+                <h:panelGroup layout="block" id="invoiceSummarydiv">
+                  <p:panelGrid>
+                    <p:row>
+                      <p:column style="font-weight: bold; text-align: right; width:125px !important;">Total Items :</p:column>
+                      <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{debitCreditNoteView.debitCreditNoteItemList.size()}</p:column>
+                      <p:column style="font-weight: bold;"></p:column>
+                      <p:column style="font-weight: bold;"></p:column>
+                      <p:column style="font-weight: bold;"></p:column>
+                    </p:row>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >
+                    <h:panelGroup layout="block">
+                      <p:panelGrid styleClass="bordered" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1}">
+                        <p:row>
+                          <p:column style="font-weight: bold;">GST %</p:column>
+                          <p:column style="font-weight: bold;">Item Count</p:column>
+                          <p:column style="font-weight: bold;">Taxable</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">CGST %</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">Value</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">SGST %</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">Value</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1}">GST Value</p:column>
+                          <p:column style="font-weight: bold;">Net Value</p:column>
+                        </p:row>
+                        <p:row>
+                          <ui:repeat value="#{debitCreditNoteView.debitCreditNote.invoiceGroup}" var="group">
+                            <p:row>
+                              <p:column style="font-weight: bold;">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                              <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                              <p:column style="font-weight: bold;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">                                
+                                #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, AccountingConstant.TAX_TYPE_CGST).ratePercentage)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">
+                                #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">                                
+                                #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(userRuntimeView.getGstTaxCode(group.taxCode, AccountingConstant.TAX_TYPE_SGST).ratePercentage)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1 and debitCreditNoteView.debitCreditNote.isLocal()}">
+                                #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1}">
+                                #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                            </p:row>
+                          </ui:repeat>
+                        </p:row>
+                      </p:panelGrid>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="text-right">
+                      <p:panelGrid columns="2" layout="grid">
+                        <!-- Taxable Value -->
+                        <h:panelGroup>Taxable :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{debitCreditNoteView.debitCreditNote.assessableValue eq null ? '0.00' : appView.decimal(debitCreditNoteView.debitCreditNote.assessableValue)}" />
+                        </h:panelGroup>
+
+                        <!-- GST Value -->
+                        <h:panelGroup rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1}">GST Value :</h:panelGroup>
+                        <h:panelGroup layout="block" rendered="#{debitCreditNoteView.debitCreditNote.taxableInvoice eq 1}">
+                          <h:outputText value="#{debitCreditNoteView.debitCreditNote.igstValue eq null ? '0.00' : appView.decimal(debitCreditNoteView.debitCreditNote.igstValue)}" />
+                        </h:panelGroup>
+
+                        <!-- Grand Total -->
+                        <h:panelGroup>Total :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{debitCreditNoteView.debitCreditNote.grandTotal  eq null ? '0.00' : appView.decimal(debitCreditNoteView.debitCreditNote.grandTotal)}" />
+                        </h:panelGroup>
+                        <!--Round off-->
+                        <h:panelGroup>Round Off :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{debitCreditNoteView.debitCreditNote.roundOff  eq null ? '0.00' : appView.decimal(debitCreditNoteView.debitCreditNote.roundOff)}" />
+                        </h:panelGroup>
+
+                        <!-- Net Amount -->
+                        <h:panelGroup>Net Amount :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{debitCreditNoteView.debitCreditNote.netValue eq null ? '0.00' : appView.decimal(debitCreditNoteView.debitCreditNote.netValue)}" />
+                        </h:panelGroup>
+                      </p:panelGrid>
+                    </h:panelGroup>
+                  </p:panelGrid>
+                </h:panelGroup>
+              </f:facet>
+            </p:dataTable>
+          </h:panelGroup>
+        </h:panelGroup>
+
+        <p:remoteCommand name="insertOrUpdatedebitCreditNoteItem" actionListener="#{debitCreditNoteView.insertOrUpdatedebitCreditNoteItem(main)}"
+                         update="debitCreditNoteItemTable" />
+        <p:remoteCommand name="updateInvoiceSummery" process="@this" update="debitCreditNoteItemTable:invoiceSummarydiv" />
+        <p:remoteCommand name="platformPopupReturn" process="@this" update="debitCreditNoteItemTable" actionListener="#{debitCreditNoteView.platformPopupReturn(main)}" />
+
+      </div>
+
+      <style>
+        .vtop{vertical-align: top;}
+        .col_bottom_color{border-bottom-color: red !important;}
+      </style>
+      <script type="text/javascript">
+        //<![CDATA[
+        function submitForm(params) {
+          insertOrUpdatedebitCreditNoteItem([{name: 'rownumber', value: params[2]}]);
+          $('#debitCreditNoteItemTable\\:0\\:productId_input').focus();
+          return false;
+        }
+        function focusToHsn(rnum) {
+          $('#debitCreditNoteItemTable\\:' + rnum + '\\:hsnCodeId').focus();
+        }
+//        function focusToRate(rnum) {
+//          $('#debitCreditNoteItemTable\\:' + rnum + '\\:taxableValue_input').focus();
+//        }
+
+        //]]>
+      </script>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <p:dataTable id="debitCreditNoteTable" var="debitCreditNoteVar" widgetVar="debitCreditNoteWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{debitCreditNoteView.debitCreditNoteLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{debitCreditNoteVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{debitCreditNoteView.debitCreditNoteSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{debitCreditNoteVar.id}" field="t1.document_no" >
+          <f:facet name="header"><h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(debitCreditNoteVar.documentNo)}"
+                         process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{debitCreditNoteView.debitCreditNote}" value="#{debitCreditNoteVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{debitCreditNoteVar.accountingLedgerId.entityId}" field="t2.title" rendered="#{debitCreditNoteView.accountGroup ne null}">
+          <f:facet name="header"><h:outputText value="#{lang.customer}" title="#{lang.customer}"/></f:facet>
+          <h:outputText value="#{appView.display(debitCreditNoteVar.accountingLedgerId.title)}" title="#{appView.title(debitCreditNoteVar.accountingLedgerId.title)}" escape="false" />
+        </p:column>
+
+<!--        <p:column sortBy="#{debitCreditNoteVar.invoiceDate}" field="t1.invoice_date" >
+          <f:facet name="header"><h:outputText value="#{lang.invoiceDate}" title="#{lang.invoiceDate}"/></f:facet>
+          <h:outputText value="#{appView.date(debitCreditNoteVar.invoiceDate)}" escape="false" />
+        </p:column>-->
+
+        <p:column sortBy="#{debitCreditNoteVar.entryDate}" field="t1.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(debitCreditNoteVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{debitCreditNoteVar.netValue}" field="t1.net_value"  >
+          <f:facet name="header"><h:outputText value="#{lang.netAmount}" title="#{lang.netAmount}"/></f:facet>
+          <h:outputText value="#{appView.decimal(debitCreditNoteVar.netValue)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{debitCreditNoteVar.statusId}" field="t1.status_id">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+
+          <h:outputText styleClass="m-r-5 #{sysRuntimeView.statusStyle(debitCreditNoteVar.statusId)}" 
+                        value="#{debitCreditNoteVar.statusId eq sysConstant.CONFIRMED ? lang.confirmed : debitCreditNoteVar.statusId eq sysConstant.DRAFT ? lang.draft : ''}"
+                        style="background-color: #{sysRuntimeView.statusColor(debitCreditNoteVar.statusId)}" escape="false" />
+        </p:column>
+
+        <p:column rendered="#{debitCreditNoteView.supplierDebitCreditNote}" field="t1.confirmed_net_value" sortBy="#{debitCreditNoteVar.confirmedNetValue}" style="width:200px;" >
+          <f:facet name="header"><h:outputText value="#{lang.party} #{lang.approvedValue}" /></f:facet>
+          <h:outputText value="#{debitCreditNoteVar.confirmedNetValue}" styleClass="text-right" />
+        </p:column>
+
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

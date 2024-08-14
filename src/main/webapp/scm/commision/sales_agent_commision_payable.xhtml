@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{scmSalesAgentCommisionPayableView.switchScmSalesAgentCommisionPayable(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.scmSalesAgentCommisionPayable}" />
+    <ui:param name="ids" value="scmSalesAgentCommisionPayable" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{scmSalesAgentCommisionPayableView.deleteScmSalesAgentCommisionPayable(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('scmSalesAgentCommisionPayableWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{scmSalesAgentCommisionPayableView.cloneScmSalesAgentCommisionPayable(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{scmSalesAgentCommisionPayableView.deleteScmSalesAgentCommisionPayable(main)}" value="#{lang.delete}" onclick="wdgOff('scmSalesAgentCommisionPayableWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{scmSalesAgentCommisionPayableView.saveScmSalesAgentCommisionPayable(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.scmSalesAgentCommisionPayableSalesAgentCommisionClaimId}" for="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" /><h:panelGroup>
+         <p:selectOneMenu value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.salesAgentCommisionClaimId}"  id="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.scmSalesAgentCommisionClaim(main)}" var="e" itemValue="#{e}" itemLabel="#{e.commisionTotal}" />
+        </p:selectOneMenu><p:message for="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.scmSalesAgentCommisionPayableSalesAgentCommisionClaimId}" for="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" /><h:panelGroup>
+          <p:autoComplete value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.salesAgentCommisionClaimId}" completeMethod="#{scmLookupView.scmSalesAgentCommisionClaimAuto}"  id="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" var="e" itemValue="#{e}" itemLabel="#{e.commisionTotal}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.scmSalesAgentCommisionClaim(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.scmSalesAgentCommisionPayableSalesAgentCommisionClaimId}" for="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId"/><h:panelGroup>
+          <p:autoComplete value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.salesAgentCommisionClaimId}" completeMethod="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionClaimAuto}" converter="wawo.LookupIntConverter"   id="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" var="e" itemValue="#{e}" itemLabel="#{e.commisionTotal}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.scmSalesAgentCommisionClaimClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.scmSalesAgentCommisionClaimById()}"/>
+        </p:autoComplete><p:message for="scmSalesAgentCommisionPayableSalesAgentCommisionClaimId" display="text" /></h:panelGroup>
+	<!-- Small list combo -->
+  <!--	<p:outputLabel value="#{lang.scmSalesAgentCommisionPayableSalesAgentCommisionId}" for="scmSalesAgentCommisionPayableSalesAgentCommisionId" /><h:panelGroup>
+         <p:selectOneMenu value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.salesAgentCommisionId}"  id="scmSalesAgentCommisionPayableSalesAgentCommisionId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+          <f:selectItems value="#{scmLookupView.scmSalesAgentCommision(main)}" var="e" itemValue="#{e}" itemLabel="#{e.commissionApplicableOn}" />
+        </p:selectOneMenu><p:message for="scmSalesAgentCommisionPayableSalesAgentCommisionId" display="text" /></h:panelGroup>	-->
+	<!-- Small list autocomplete -->
+	<!--  <p:outputLabel value="#{lang.scmSalesAgentCommisionPayableSalesAgentCommisionId}" for="scmSalesAgentCommisionPayableSalesAgentCommisionId" /><h:panelGroup>
+          <p:autoComplete value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.salesAgentCommisionId}" completeMethod="#{scmLookupView.scmSalesAgentCommisionAuto}"  id="scmSalesAgentCommisionPayableSalesAgentCommisionId" var="e" itemValue="#{e}" itemLabel="#{e.commissionApplicableOn}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+          <o:converter list="#{scmLookupView.scmSalesAgentCommision(main)}" converterId="omnifaces.ListConverter"  />
+        </p:autoComplete><p:message for="scmSalesAgentCommisionPayableSalesAgentCommisionId" display="text" /></h:panelGroup> 	-->
+	<!-- Big list autocomplete -->
+        <p:outputLabel value="#{lang.scmSalesAgentCommisionPayableSalesAgentCommisionId}" for="scmSalesAgentCommisionPayableSalesAgentCommisionId"/><h:panelGroup>
+          <p:autoComplete value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.salesAgentCommisionId}" completeMethod="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionAuto}" converter="wawo.LookupIntConverter"   id="scmSalesAgentCommisionPayableSalesAgentCommisionId" var="e" itemValue="#{e}" itemLabel="#{e.commissionApplicableOn}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" >
+            <f:attribute name="clazz" value="#{scmLookupView.scmSalesAgentCommisionClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.scmSalesAgentCommisionById()}"/>
+        </p:autoComplete><p:message for="scmSalesAgentCommisionPayableSalesAgentCommisionId" display="text" /></h:panelGroup>
+        <p:outputLabel value="#{lang.commisionPayable}" for="commisionPayable" />
+        <h:panelGroup><p:inputNumber value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.commisionPayable}" converterMessage="#{lang.commisionPayable} #{lang.invalidNumber}" decimalPlaces="8" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="18" id="commisionPayable" /><p:message for="commisionPayable" display="text"/></h:panelGroup>
+        <p:outputLabel value="#{lang.status}" for="status" />
+        <h:panelGroup><p:inputNumber value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.status}" converterMessage="#{lang.status} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="status" /><p:message for="status" display="text"/></h:panelGroup>
+<!--            
+        <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+        <h:panelGroup><p:inputText value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>
+-->
+<!--            
+        <p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
+        <h:panelGroup><p:inputText value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+-->
+<!--
+        <p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+        <h:panelGroup><p:calendar value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+-->
+<!--
+        <p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+        <h:panelGroup><p:calendar value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>
+-->
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="scmSalesAgentCommisionPayableTable" var="scmSalesAgentCommisionPayableVar" widgetVar="scmSalesAgentCommisionPayableWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+        lazy="true" value="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayableLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{scmSalesAgentCommisionPayableVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+        selection="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayableSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.id}" field="scm_sales_agent_commision_payable.id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{scmSalesAgentCommisionPayableVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{scmSalesAgentCommisionPayableView.scmSalesAgentCommisionPayable}" value="#{scmSalesAgentCommisionPayableVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.salesAgentCommisionClaimId.commisionTotal}" field="sales_agent_commision_claim_id.commision_total">
+          <f:facet name="header"><h:outputText value="#{lang.commisionTotal}" title="#{lang.commisionTotal}"/></f:facet>
+          <h:outputText value="#{appView.display(scmSalesAgentCommisionPayableVar.salesAgentCommisionClaimId.commisionTotal)}" title="#{appView.title(scmSalesAgentCommisionPayableVar.salesAgentCommisionClaimId.commisionTotal)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.salesAgentCommisionId.commissionApplicableOn}" field="sales_agent_commision_id.commission_applicable_on">
+          <f:facet name="header"><h:outputText value="#{lang.commissionApplicableOn}" title="#{lang.commissionApplicableOn}"/></f:facet>
+          <h:outputText value="#{appView.display(scmSalesAgentCommisionPayableVar.salesAgentCommisionId.commissionApplicableOn)}" title="#{appView.title(scmSalesAgentCommisionPayableVar.salesAgentCommisionId.commissionApplicableOn)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.commisionPayable}" field="scm_sales_agent_commision_payable.commision_payable" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.commisionPayable}" title="#{lang.commisionPayable}"/></f:facet>
+          <h:outputText value="#{appView.decimal(scmSalesAgentCommisionPayableVar.commisionPayable)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.status}" field="scm_sales_agent_commision_payable.status" styleClass="text-right">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.number(scmSalesAgentCommisionPayableVar.status)}" escape="false" />
+        </p:column>
+<!-- 
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.createdBy}" field="scm_sales_agent_commision_payable.created_by">
+          <f:facet name="header"><h:outputText value="#{lang.createdBy}" title="#{lang.createdBy}"/></f:facet>
+          <h:outputText value="#{appView.display(scmSalesAgentCommisionPayableVar.createdBy)}" title="#{appView.title(scmSalesAgentCommisionPayableVar.createdBy)}" escape="false" />
+        </p:column> -->
+
+<!-- 
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.modifiedBy}" field="scm_sales_agent_commision_payable.modified_by">
+          <f:facet name="header"><h:outputText value="#{lang.modifiedBy}" title="#{lang.modifiedBy}"/></f:facet>
+          <h:outputText value="#{appView.display(scmSalesAgentCommisionPayableVar.modifiedBy)}" title="#{appView.title(scmSalesAgentCommisionPayableVar.modifiedBy)}" escape="false" />
+        </p:column> -->
+
+<!-- 
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.createdAt}" field="scm_sales_agent_commision_payable.created_at" >
+          <f:facet name="header"><h:outputText value="#{lang.createdAt}" title="#{lang.createdAt}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(scmSalesAgentCommisionPayableVar.createdAt)}" escape="false" />
+        </p:column> -->
+
+<!-- 
+        <p:column sortBy="#{scmSalesAgentCommisionPayableVar.modifiedAt}" field="scm_sales_agent_commision_payable.modified_at" >
+          <f:facet name="header"><h:outputText value="#{lang.modifiedAt}" title="#{lang.modifiedAt}"/></f:facet>
+          <h:outputText value="#{appView.dateTime(scmSalesAgentCommisionPayableVar.modifiedAt)}" escape="false" />
+        </p:column> -->
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

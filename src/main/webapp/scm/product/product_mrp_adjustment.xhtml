@@ -1,0 +1,363 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{productMrpAdjustmentView.switchProductMrpAdjustment(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.product} #{lang.mrp} #{lang.adjustment}" />
+    <ui:param name="ids" value="productMrpAdjustment" />    
+    <ui:param name="reset" value="false" />    
+    <ui:param name="deleteFormMenu" value="#{productMrpAdjustmentView.draft}" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productMrpAdjustmentView.deleteProductMrpAdjustment(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productMrpAdjustmentWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >      
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productMrpAdjustmentView.deleteProductMrpAdjustment(main)}" value="#{lang.delete}" onclick="wdgOff('productMrpAdjustmentWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{productMrpAdjustmentView.saveProductMrpAdjustment(main, 1)}" value="#{lang.saveAsDraft}" onclick="toTop()"
+                       styleClass="btn btn-primary" rendered="#{(main.isNew() or productMrpAdjustmentView.draft) and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <h:commandButton action="#{productMrpAdjustmentView.saveProductMrpAdjustment(main, 2)}" value="#{lang.confirm}" onclick="toTop()"                       
+                       styleClass="btn btn-primary" rendered="#{(main.edit and productMrpAdjustmentView.draft) and (userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true)}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+
+      <p:outputLabel value="#{lang.commodity}" for="productCommodityId"/>      
+      <h:panelGroup id="commodityDiv">        
+        <p:selectOneMenu value="#{productMrpAdjustmentView.commodityId}"  id="productCommodityId"
+                         converter="omnifaces.SelectItemsConverter" styleClass="fw o-100">
+          <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+          <f:selectItems value="#{productMrpAdjustmentView.lookupCommodity()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+          <p:ajax event="itemSelect" process="@this" update="productId batchDiv preMrpDiv dt1" listener="#{productMrpAdjustmentView.commoditySelectEventHandler}"/>
+        </p:selectOneMenu>        
+        <p:message for="productCommodityId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.product}" for="productId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{productMrpAdjustmentView.productMrpAdjustment.productId}" completeMethod="#{productMrpAdjustmentView.productAuto}"
+                        converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.product} #{lang.isRequired}" scrollHeight="400"
+                        id="productId" var="p" itemValue="#{p}" itemLabel="#{p.productName}" emptyMessage="#{lang.noResult}" minQueryLength="1"
+                        dropdown="true" cache="true" queryDelay="500"  converterMessage="#{lang.invalidSelection}"
+                        autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+          <p:ajax event="itemSelect" listener="#{productMrpAdjustmentView.productSelectEvent}" update="batchDiv preMrpDiv newmrp dt1" process="@this"  />            
+        </p:autoComplete><p:message for="productId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.productBatch}" for="productBatchId"/>
+      <h:panelGroup id="batchDiv">
+        <p:autoComplete value="#{productMrpAdjustmentView.productMrpAdjustment.productBatchId}" completeMethod="#{productMrpAdjustmentView.productBatchAuto}"
+                        converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.product} #{lang.isRequired}"
+                        id="productBatchId" emptyMessage="#{lang.noResult}"
+                        dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                        autocomplete="off" forceSelection="true"  styleClass="fw" minQueryLength="3"
+                        var="batch" itemLabel="#{batch.batchNo}" itemValue="#{batch}" >
+          <f:attribute name="clazz" value="#{scmLookupView.productBatchClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.productBatchById()}"/>
+
+          <p:column style="width: 130px;">
+            <f:facet name="header"><label>#{lang.batch}</label></f:facet>
+                #{batch.batchNo}
+          </p:column>          
+          <p:column>
+            <f:facet name="header"><label>#{lang.expiry}</label></f:facet>
+                #{sysRuntimeView.dateToMMYY(batch.expiryDateActual)}
+          </p:column>
+          <p:column>
+            <f:facet name="header"><label>#{lang.taxPercentage}</label></f:facet>
+                #{batch.productId.productCategoryId.purchaseTaxCodeId.ratePercentage}
+          </p:column>
+          <p:column>
+            <f:facet name="header">#{lang.mrp}</f:facet>
+              #{batch.valueMrp}
+          </p:column>
+          <p:ajax event="itemSelect" listener="#{productMrpAdjustmentView.productBatchSelectEvent}" update="taxDetail preMrpDiv newmrp btn1 dt1" process="@this"  />            
+        </p:autoComplete>
+        <p:outputLabel value="#{productMrpAdjustmentView.productTaxDetail}" id="taxDetail"/>
+        <p:message for="productBatchId" display="text" />                
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.mrp}" for="premrp" />
+      <h:panelGroup id="preMrpDiv">        
+        <p:inputNumber value="#{productMrpAdjustmentView.productMrpAdjustment.previousValueMrp}" 
+                       converterMessage="#{lang.mrp} #{lang.invalidNumber}"
+                       title="#{lang.mrp}" readonly="true"
+                       decimalPlaces="3" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="6"
+                       id="premrp">          
+        </p:inputNumber>
+        <p:message for="premrp" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.mrp}" for="newmrp" />
+      <h:panelGroup>        
+        <p:inputNumber value="#{productMrpAdjustmentView.productMrpAdjustment.valueMrp}" 
+                       converterMessage="#{lang.mrp} #{lang.invalidNumber}"
+                       title="#{lang.mrp}" required="true" requiredMessage="#{lang.mrp} #{lang.isRequired}"
+                       decimalPlaces="3" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="6"
+                       id="newmrp">
+          <p:ajax event="change" process="@this" update="btn1" />
+        </p:inputNumber>
+        <p:message for="newmrp" display="text"/>
+
+        <p:commandButton id="btn1" actionListener="#{productMrpAdjustmentView.loadProductBatchDetails(main)}" value="#{lang.load}" 
+                         styleClass="btn btn-primary" process="f1" update="dt1" 
+                         disabled="#{productMrpAdjustmentView.productMrpAdjustment.valueMrp eq null}" >
+        </p:commandButton>
+
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.note}" for="note" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" tabindex="12" value="#{productMrpAdjustmentView.productMrpAdjustment.note}"
+                          cols="100" rows="3" maxlength="500" id="note" autoResize="false" />
+        <p:message for="note" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="afterForm" >
+      <h:panelGroup layout="block" rendered="#{main.isForm()}"  id="p21">
+        <style>
+          .vtop{vertical-align: top;}
+          .old{
+            background-color: #fca752 !important;
+            background-image: none !important;
+            color: #000000 !important;}
+          </style>
+          <h:panelGroup id="p22" layout="block"  styleClass="card p-a-0" rendered="#{main.isForm()}" >
+          <p:dataTable id="dt1" var="productMrpAdjustmentItemVar" widgetVar="productMrpAdjustmentItemWidget" rowIndexVar="rowIndex" reflow="true"
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable"
+                       value="#{productMrpAdjustmentView.productMrpAdjustmentItemList}" >
+            <p:column id="col14" styleClass="w-40" style="text-align: center;">
+              <f:facet name="header"><h:outputText value="#{lang.sno}" title="#{lang.serialNumber}"/></f:facet>
+              <h:outputText value="#{rowIndex + 1}" />
+            </p:column>
+
+            <!-- Invoice No -->
+            <p:column id="col17" style="width:70px;">
+              <f:facet name="header"><h:outputText id="lbl34" value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+              <h:outputText id="txt15" value="#{productMrpAdjustmentItemVar.invoiceNo}" />
+            </p:column>            
+            
+            <!-- Saleable Qty -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.saleableQty}" title="#{lang.saleableQuantity}"/></f:facet>
+              <h:panelGroup layout="block" id="saleableQty">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.saleableQty}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Damaged Quantity -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.damagedQty}" title="#{lang.damagedQuantity}"/></f:facet>
+              <h:panelGroup layout="block" id="damagedQty">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.quantityNonSaleable}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Value Rate -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+              <h:panelGroup layout="block" id="rate">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.valueRate}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Landing Rate -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.landingPrice}" title="#{lang.landingPrice}"/></f:facet>
+              <h:panelGroup layout="block" id="preLandingRate">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.landingRate}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- New Scheme Discount -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.schemeDisc}" title="#{lang.schemeDiscount}"/></f:facet>
+              <h:panelGroup layout="block" id="schemeDisc">
+                <h:panelGroup layout="block">
+                  <p:inputNumber value="#{productMrpAdjustmentItemVar.schemeDiscountPercentage}" 
+                                 disabled="#{productMrpAdjustmentItemVar.prevSchemeDiscountPercentage eq null or productMrpAdjustmentItemVar.isSchemeDiscountToCustomer eq 0}"
+                                 styleClass="fw t-r" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.00"
+                                 inputStyle="color:#{productMrpAdjustmentItemVar.isSchemeDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}">
+                    <p:ajax event="change" process="@this" update="credit debit "
+                            listener="#{productMrpAdjustmentView.updateChangeEvent(productMrpAdjustmentItemVar)}"/>
+                  </p:inputNumber>                  
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>            
+
+            <!-- New Product Discount -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.productDisc}" title="#{lang.productDiscount}"/></f:facet>
+              <h:panelGroup layout="block" id="productDisc">
+                <h:panelGroup layout="block">
+                  <p:inputNumber value="#{productMrpAdjustmentItemVar.productDiscountPercentage}" 
+                                 disabled="#{productMrpAdjustmentItemVar.prevProductDiscountPercentage eq null or productMrpAdjustmentItemVar.isProductDiscountToCustomer eq 0}"
+                                 inputStyle="color:#{productMrpAdjustmentItemVar.isProductDiscountToCustomer eq 1 ? '#ff7104' : '#0274e6'}"
+                                 styleClass="fw t-r" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="2" minValue="0.00">
+                    <p:ajax event="change" process="@this" update="credit debit "
+                            listener="#{productMrpAdjustmentView.updateChangeEvent(productMrpAdjustmentItemVar)}"/>
+                  </p:inputNumber>                  
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>            
+
+            <!-- Previous PTS -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+              <h:panelGroup layout="block" id="prePts">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.previousValuePts}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- New PTS -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.pts}" title="#{lang.pts}"/></f:facet>
+              <h:panelGroup layout="block" id="valuePts">
+                <h:panelGroup layout="block">
+                  <p:inputNumber value="#{productMrpAdjustmentItemVar.valuePts}" id="valPts"
+                                 styleClass="fw t-r" onfocus="this.select()" inputStyleClass="text-right" 
+                                 decimalPlaces="2"  >
+                    <f:validateDoubleRange minimum="1" maximum="#{productMrpAdjustmentView.productMrpAdjustment.valueMrp}" />
+                    <p:ajax event="change" process="@this" update="credit debit " resetValues="true"
+                            listener="#{productMrpAdjustmentView.updateChangeEvent(productMrpAdjustmentItemVar)}"/>
+                  </p:inputNumber>                  
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- Previous PTR -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.ptr}" title="#{lang.ptr}"/></f:facet>
+              <h:panelGroup layout="block" id="prePtr">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.previousValuePtr}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <!-- New PTR -->
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.ptr}" title="#{lang.ptr}"/></f:facet>
+              <h:panelGroup layout="block" id="valuePtr">
+                <h:panelGroup layout="block">
+                  <p:inputNumber value="#{productMrpAdjustmentItemVar.valuePtr}" 
+                                 styleClass="fw t-r" onfocus="this.select()" inputStyleClass="text-right" 
+                                 maxValue="#{productMrpAdjustmentView.productMrpAdjustment.valueMrp eq null?999999:productMrpAdjustmentView.productMrpAdjustment.valueMrp}" decimalPlaces="2" minValue="0.00">
+                  </p:inputNumber>                  
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>            
+
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.credit}" title="#{lang.credit}"/></f:facet>
+              <h:panelGroup layout="block" id="credit">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.valueCredit}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+            <p:column>
+              <f:facet name="header"><h:outputText value="#{lang.debit}" title="#{lang.debit}"/></f:facet>
+              <h:panelGroup layout="block" id="debit">
+                <h:panelGroup layout="block">
+                  <h:outputText value="#{productMrpAdjustmentItemVar.valueDebit}"  />
+                </h:panelGroup>
+              </h:panelGroup>
+            </p:column>
+
+          </p:dataTable>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+
+
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(productMrpAdjustmentView.productMrpAdjustment.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(productMrpAdjustmentView.productMrpAdjustment.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(productMrpAdjustmentView.productMrpAdjustment.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(productMrpAdjustmentView.productMrpAdjustment.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(productMrpAdjustmentView.productMrpAdjustment.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productMrpAdjustmentTable" var="productMrpAdjustmentVar" widgetVar="productMrpAdjustmentWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{productMrpAdjustmentView.productMrpAdjustmentLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productMrpAdjustmentVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productMrpAdjustmentView.productMrpAdjustmentSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+
+
+        <p:column  sortBy="#{productMrpAdjustmentVar.productId.productName}" field="product_id.product_name" >
+          <f:facet name="header"><h:outputText value="#{lang.productName}" title="#{lang.productName}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productMrpAdjustmentVar.productId.productName}" process="@this" update="f1"
+                         immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productMrpAdjustmentView.productMrpAdjustment}" value="#{productMrpAdjustmentVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column  sortBy="#{productMrpAdjustmentVar.productBatchId.batchNo}" field="product_batch_id.batch_no" filterBy="#{productMrpAdjustmentVar.productBatchId}"
+                   filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+          <h:outputText value="#{appView.display(productMrpAdjustmentVar.productBatchId.batchNo)}" title="#{appView.title(productMrpAdjustmentVar.productBatchId.batchNo)}" escape="false" />
+        </p:column>
+
+        <p:column  sortBy="#{productMrpAdjustmentVar.note}" field="scm_productMrpAdjustment.note" filterBy="#{productMrpAdjustmentVar.note}"
+                   filterStyle="display:none">
+          <f:facet name="header"><h:outputText value="#{lang.note}" title="#{lang.note}"/></f:facet>
+          <h:outputText value="#{appView.display(productMrpAdjustmentVar.note)}" title="#{appView.title(productMrpAdjustmentVar.note)}" escape="false" />
+        </p:column>
+
+
+        <p:column sortBy="#{productMrpAdjustmentVar.statusId}" field="scm_productMrpAdjustment.status_id">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{productMrpAdjustmentVar.statusId eq 2 ? 'Confirmed' : 'Draft'}" 
+                        title="#{productMrpAdjustmentVar.statusId eq 2 ? 'Confirmed' : 'Draft'}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(productMrpAdjustmentVar.statusId)}" 
+                        style="background-color: #{sysRuntimeView.statusColor(productMrpAdjustmentVar.statusId)}"/>
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(productMrpAdjustmentVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productMrpAdjustmentVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productMrpAdjustmentVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productMrpAdjustmentVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(productMrpAdjustmentVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{companyAddressView.switchCompanyAddress(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{companyAddressView.companyAddress.companyId.companyName}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? appView.display(companyAddressView.companyAddress.address) : lang.address}" />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="companyAddress"/>
+    <ui:param name="deleteFormMenu" value="#{!companyAddressView.registeredAddress}"/>
+
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{companyAddressView.companyAddressPopupClose}" oncomplete="parent.companyAddressPopupReturned(); closePopup()" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{companyAddressView.deleteCompanyAddress(main)}" value="#{lang.delete}" onclick="wdgOff('companyAddressWidgetDel')" 
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete"/>
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{companyAddressView.saveCompanyAddress(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <!--Address Type-->
+      <p:outputLabel value="#{lang.addressType}" for="companyAddressAddressTypeId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{companyAddressView.companyAddress.addressTypeId}" completeMethod="#{companyAddressView.lookupAddressType}" 
+                         dropdown="true" converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.addressType} #{lang.isRequired}" 
+                         id="companyAddressAddressTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" 
+                         cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" 
+                         forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.addressTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.addressTypeById()}"/>
+        </p:autoComplete>
+        <p:message for="companyAddressAddressTypeId" display="text" />
+      </h:panelGroup>
+
+      <!--Address-->
+      <p:outputLabel value="#{lang.address}" for="address" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{companyAddressView.companyAddress.address}" cols="100" rows="2" maxlength="500" required="true"
+                          requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" validator="wawo.WhiteSpaceValidator"/>
+        <p:message for="address" display="text"/>
+      </h:panelGroup>
+
+      <!--country-->
+      <p:outputLabel value="#{lang.country}" for="companyAddressCountryId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{companyAddressView.companyAddress.countryId}" completeMethod="#{companyAddressView.countryAuto}" converter="wawo.LookupIntConverter" 
+                         dropdown="true" required="true" requiredMessage="#{lang.country} #{lang.isRequired}" id="companyAddressCountryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}"
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                         forceSelection="true"  styleClass="fw" readonly="true">
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" update="companyAddressStateDiv companyAddressDistrictDiv phone1 phone2" listener="#{companyAddressView.clearStateDistrict}"/>
+        </p:autoComplete>
+        <p:message for="companyAddressCountryId" display="text" />
+      </h:panelGroup>
+
+      <!--state-->
+      <p:outputLabel value="#{lang.state}" for="companyAddressStateId"/>
+      <h:panelGroup id="companyAddressStateDiv">
+        <p:autoComplete  value="#{companyAddressView.companyAddress.stateId}" completeMethod="#{companyAddressView.stateAuto}" converter="wawo.LookupIntConverter"   
+                         dropdown="true" required="true" requiredMessage="#{lang.state} #{lang.isRequired}" id="companyAddressStateId" var="e" itemValue="#{e}" itemLabel="#{e.stateName}" 
+                         emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw" readonly="#{companyAddressView.registeredAddress}">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+          <p:ajax event="itemSelect" update="companyAddressDistrictDiv " listener="#{companyAddressView.clearDistrict}"/>
+        </p:autoComplete>
+        <p:message for="companyAddressStateId" display="text" />
+      </h:panelGroup>
+
+      <!--district-->
+      <p:outputLabel value="#{lang.district}" for="companyAddressDistrictId"/>
+      <h:panelGroup id="companyAddressDistrictDiv">
+        <p:autoComplete  value="#{companyAddressView.companyAddress.districtId}" completeMethod="#{companyAddressView.districtAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.district} #{lang.isRequired}" id="companyAddressDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" 
+                         dropdown="true" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+          <!--<p:ajax event="itemSelect" update="companyAddressTerritoryDiv" listener="#{companyAddressView.clearTerritory}"/>-->
+        </p:autoComplete>
+        <p:message for="companyAddressDistrictId" display="text" />
+      </h:panelGroup>      
+
+      <!--pin code-->
+      <p:outputLabel value="#{lang.pincode}" for="pin" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{companyAddressView.companyAddress.pin}" maxlength="6" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="0"  thousandSeparator="" 
+                       validatorMessage="#{lang.pincode} #{lang.requiredLength} is 6 "  id="pin" autocomplete="off">
+          <f:validateLength minimum="6" />
+        </p:inputNumber>
+        <p:message for="pin" display="text"/>
+      </h:panelGroup>
+
+      <!--phone 1-->
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.phone1}" maxlength="13" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" 
+                     validatorMessage="#{lang.errorInvalidPhoneNo}" autocomplete="off" id="phone1">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+          <!--<f:validateLength minimum="10" maximum="13"/>-->
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup>
+
+      <!--phone 2-->
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.phone2}" maxlength="13" id="phone2" validatorMessage="#{lang.errorInvalidPhoneNo}" autocomplete="off">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone2" display="text"/>
+      </h:panelGroup>
+
+      <!--phone 3-->
+      <p:outputLabel value="#{lang.phone3}" for="phone3" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.phone3}" maxlength="13" id="phone3" validatorMessage="#{lang.errorInvalidPhoneNo}" autocomplete="off">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone3" display="text"/>
+      </h:panelGroup>
+
+      <!--fax 1-->
+      <p:outputLabel value="#{lang.fax1}" for="fax1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.fax1}" maxlength="13" id="fax1" autocomplete="off">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax1" display="text"/>
+      </h:panelGroup>
+
+      <!--fax 2-->
+      <p:outputLabel value="#{lang.fax2}" for="fax2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.fax2}" maxlength="13" id="fax2" autocomplete="off">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax2" display="text"/>
+      </h:panelGroup>
+
+      <!--email-->
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.email}" maxlength="50" id="email" validator="wawo.EmailValidator" autocomplete="off" />
+        <p:message for="email" display="text"/>
+      </h:panelGroup>
+
+      <!--website-->
+      <p:outputLabel value="#{lang.website}" for="website" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyAddressView.companyAddress.website}" maxlength="50" id="website" autocomplete="off" />
+        <p:message for="website" display="text"/>
+      </h:panelGroup>
+
+      <!--Sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{companyAddressView.companyAddress.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" 
+                       minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" autocomplete="off" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="companyAddressStatusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{companyAddressView.companyAddress.statusId}" converter="omnifaces.SelectItemsConverter" required="true" 
+                         requiredMessage="#{lang.status} #{lang.isRequired}" styleClass="fw"
+                         id="companyAddressStatusId">
+          <f:selectItems value="#{companyAddressView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="companyAddressStatusId" display="text" />
+      </h:panelGroup> 
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(companyAddressView.companyAddress.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(companyAddressView.companyAddress.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(companyAddressView.companyAddress.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(companyAddressView.companyAddress.modifiedAt)}</ui:define>
+        <ui:define name="id">#{companyAddressView.companyAddress.id}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+
+</html>

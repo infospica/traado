@@ -1,0 +1,450 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesServicesInvoiceView.switchSalesServicesInvoice(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesServicesInvoice}" />
+    <ui:param name="navLabel" value="#{main.edit ? salesServicesInvoiceView.draft ? 'Draft' : 'Confirmed' : null}" />
+    <ui:param name="ids" value="salesServicesInvoice" />
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesServicesInvoiceView.deleteSalesServicesInvoice(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesServicesInvoiceWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesServicesInvoiceView.cloneSalesServicesInvoice(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesServicesInvoiceView.deleteSalesServicesInvoice(main)}" value="#{lang.delete}" onclick="wdgOff('salesServicesInvoiceWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesServicesInvoiceView.saveSalesServicesInvoice(main, 1)}" value="#{lang.saveAsDraft}" onclick="toTop()" styleClass="btn btn-primary"
+                       rendered="#{main.isNew() or salesServicesInvoiceView.draft}"  >
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+        
+      <!-- Reset To Draft -->
+      <p:commandButton id="saveBtnReset" value="#{lang.resetToDraft}" styleClass="btn btn-info" process="@this" update="f1"
+                       action="#{salesServicesInvoiceView.actionResetToDraft(main)}"
+                       rendered="#{!salesServicesInvoiceView.draft and main.edit  and userRuntimeView.privilege.resetToDraft==true}" >
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+
+      <p:commandButton action="#{salesServicesInvoiceView.saveSalesServicesInvoice(main, 2)}" value="#{lang.confirm}"  onclick="toTop()"
+                       process="f1" update="f1" rendered="#{main.edit and salesServicesInvoiceView.draft}" id="confirmBtn"
+                       styleClass="btn btn-warning">
+        <p:confirm header="#{lang.confirm}" 
+                   message="#{(salesServicesInvoiceView.taxableServicesExist and salesServicesInvoiceView.salesServicesInvoice.taxableInvoice eq 0) ? lang.taxableServicesExist : lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:commandButton value="#{lang.print}" actionListener="#{salesServicesInvoiceView.print}"
+                       rendered="#{main.edit and !salesServicesInvoiceView.draft and salesServicesInvoiceView.confirmed}" immediate="true"  process="@this"  styleClass="btn btn-primary">
+      </p:commandButton>
+    </ui:define>   
+
+    <ui:define name="form">
+
+      <!-- Customer / Supplier -->
+      <p:outputLabel value="#{lang.party}" for="ledgerId"/>
+      <h:panelGroup id="ledgerDiv">
+        <p:autoComplete value="#{salesServicesInvoiceView.salesServicesInvoice.accountingLedgerId}" 
+                        completeMethod="#{salesServicesInvoiceView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"
+                        required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}" id="ledgerId"
+                        var="ld" itemValue="#{ld}" itemLabel="#{ld.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="25"
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" readonly="#{salesServicesInvoiceView.draft or(main.edit and !salesServicesInvoiceView.draft)}" >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+          <p:column><h:outputText value="#{ld.title}" /></p:column>
+          <p:column><h:outputText value="#{ld.accountingGroupId.title}" /></p:column>
+          <p:column><h:outputText value="#{ld.accountingGroupId.parentId.title}" /></p:column>
+          <p:message for="ledgerId" display="text" />
+          <p:ajax event="itemSelect" listener="#{salesServicesInvoiceView.ledgerSelectEvent}" process="ledgerDiv" update="serialNo" />
+        </p:autoComplete>        
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sales} #{lang.ledger}" for="serviceLedgerId" />
+      <h:panelGroup>
+        <p:autoComplete  value="#{salesServicesInvoiceView.salesServicesInvoice.salesServicesLedgerId}" completeMethod="#{salesServicesInvoiceView.accountingLedgerSalesServicesAuto}" 
+                         converter="wawo.LookupIntConverter" required="true" requiredMessage="#{lang.services} #{lang.ledger} #{lang.isRequired}" 
+                         id="serviceLedgerId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                         converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw"
+                         >
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>          
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.title}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountingGroupId.title}" />
+          </p:column>
+          <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+            <h:outputText value="#{e.accountingGroupId.parentId.title}" />
+          </p:column>
+        </p:autoComplete>
+        <p:message for="serviceLedgerId" display="text" />
+      </h:panelGroup>
+
+      <!-- Taxable Invoice -->
+      <p:outputLabel value="#{lang.taxable} #{lang.invoice}" for="taxableInvoiceId"  />
+      <h:panelGroup layout="block" id="taxableInvoiceDiv">
+        <p:selectOneRadio id="taxableInvoiceId" value="#{salesServicesInvoiceView.salesServicesInvoice.taxableInvoice}" 
+                          layout="grid" required="true" requiredMessage="#{lang.taxable} #{lang.invoice} #{lang.isRequired}" columns="2"
+                          valueChangeListener="#{salesServicesInvoiceView.taxableInvoiceChangeEvent}">
+          <f:selectItem itemLabel="Yes" itemValue="1" />
+          <f:selectItem itemLabel="No" itemValue="0" /> 
+          <p:ajax process="taxableInvoiceDiv" update="confirmBtn serialNo" />
+        </p:selectOneRadio>
+        <p:message for="taxableInvoiceId" display="text" />
+      </h:panelGroup>
+
+      <!-- Invoice No -->
+      <p:outputLabel value="#{lang.invoiceNo}" for="serialNo" />
+      <h:panelGroup>
+        <p:inputText value="#{salesServicesInvoiceView.salesServicesInvoice.serialNo}" maxlength="100" id="serialNo" readonly="true" required="true" requiredMessage="#{lang.invoiceNo} #{lang.isRequired}" />
+        <p:message for="serialNo" display="text" styleClass="fw" />
+      </h:panelGroup>
+
+      <!-- Entry Date -->
+      <p:outputLabel value="#{lang.entryDate}" for="entryDate" />
+      <h:panelGroup>
+        <p:calendar value="#{salesServicesInvoiceView.salesServicesInvoice.entryDate}" pattern="#{lang.datePattern}" 
+                    required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"  
+                    converterMessage="#{lang.entryDate} #{lang.invalidDate}" maxlength="29" id="entryDate" showButtonPanel="true" navigator="true" mask="true"/>
+        <p:message for="entryDate" display="text"/>
+      </h:panelGroup>
+
+      <!-- TDS Tax Code -->
+      <p:outputLabel value="#{lang.tds}" for="tdsTaxCodeId" rendered="false" />
+      <h:panelGroup rendered="false">
+        <p:selectOneMenu value="#{servicesView.commodity.tdsTaxCodeId}"                               
+                         id="tdsTaxCodeId" converter="omnifaces.SelectItemsConverter">
+          <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+          <f:selectItems value="#{salesServicesInvoiceView.lookupTdsTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />              
+        </p:selectOneMenu>
+        <p:message for="tdsTaxCodeId" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+
+    <ui:define name="after">
+      <div class="table-responsive">
+        <h:panelGroup layout="block"  styleClass="card" rendered="#{main.isForm() and main.edit}">
+          <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+          <h:panelGroup layout="block" id="servicesTableDiv" styleClass="table-responsive" pt:data-fast-input="true">
+
+            <p:dataTable id="salesServicesInvoiceItemTable" var="salesServicesInvoiceItemVar" widgetVar="salesServicesInvoiceItemWidget" rowIndexVar="rowIndex" reflow="true"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" value="#{salesServicesInvoiceView.salesServicesInvoiceItemList}">
+              <p:focus context="salesServicesInvoiceItemTable"/>
+              <!-- Sno -->
+              <p:column width="61" style="text-align: center;">
+                <f:facet name="header"><h:outputText value="Sno" title="Serail Numner"/></f:facet>
+                <h:outputText value="#{rowIndex + 1}" />
+              </p:column>
+
+              <!-- Service -->
+              <p:column width="500">
+                <f:facet name="header">
+                  <p:commandLink actionListener="#{salesServicesInvoiceView.openServicesPopup()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                    <h:outputText value="#{lang.services}" title="#{lang.services}"/>
+                  </p:commandLink>
+                </f:facet>                
+                <p:focus for="salesServicesInvoiceItemTable"  />
+                <h:panelGroup layout="block" id="commodityDiv">
+                  <p:autoComplete value="#{salesServicesInvoiceItemVar.commodityId}" completeMethod="#{salesServicesInvoiceView.commodityServiceAuto}" 
+                                  onfocus="this.select()" converter="wawo.LookupIntConverter" id="productCommodityId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                                  emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" inputStyleClass="text-left"
+                                  converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" readonly="#{!(main.edit and salesServicesInvoiceView.draft)}" >
+                    <f:attribute name="clazz" value="#{scmLookupView.commodityClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.commodityById()}"/>
+                    <p:ajax event="itemSelect" process="commodityDiv" update="sacCode ratePercentage tdsRatePercentage description taxableValue sgstAmount cgstAmount igstAmount totalAmount" 
+                            listener="#{salesServicesInvoiceView.servicesSelectEvent(salesServicesInvoiceItemVar)}"
+                            oncomplete="updateInvoiceSummery(); focusToDesc(#{rowIndex});" />
+                  </p:autoComplete>                                    
+                </h:panelGroup>
+              </p:column>
+
+              <!-- SAC Code -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.sacCode}" title="#{lang.sacCode}"/></f:facet>
+                <p:inputText value="#{salesServicesInvoiceItemVar.commodityId.hsnCode}" onfocus="this.select()" maxlength="100" id="sacCode" disabled="true" />
+              </p:column>
+
+              <!-- Tax Rate Percentage -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.tax} #{lang.rate}" title="#{lang.tax} #{lang.rate}"/></f:facet>
+                <p:inputText value="#{appView.decimal(salesServicesInvoiceItemVar.commodityId.salesTaxCodeId.ratePercentage)}" maxlength="100" id="ratePercentage" disabled="true" />
+              </p:column>
+
+              <!-- TDS Rate Percentage -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.tds} #{lang.rate}" title="#{lang.tds} #{lang.rate}"/></f:facet>
+                <p:inputText value="#{salesServicesInvoiceItemVar.commodityId.tdsTaxCodeId ne null ? salesServicesInvoiceItemVar.commodityId.tdsTaxCodeId.ratePercentage : '' }" maxlength="100" id="tdsRatePercentage" disabled="true" />
+              </p:column>
+
+              <!-- Description -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+                <h:panelGroup layout="block" id="descriptionDiv">
+                  <p:inputText autocomplete="off"  onfocus="this.select()" value="#{salesServicesInvoiceItemVar.description}" maxlength="1000" id="description" readonly="#{!(main.edit and salesServicesInvoiceView.draft)}" />
+                </h:panelGroup>
+              </p:column>
+
+              <!-- Taxable Value -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.taxable} #{lang.value}" title="#{lang.taxable} #{lang.value}"/></f:facet>
+                <h:panelGroup layout="block" id="servicesRateDiv">
+                  <p:inputNumber value="#{salesServicesInvoiceItemVar.taxableValue}" converterMessage="#{lang.taxableValue} #{lang.invalidNumber}" 
+                                 decimalPlaces="2" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="9999999999" minValue="0.0" styleClass="submit_item fw"
+                                 maxlength="18" id="taxableValue" autocomplete="off" readonly="#{!(main.edit and salesServicesInvoiceView.draft)}" >
+                    <p:ajax event="change" process="servicesRateDiv" update="salesServicesInvoiceItemTable" oncomplete="updateInvoiceSummery();"
+                            listener="#{salesServicesInvoiceView.servicesRateBlurEvent(salesServicesInvoiceItemVar)}" />
+                  </p:inputNumber>
+                </h:panelGroup>
+              </p:column>
+
+              <!-- SGST -->
+              <p:column rendered="#{salesServicesInvoiceView.intrastateServices}">
+                <f:facet name="header"><h:outputText value="#{lang.sgst}" title="#{lang.sgst}"/></f:facet>
+                <p:inputNumber value="#{salesServicesInvoiceItemVar.sgstAmount}" converterMessage="#{lang.sgstAmount} #{lang.invalidNumber}" 
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                               maxlength="18" id="sgstAmount" disabled="true"/>
+              </p:column>
+
+              <!-- CGST -->
+              <p:column rendered="#{salesServicesInvoiceView.intrastateServices}">
+                <f:facet name="header"><h:outputText value="#{lang.cgst}" title="#{lang.cgst}"/></f:facet>
+                <p:inputNumber value="#{salesServicesInvoiceItemVar.cgstAmount}" converterMessage="#{lang.cgstAmount} #{lang.invalidNumber}" 
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                               maxlength="18" id="cgstAmount" disabled="true"/>
+              </p:column>
+
+              <!-- IGST -->
+              <p:column rendered="#{!salesServicesInvoiceView.intrastateServices}">
+                <f:facet name="header"><h:outputText value="#{lang.igst}" title="#{lang.igst}"/></f:facet>
+                <p:inputNumber value="#{salesServicesInvoiceItemVar.igstAmount}" converterMessage="#{lang.igstAmount} #{lang.invalidNumber}" 
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                               maxlength="18" id="igstAmount" disabled="true"/>
+              </p:column>
+
+              <!-- TDS -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.tds}" title="#{lang.tds}"/></f:facet>
+                <p:inputNumber value="#{salesServicesInvoiceItemVar.tdsAmount}" converterMessage="#{lang.tdsAmount} #{lang.invalidNumber}" 
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                               maxlength="18" id="tdsAmount" disabled="true"/>
+              </p:column>
+
+              <!-- Total -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.total}" title="#{lang.total}"/></f:facet>
+                <p:inputNumber value="#{salesServicesInvoiceItemVar.netValue}" converterMessage="#{lang.netValue} #{lang.invalidNumber}" 
+                               decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" 
+                               maxlength="18" id="totalAmount" disabled="true"/>
+              </p:column>
+
+              <!-- Action -->
+              <p:column headerText="">              
+                <p:commandButton process="@this" value="" update="salesServicesInvoiceItemTable" icon="fa fa-trash" tabindex="-1"
+                                 rendered="#{salesServicesInvoiceView.draft}" style="color: mediumvioletred;"
+                                 actionListener="#{salesServicesInvoiceView.actionDeleteSalesServicesInvoiceItem(main, salesServicesInvoiceItemVar)}">
+                  <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                </p:commandButton>
+              </p:column>
+
+              <f:facet name="footer">
+                <h:panelGroup layout="block" id="invoiceSummarydiv">
+                  <p:panelGrid>
+                    <p:row>
+                      <p:column style="font-weight: bold; text-align: right; width:150px !important;">Total Items :</p:column>
+                      <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{salesServicesInvoiceView.salesServicesInvoiceItemList.size()}</p:column>
+                      <p:column style="font-weight: bold;"></p:column>
+                      <p:column style="font-weight: bold;"></p:column>
+                      <p:column style="font-weight: bold;">
+
+                      </p:column>
+                    </p:row>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="2" columnClasses="vtop,vtop w-320" >
+                    <h:panelGroup layout="block">
+                      <p:panelGrid styleClass="bordered">
+                        <p:row>
+                          <p:column style="font-weight: bold;">GST %</p:column>
+                          <p:column style="font-weight: bold;">Item Count</p:column>                          
+                          <p:column style="font-weight: bold;">Taxable</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">CGST %</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">Value</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">SGST %</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">Value</p:column>
+                          <p:column style="font-weight: bold;" rendered="#{!salesServicesInvoiceView.intrastateServices}">GST Value</p:column>
+                          <p:column style="font-weight: bold;">TDS Value</p:column>
+                          <p:column style="font-weight: bold;">Net Value</p:column>
+                        </p:row>
+                        <p:row>
+                          <ui:repeat value="#{salesServicesInvoiceView.salesServicesInvoice.invoiceGroup}" var="group">
+                            <p:row>
+                              <p:column style="font-weight: bold;">#{group.taxCode.ratePercentage eq null ? '0.00' : appView.decimal(group.taxCode.ratePercentage)}</p:column>
+                              <p:column style="font-weight: bold;">#{group.productQuantity eq null ? '0' : group.productQuantity}</p:column>
+                              <p:column style="font-weight: bold;">#{group.assessableValue eq null ? '0.00' : appView.decimal(group.assessableValue)}</p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">
+                                #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(group.taxCode.ratePercentage / 2) }
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">
+                                #{group.invoiceCgstValue eq null ? '0.00' : appView.decimal(group.invoiceCgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">
+                                #{group.taxCode.ratePercentage eq null ? '' : appView.decimal(group.taxCode.ratePercentage / 2) }
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{salesServicesInvoiceView.intrastateServices}">
+                                #{group.invoiceSgstValue eq null ? '0.00' : appView.decimal(group.invoiceSgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;" rendered="#{!salesServicesInvoiceView.intrastateServices}">
+                                #{group.invoiceIgstValue eq null ? '0.00' : appView.decimal(group.invoiceIgstValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;">
+                                #{group.invoiceTdsValue eq null ? '0.00' : appView.decimal(group.invoiceTdsValue)}
+                              </p:column>
+                              <p:column style="font-weight: bold;">#{group.invoiceNetAmount eq null ? '0.00' : appView.decimal(group.invoiceNetAmount)}</p:column>
+                            </p:row>
+                          </ui:repeat>
+                        </p:row>
+                      </p:panelGrid>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="text-right">
+                      <p:panelGrid columns="2" layout="grid">
+                        <!-- Taxable Value -->
+                        <h:panelGroup>Taxable :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.assessableValue eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.assessableValue)}" />
+                        </h:panelGroup>
+
+                        <!-- GST Value -->
+                        <h:panelGroup>GST Value :</h:panelGroup>
+                        <h:panelGroup layout="block">
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.igstValue eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.igstValue)}" />
+                        </h:panelGroup>
+
+                        <!-- Invoice Amount -->
+                        <h:panelGroup>#{lang.invoiceAmount}:</h:panelGroup>
+                        <h:panelGroup layout="block">
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.assessableValue eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.igstValue+salesServicesInvoiceView.salesServicesInvoice.assessableValue)}" />
+                        </h:panelGroup>
+
+                        <!-- TDS Value -->
+                        <h:panelGroup>TDS Value :</h:panelGroup>
+                        <h:panelGroup style="border-bottom:1px solid;" layout="block">
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.tdsValue eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.tdsValue)}" />
+                        </h:panelGroup>
+
+                        <!-- Grand Total -->
+                        <h:panelGroup>Total :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.grandTotal  eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.grandTotal)}" />
+                        </h:panelGroup>                        
+
+                        <!-- Round Off -->
+                        <h:panelGroup >Round Off :</h:panelGroup>
+                        <h:panelGroup layout="block" style="border-bottom:1px solid;">
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.roundOffValue eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.roundOffValue)}" />
+                        </h:panelGroup>
+
+                        <!-- Net Amount -->
+                        <h:panelGroup>Net Amount :</h:panelGroup>
+                        <h:panelGroup>
+                          <h:outputText value="#{salesServicesInvoiceView.salesServicesInvoice.netValue eq null ? '0.00' : appView.decimal(salesServicesInvoiceView.salesServicesInvoice.netValue)}" />
+                        </h:panelGroup>
+                      </p:panelGrid>                      
+                    </h:panelGroup>
+                  </p:panelGrid>
+                </h:panelGroup>
+              </f:facet>
+
+            </p:dataTable>   
+          </h:panelGroup>
+        </h:panelGroup>        
+        <p:remoteCommand name="insertOrUpdateSalesInvoiceServiceItem" actionListener="#{salesServicesInvoiceView.insertOrUpdateSalesInvoiceServiceItem(main)}"
+                         update="salesServicesInvoiceItemTable" />  
+
+        <p:remoteCommand name="updateInvoiceSummery" process="@this" update="salesServicesInvoiceItemTable:invoiceSummarydiv" />
+
+        <p:remoteCommand name="commodityPopupReturn" process="@this" update="@this" />
+
+      </div>
+
+      <style>
+        .vtop{vertical-align: top;}
+        .col_bottom_color{border-bottom-color: red !important;}
+      </style>
+      <script type="text/javascript">
+        //<![CDATA[
+        function submitForm(params) {
+          insertOrUpdateSalesInvoiceServiceItem([{name: 'rownumber', value: params[2]}]);
+          $('#salesServicesInvoiceItemTable\\:0\\:commodityId_input').focus();
+          return false;
+        }
+
+        function focusToRate(rnum) {
+          $('#salesServicesInvoiceItemTable\\:' + rnum + '\\:taxableValue_input').focus();
+        }
+        function focusToDesc(rnum) {
+          $('#salesServicesInvoiceItemTable\\:' + rnum + '\\:description_input').focus();
+        }
+        //]]>
+      </script> 
+    </ui:define>
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <p:dataTable id="salesServicesInvoiceTable" var="salesServicesInvoiceVar" widgetVar="salesServicesInvoiceWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesServicesInvoiceView.salesServicesInvoiceLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesServicesInvoiceVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesServicesInvoiceView.salesServicesInvoiceSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column sortBy="#{salesServicesInvoiceVar.serialNo}" field="scm_sales_service_invoice.serial_no">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceNo}" title="#{lang.invoiceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesServicesInvoiceVar.serialNo)}" process="@this" update="f1" 
+                         immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesServicesInvoiceView.salesServicesInvoice}" value="#{salesServicesInvoiceVar}" />
+          </p:commandLink>
+        </p:column>        
+
+        <p:column sortBy="#{salesServicesInvoiceVar.accountingLedgerId}" field="scm_sales_service_invoice.accounting_ledger_id" >
+          <f:facet name="header"><h:outputText value="#{lang.party}" title="#{lang.party}"/></f:facet>
+          <h:outputText value="#{appView.display(salesServicesInvoiceVar.accountingLedgerId.title)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{salesServicesInvoiceVar.entryDate}" field="scm_sales_service_invoice.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(salesServicesInvoiceVar.entryDate)}" escape="false" />
+        </p:column>        
+
+        <p:column sortBy="#{salesServicesInvoiceVar.statusId}" field="scm_sales_service_invoice.status_id" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>                   
+          <h:outputText styleClass="m-r-5 #{sysRuntimeView.statusStyle(salesServicesInvoiceVar.statusId)}" 
+                        value="#{salesServicesInvoiceVar.statusId eq sysConstant.CONFIRMED ? lang.confirmed : lang.draft }"
+                        style="background-color: #{sysRuntimeView.statusColor(salesServicesInvoiceVar.statusId)}" escape="false" />
+
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesServicesInvoiceVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesServicesInvoiceVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesServicesInvoiceVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesServicesInvoiceVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesServicesInvoiceVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>   
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

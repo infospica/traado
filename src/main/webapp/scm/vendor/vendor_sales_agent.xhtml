@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>TODO supply a title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+  <body>
+    <div>
+      <!--        SALES AGENT
+                <p:tab title="#{lang.salesAgent}" disabled="#{main.isNew()}">
+                  <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+                    <ui:param name="ids" value="salesAgent" />
+                    <ui:define name="menuleft">
+                      <p:commandButton action="#{vendorView.userProfileNewPopup(2)}" immediate="true" process="@this" icon="fa fa-plus" title="#{lang.add}" 
+                                       iconPos="left" styleClass="btn btn-info"  >
+        
+                      </p:commandButton>
+                      <p:remoteCommand name="userProfilePopupReturned" actionListener="#{vendorView.vendorSalesAgentPopupReturned()}" update="salesAgentContractTable"  
+                                       process="@this" immediate="true" />
+                    </ui:define>
+                    <p:dataTable id="vendorSalesAgentTable" var="vendorSalesAgentVar" widgetVar="vendorSalesAgentWidget" value="#{vendorView.getVendorSalesAgentList(main)}" 
+                                 rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  
+                                 tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+        
+                      <f:facet name="header">
+                        <p:outputPanel styleClass="hidden" >
+                          <p:inputText id="globalFilter"  onkeyup="return PF('vendorSalesAgentWidget').filter()" />
+                        </p:outputPanel>
+                      </f:facet>
+                      <p:ajax event="rowEdit" update="vendorSalesAgentTable" listener="#{salesAgentContractView.onRowEdit(salesAgentContractVar)}"/>
+        
+                      <p:column headerText="#{lang.name}" sortBy="#{vendorSalesAgentVar.userProfileId.name}" field="name" filterBy="#{vendorSalesAgentVar.userProfileId.name}" filterStyleClass="hidden">
+                        <h:outputText value="#{appView.display(vendorSalesAgentVar.userProfileId.name)}" title="#{appView.title(vendorSalesAgentVar.userProfileId.name)}" escape="false" />
+                      </p:column>
+                      
+                      <p:column headerText="#{lang.vendorName}" sortBy="#{vendorSalesAgentVar.vendorId.vendorName}" field="name" filterBy="#{vendorSalesAgentVar.vendorId.vendorName}" filterStyleClass="hidden">
+                        <h:outputText value="#{appView.display(vendorSalesAgentVar.vendorId.vendorName)}" title="#{appView.title(vendorSalesAgentVar.vendorId.vendorName)}" escape="false" />
+                      </p:column>
+                       <p:rowEditor />
+                      <p:column headerText="#{lang.action}" styleClass="C"> 
+                       
+                        <p:commandButton action="#{vendorView.deleteVendorSalesAgent(main,vendorSalesAgentVar)}" process="@this" 
+                                         value="" update="vendorSalesAgentTable" icon="fa fa-trash">
+                          <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                        </p:commandButton>
+                      </p:column>
+                      
+                      <p:column headerText="#{lang.log}">
+                        <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                          <ui:define name="cby">#{appView.display(vendorSalesAgentVar.createdBy)}</ui:define>
+                          <ui:define name="cat">#{appView.dateTime(vendorSalesAgentVar.createdAt)}</ui:define>
+                          <ui:define name="uby">#{appView.display(vendorSalesAgentVar.modifiedBy)}</ui:define>
+                          <ui:define name="uat">#{appView.dateTime(vendorSalesAgentVar.modifeidAt)}</ui:define>
+                          <ui:define name="id">#{appView.display(vendorSalesAgentVar.id)}</ui:define>
+                        </ui:decorate>
+                      </p:column>
+                    </p:dataTable>
+                  </ui:decorate>
+                </p:tab>-->
+
+    </div>
+  </body>
+</html>

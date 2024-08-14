@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{currencyView.switchCurrency(main, viewType)}
+
+ <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.currency}" />
+    <ui:param name="ids" value="currency" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{currencyView.deleteCurrency(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('currencyWidgetDelConf')" process="f1" update="f1" >
+	    <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{currencyView.cloneCurrency(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{currencyView.deleteCurrency(main)}" value="#{lang.delete}" onclick="wdgOff('currencyWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{currencyView.saveCurrency(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+        <p:outputLabel value="#{lang.title}" for="title" />
+        <h:panelGroup><p:inputText value="#{currencyView.currency.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text" styleClass="fw" /></h:panelGroup>    
+        <p:outputLabel value="#{lang.code}" for="code" />
+        <h:panelGroup><p:inputText value="#{currencyView.currency.code}" maxlength="200" id="code" /><p:message for="code" display="text" styleClass="fw" /></h:panelGroup>            
+        <p:outputLabel value="#{lang.symbol}" for="symbol" />
+        <h:panelGroup><p:inputText value="#{currencyView.currency.symbol}" maxlength="5" id="symbol" /><p:message for="symbol" display="text" styleClass="fw" /></h:panelGroup> 
+        <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+        <h:panelGroup><p:inputText value="#{currencyView.currency.sortOrder}" maxlength="5" id="sortOrder" /><p:message for="sortOrder" display="text" styleClass="fw" /></h:panelGroup>
+    </ui:define>
+     <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(currencyView.currency.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(currencyView.currency.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(currencyView.currency.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(currencyView.currency.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(currencyView.currency.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+	
+    <ui:define name="list">
+      <p:dataTable id="currencyTable" var="currencyVar" widgetVar="currencyWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+        lazy="true" value="#{currencyView.currencyLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{currencyVar.id}"
+        rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+        selection="#{currencyView.currencySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{currencyVar.title}" field="t1.title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{currencyVar.title}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{currencyView.currency}" value="#{currencyVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{currencyVar.code}" field="t1.code">
+          <f:facet name="header"><h:outputText value="#{lang.code}" title="#{lang.code}"/></f:facet>
+          <h:outputText value="#{appView.display(currencyVar.code)}" title="#{appView.title(currencyVar.code)}" escape="false" />
+        </p:column>
+         <p:column sortBy="#{currencyVar.symbol}" field="t1.symbol">
+          <f:facet name="header"><h:outputText value="#{lang.symbol}" title="#{lang.symbol}"/></f:facet>
+          <h:outputText value="#{currencyVar.symbol}" title="#{currencyVar.symbol}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{currencyVar.sortOrder}" field="t1.sort_order">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+          <h:outputText value="#{appView.display(currencyVar.sortOrder)}" title="#{appView.title(currencyVar.sortOrder)}" escape="false" />
+        </p:column>
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(currencyVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(currencyVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(currencyVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(currencyVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(currencyVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>  
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

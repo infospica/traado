@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <o:importConstants type="spica.constant.AccountingConstant" />
+
+  #{bankChargesView.switchBankCharges(main, 'newform')}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.bank} #{lang.charges}"/>
+    <ui:param name="labelOnly" value="true"/>
+    <ui:param name="navLabel" value="#{accountingMainView.selectedLedger.title}"/>
+    <ui:param name="ids" value="bankCharges"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+
+    <ui:define name="save">
+      <p:commandButton process="bankChargeTableDiv @this" value="#{lang.save}" action="#{bankChargesView.actionSave(main)}" styleClass="btn btn-primary" update="f1" ></p:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="list">
+    </ui:define>
+
+    <ui:define name="navRight" >
+      <h:inputText id="forFocus" styleClass="sr-only" />
+      <h:panelGroup styleClass="L" >
+        <p:commandButton actionListener="#{bankChargesView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="bankChargeTable fmess fromDate" styleClass="btn"/>
+        <p:commandButton actionListener="#{bankChargesView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="bankChargeTable fmess fromDate" styleClass="btn"/>
+        <p:calendar id="fromDate" value="#{accountingMainView.fromDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="3" mindate="#{userRuntimeView.company.financialYearStartDate}"
+                    maxlength="10" size="7"  showButtonPanel="true" navigator="true" mask="true" maxdate="#{userRuntimeView.getToday()}" >
+          <p:ajax event="dateSelect" process="@this" listener="#{bankChargesView.onFromDateSelect}" update="bankChargeTable  fmess toDate"/>
+        </p:calendar> <p:message for="fromDate" display="text" id='fmess'/>
+      </h:panelGroup>
+      <h:panelGroup styleClass="L" >
+        <p:calendar id="toDate" value="#{accountingMainView.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="3" mindate="#{accountingMainView.fromDate}"
+                    maxlength="10" size="7"  showButtonPanel="true" navigator="true" mask="true"  maxdate="#{userRuntimeView.getToday()}">
+          <p:ajax event="dateSelect" process="@this" listener="#{bankChargesView.onToDateSelect}" update="bankChargeTable  tmess"/>
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>
+      </h:panelGroup>  
+      <p:commandButton process="@this" immediate="true" actionListener="#{bankChargesView.dialogClose}"
+                       icon="fa fa-times" iconPos="right" styleClass="btn btn-default right" update="f1" />
+    </ui:define>
+
+    <ui:define name="formRight">
+      <h:panelGroup styleClass="L" layout="block">
+        <p:selectOneButton id="filter" value="#{bankChargesView.reconciliationOptions}" styleClass="l-p-10" valueChangeListener="#{bankChargesView.filterWithStatus}"  >
+          <f:selectItem itemLabel="#{lang.deposited}" itemValue="#{AccountingConstant.BANK_CHEQUE_ISSUED}" /> 
+          <f:selectItem itemLabel="#{lang.cleared}" itemValue="#{AccountingConstant.BANK_CHEQUE_RECONCILED}" />
+          <f:selectItem itemLabel="#{lang.dishonoured}" itemValue="#{AccountingConstant.BANK_CHEQUE_BOUNCE}" />
+          <f:selectItem itemLabel="#{lang.all}" itemValue="#{null}" />
+          <p:ajax event="change" process="@this" update="bankChargeTable @this" onstart="block();" oncomplete="unblock();" />
+        </p:selectOneButton>
+      </h:panelGroup>
+    </ui:define>
+
+
+    <ui:define name="afterForm">
+
+      <h:panelGroup layout="block" id="bankChargeTableDiv" styleClass="table-responsive">
+
+        <p:dataTable id="bankChargeTable" var="row" widgetVar="bankChargeWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{bankChargesView.getBankReconciliationList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                     rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+          <p:ajax event="page" onstart="block();" oncomplete="unblock();" />
+          <f:facet name="header">
+            <p:outputPanel styleClass="hidden" >
+              <p:inputText id="globalFilter"  onkeyup="return PF('bankChargeWidget').filter()" />
+            </p:outputPanel>
+          </f:facet>
+          <p:column headerText="#{lang.particulars}"><h:outputText value="#{appView.display(row.particulars)}" title="#{appView.title(row.particulars)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.voucherType}">            
+            <h:outputText value="#{appView.display(row.voucherType)}" title="#{appView.title(row.voucherType)}" escape="false" rendered="#{row.processedAt eq null}"/>
+            <h:outputText value="#{appView.display(row.voucherType)}" title="#{appView.title(row.voucherType)}" escape="false" rendered="#{row.processedAt ne null}"/>
+          </p:column>
+          <p:column headerText="#{lang.transactionType}"><h:outputText value="#{appView.display(row.transactionType)}" title="#{appView.title(row.transactionType)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.documentNo}"><h:outputText value="#{appView.display(row.documentNumber)}" title="#{appView.title(row.documentNumber)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.reference} #{lang.no}"><h:outputText value="#{appView.display(row.referNumber)}" title="#{appView.title(row.referNumber)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.document} #{lang.date}"><h:outputText value="#{appView.date(row.documentDate)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.deposit} #{lang.date}"><h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.bank} #{lang.charges}">
+            <h:panelGroup layout="block" id="amountDiv">
+              <div class="flex">
+                <div class="cell-0 p-t-5">
+                  <p:commandButton process="@this" value="" tabindex="-1" icon="fa fa-trash" rendered="#{row.bankChargeId ne null}"
+                                   actionListener="#{bankChargesView.actionDeleteBankCharge(main, row)}" update="amountDiv taxAmountDiv">
+                    <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                  </p:commandButton>
+                </div>
+                <p:inputNumber value="#{row.bankChargeAmount}" decimalPlaces="2" styleClass="cell-0" onfocus="this.select()" inputStyleClass="text-right fw" maxValue="9999999999" minValue="0.0" maxlength="10"
+                               readonly="#{row.bankChargeId ne null}" id="bankChargeAmountId">
+                  <p:ajax event="change" process="@this" update="taxAmountDiv" listener="#{bankChargesView.bankChargeEvent(row)}" />              
+                </p:inputNumber>
+              </div>
+            </h:panelGroup>
+          </p:column>
+
+          <p:column headerText="#{lang.tax}" styleClass="w-40">
+             <h:panelGroup layout="block" id="taxAmountDiv">
+            <h:outputText id="taxAmountId" value="#{appView.decimal(row.igstAmount)}" escape="false" />
+             </h:panelGroup>
+          </p:column>   
+          <p:column headerText="#{lang.debit}" style="text-align: right;"><h:outputText  rendered="#{row.isReciept(bankChargesView.selectedLedger.id)}" value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.credit}" style="text-align: right;"><h:outputText rendered="#{row.isPayment(bankChargesView.selectedLedger.id)}" value="#{appView.decimal(row.netAmount)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.status} #{row.bankStatus}" style="text-align: right;" ><h:outputText value="#{appView.display(row.bankStatus eq AccountingConstant.BANK_CHEQUE_RECIEVED ? lang.received : row.bankStatus eq AccountingConstant.BANK_CHEQUE_ISSUED ? lang.deposited : row.bankStatus eq AccountingConstant.BANK_CHEQUE_RECONCILED ? lang.cleared : row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE ? lang.dishonoured : row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE_RESUBMITTED ? lang.represent : row.bankStatus eq AccountingConstant.BANK_CHEQUE_RETURNED ? lang.returned :  row.bankStatus eq AccountingConstant.BANK_CHEQUE_BOUNCE_HIDE ? lang.dishonoured : lang.cancelled )}" escape="false" /></p:column>
+          <!--        Do we need this in bank charges  <p:columnGroup type="footer">
+                      <p:row>
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column  styleClass="fw" colspan="2" footerText="#{lang.balanceaspercompany}" />
+                        <p:column style="text-align:right" footerText="#{appView.decimal(bankChargesView.totalAmountDebit - bankChargesView.totalAmountCredit)}" rendered="#{bankChargesView.totalAmountDebit gt bankChargesView.totalAmountCredit}"></p:column>
+                        <p:column style="text-align:right" footerText="#{appView.decimal(bankChargesView.totalAmountCredit - bankChargesView.totalAmountDebit)}" rendered="#{bankChargesView.totalAmountDebit lt bankChargesView.totalAmountCredit}"></p:column>
+                        <p:column style="text-align:right" footerText="" />
+                      </p:row>
+                      <p:row>
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column styleClass="fw" colspan="2"  footerText="#{lang.amountnotreflected}" />
+                        <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(bankChargesView.debit)}"></p:column>
+                        <p:column style="text-align:right" styleClass="text-right" footerText="#{appView.decimal(bankChargesView.credit)}"></p:column>
+                        <p:column style="text-align:right" footerText="" />
+                      </p:row>
+                      <p:row>
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column style="text-align:right" footerText="" />
+                        <p:column styleClass="fw" colspan="2"  footerText="#{lang.balanceasperbank}" />
+                        <p:column style="text-align:right" footerText="#{appView.decimal(bankChargesView.processedAmountDebit - bankChargesView.processedAmountCredit)}" rendered="#{bankChargesView.processedAmountDebit gt bankChargesView.processedAmountCredit}"></p:column>
+                        <p:column style="text-align:right" footerText="#{appView.decimal(bankChargesView.processedAmountCredit - bankChargesView.processedAmountDebit)}" rendered="#{bankChargesView.processedAmountDebit lt bankChargesView.processedAmountCredit}"></p:column>
+                        <p:column style="text-align:right" footerText="" />
+                      </p:row>
+                    </p:columnGroup>-->
+        </p:dataTable>
+
+      </h:panelGroup>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

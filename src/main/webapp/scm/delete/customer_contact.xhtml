@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  <ui:composition template="/theme1/layoutDialog.xhtml" >
+    <ui:define name="content"  >
+      <h:form id="f1" prependId="false">
+        #{main.setViewPath(param.viewPath eq null ? main.viewPath : param.viewPath, param.viewType eq null ? main.viewType : param.viewType)}
+        #{customerContactView.switchCustomerContact(main, param.viewType eq null ? main.viewType : param.viewType)}
+        <ui:decorate template="/WEB-INF/resources/theme1/dialogForm.xhtml">
+          <ui:param name="label" value="#{customerContactView.customerContact.customerId.customerName} / #{main.isEdit() ? appView.display(customerContactView.customerContact.contactName) : lang.contact}"/>
+          <ui:param name="ids" value="customerContact" />
+
+          <ui:define name="menu1" >
+            <p:menuitem actionListener="#{customerContactView.cloneCustomerContact(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+          </ui:define>
+          <ui:define name="navLeftRight" >
+            <p:commandButton actionListener="#{customerContactView.customerContactDialogClose}" value="#{lang.close}" partialSubmit="true" process="@this" immediate="true"  styleClass="btn btn-default"/>
+          </ui:define>
+          <ui:define name="deleteForm" >
+            <p:commandButton action="#{customerContactView.deleteCustomerContact(main)}" value="#{lang.delete}" onclick="wdgOff('customerContactWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+          </ui:define>
+
+          <ui:define name="save" >
+            <h:commandButton action="#{customerContactView.saveCustomerContact(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+              <f:ajax execute="f1" render="f1"  />
+            </h:commandButton>
+          </ui:define>
+
+          <ui:define name="form">
+            <p:outputLabel value="#{lang.name}" for="contactName" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{customerContactView.customerContact.contactName}" maxlength="50" required="true" requiredMessage="#{lang.contactName} #{lang.isRequired}" id="contactName" />
+              <p:message for="contactName" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.designation}" for="customerContactDesignationId"/>
+            <h:panelGroup>
+              <p:autoComplete  value="#{customerContactView.customerContact.designationId}" completeMethod="#{customerContactView.designationAuto}" converter="wawo.LookupIntConverter"   
+                               required="true" requiredMessage="#{lang.designation} #{lang.isRequired}" id="customerContactDesignationId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                               emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                               autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.designationClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.designationById()}"/>
+              </p:autoComplete>
+              <p:message for="customerContactDesignationId" display="text" />
+            </h:panelGroup>  
+
+            <p:outputLabel value="#{lang.phone1}" for="phone1" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{customerContactView.customerContact.phone1}" validator="wawo.WhiteSpaceValidator" maxlength="10" id="phone1" 
+                           required="true" requiredMessage="#{lang.isRequired}"/>
+              <p:message for="phone1" display="text"/>
+            </h:panelGroup>            
+
+            <p:outputLabel value="#{lang.phone2}" for="phone2" />
+            <h:panelGroup><p:inputText styleClass="fw" value="#{customerContactView.customerContact.phone2}" maxlength="10" id="phone2" />
+              <p:message for="phone2" display="text"/>
+            </h:panelGroup>            
+
+            <p:outputLabel value="#{lang.fax1}" for="fax1" />
+            <h:panelGroup><p:inputText styleClass="fw" value="#{customerContactView.customerContact.fax1}" maxlength="20" id="fax1" />
+              <p:message for="fax1" display="text"/>
+            </h:panelGroup>                      
+
+            <p:outputLabel value="#{lang.email}" for="email" />
+            <h:panelGroup><p:inputText styleClass="fw" value="#{customerContactView.customerContact.email}" maxlength="50" id="email" validator="wawo.EmailValidator"/>
+              <p:message for="email" display="text"/>
+            </h:panelGroup>
+
+            <!--sortOrder-->
+            <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+            <h:panelGroup>
+              <p:inputNumber value="#{customerContactView.customerContact.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
+              <p:message for="sortOrder" display="text"/>
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.status}" for="status"/>
+            <h:panelGroup>
+              <p:autoComplete  value="#{customerContactView.customerContact.statusId}" completeMethod="#{customerContactView.statusAuto}" converter="wawo.LookupIntConverter"   
+                               id="status" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" 
+                               maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw"  
+                               required="true" requiredMessage="#{lang.status} #{lang.isRequired}">
+                <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
+              </p:autoComplete>
+              <p:message for="status" display="text" />
+            </h:panelGroup>
+          </ui:define>
+          <ui:define name="after">
+            <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+              <ui:define name="cby">#{appView.display(customerContactView.customerContact.createdBy)}</ui:define>
+              <ui:define name="cat">#{appView.dateTime(customerContactView.customerContact.createdAt)}</ui:define>
+              <ui:define name="uby">#{appView.display(customerContactView.customerContact.modifiedBy)}</ui:define>
+              <ui:define name="uat">#{appView.dateTime(customerContactView.customerContact.modifiedAt)}</ui:define>
+            </ui:decorate>
+          </ui:define>
+        </ui:decorate>
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>

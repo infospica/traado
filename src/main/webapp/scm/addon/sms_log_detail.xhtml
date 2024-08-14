@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{smsSummaryView.switchSmsLog(main, "list")}
+  <o:importConstants type="spica.constant.AccountingConstant" />
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants"/> 
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}" />
+    <ui:param name="ids" value="logDetail" />
+    <ui:param name="reset" value="false" />
+    <ui:param name="toolForm" value="false" />
+    <ui:param name="search" value="false" />
+    <ui:define name="newList"></ui:define>
+
+
+    <ui:define name="rightList" >
+      <h:panelGroup styleClass="L">
+        <h:panelGrid columns="3" >
+          <h:panelGroup>
+            <p:outputLabel value="#{lang.fromDate}" for="validFrom" />
+            <h:panelGroup id="fromDateDiv">
+              <p:calendar value="#{smsSummaryView.filterParameters.fromDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.validFrom} #{lang.invalidDate}" maxlength="29"
+                          required="true" requiredMessage="#{lang.validFrom} #{lang.isRequired}" id="validFrom" showButtonPanel="true" navigator="true" mask="true"
+                          mindate="#{userRuntimeView.minDate}" autocomplete="off"
+                          maxdate="#{smsSummaryView.filterParameters.toDate}"
+                          disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}">
+                <p:ajax event="dateSelect" process="@this" listener="#{smsSummaryView.reset(main)}" update="toDateDiv smsDetailListTable" onstart="block();" oncomplete="unblock();" />
+              </p:calendar>
+              <p:message for="validFrom" display="text"/>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <!-- Valid To -->
+          <h:panelGroup>
+            <p:outputLabel value="#{lang.toDate}" for="validTo" />
+            <h:panelGroup id="toDateDiv">
+              <p:calendar value="#{smsSummaryView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.validTo} #{lang.invalidDate}" maxlength="29"
+                          required="true" requiredMessage="#{lang.validTo} #{lang.isRequired}" id="validTo" showButtonPanel="true" navigator="true" mask="true"
+                          mindate="#{smsSummaryView.filterParameters.fromDate}" autocomplete="off"
+                          maxdate="#{smsSummaryView.filterParameters.today}"
+                          disabled="#{accountView.isActiveContract() or accountView.isSuspendContract()}" >
+                <p:ajax event="dateSelect" process="@this" listener="#{smsSummaryView.reset(main)}" update="fromDateDiv smsDetailListTable" onstart="block();" oncomplete="unblock();" />
+              </p:calendar>
+              <p:message for="validTo" display="text"/>
+            </h:panelGroup>
+          </h:panelGroup>
+          <h:panelGroup>
+            <p:commandButton icon="fa fa-fw fa-trash" iconPos="left" styleClass="btn btn-info" value="Delete Log" title="Clear Log" 
+                             actionListener="#{smsSummaryView.clearLogByDate(main)}" update="smsDetailListTable" >
+                <p:confirm header="Confirmation" message="Are you sure want to delete the all log between the selected days ?" icon="pi pi-exclamation-triangle" />
+              </p:commandButton>
+          </h:panelGroup>
+        </h:panelGrid>
+         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">           
+             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no btn btn-info" icon="fa fa-times" />
+             <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes btn btn-primary" icon="fa fa-check" />
+          </p:confirmDialog> 
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="navRight">
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times" iconPos="right"/>
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="smsDetailListTable">
+        <p:dataTable value="#{smsSummaryView.smsLogList}" id="logDetailTable" widgetVar="logDetailWidget" var="logDetail" tableStyleClass="mDataTable mDataTable-center editLinks" rowIndexVar="index"
+                     rowKey="#{logDetail.id}" paginatorPosition="bottom"  
+                     rows="#{main.pageData.pageSize}"
+                     rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" 
+                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; ">
+          <p:ajax event="page" oncomplete="unblock();" />
+          <p:column style="width:80px;" >
+            <f:facet name="header">
+              <h:outputText value="#{lang.slno}" />
+            </f:facet>
+            <h:outputText value="#{index+1}" />
+          </p:column>
+          
+           <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.recipient} #{lang.type}" />
+            </f:facet>
+             <h:outputText value="#{logDetail.personType eq 3 ? lang.salesAgent : lang.customer}" />
+          </p:column>
+          
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.recipient}" />
+            </f:facet>
+            <h:outputText value="#{logDetail.recipient}" />
+          </p:column>
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.senderId}" />
+            </f:facet>
+
+            <h:outputText value="#{logDetail.senderId}" />
+          </p:column>
+          <p:column style="text-align:left;white-space: normal;"  styleClass="w-420 wrap" >
+            <f:facet name="header">
+              <h:outputText value="#{lang.message}" />
+            </f:facet>           
+              <h:outputText value="#{logDetail.message}" />           
+          </p:column>
+           <p:column style="text-align:left;white-space: normal;"  styleClass="w-420 wrap" >
+            <f:facet name="header">
+              <h:outputText value="#{lang.response}" />
+            </f:facet>            
+              <h:outputText value="#{logDetail.response}" />           
+          </p:column>
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.date}" />
+            </f:facet>
+            <h:outputText value="#{logDetail.createdAt}" >
+              <f:convertDateTime pattern = "dd-MM-yyyy hh:mm " />
+            </h:outputText>
+          </p:column>
+        </p:dataTable>
+      </h:panelGroup>
+
+    </ui:define> 
+  </ui:decorate>
+</ui:composition>

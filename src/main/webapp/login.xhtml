@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8 ie7"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9 ie8"> <![endif]-->
+<!--[if IE 9]>         <html class="no-js lt-ie10 ie9"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html class="no-js"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui">
+  <!--<![endif]-->
+
+  <h:head>
+    <meta charset="utf-8" />
+    <title>#{lang.pageTitle}</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" />
+    <!--The below meta doesn't validate on http://validator.w3.org 
+        See details of this meta on http://www.chromium.org/developers/how-tos/chrome-frame-getting-started-->
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1" /> 
+    <link rel="icon" href="#{request.contextPath}/theme1/img/fav.png" type="image/x-icon"/>
+    <link rel="shortcut icon" href="#{request.contextPath}/theme1/img/fav.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="theme1/css/login.css"></link>
+    <script src="theme1/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+  </h:head>
+
+  <h:body>
+    <div class="login pageWrapper">
+      <div class="container-fluid">
+        <div class="f-row pageContent m-a-0">
+          <section class="f-col-xs-12 flexContentMiddle">
+            <div class="spaceWrap logoSector t-c">
+              <div class="contents">
+                <div class="infoGraphics">
+                  <img src="theme1/img/SCMS.png" alt="" />
+                </div>
+                <div class="t-c b-t-1 dashed p-t-10">
+                  <p>
+                    <!--Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard-->
+                  </p>
+                  <div class="dateTimeViewer">
+                    <div class="board">
+                      <i class="i i-day i-1_5x ib-m m-b-5 text-theme"></i>
+                      <div class="dateDisplay">__ ___ ____</div>
+                      <div class="timeDisplay">00:00 __</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="f-col-xs-12 flexContentMiddle">
+            <h1 class="h1 sr-only">Login / Signup</h1>
+            <div class="spaceWrap loginForm">
+              <h1 class="h1 t-c text-uppercase bold text-theme">
+                Supply chain <br />
+                Management System 
+              </h1>
+              <h:form id="loginForm" styleClass="" prependId="false" pt:data-fast-input="true">
+                <p:messages  styleClass="m-b-10" showIcon="false"  >
+                  <p:autoUpdate/>
+                </p:messages>
+                <p:focus />
+                <div class="form-group">
+                  <p:inputText value="#{userRuntimeView.loginId}" id="loginid" autocomplete="off"   styleClass="form-control"
+                               required="true" requiredMessage="#{lang.userName} #{lang.isRequired}" 
+                               placeholder="#{lang.userName}"  />                  
+                </div>
+                <div class="form-group">
+                  <p:password value="#{userRuntimeView.password}" styleClass="form-control" id="password" autocomplete="off" placeholder="#{lang.password}" pt:data-focus="signin" />                  
+                </div>
+                <div class="R p-t-5">
+                  <p:commandLink styleClass="a" value="#{lang.forgotPassword}"></p:commandLink>                    
+                </div>
+                <div class="bar-T p-a-0 m-y-15">
+                  <div class="L">
+                    <input type="checkbox" name="remember" id="remember" class="custom hidden"  />
+                    <label for="remember" class="m-b-0 hidden">Remember</label>
+                  </div>
+
+                  <div class="R p-t-5">
+                    <p:captcha label="Captcha" validatorMessage="Invalid Captcha" rendered="#{userRuntimeView.failedAttempt gt 2}" />
+                  </div>
+
+                </div>
+
+                <div class="t-c m-t-20">
+                  <p:commandButton value="#{lang.login}"  styleClass="btn btn-mtl btn-theme p-y-0" action="#{userRuntimeView.loginCheck}" update="loginForm" />                  
+                </div>
+
+
+
+              </h:form>
+            </div>
+          </section>
+        </div>
+      </div>
+      <footer class="footer">      
+          <a href="javascript:;" class="ignoreLoad" >#{lang.applicationName} #{appView.version}</a> <h:outputText escape="false" value=" #{lang.copyRight}" />
+      </footer>
+    </div>
+
+    <script src="theme1/js/bootstrap.min.js"></script>
+    <script src="theme1/js/plugins.js"></script>
+    <script src="theme1/js/main.js"></script>
+
+  </h:body>
+
+</html>

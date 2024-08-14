@@ -1,0 +1,170 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{servicesView.switchCommodity(main, viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.services}" />
+    <ui:param name="ids" value="services" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  onclick="closePopup()" icon="fa fa-times" 
+                       iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{servicesView.deleteCommodity(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('commodityWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{servicesView.cloneCommodity(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{servicesView.deleteCommodity(main)}" value="#{lang.delete}" onclick="wdgOff('commodityWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{servicesView.saveCommodity(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"                        
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify== true)}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <!-- title -->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{servicesView.commodity.title}" maxlength="200" validator="wawo.WhiteSpaceValidator"
+                     required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" >
+        </p:inputText>
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <!-- GST Regime Tax Code and fields -->
+      <ui:fragment rendered="#{servicesView.gstRegime}">
+        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+
+          <!-- SAC Code-->
+          <p:outputLabel value="#{lang.sacCode} " for="sacCode" />
+          <h:panelGroup>
+            <p:inputText styleClass="fw" value="#{servicesView.commodity.hsnSacCode}" maxlength="10" validator="wawo.WhiteSpaceValidator" required="true"
+                         requiredMessage="#{lang.sacCode} #{lang.isRequired}" id="sacCode" >
+              <f:validateLength minimum="2"/>
+            </p:inputText>
+            <p:message for="sacCode" display="text"/>
+          </h:panelGroup>  
+          
+          <p:outputLabel value="#{lang.rate}" for="rate" rendered="#{userRuntimeView.company.companySettings.serviceBusiness eq 1}"/>
+          <h:panelGroup rendered="#{userRuntimeView.company.companySettings.serviceBusiness eq 1}">
+                  <p:inputNumber value="#{servicesView.commodity.rate}" converterMessage="#{lang.rate} #{lang.invalidNumber}" decimalPlaces="2" 
+                                 onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999.00" minValue="0.0" symbol="#{appView.currencySymbol}" maxlength="15" required="true" requiredMessage="#{lang.rate} #{lang.isRequired}" 
+                       id="rate" />
+            <p:message for="rate" display="text"/>
+          </h:panelGroup> 
+
+          <!-- Sales Gst Tax Code-->
+          <p:outputLabel value="#{lang.serviceTax}" for="commoditySalesTaxCodeId"/>
+          <h:panelGroup id="salesTaxDiv">
+            <p:selectOneMenu value="#{servicesView.commodity.salesTaxCodeId}"  
+                             required="true" requiredMessage="#{lang.serviceTax} #{lang.isRequired}"
+                             id="commoditySalesTaxCodeId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+              <f:selectItems value="#{servicesView.lookupGstTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />
+              <p:ajax event="itemSelect" process="salesTaxDiv" update="@this" />
+            </p:selectOneMenu>
+            <p:message for="commoditySalesTaxCodeId" display="text" />
+          </h:panelGroup>
+
+          <!-- Sales TDS Tax Code-->
+          <p:outputLabel value="#{lang.tds}" for="tdsTaxCodeId"/>
+          <h:panelGroup id="tdsTaxDiv">
+            <p:selectOneMenu value="#{servicesView.commodity.tdsTaxCodeId}"                               
+                             id="tdsTaxCodeId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.select}" itemValue="#{null}" />
+              <f:selectItems value="#{servicesView.lookupTdsTaxCode()}" var="e" itemValue="#{e}" itemLabel="#{e.code}" />              
+            </p:selectOneMenu>
+            <p:message for="tdsTaxCodeId" display="text" />
+          </h:panelGroup>
+
+          <p:outputLabel value="#{lang.description}" for="description" />
+          <h:panelGroup>
+            <p:inputTextarea  styleClass="fw" value="#{servicesView.commodity.description}" cols="100" rows="3" required="true" 
+                              requiredMessage="#{lang.description} #{lang.isRequired}"
+                              maxlength="500" id="description" autoResize="false"/>
+            <p:message for="description" display="text"/>
+          </h:panelGroup>          
+        </p:panelGrid>
+      </ui:fragment>
+
+      <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+        <!-- Sort Order -->
+        <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+        <h:panelGroup>
+          <p:inputNumber value="#{servicesView.commodity.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" thousandSeparator=""/>
+          <p:message for="sortOrder" display="text"/>
+        </h:panelGroup>
+      </p:panelGrid>
+    </ui:define>
+
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(servicesView.commodity.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(servicesView.commodity.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(servicesView.commodity.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(servicesView.commodity.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="commodityTable" var="commodityVar" widgetVar="commodityWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{servicesView.commodityLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{commodityVar.id}" rowsPerPageTemplate="#{main.pageData.pageSize},50,100" 
+                   paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{servicesView.commoditySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" rendered="#{servicesView.isEditable(commodityVar)}" />
+        <p:column exportable="false" rendered="#{!servicesView.isEditable(commodityVar)}" />
+
+        <!-- Title -->
+        <p:column sortBy="#{commodityVar.title}" field="title" >
+          <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{commodityVar.title}" process="@this" update="f1" immediate="true" rendered="#{servicesView.isEditable(commodityVar)}"
+                         onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{servicesView.commodity}" value="#{commodityVar}" />
+          </p:commandLink>
+          <h:outputText value="#{commodityVar.title}" rendered="#{!servicesView.isEditable(commodityVar)}" />
+        </p:column>        
+
+        <!-- SAC Code -->
+        <p:column sortBy="#{commodityVar.hsnSacCode}" field="commodity.hsn_code" rendered="#{servicesView.gstRegime}">
+          <f:facet name="header"><h:outputText value="#{lang.sacCode}" title="#{lang.sacCode}"/></f:facet>
+          <h:outputText value="#{appView.display(commodityVar.hsnSacCode)}" title="#{appView.title(commodityVar.hsnSacCode)}" escape="false" />
+        </p:column>        
+
+        <!-- Sales Tax -->
+        <p:column sortBy="#{commodityVar.salesTaxCodeId}" field="commodity.sales_tax_code_id">
+          <f:facet name="header"><h:outputText value="#{lang.serviceTax}" title="#{lang.salesTax}"/></f:facet>
+          <h:outputText value="#{appView.display(commodityVar.salesTaxCodeId.code)}" title="#{appView.title(commodityVar.salesTaxCodeId.code)}" escape="false" />
+        </p:column>
+        
+        <p:column sortBy="#{commodityVar.rate}" field="commodity.rate" rendered="#{userRuntimeView.company.companySettings.serviceBusiness eq 1}">
+           <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+          <h:outputText value="#{appView.display(commodityVar.salesTaxCodeId.code)}" title="#{appView.title(commodityVar.salesTaxCodeId.code)}" escape="false" />
+        </p:column>
+
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(commodityVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(commodityVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(commodityVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(commodityVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(commodityVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

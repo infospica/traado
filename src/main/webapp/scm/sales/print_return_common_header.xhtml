@@ -1,0 +1,678 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" > 
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANTS" />
+  <p:fragment rendered="#{salesReturnPrintView.salesReturn.printType eq SYSTEM_CONSTANTS.PRINT_SINGLE_LINE}">
+     <tr>
+        <td>
+          <div class="dataTitle" style="text-align: center;border: none;width:100%;">
+            <b> 
+              <h:outputText value="#{salesReturnPrintView.salesReturn.salesReturnType eq 1 ? 'CREDIT NOTE SALES RETURN':'CREDIT NOTE DAMAGED RETURN'}"  />
+            </b>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="text-align: center;border: solid 1px #000; border-bottom-style: none;width:100%;">
+            <table border="0" style="width:100%;">
+              <tr>
+                <td align="left" valign="top" style="width:250px;">
+                  <div class="data" style="padding-top: 5px;padding-left: 5px;">
+                    <table border="0" >
+                      <tr>
+                        <td colspan="2">
+                          <span class="dataTitle" style="font-size: 11px;text-transform: uppercase;"><b>#{salesReturnPrintView.salesReturn.customerId.companyId.companyName}</b> </span><br/>
+                          <span>#{salesReturnPrintView.companyAddress.address}</span><br/>                    
+                          <span>#{salesReturnPrintView.companyAddress.districtId.districtName},</span>
+                          <span>#{salesReturnPrintView.companyAddress.stateId.stateName},&#160;</span>
+                          <span>#{lang.pin}: #{salesReturnPrintView.companyAddress.pin}</span> <br />
+                                                
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Phone:</td>
+                        <td><h:outputText value="#{salesReturnPrintView.companyAddress.phone1}" /></td>
+                      </tr>
+                      <tr>
+                        <td>GST No.</td>
+                        <td><h:outputText value="#{salesReturnPrintView.salesReturn.customerId.companyId.gstNo}" /></td>
+                      </tr>
+                      <tr>
+                        <td style="width:40px;" align="left" valign="top">
+                          FSSAI No.
+                        </td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                      <tr>
+                        <td valign="top">
+                          D.L NO.
+                        </td>
+                        <td valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:150px;">
+                  <div style="text-align: left;">
+                    <span style="font-size: 6.5px;"> Bill To:</span><br />
+                    <span class="dataTitle"><b>#{salesReturnPrintView.salesReturn.customerId.customerName}</b></span>
+                  </div>
+                  <div class="data" >
+                    <h:outputText value="#{salesReturnPrintView.customerAddress.address}" 
+                                  rendered="#{salesReturnPrintView.customerAddress.address ne null and salesReturnPrintView.customerAddress.address.length()>1}" />
+                    <h:outputText value=", #{salesReturnPrintView.customerAddress.stateId.stateName}" 
+                                  rendered="#{salesReturnPrintView.customerAddress.stateId.stateName ne null and salesReturnPrintView.customerAddress.stateId.stateName.length()>1}" />
+
+                    <h:outputText escape="false" value=", PIN: #{salesReturnPrintView.customerAddress.pin}"
+                                  rendered="#{salesReturnPrintView.customerAddress.pin ne null and salesReturnPrintView.customerAddress.pin.length()>1}"/>
+
+                    <h:outputText value=", Phone: #{salesReturnPrintView.customerAddress.phone1}"
+                                  rendered="#{salesReturnPrintView.customerAddress.phone1 ne null and salesReturnPrintView.customerAddress.phone1.length()>1}"/>
+
+
+                    <h:outputText value=", Mob: #{salesReturnPrintView.customerAddress.phone2}"
+                                  rendered="#{salesReturnPrintView.customerAddress.phone2 ne null and salesReturnPrintView.customerAddress.phone2.length()>1}" />
+
+
+                    <h:outputText value=", Email :#{salesReturnPrintView.customerAddress.email}"
+                                  rendered="#{salesReturnPrintView.customerAddress.email ne null and salesReturnPrintView.customerAddress.email.length()>1}"/>
+                    <table >
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{salesReturnPrintView.salesReturn.customerId.gstNo}</td>
+                      </tr>                                            
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top"> :</td>
+                        <td align="left" valign="top" style="line-height: normal;" >                            
+                          <p:repeat value="#{salesReturnPrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat> 
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>                          
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+
+                </td>
+                <td valign="top" align="left">
+                  <h:panelGroup rendered="true">
+                    <div style="padding-left:5px;width: 130px; ">
+                      <div style="text-align: left;">
+                        <span style="font-size: 6.5px;"> Shipping Address:</span><br />
+                        <!--<span class="dataTitle"><b>#{salesReturnPrintView.salesReturn.shippingAddressId.customerId.customerName}</b></span>-->
+                      </div>
+                      <div >
+<!--                        <h:outputText value="#{salesReturnPrintView.salesReturn.shippingAddressId.address}," 
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.address ne null and salesReturnPrintView.salesReturn.shippingAddressId.address.length()>1}" />
+                        <h:outputText value=", #{salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName}" 
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName ne null and salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName.length()>1}" />                      
+                        <h:outputText value=", PIN: #{salesReturnPrintView.salesReturn.shippingAddressId.pin}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.pin ne null and salesReturnPrintView.salesReturn.shippingAddressId.pin.length()>1}"/>                      
+                        <h:outputText value=", Phone: #{salesReturnPrintView.salesReturn.shippingAddressId.phone1}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.phone1 ne null and salesReturnPrintView.salesReturn.shippingAddressId.phone1.length()>1}"/>
+                        <h:outputText value=", Mob: #{salesReturnPrintView.salesReturn.shippingAddressId.phone2}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.phone2 ne null and salesReturnPrintView.salesReturn.shippingAddressId.phone2.length()>1}" />
+                        <h:outputText value=", Email :#{salesReturnPrintView.salesReturn.shippingAddressId.email}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.email ne null and salesReturnPrintView.salesReturn.shippingAddressId.email.length()>1}"/>-->
+
+                      </div>
+                    </div>
+                  </h:panelGroup>
+                </td>
+                <td align="right" valign="top" style="width:190px;">
+                  <div style="padding-left: 2px; padding-top: 5px;padding-right: 2px;">
+                    <table class="data"  border="0">
+                      <tr>
+                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Bill No.</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td style=""><span style="font-size: 10px;"><b>#{salesReturnPrintView.salesReturn.invoiceNo}</b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(salesReturnPrintView.salesReturn.invoiceDate)}"  /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" width="40"><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td>
+                            <span style="font-size: 10px;">
+                                <!--<b><h:outputText value="#{appView.date(salesReturnPrintView.getDueDate())}" /></b>-->
+                            </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. NO</td>
+                        <td>:</td>
+                        <td ><h:outputText value="#{salesReturnPrintView.consignmentDetail.exitDocumentNo}"  /></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. DT</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{appView.date(salesReturnPrintView.consignmentDetail.lrDate)}"  /></td>
+                      </tr>
+                      <tr>                    
+                        <td align="left" valign="top">CARRIER</td>
+                        <td>:</td>
+                        <td ></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">E.Way Bill </td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+<!--                      <tr>
+                        <td align="left" valign="top">No.Date </td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>-->
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+
+
+  </p:fragment>
+   <p:fragment rendered="#{salesReturnPrintView.salesReturn.printType eq SYSTEM_CONSTANTS.PRINT_MULTIPLE_LINE}">
+    <tr>
+        <td>
+          <div style="text-align: center;border: solid 1px #000;width:100%;">
+            <table border="0" style="width:100%;">
+              <tr>
+                  <td align="left" valign="top" style="width:280px;">
+                  <div class="data" style="padding:5px;">
+                    <span class="dataTitle" style="font-size: 10px;text-transform: uppercase;"><b>#{salesReturnPrintView.salesReturn.customerId.companyId.companyName}</b> </span><br/>
+                    <span>#{salesReturnPrintView.companyAddress.address}</span><br/>                    
+                    <span>#{salesReturnPrintView.companyAddress.districtId.districtName},</span>
+                    <span>#{salesReturnPrintView.companyAddress.stateId.stateName},&#160;</span>
+                    <span>#{lang.pin}: #{salesReturnPrintView.companyAddress.pin}</span> <br />
+                    <span>Phone: <span>#{salesReturnPrintView.companyAddress.phone1}</span></span><br />
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:150px;">
+
+                  <div style="padding-right: 5px;padding-left: 10px;padding-top: 5px;" class="data">
+                    <table class="data" style="padding-top: 5px;">
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top"  ><div class="data" style="text-transform: uppercase;" >#{salesReturnPrintView.salesReturn.customerId.companyId.gstNo}</div></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;">#{salesReturnPrintView.salesReturn.customerId.companyId.panNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>  
+                      </tr>
+                    
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+                <td align="right" valign="top" style="width:250px">
+                  <div style="padding-left: 5px; padding-top: 5px;padding-right: 2px;">
+                    <table class="data" style="padding-top: 5px;" border="0">
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size:10px;"><b>Bill No.</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td ><span style="font-size:10px;"><b>#{salesReturnPrintView.salesReturn.invoiceNo}</b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size:10px;"><b><h:outputText value="#{appView.date(salesReturnPrintView.salesReturn.invoiceDate)}"  /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td ><span style="font-size: 10px;">
+                            <!--<b><h:outputText value="#{appView.date(salesReturnPrintView.getDueDate())}" /></b>-->
+                          </span></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="dataTitle" style="text-align: center;border: solid 1px #000; border-top: none;border-bottom: none;width:100%;padding:5px;">
+            <b>              
+              <h:outputText value="#{salesReturnPrintView.salesReturn.salesReturnType eq 1 ? 'CREDIT NOTE SALES RETURN':'CREDIT NOTE DAMAGED RETURN'}"  />
+              </b>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="border:solid 1px #000000;border-bottom-style: none;" class="data">
+            <table border="0" style=" width: 100%;">
+              <tr>
+
+                <td style="width:25%;" valign="top">
+                  <div  style="padding-left:5px;">
+                    <div style="text-align: left;">
+                      Bill To:<br />
+                      <span class="dataTitle"><b>#{salesReturnPrintView.salesReturn.customerId.customerName}</b></span>
+                    </div>
+                    <div class="data" >
+                      <h:outputText value="#{salesReturnPrintView.customerAddress.address}" 
+                                    rendered="#{salesReturnPrintView.customerAddress.address ne null and salesReturnPrintView.customerAddress.address.length()>1}" />
+                      <h:outputText value=",#{salesReturnPrintView.customerAddress.stateId.stateName}" 
+                                    rendered="#{salesReturnPrintView.customerAddress.stateId.stateName ne null and salesReturnPrintView.customerAddress.stateId.stateName.length()>1}" />
+
+                      <h:outputText escape="false" value=",PIN: #{salesReturnPrintView.customerAddress.pin}"
+                                    rendered="#{salesReturnPrintView.customerAddress.pin ne null and salesReturnPrintView.customerAddress.pin.length()>1}"/>
+
+                      <h:outputText value=",Phone: #{salesReturnPrintView.customerAddress.phone1}"
+                                    rendered="#{salesReturnPrintView.customerAddress.phone1 ne null and salesReturnPrintView.customerAddress.phone1.length()>1}"/>
+
+
+                      <h:outputText value=",Mob: #{salesReturnPrintView.customerAddress.phone2}"
+                                    rendered="#{salesReturnPrintView.customerAddress.phone2 ne null and salesReturnPrintView.customerAddress.phone2.length()>1}" />
+
+
+                      <h:outputText value=",Email :#{salesReturnPrintView.customerAddress.email}"
+                                    rendered="#{salesReturnPrintView.customerAddress.email ne null and salesReturnPrintView.customerAddress.email.length()>1}"/>
+
+                    </div>
+                  </div>
+                </td>
+                <td style="width:25%;" align="left" valign="top">
+                  <div class="data" style="padding-top:10px;padding-left: 5px;">
+                    <table >
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{salesReturnPrintView.salesReturn.customerId.gstNo}</td>
+
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{salesReturnPrintView.salesReturn.customerId.panNo}</td>
+
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top"> :</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat> 
+
+                        </td>
+
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">
+                          <p:repeat value="#{salesReturnPrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                            <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>                          
+                        </td>
+                      </tr>
+
+                    </table>
+                  </div>
+                </td>
+                <td style="width:25%;" valign="top">
+
+                  <h:panelGroup rendered="true">
+                    <div style="padding-left:10px;width: 130px; ">
+                      <div style="text-align: left;">
+                        Shipping Address:<br />
+                        <!--<span class="dataTitle"><b>#{salesReturnPrintView.salesReturn.shippingAddressId.customerId.customerName}</b></span>-->
+                      </div>
+                      <div >
+<!--                        <h:outputText value="#{salesReturnPrintView.salesReturn.shippingAddressId.address}," 
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.address ne null and salesReturnPrintView.salesReturn.shippingAddressId.address.length()>1}" />
+                        <h:outputText value=" #{salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName}" 
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName ne null and salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName.length()>1}" />                      
+                        <h:outputText value=", PIN: #{salesReturnPrintView.salesReturn.shippingAddressId.pin}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.pin ne null and salesReturnPrintView.salesReturn.shippingAddressId.pin.length()>1}"/>                      
+                        <h:outputText value=", Phone: #{salesReturnPrintView.salesReturn.shippingAddressId.phone1}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.phone1 ne null and salesReturnPrintView.salesReturn.shippingAddressId.phone1.length()>1}"/>
+                        <h:outputText value=", Mob: #{salesReturnPrintView.salesReturn.shippingAddressId.phone2}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.phone2 ne null and salesReturnPrintView.salesReturn.shippingAddressId.phone2.length()>1}" />
+                        <h:outputText value=", Email :#{salesReturnPrintView.salesReturn.shippingAddressId.email}"
+                                      rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.email ne null and salesReturnPrintView.salesReturn.shippingAddressId.email.length()>1}"/>-->
+
+
+                      </div>
+                    </div>
+                  </h:panelGroup>
+                </td>
+                <td style="width:25%;" align="left" valign="top">
+                  <div class="data" style="padding-top:10px;padding-left: 10px;">
+                    <table border="0" >
+
+                      <tr>
+                        <td align="left" valign="top">L.R. NO</td>
+                        <td>:</td>
+                        <td ><h:outputText value="#{salesReturnPrintView.consignmentDetail.exitDocumentNo}"  /></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. DT</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{appView.date(salesReturnPrintView.consignmentDetail.lrDate)}"  /></td>
+                      </tr>
+                      <tr>                    
+                        <td align="left" valign="top">CARRIER</td>
+                        <td>:</td>
+                        <td ></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">E.Way Bill <br/> </td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+
+
+  </p:fragment>
+  
+<p:fragment rendered="#{salesReturnPrintView.salesReturn.printType eq SYSTEM_CONSTANTS.PRINT_PORTRAIT}">
+     
+        <p:fragment rendered="#{salesReturnPrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP}" >
+        <tr>
+          <td>
+            <div class="dataTitle" style="text-align: center;border: none;width:100%;padding-bottom:5px;">
+              <b> 
+               <h:outputText value="#{salesReturnPrintView.salesReturn.salesReturnType eq 1 ? 'CREDIT NOTE SALES RETURN':'CREDIT NOTE DAMAGED RETURN'}"  />
+              </b>
+            </div>
+          </td>
+        </tr>
+      </p:fragment> 
+      <tr>
+        <td>          
+          <div  style="text-align: center;border: solid 1px #000;width:100%;">
+            <table border="0" style="width:100%;">
+              <tr>
+                <td align="left" valign="top" style="width:220px;">
+                  <div class="data" style="padding:5px;">
+                    <span class="dataTitle" style="font-size: 10px;"><b>#{salesReturnPrintView.salesReturn.customerId.companyId.companyName}</b> </span><br/>
+                    <span>#{salesReturnPrintView.companyAddress.address}</span><br/>                    
+                    <span>#{salesReturnPrintView.companyAddress.districtId.districtName},</span>
+                    <span>#{salesReturnPrintView.companyAddress.stateId.stateName},&#160;</span>
+                    <span>#{lang.pin}: #{salesReturnPrintView.companyAddress.pin}</span> <br />
+                    <span>Phone: <span>#{salesReturnPrintView.companyAddress.phone1}</span></span><br />
+                   
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:190px;">
+                  <div style="padding-right: 5px;padding-left: 30px;padding-top: 5px;" class="data">
+                    <table class="data" style="padding-top: 5px;">
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top"><div class="data" style="text-transform: uppercase;" >#{salesReturnPrintView.salesReturn.customerId.companyId.gstNo}</div></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;">#{salesReturnPrintView.salesReturn.customerId.companyId.panNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="text-transform: uppercase;line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>  
+                      </tr>                     
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.companyLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>  
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+                <td align="right" valign="top" style="">
+                  <div style="padding-top: 5px;width:100%;padding-right:5px;">
+                    <table class="data"  border="0">
+                      <tr>
+                        <td align="left" valign="top" style="width:40px;"><span style="font-size: 10px;"><b>Bill No.</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b>#{salesReturnPrintView.salesReturn.invoiceNo}</b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top"><span style="font-size: 10px;"><b>Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;"><b><h:outputText value="#{appView.date(salesReturnPrintView.salesReturn.invoiceDate)}"  /></b></span></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top" ><span style="font-size: 10px;"><b>Due Date</b></span></td>
+                        <td align="left" valign="top">:</td>
+                        <td><span style="font-size: 10px;">
+                                <!--<b><h:outputText value="#{appView.date(salesReturnPrintView.getDueDate())}" /></b>-->
+                          </span></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <p:fragment rendered="#{salesReturnPrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_MIDDLE}" >
+        <tr>
+          <td>
+            <div class="dataTitle" style="text-align: center;border: solid 1px #000; border-top: none;border-bottom: none;width:100%;padding:5px;">
+              <b> 
+                <h:outputText value="#{salesReturnPrintView.salesReturn.salesReturnType eq 1 ? 'CREDIT NOTE SALES RETURN':'CREDIT NOTE DAMAGED RETURN'}"  />
+              </b>
+            </div>
+          </td>
+        </tr>
+      </p:fragment> 
+      <tr>
+        <td >
+          
+          <div style="border:solid 1px #000000;border-bottom-style: none;
+               #{salesReturnPrintView.companySettings.printBillTitlePosition eq sysConstant.PRINT_BILL_TITLE_TOP?'border-top-style: none;':''}" class="data">
+            <table border="0" style="font-size: 7px;">
+              <tr>
+                <td valign="top" style="width:27%;">
+                  <div  style="padding-left:5px;">
+                    <div style="text-align: left;">
+                      Bill To:<br />
+                      <span class="dataTitle"><b>#{salesReturnPrintView.salesReturn.customerId.customerName}</b></span>
+                    </div>
+                    <div class="data" >
+                      <h:outputText value="#{salesReturnPrintView.customerAddress.address}" 
+                                    rendered="#{salesReturnPrintView.customerAddress.address ne null and salesReturnPrintView.customerAddress.address.length()>1}" />
+                      <h:outputText value=", #{salesReturnPrintView.customerAddress.stateId.stateName}" 
+                                    rendered="#{salesReturnPrintView.customerAddress.stateId.stateName ne null and salesReturnPrintView.customerAddress.stateId.stateName.length()>1}" />
+
+                      <h:outputText escape="false" value=", PIN: #{salesReturnPrintView.customerAddress.pin}"
+                                    rendered="#{salesReturnPrintView.customerAddress.pin ne null and salesReturnPrintView.customerAddress.pin.length()>1}"/>
+
+                      <h:outputText value=", Phone: #{salesReturnPrintView.customerAddress.phone1}"
+                                    rendered="#{salesReturnPrintView.customerAddress.phone1 ne null and salesReturnPrintView.customerAddress.phone1.length()>1}"/>
+
+
+                      <h:outputText value=", Mob: #{salesReturnPrintView.customerAddress.phone2}"
+                                    rendered="#{salesReturnPrintView.customerAddress.phone2 ne null and salesReturnPrintView.customerAddress.phone2.length()>1}" />
+
+
+                      <h:outputText value=", Email :#{salesReturnPrintView.customerAddress.email}"
+                                    rendered="#{salesReturnPrintView.customerAddress.email ne null and salesReturnPrintView.customerAddress.email.length()>1}"/>
+                    </div>
+                  </div>
+                </td>
+                <td align="left" valign="top" style="width:25%;">
+                  <div class="data" style="padding-top:10px;padding-left: 5px;">
+                    <table >
+                      <tr>
+                        <td align="left" valign="top">GST No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{salesReturnPrintView.salesReturn.customerId.gstNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top"> PAN No.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top">#{salesReturnPrintView.salesReturn.customerId.panNo}</td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">FSSAI No.</td>
+                        <td align="left" valign="top"> :</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}">
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.FSSAI_LIC}" />
+                            </p:fragment>
+                          </p:repeat> 
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">D.L NO.</td>
+                        <td align="left" valign="top">:</td>
+                        <td align="left" valign="top" style="line-height: normal;">
+                          <p:repeat value="#{salesReturnPrintView.customerLicenseList}" var="license">
+                            <p:fragment rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" >
+                              <h:outputText value="#{license.licenseKey}" rendered="#{license.licenseTypeId.id==sysConstant.DRUG_LIC}" />
+                            </p:fragment>
+                          </p:repeat>                          
+                        </td>
+                      </tr>
+
+                    </table>
+                  </div>
+                </td>
+                <td valign="top" style="width:25%;">
+                  <h:panelGroup rendered="true">
+                    <div style="padding-left:10px;width: 130px; font-size: 8px;">
+                      <div style="text-align: left;">
+                        Shipping Address:<br />
+                        <!--<span class="dataTitle"><b>#{salesReturnPrintView.salesReturn.shippingAddressId.customerId.customerName}</b></span>-->
+                      </div>
+                      <div >
+<!--                        <h:outputLabel value="#{salesReturnPrintView.salesReturn.shippingAddressId.address}," 
+                                       rendered=", #{salesReturnPrintView.salesReturn.shippingAddressId.address ne null and salesReturnPrintView.salesReturn.shippingAddressId.address.length()>1}" />
+                        <h:outputLabel value="#{salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName}" 
+                                       rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName ne null and salesReturnPrintView.salesReturn.shippingAddressId.stateId.stateName.length()>1}" />                      
+                        <h:outputLabel value=", PIN: #{salesReturnPrintView.salesReturn.shippingAddressId.pin}"
+                                       rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.pin ne null and salesReturnPrintView.salesReturn.shippingAddressId.pin.length()>1}"/>                      
+                        <h:outputLabel value=", Phone: #{salesReturnPrintView.salesReturn.shippingAddressId.phone1}"
+                                       rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.phone1 ne null and salesReturnPrintView.salesReturn.shippingAddressId.phone1.length()>1}"/>
+                        <h:outputLabel value=", Mob: #{salesReturnPrintView.salesReturn.shippingAddressId.phone2}"
+                                       rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.phone2 ne null and salesReturnPrintView.salesReturn.shippingAddressId.phone2.length()>1}" />
+                        <h:outputLabel value=", Email :#{salesReturnPrintView.salesReturn.shippingAddressId.email}"
+                                       rendered="#{salesReturnPrintView.salesReturn.shippingAddressId.email ne null and salesReturnPrintView.salesReturn.shippingAddressId.email.length()>1}"/>-->
+
+                      </div>
+                    </div>
+                  </h:panelGroup>
+                </td>
+                <td align="left" valign="top" style="width:23%;">
+                  <div class="data" style="padding-top:10px;padding-left: 10px;">
+                    <table border="0" >
+                      <tr>
+                        <td align="left" valign="top">L.R. NO</td>
+                        <td>:</td>
+                        <td > <h:outputText value="#{salesReturnPrintView.consignmentDetail.exitDocumentNo}"  /></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">L.R. DT</td>
+                        <td>:</td>
+                        <td><h:outputText value="#{appView.date(salesReturnPrintView.consignmentDetail.lrDate)}"  /> </td>
+                      </tr>
+                      <tr>                    
+                        <td align="left" valign="top">CARRIER</td>
+                        <td>:</td>
+                        <td ></td>
+                      </tr>
+                      <tr>
+                        <td align="left" valign="top">E.Way Bill <br/> </td>
+                        <td align="left" valign="top">:</td>
+                        <td></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      
+      
+  </p:fragment>
+</ui:composition>

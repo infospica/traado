@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{tradingVariationLogView.switchTradingVariationLog(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.tradingVariationLog}" />
+    <ui:param name="ids" value="tradingVariationLog" />
+    <ui:param name="search" value="false" />
+
+<!--    <ui:define name="leftLeftList" >
+      <h:panelGroup styleClass="searchBox m m-r-5"  >
+        <p:inputText styleClass="fw" id="search" value="#{main.pageData.searchKeyWord}" placeholder="#{lang.search}"  />
+        <p:commandButton styleClass="btn" onclick="block()" oncomplete="unblock();" update="tables" process="search,@this" title="#{lang.search}" id="btnSkw" partialSubmit="true" icon="fa fa-search" iconPos="left" >
+          <f:setPropertyActionListener target="#{tradingVariationLogView.rootDebit}" value="#{null}" />
+          <f:setPropertyActionListener target="#{tradingVariationLogView.rootCredit}" value="#{null}" />
+          <f:setPropertyActionListener target="#{tradingVariationLogView.debitTotalRecords}" value="#{null}" />
+          <f:setPropertyActionListener target="#{tradingVariationLogView.creditTotalRecords}" value="#{null}" />
+          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+        </p:commandButton>
+        <ui:insert name="defaultCommand" >
+          <p:defaultCommand target="btnSkw"/>
+        </ui:insert>
+      </h:panelGroup>
+    </ui:define>-->
+
+    <ui:define name="rightList" >
+      <p:selectOneMenu styleClass="L" id="summary" value="#{tradingVariationLogView.selectedSummary}" >
+        <f:selectItems value="#{tradingVariationLogView.tradingVariationLogSummaryFilters}" var="s" itemLabel="#{s.itemLabel}" itemValue="#{s.intValue}" />
+        <p:ajax event="itemSelect" process="@this" immediate="true" listener="#{tradingVariationLogView.summaryFilter}" update="tradingVariationLogTable1 tradingVariationLogTable2 tradingVariationLogTable3 tradingVariationLogTable4 tables"/>
+      </p:selectOneMenu>
+    </ui:define>
+
+
+    <ui:define name="newList" />
+    <ui:define name="deleteList" ></ui:define>
+    <ui:define name="form"></ui:define>
+
+    <ui:define name="list">
+      <style>
+        .vtop{vertical-align: top;}
+        .ui-treetable-toggler.ui-icon.ui-icon-triangle-1-e.ui-c {
+          visibility: visible !important;
+        }
+        .ui-treetable-toggler.ui-icon.ui-c.ui-icon-triangle-1-s{
+          visibility: visible !important;
+        }
+        .ui-panelgrid .ui-panelgrid-cell {
+          padding: 0px 0px;
+        }
+      </style>
+      <p:panelGrid columns="2" columnClasses="vtop #{sysRuntimeView.getGrid2()} vtop" id="tables" >
+
+        <h:panelGroup layout="block" id="debitSummaryDiv">
+
+          <p:treeTable rendered="#{tradingVariationLogView.selectedSummary == 1}" selectionMode="checkbox" selection="#{tradingVariationLogView.platformDebitTreeSelected}" id="tradingVariationLogTable3"
+                       value="#{tradingVariationLogView.getRootDebit(main)}" var="debitVar" tableStyleClass="mDataTable mDataTable-center fw editLinks">
+            <p:ajax event="expand" listener="#{tradingVariationLogView.onNodeExpandDebit}" update="tradingVariationLogTable3" />
+            <p:column headerText="#{lang.description}" >
+              <h:outputText value="#{appView.title(debitVar.title)}" rendered="#{debitVar.level ne 2}" style="font-weight: bold;" title="#{debitVar.level == 1 ? appView.title(debitVar.sourceId.title):debitVar.level == 2 ? appView.title(debitVar.sourceId.title) +=  ' '+=lang.invoiceNo :debitVar.level == 3 ? lang.product :''}"/>              
+              <p:commandLink action="#{tradingVariationLogView.showItems(debitVar)}" rendered="#{debitVar.level eq 2}" style="font-weight: bold;padding-left: 73px;margin-top: -28px;"
+                             value="#{appView.title(debitVar.title)}"
+                             process="@this" immediate="true" onstart="block();" oncomplete="unblock();" title="#{debitVar.level == 1 ? appView.title(debitVar.sourceId.title):debitVar.level == 2 ? appView.title(debitVar.sourceId.title) +=  ' '+=lang.invoiceNo :debitVar.level == 3 ? lang.product :''}">
+              </p:commandLink>
+            </p:column>
+            <p:column headerText="#{lang.debit}" style="text-align:right;" >
+              <h:outputText value="#{appView.decimal(debitVar.debitAmountRequired)}" styleClass="label" style="background-color: ##{debitVar.sourceId.displayColor}"/>
+            </p:column>
+          </p:treeTable>
+        </h:panelGroup>
+        <!-- Credit Summary List -->
+        <h:panelGroup layout="bock" id="creditSummaryDiv">
+
+          <p:treeTable rendered="#{tradingVariationLogView.selectedSummary == 1}" selectionMode="checkbox" selection="#{tradingVariationLogView.platformCreditTreeSelected}" id="tradingVariationLogTable4"
+                       value="#{tradingVariationLogView.getRootCredit(main)}" var="creditVar" tableStyleClass="mDataTable mDataTable-center fw editLinks">
+            <p:ajax event="expand" listener="#{tradingVariationLogView.onNodeExpandCredit}" update="tradingVariationLogTable4" />
+            <p:column headerText="#{lang.description}">
+              <h:outputText value="#{appView.title(creditVar.title)}" rendered="#{creditVar.level ne 2}" style="font-weight: bold;" title="#{creditVar.level == 1 ? appView.title(creditVar.sourceId.title):creditVar.level == 2 ? appView.title(creditVar.sourceId.title) += ' '+=lang.invoiceNo :creditVar.level == 3 ? lang.product :''}"/>
+              <p:commandLink action="#{tradingVariationLogView.showItems(creditVar)}" rendered="#{creditVar.level eq 2}" style="font-weight: bold;padding-left: 73px;margin-top: -28px;"
+                             value="#{appView.title(creditVar.productEntryId.accountInvoiceNo == null ? creditVar.salesInvoiceId.invoiceNo : creditVar.productEntryId.accountInvoiceNo)}"
+                             process="@this" immediate="true" onstart="block();" oncomplete="unblock();" title="#{creditVar.level == 1 ? appView.title(creditVar.sourceId.title):creditVar.level == 2 ? appView.title(creditVar.sourceId.title) += ' '+=lang.invoiceNo :creditVar.level == 3 ? lang.product :''}">
+              </p:commandLink>
+            </p:column>
+            <p:column headerText="#{lang.credit}" style="text-align:right;">
+              <h:outputText styleClass="label" value="#{appView.decimal(creditVar.creditAmountRequired)}" style="background-color: ##{creditVar.sourceId.displayColor}" />
+            </p:column>
+          </p:treeTable>
+        </h:panelGroup>
+        
+        <h:panelGroup layout="block" id="debitDetailDiv">
+          <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+          <!-- Detail Left Data Table (Debit) -->
+          <p:dataTable rendered="#{tradingVariationLogView.selectedSummary eq sysConstant.PLATFORM_DETAILED_VIEW}" id="tradingVariationLogTable1" var="debitVar" widgetVar="tradingVariationWidget1" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       lazy="true" value="#{tradingVariationLogView.tradingVariationDebitLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{debitVar.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{tradingVariationLogView.debitTotalRecords} #{lang.entries} &lt;/span&gt; "
+                       selection="#{tradingVariationLogView.platformDebitSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                       scrollable="false"  >
+            <p:column selectionMode="multiple" exportable="false" />
+            <p:column headerText="#{lang.documentNo}" sortBy="#{debitVar.documentNo}" field="document_no">
+              <h:outputText value="#{appView.display(debitVar.documentNo)}" escape="false" title="#{appView.title(debitVar.sourceId.title)}"/>
+            </p:column>
+            <p:column headerText="#{lang.product}" sortBy="#{debitVar.productDetailId.productBatchId.productId.productName}" field="scm_product.product_name">
+              <h:outputText value="#{appView.display(debitVar.productDetailId.productBatchId.productId.productName)}"
+                            title="#{appView.title(debitVar.productDetailId.productBatchId.productId.productName)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-80" headerText="#{lang.date}" sortBy="#{debitVar.entryDate}" field="entry_date" rendered="#{tradingVariationLogView.selectedSummary == 2}" >
+              <h:outputText value="#{appView.date(debitVar.entryDate)}" title="#{appView.time(debitVar.entryDate)}" escape="false" />
+            </p:column>
+            <p:column headerText="#{lang.title}" sortBy="#{debitVar.platformDescId.title}" field="platform_desc_id.title">
+              <h:outputText value="#{appView.display(debitVar.platformDescId.title)}" title="#{appView.title(debitVar.platformDescId.title)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-100" headerText="#{lang.debit}" sortBy="#{debitVar.debitAmountRequired}" field="debit_amount_required" style="text-align:right;" >
+              <h:outputText value="#{appView.decimal(debitVar.debitAmountRequired)}" escape="false"  styleClass="label" style="background-color: ##{debitVar.sourceId.displayColor}"/>
+            </p:column>
+          </p:dataTable>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" id="creditDetailDiv">
+          <!-- Detail Right Data Table (Credit) -->
+          <p:dataTable rendered="#{tradingVariationLogView.selectedSummary eq sysConstant.PLATFORM_DETAILED_VIEW}" id="tradingVariationLogTable2" var="creditVar" widgetVar="tradingVariationWidget2" 
+                       tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                       lazy="true" value="#{tradingVariationLogView.tradingVariationCreditLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{creditVar.id}"
+                       rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" 
+                       paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{tradingVariationLogView.creditTotalRecords} #{lang.entries} &lt;/span&gt;"
+                       selection="#{tradingVariationLogView.platformCreditSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+            <p:column selectionMode="multiple" exportable="false" />           
+            <p:column headerText="#{lang.documentNo}" sortBy="#{creditVar.documentNo}" field="document_no">
+              <h:outputText value="#{appView.display(creditVar.documentNo)}" escape="false" title="#{appView.title(creditVar.sourceId.title)}"/>
+            </p:column>
+            <p:column headerText="#{lang.product}" sortBy="#{creditVar.productDetailId.productBatchId.productId.productName}" field="product_detail_id.product_id.product_name">
+              <h:outputText value="#{appView.display(creditVar.productDetailId.productBatchId.productId.productName)}"
+                            title="#{appView.title(creditVar.productDetailId.productBatchId.productId.productName)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-80" headerText="#{lang.date}" sortBy="#{creditVar.entryDate}" field="entry_date" rendered="#{tradingVariationLogView.selectedSummary == 2}">
+              <h:outputText value="#{appView.date(creditVar.entryDate)}" title="#{appView.time(creditVar.entryDate)}" escape="false" />
+            </p:column>
+            <p:column headerText="#{lang.title}" sortBy="#{creditVar.platformDescId.title}" field="platform_desc_id.title">
+              <h:outputText value="#{appView.display(creditVar.platformDescId.title)}" title="#{appView.title(creditVar.platformDescId.title)}" escape="false" />
+            </p:column>
+            <p:column styleClass="w-100" headerText="#{lang.credit}" sortBy="#{creditVar.creditAmountRequired}" field="credit_amount_required" style="text-align:right;">
+              <h:outputText value="#{appView.decimal(creditVar.creditAmountRequired)}" escape="false" styleClass="label" style="background-color: ##{creditVar.sourceId.displayColor}"/>
+            </p:column>
+          </p:dataTable>       
+        </h:panelGroup>        
+      </p:panelGrid>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

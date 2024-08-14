@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:h="http://xmlns.jcp.org/jsf/html"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"> 
+
+  #{vendorBankContactView.switchVendorBankContact(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{vendorBankContactView.parent.vendorId.vendorName}" />
+    <ui:param name="subLabel" value="#{vendorBankContactView.parent.bankId.name}" />
+    <ui:param name="labelLevel3" value="#{main.isEdit() ? vendorBankContactView.vendorBankContact.contactName : lang.contact}" />
+    <ui:param name="ids" value="vendorBankContact" />
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{vendorBankContactView.vendorBankContactDialogClose()}"                       
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{vendorBankContactView.deleteVendorBankContact(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('vendorBankContactWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{vendorBankContactView.cloneVendorBankContact(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{vendorBankContactView.deleteVendorBankContact(main)}" value="#{lang.delete}" onclick="wdgOff('vendorBankContactWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{vendorBankContactView.saveVendorBankContact(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>    
+
+    <ui:define name="form">
+
+      <!--contact Name-->
+      <p:outputLabel value="#{lang.name}" for="contactName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankContactView.vendorBankContact.contactName}" maxlength="50" id="contactName" autocomplete="off"
+                     required="true" requiredMessage="#{lang.name} #{lang.isRequired}"/>
+        <p:message for="contactName" display="text"/>
+      </h:panelGroup>
+
+      <!--designation-->
+      <p:outputLabel value="#{lang.designation}" for="vendorBankContactDesignationId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{vendorBankContactView.vendorBankContact.designationId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.designation} #{lang.isRequired}" 
+                         id="vendorBankContactDesignationId" style="position: relative" styleClass="fw">
+          <f:selectItems value="#{vendorBankContactView.selectDesignationByVendorContext(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="vendorBankContactDesignationId" display="text" />
+      </h:panelGroup>            
+
+      <!--phone1-->
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" style="position: relative" value="#{vendorBankContactView.vendorBankContact.phone1}" 
+                     autocomplete="off" validatorMessage="#{lang.errorInvalidPhoneNo}" maxlength="13" id="phone1" required="true" 
+                     requiredMessage="#{lang.phone1} #{lang.isRequired}" validator="wawo.WhiteSpaceValidator">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup>
+
+      <!--phone2-->
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankContactView.vendorBankContact.phone2}" autocomplete="off" maxlength="13" id="phone2" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone2" display="text"/>
+      </h:panelGroup>
+
+      <!--fax1-->
+      <p:outputLabel value="#{lang.fax1}" for="fax1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankContactView.vendorBankContact.fax1}" maxlength="13" id="fax1" autocomplete="off">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax1" display="text"/>
+      </h:panelGroup>
+
+      <!--email-->
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{vendorBankContactView.vendorBankContact.email}" autocomplete="off" maxlength="50" id="email" validator="wawo.EmailValidator"/>
+        <p:message for="email" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{vendorBankContactView.vendorBankContact.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator="" autocomplete="off"/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.status}" for="statusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{vendorBankContactView.vendorBankContact.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
+                         id="statusId" styleClass="fw">
+          <f:selectItems value="#{vendorBankContactView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="statusId" display="text" />
+      </h:panelGroup> 
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(vendorBankContactView.vendorBankContact.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(vendorBankContactView.vendorBankContact.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(vendorBankContactView.vendorBankContact.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(vendorBankContactView.vendorBankContact.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="vendorBankContactTable" var="vendorBankContactVar" widgetVar="vendorBankContactWidget"
+                   lazy="true" value="#{vendorBankContactView.vendorBankContactLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{vendorBankContactVar.id}" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{vendorBankContactView.vendorBankContactSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" style="width:38px"/>
+        <p:column headerText="#{lang.contactName}" sortBy="#{vendorBankContactVar.contactName}" field="id" styleClass="editLinks">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{vendorBankContactVar.contactName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{vendorBankContactView.vendorBankContact}" value="#{vendorBankContactVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.designation}" sortBy="#{vendorBankContactVar.designationId.title}" field="designation_id.title">
+          <h:outputText value="#{appView.display(vendorBankContactVar.designationId.title)}" title="#{appView.title(vendorBankContactVar.designationId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.phone1}" sortBy="#{vendorBankContactVar.phone1}" field="phone_1">
+          <h:outputText value="#{appView.display(vendorBankContactVar.phone1)}" title="#{appView.title(vendorBankContactVar.phone1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.fax1}" sortBy="#{vendorBankContactVar.fax1}" field="fax_1">
+          <h:outputText value="#{appView.display(vendorBankContactVar.fax1)}" title="#{appView.title(vendorBankContactVar.fax1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.email}" sortBy="#{vendorBankContactVar.email}" field="email">
+          <h:outputText value="#{appView.display(vendorBankContactVar.email)}" title="#{appView.title(vendorBankContactVar.email)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.status}" sortBy="#{vendorBankContactVar.statusId.title}" field="status_id.title">
+          <h:outputText value="#{appView.display(vendorBankContactVar.statusId.title)}" title="#{appView.title(vendorBankContactVar.statusId.title)}" rendered="#{vendorBankContactVar.statusId.id==1}" escape="false" />
+          <h:outputText value="#{appView.display(vendorBankContactVar.statusId.title)}" title="#{appView.title(vendorBankContactVar.statusId.title)}" rendered="#{vendorBankContactVar.statusId.id==3}" style="color:grey" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.log}">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(vendorBankContactVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(vendorBankContactVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(vendorBankContactVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(vendorBankContactVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(vendorBankContactVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>      
+</ui:composition>
+

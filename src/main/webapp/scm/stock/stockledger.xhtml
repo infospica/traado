@@ -1,0 +1,190 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{stockLedgerView.setStockLedgerList(null)}
+  #{stockLedgerView.reset()}
+
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <o:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.stockledger}"/>
+    <ui:param name="ids" value="stockledger"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="form">
+    </ui:define>
+
+    <ui:define name="save">
+
+    </ui:define>
+
+    <ui:define name="rightList" >
+
+      <h:panelGroup id="filterDiv">  
+        <h:panelGroup id="currentStockDiv" >
+          <h:panelGroup rendered="#{stockLedgerView.currentStock ne null}" styleClass="label  ib-m m-x-10" style="font: inherit;background-color: #{stockLedgerView.currentStock gt 0?'#3c948b':'#df6c4f'}" > 
+            #{lang.currentStock}#{lang.colon} #{stockLedgerView.currentStock}  </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup id="accountGroupDiv" styleClass="w-200 ib-m">
+          <p:autoComplete id='accountGroup'  value="#{stockLedgerView.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" 
+                          title="#{lang.accountGroup}" scrollHeight="400">
+            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+            <p:column style="width:250px;">
+              <h:outputText value="#{e.groupName}" />
+            </p:column>
+            <p:column style="width: 40px;">
+              <h:outputText value="#{e.groupCode}" />
+            </p:column>
+            <p:ajax event="itemSelect" immediate="true" process="accountGroupDiv" update="accountDiv productDiv productBatchDiv" listener="#{stockLedgerView.accountGroupSelectEvent}"/>
+          </p:autoComplete>   
+          <p:message for="accountGroup" />
+        </h:panelGroup>
+
+        <h:panelGroup id="accountDiv" styleClass="w-200 ib-m">
+          <p:autoComplete id='account'  value="#{stockLedgerView.account}" completeMethod="#{stockLedgerView.accountAuto}" converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                          title="#{lang.accountNumber}" scrollHeight="400" >
+            <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+            <p:column style="width: 200px;">
+              <h:outputText value="#{e.vendorId.vendorName}" />
+            </p:column>
+            <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+              <h:outputText value="#{e.accountCode}" />
+            </p:column>
+            <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+              <h:outputText value="#{e.companyTradeProfileId.title}" />
+            </p:column>
+            <p:ajax event="itemSelect" immediate="true" process="accountDiv" update="productDiv productBatchDiv" listener="#{stockLedgerView.accountSelectEvent}"/>
+          </p:autoComplete>
+          <p:message for="account" />
+        </h:panelGroup>
+
+        <h:panelGroup id="productDiv" styleClass="w-200 ib-m">
+          <p:autoComplete id="product" value="#{stockLedgerView.product}" completeMethod="#{stockLedgerView.productAuto}"
+                          converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative;" scrollHeight="400"
+                          cache="true" queryDelay="500" placeholder="#{lang.productName}"
+                          var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true" required="true" requiredMessage="#{lang.product} #{lang.isRequired}" dropdown="true" 
+                          >
+            <p:ajax event="itemSelect" process="@this" update="productBatchDiv"  listener="#{stockLedgerView.productSelectEvent}"  partialSubmit="true"  />
+            <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+          </p:autoComplete>
+          <p:message for="product" />
+        </h:panelGroup>
+
+        <h:panelGroup id="productBatchDiv" styleClass="w-200 ib-m" >
+          <p:autoComplete id="productBatch" value="#{stockLedgerView.productBatch}" completeMethod="#{stockLedgerView.productBatchAuto}"
+                          converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative;"
+                          cache="true" queryDelay="500" placeholder="#{lang.productBatch}" scrollHeight="400"
+                          var="prodbatch" itemLabel="#{prodbatch.batchNo}" itemValue="#{prodbatch}" forceSelection="true" dropdown="true" 
+                          >
+            <p:ajax event="itemSelect" process="@this" listener="#{stockLedgerView.productBatchSelectEvent}" partialSubmit="true" />      
+            <f:attribute name="clazz" value="#{scmLookupView.productBatchClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.productBatchById()}"/>
+          </p:autoComplete>
+        </h:panelGroup>    
+
+        <p:calendar value="#{stockLedgerView.selectedToDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="10" size="10" 
+                    id="selectedToDate" showButtonPanel="true" navigator="true" mask="true" title="#{lang.date}" >
+          <p:ajax event="dateSelect" listener="#{stockLedgerView.selectedDateToEvent}" />
+        </p:calendar>
+      </h:panelGroup>
+      <p:commandButton value="#{lang.ok}" styleClass="btn btn-info" process="filterDiv currentStockDiv" update="stockledgerTable filterDiv currentStockDiv" style="margin-left: 3px; margin-bottom: 4px;" 
+                       onstart="block()" oncomplete="unblock()" >
+      </p:commandButton>
+
+    </ui:define>
+    <ui:define name="list">
+
+
+      <p:dataTable id="stockledgerTable" var="row" widgetVar="stockledgerWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{stockLedgerView.getStockLedgerList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}" 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('stockledgerWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+
+        <p:column headerText="#{lang.documentNo}" sortBy="#{row.documentNo}" field="document_no" filterBy="#{row.documentNo}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" 
+                        rendered="#{row.tradeType ne 'Sales' and row.tradeType ne 'Stock Adj.' and row.tradeType ne 'Sales Return' 
+                                    and row.tradeType ne 'Purchase Return' and row.tradeType ne 'Purchase' 
+                                    and row.tradeType ne 'Moved to Saleable' and row.tradeType ne 'Moved to Damage'
+                                    and row.tradeType ne 'OpenStock' }" />
+          <p:commandLink actionListener="#{popUpView.showSalesInvoice(row.tradePkId)}" rendered="#{row.tradeType eq 'Sales'}">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showStockAdjustMent(row.tradePkId)}" rendered="#{row.tradeType eq 'Stock Adj.'}">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>         
+          <p:commandLink actionListener="#{popUpView.showSalesReturn(row.tradePkId)}" rendered="#{row.tradeType eq 'Sales Return'}">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showPurchaseReturn(row.tradePkId)}" rendered="#{row.tradeType eq 'Purchase Return'}">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showPurchase(row.tradePkId)}" rendered="#{row.tradeType eq 'Purchase'}">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>                   
+          <p:commandLink actionListener="#{popUpView.showStockMovement(row.tradePkId)}" rendered="#{row.tradeType eq 'Moved to Saleable' or row.tradeType eq 'Moved to Damage' }">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>
+          <p:commandLink actionListener="#{popUpView.showOpeningStock(row.tradePkId)}" rendered="#{row.tradeType eq 'OpenStock'}">
+            <h:outputText value="#{appView.display(row.documentNo eq null ? lang.openingStock: row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>
+
+        </p:column>
+        <p:column headerText="#{lang.date}" sortBy="#{row.entryDate}" filterBy="#{row.entryDate}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.batchNo}" sortBy="#{row.prodBatch}" field="prod_batch" filterBy="#{row.prodBatch}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.display(row.prodBatch)}" title="#{appView.title(row.prodBatch)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.expiryDate}" sortBy="#{row.expiryDate}"  filterBy="#{row.expiryDate}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.display(row.expiryDate)}" title="#{appView.title(row.expiryDate)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.mrp}" sortBy="#{row.prodMrpValue}" field="prod_mrp_value" style="text-align: right;" filterBy="#{row.prodMrpValue}" filterStyleClass="hprodMrpValueden">
+          <h:outputText value="#{appView.decimal(row.prodMrpValue)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.traderName}" sortBy="#{row.traderName}" field="trader_name" filterBy="#{row.traderName}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.display(row.traderName)}" title="#{appView.title(row.traderName)}" escape="false" /></p:column>
+
+        <p:column headerText="#{lang.qty} #{lang.in}" sortBy="#{row.quantityIn}" field="quantity_in" style="text-align: right;" filterBy="#{row.quantityIn}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.number(row.openingStock==null?row.quantityIn:row.openingStock)}" escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{stockLedgerView.qtyInTotal}"  />
+          </f:facet>
+        </p:column>        
+        <p:column headerText="#{lang.qty} #{lang.out}" sortBy="#{row.quantityOut}" field="quantity_out" style="text-align: right;" filterBy="#{row.quantityOut}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.number(row.quantityOut)}" escape="false" />
+          <f:facet name="footer">
+            <h:outputText value="#{stockLedgerView.qtyOutTotal}"  />
+          </f:facet>
+        </p:column>        
+        <p:column headerText="#{lang.rate}" sortBy="#{row.rateValue}" field="rate_value" style="text-align: right;" filterBy="#{row.rateValue}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.opemingStockValue==null?row.rateValue:row.opemingStockValue)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.tradeType}" sortBy="#{row.tradeType}" field="trade_type" filterBy="#{row.tradeType}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.display(row.tradeType)}" title="#{appView.title(row.tradeType)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.quantityAvailable}" sortBy="#{row.quantityAvailable}" field="quantity_available" style="text-align: right;" filterBy="#{row.quantityAvailable}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.number(row.quantityAvailable)}" escape="false" /></p:column>
+
+      </p:dataTable>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

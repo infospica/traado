@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{finAccountingPrefixView.switchFinAccountingPrefix(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.AccountingPrefix}" />
+    <ui:param name="ids" value="finAccountingPrefix" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{finAccountingPrefixView.deleteFinAccountingPrefix(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('finAccountingPrefixWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{finAccountingPrefixView.cloneFinAccountingPrefix(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{finAccountingPrefixView.deleteFinAccountingPrefix(main)}" value="#{lang.delete}" onclick="wdgOff('finAccountingPrefixWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{finAccountingPrefixView.saveFinAccountingPrefix(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">            
+      <p:outputLabel value="#{lang.docPrefix}" for="docPrefix" />
+      <h:panelGroup>
+        <p:inputText value="#{finAccountingPrefixView.finAccountingPrefix.docPrefix}" required="true" maxlength="20" id="docPrefix" /><p:message for="docPrefix" display="text" styleClass="fw" />
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.docNumberCounter}" for="docNumberCounter" />
+      <h:panelGroup>
+        <p:inputNumber value="#{finAccountingPrefixView.finAccountingPrefix.docNumberCounter}" converterMessage="#{lang.docNumberCounter} #{lang.invalidNumber}" decimalPlaces="0" required="true" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="docNumberCounter" /><p:message for="docNumberCounter" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.padding}" for="padding" />
+      <h:panelGroup>
+        <p:inputNumber value="#{finAccountingPrefixView.finAccountingPrefix.padding}" converterMessage="#{lang.padding} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="padding" /><p:message for="padding" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.yearSequence}" for="yearSequence" />
+      <h:panelGroup id="yearSequenceDiv">
+        <p:selectOneRadio id="yearSequence" value="#{finAccountingPrefixView.finAccountingPrefix.yearSequence}">
+          <f:selectItem itemLabel="#{lang.none}" itemValue="#{0}" />
+          <f:selectItem itemLabel="#{lang.currentYear}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.financialYear}" itemValue="#{2}" />
+          <p:ajax process="yearSequenceDiv" update="yearPaddingLabel yearPaddingDiv yearStartLabel yearStartDiv" listener="#{finAccountingPrefixView.yearSequenceChangeHandler}"  />
+        </p:selectOneRadio>
+        <p:message for="yearSequence" display="text"/>
+      </h:panelGroup>
+
+      <h:panelGroup id="yearPaddingLabel">
+        <p:outputLabel value="#{lang.yearPadding}" for="yearPadding" rendered="#{finAccountingPrefixView.yearSequence}" />
+      </h:panelGroup>
+      <h:panelGroup id="yearPaddingDiv">
+        <p:selectOneRadio id="yearPadding" value="#{finAccountingPrefixView.finAccountingPrefix.yearPadding}" rendered="#{finAccountingPrefixView.yearSequence}" >
+          <f:selectItem itemLabel="#{lang.twoDigits}" itemValue="#{2}" />
+          <f:selectItem itemLabel="#{lang.fourDigits}" itemValue="#{4}" />
+          <p:ajax update="yearPaddingLabel yearPaddingDiv"  />
+        </p:selectOneRadio>
+        <p:message for="yearPadding" display="text" />
+      </h:panelGroup>
+
+      <h:panelGroup id="yearStartLabel">
+        <p:outputLabel value="#{lang.startYearOnlyLabel}" for="yearStart" rendered="#{finAccountingPrefixView.yearSequence}" />
+      </h:panelGroup>
+      <h:panelGroup id="yearStartDiv">
+        <p:selectOneRadio id="yearStart" value="#{finAccountingPrefixView.finAccountingPrefix.startYearOnly}" rendered="#{finAccountingPrefixView.yearSequence}" >
+          <f:selectItem itemLabel="#{lang.startYearOnly}" itemValue="#{1}" />
+          <f:selectItem itemLabel="#{lang.startEndYear}" itemValue="#{0}" />
+          <p:ajax update="yearStartLabel yearStartDiv"  />
+        </p:selectOneRadio>
+        <p:message for="yearStart" display="text" />
+      </h:panelGroup>
+      <!-- Small list combo -->
+      <!--	<p:outputLabel value="#{lang.finAccountingPrefixPrefixTypeId}" for="finAccountingPrefixPrefixTypeId" /><h:panelGroup>
+             <p:selectOneMenu value="#{finAccountingPrefixView.finAccountingPrefix.prefixTypeId}"  id="finAccountingPrefixPrefixTypeId" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+              <f:selectItems value="#{scmLookupView.finPrefixType(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+            </p:selectOneMenu><p:message for="finAccountingPrefixPrefixTypeId" display="text" /></h:panelGroup>	-->
+      <!-- Small list autocomplete -->
+      <!--  <p:outputLabel value="#{lang.finAccountingPrefixPrefixTypeId}" for="finAccountingPrefixPrefixTypeId" /><h:panelGroup>
+              <p:autoComplete value="#{finAccountingPrefixView.finAccountingPrefix.prefixTypeId}" completeMethod="#{scmLookupView.finPrefixTypeAuto}"  id="finAccountingPrefixPrefixTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+              <o:converter list="#{scmLookupView.finPrefixType(main)}" converterId="omnifaces.ListConverter"  />
+            </p:autoComplete><p:message for="finAccountingPrefixPrefixTypeId" display="text" /></h:panelGroup> 	-->
+      <!-- Big list autocomplete -->
+      <p:outputLabel value="#{lang.accountingVoucherType}" for="finAccountingVoucherTypeId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{finAccountingPrefixView.finAccountingPrefix.voucherTypeId}" required="true" completeMethod="#{finAccountingPrefixView.finVoucherTypeAuto}" converter="wawo.LookupIntConverter"   id="finAccountingVoucherTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="false" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.finVoucherTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.finVoucherTypeById()}"/>
+        </p:autoComplete><p:message for="finAccountingVoucherTypeId" display="text" />
+      </h:panelGroup>
+
+<!--        <p:outputLabel value="#{lang.status}" for="accountPrefixStatus" />
+<h:panelGroup>
+  <p:autoComplete value="#{finAccountingPrefixView.finAccountingPrefix.statusId}" completeMethod="#{finAccountingPrefixView.statusAuto}" converter="wawo.LookupIntConverter"
+                required="true" requiredMessage="#{lang.status} #{lang.isRequired}" id="accountPrefixStatus" var="e" itemValue="#{e}" itemLabel="#{e.title}"
+                emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                forceSelection="true"  style="position: relative" >
+  <f:attribute name="clazz" value="#{scmLookupView.statusClass()}"/>
+  <f:attribute name="byid" value="#{scmLookupView.statusById()}"/>
+</p:autoComplete><p:message for="accountPrefixStatus" display="text" />        
+</h:panelGroup>-->
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{finAccountingPrefixView.finAccountingPrefix.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" /><p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+<!--        <p:outputLabel value="#{lang.createdBy}" for="createdBy" />
+<h:panelGroup><p:inputText value="#{finAccountingPrefixView.finAccountingPrefix.createdBy}" maxlength="200" id="createdBy" /><p:message for="createdBy" display="text" styleClass="fw" /></h:panelGroup>
+
+
+<p:outputLabel value="#{lang.createdAt}" for="createdAt" />
+<h:panelGroup><p:calendar value="#{finAccountingPrefixView.finAccountingPrefix.createdAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.createdAt} #{lang.invalidDate}" maxlength="29" id="createdAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="createdAt" display="text"/></h:panelGroup>
+
+
+<p:outputLabel value="#{lang.modifiedBy}" for="modifiedBy" />
+<h:panelGroup><p:inputText value="#{finAccountingPrefixView.finAccountingPrefix.modifiedBy}" maxlength="200" id="modifiedBy" /><p:message for="modifiedBy" display="text" styleClass="fw" /></h:panelGroup>
+
+
+<p:outputLabel value="#{lang.modifiedAt}" for="modifiedAt" />
+<h:panelGroup><p:calendar value="#{finAccountingPrefixView.finAccountingPrefix.modifiedAt}" pattern="#{lang.datePattern}" converterMessage="#{lang.modifiedAt} #{lang.invalidDate}" maxlength="29" id="modifiedAt" showButtonPanel="true" navigator="true" mask="true"/><p:message for="modifiedAt" display="text"/></h:panelGroup>-->
+
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(finAccountingPrefixView.finAccountingPrefix.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(finAccountingPrefixView.finAccountingPrefix.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(finAccountingPrefixView.finAccountingPrefix.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(finAccountingPrefixView.finAccountingPrefix.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(finAccountingPrefixView.finAccountingPrefix.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="finAccountingPrefixTable" var="finAccountingPrefixVar" widgetVar="finAccountingPrefixWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{finAccountingPrefixView.finAccountingPrefixLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{finAccountingPrefixVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{finAccountingPrefixView.finAccountingPrefixSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+<!--        <p:column sortBy="#{finAccountingPrefixVar.id}" field="t1.id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{finAccountingPrefixVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+        <f:setPropertyActionListener target="#{finAccountingPrefixView.finAccountingPrefix}" value="#{finAccountingPrefixVar}" />
+          </p:commandLink>
+        </p:column>-->
+
+        <p:column sortBy="#{finAccountingPrefixVar.docPrefix}" field="fin_accounting_prefix.doc_prefix">
+          <f:facet name="header"><h:outputText value="#{lang.docPrefix}" title="#{lang.docPrefix}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(finAccountingPrefixVar.docPrefix)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{finAccountingPrefixView.finAccountingPrefix}" value="#{finAccountingPrefixVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column sortBy="#{finAccountingPrefixVar.voucherTypeId.title}" field="t1.voucherType">
+          <f:facet name="header"><h:outputText value="#{lang.voucherType}" title="#{lang.voucherType}"/></f:facet>
+          <h:outputText value="#{appView.display(finAccountingPrefixVar.voucherTypeId.title)}" title="#{appView.title(finAccountingPrefixVar.voucherTypeId.title)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{finAccountingPrefixVar.padding}" field="t1.padding">
+          <f:facet name="header"><h:outputText value="#{lang.padding}" title="#{lang.padding}"/></f:facet>
+          <h:outputText value="#{appView.number(finAccountingPrefixVar.padding)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{finAccountingPrefixVar.docNumberCounter}" field="t1.doc_number_counter">
+          <f:facet name="header"><h:outputText value="#{lang.docNumberCounter}" title="#{lang.docNumberCounter}"/></f:facet>
+          <h:outputText value="#{appView.number(finAccountingPrefixVar.docNumberCounter)}" escape="false" />
+        </p:column>
+
+<!--        <p:column sortBy="#{finAccountingPrefixVar.yearSequence}" field="t1.year_sequence" styleClass="text-right">
+  <f:facet name="header"><h:outputText value="#{lang.yearSequence}" title="#{lang.yearSequence}"/></f:facet>
+  <h:outputText value="#{appView.number(finAccountingPrefixVar.yearSequence)}" escape="false" />
+</p:column>
+<p:column sortBy="#{finAccountingPrefixVar.yearPadding}" field="t1.year_padding" styleClass="text-right">
+  <f:facet name="header"><h:outputText value="#{lang.yearPadding}" title="#{lang.yearPadding}"/></f:facet>
+  <h:outputText value="#{appView.number(finAccountingPrefixVar.yearPadding)}" escape="false" />
+</p:column>
+<p:column sortBy="#{finAccountingPrefixVar.prefixTypeId.title}" field="t2.title">
+  <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+  <h:outputText value="#{appView.display(finAccountingPrefixVar.prefixTypeId.title)}" title="#{appView.title(finAccountingPrefixVar.prefixTypeId.title)}" escape="false" />
+</p:column>-->
+<!--        <p:column sortBy="#{finAccountingPrefixVar.sortOrder}" field="fin_accounting_prefix.sort_order" styleClass="text-right">
+  <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+  <h:outputText value="#{appView.number(finAccountingPrefixVar.sortOrder)}" escape="false" />
+</p:column>-->
+<!--        <p:column sortBy="#{finAccountingPrefixVar.statusId}" field="t1.status_id" styleClass="text-right">
+  <f:facet name="header"><h:outputText value="#{lang.statusId}" title="#{lang.statusId}"/></f:facet>
+  <h:outputText value="#{appView.number(finAccountingPrefixVar.statusId)}" escape="false" />
+</p:column>-->
+        <!--
+                <p:column sortBy="#{finAccountingPrefixVar.createdBy}" field="t1.created_by">
+                  <f:facet name="header"><h:outputText value="#{lang.createdBy}" title="#{lang.createdBy}"/></f:facet>
+                  <h:outputText value="#{appView.display(finAccountingPrefixVar.createdBy)}" title="#{appView.title(finAccountingPrefixVar.createdBy)}" escape="false" />
+                </p:column> 
+        
+        
+                <p:column sortBy="#{finAccountingPrefixVar.createdAt}" field="t1.created_at" >
+                  <f:facet name="header"><h:outputText value="#{lang.createdAt}" title="#{lang.createdAt}"/></f:facet>
+                  <h:outputText value="#{appView.dateTime(finAccountingPrefixVar.createdAt)}" escape="false" />
+                </p:column> 
+        
+        
+                <p:column sortBy="#{finAccountingPrefixVar.modifiedBy}" field="t1.modified_by">
+                  <f:facet name="header"><h:outputText value="#{lang.modifiedBy}" title="#{lang.modifiedBy}"/></f:facet>
+                  <h:outputText value="#{appView.display(finAccountingPrefixVar.modifiedBy)}" title="#{appView.title(finAccountingPrefixVar.modifiedBy)}" escape="false" />
+                </p:column> 
+        
+        
+                <p:column sortBy="#{finAccountingPrefixVar.modifiedAt}" field="t1.modified_at" >
+                  <f:facet name="header"><h:outputText value="#{lang.modifiedAt}" title="#{lang.modifiedAt}"/></f:facet>
+                  <h:outputText value="#{appView.dateTime(finAccountingPrefixVar.modifiedAt)}" escape="false" />
+                </p:column>-->
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(finAccountingPrefixVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(finAccountingPrefixVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(finAccountingPrefixVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(finAccountingPrefixVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(finAccountingPrefixVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

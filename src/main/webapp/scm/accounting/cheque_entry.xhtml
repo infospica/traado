@@ -1,0 +1,288 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{chequeEntryView.switchChequeEntry(main, viewType, inOrOut)}
+  <o:importConstants type="spica.constant.AccountingConstant" />
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants"/> 
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.chequeEntry}" />
+    <ui:param name="ids" value="chequeEntry" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{chequeEntryView.deleteChequeEntry(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('chequeEntryWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{chequeEntryView.cloneChequeEntry(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{chequeEntryView.deleteChequeEntry(main)}" value="#{lang.delete}" onclick="wdgOff('chequeEntryWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" rendered="#{(userRuntimeView.privilege.delete==true) and chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED}"/>
+    </ui:define>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
+    <ui:define name="save" >
+      <h:commandButton action="#{chequeEntryView.saveChequeEntry(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED}"><f:ajax execute="f1" render="f1"  /></h:commandButton> <i class="fa #{chequeEntryView.inOrOut eq 0 ? 'fa-arrow-right' : 'fa-arrow-left' }" aria-hidden="true"></i>    
+    </ui:define>   
+    <ui:define name="rightList" >
+      <h:panelGroup styleClass="L">
+        <p:selectOneMenu var="e"  value="#{chequeEntryView.accountGroup}" filter="true" filterMatchMode="contains" 
+                         converter="omnifaces.SelectItemsConverter" height="450">
+          <f:selectItem itemLabel="#{lang.select} #{lang.accountGroup}" itemValue="#{null}" />
+          <f:selectItems  var="accGroup" value="#{userRuntimeView.accountGroupList}" itemLabel="#{accGroup.groupName}" itemValue="#{accGroup}" />
+          <p:ajax event="itemSelect" update="f1" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+          <p:column style="width: 350px;">
+            <h:outputText value="#{e.groupName}"  />
+          </p:column>
+          <p:column style="width: 50px;">
+            <h:outputText value="#{e.groupCode}"  />                          
+          </p:column>
+          <p:column style="width: 50px;">
+            <p:fragment rendered="#{e.isDefault eq 0}">
+              <i class="fa fa-th" title="#{lang.custom} #{lang.accountGroup}" ></i>
+            </p:fragment>
+            <p:fragment rendered="#{e.isDefault eq 1}">
+              <!--<i class="fa fa-square-o" style="color:#CCC;" ></i>-->
+            </p:fragment>
+          </p:column>
+        </p:selectOneMenu>
+
+        <p:selectOneMenu value="#{chequeEntryView.chequeReviewType}">
+          <f:selectItem itemLabel="#{lang.all} #{lang.type}" itemValue="#{null}" />          
+          <f:selectItem itemLabel="#{lang.cheque} #{lang.today}" itemValue="#{SystemConstants.CHEQUE_TODAY}" />          
+          <f:selectItem itemLabel="#{lang.cheque}s #{lang.overdue}" itemValue="#{SystemConstants.CHEQUES_OVERDUE}" />          
+          <f:selectItem itemLabel="#{lang.undated} #{lang.cheque}" itemValue="#{SystemConstants.UNDATED_CHEQUE}" /> 
+          <p:ajax event="itemSelect" listener="#{chequeEntryView.setChequeViewType}" process="@this" update="panelGroupDiv" />
+        </p:selectOneMenu>
+
+        <p:selectCheckboxMenu id="status" value="#{chequeEntryView.chequeStatus}" label="#{lang.status}" immediate="true" 
+                              filter="true" panelStyle="width:250px">
+          <f:selectItems value="#{chequeEntryView.statusName}" var="cheqStatus" itemLabel="#{cheqStatus.status}" itemValue="#{cheqStatus.id}" />
+          <p:ajax event="change" listener="#{chequeEntryView.setChequeStatus}" update="chequeEntryTable" process="@this" />
+        </p:selectCheckboxMenu>        
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="navRight">
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times" iconPos="right"/>
+    </ui:define>
+    <ui:define name="formRight">
+      <p:commandButton icon="fa fa-external-link-square" styleClass="btn" id="linkTranF" actionListener="#{chequeEntryView.journalPopup(chequeEntryView.chequeEntry)}" title="#{lang.accountingTransaction}"  process="@this" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED and (chequeEntryView.chequeEntry.chequePresent eq 'Due today' or  chequeEntryView.chequeEntry.chequePresent.startsWith('Valid'))}" />
+      <h:outputText title="#{chequeEntryView.chequeEntry.parentId ne null ? lang.represent : ''}" value="#{appView.display(chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED ? (chequeEntryView.inOrOut eq 0 ? lang.issued : lang.received) : chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_ISSUED ? lang.deposited : chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_RECONCILED ? lang.cleared : chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE ? lang.dishonoured : chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_RESUBMITTED ? lang.represent : chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_RETURNED ? lang.returned :  chequeEntryView.chequeEntry.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_HIDE ? lang.dishonoured : lang.cancelled )} "  escape="false" rendered="#{chequeEntryView.chequeEntry.id ne null}" />
+      <h:outputText  styleClass="label" style="background-color: #{chequeEntryView.chequeEntry.chequePresentColor}" value="#{chequeEntryView.chequeEntry.chequePresent}"  escape="false"   />
+    </ui:define>
+
+    <ui:define name="form">  
+
+      <p:outputLabel value="#{lang.entryDate}" for="entryDate" />
+      <h:panelGroup>
+        <h:inputText id="forFocus" styleClass="sr-only" />
+        <p:calendar value="#{chequeEntryView.chequeEntry.entryDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.entryDate} #{lang.invalidDate}" maxlength="13" pages="3" maxdate="#{userRuntimeView.today}"
+                    validator="#{sysRuntimeView.dateLteToday}"  id="entryDate" required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" showButtonPanel="true" navigator="true" mask="true" maskAutoClear="true" /><p:message for="entryDate" display="text"/>
+      </h:panelGroup> 
+
+      <!--      <o:validateOrder type="lte" components="entryDate chequeDate" 
+                             message="#{lang.chequeDate} #{lang.gte} #{lang.entryDate}" showMessageFor="chequeDate" />-->
+
+      <!-- Ledger - Sundry debtors and creditors -->  
+
+      <p:commandLink actionListener="#{chequeEntryView.ledgerPopup(chequeEntryView.chequeEntry.ledgerId)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+        <p:outputLabel value="#{lang.party}" for="chequeEntryParty" />
+      </p:commandLink>       
+      <h:panelGroup id="chequeEntryPartyDIV">
+        <p:autoComplete value="#{chequeEntryView.chequeEntry.ledgerId}" completeMethod="#{chequeEntryView.accountingLedgerSalesAuto}" 
+                        id="chequeEntryParty" required="true" converter="wawo.LookupIntConverter"
+                        var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" 
+                        dropdown="true" cache="true" queryDelay="500" maxResults="30" autocomplete="off" scrollHeight="600"
+                        converterMessage="#{lang.invalidSelection}" forceSelection="true" styleClass="fw">          
+          <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+          <p:ajax event="itemSelect" listener="#{chequeEntryView.partySelectevent}" process="chequeEntryPartyDIV" update="agDiv accountGroupDiv customerOutStandingDiv" />
+          <p:column style="width: 200px;">
+            <h:outputText value="#{e.title}"/>
+          </p:column>
+          <p:column style="width: 100px;">
+            <h:outputText value="#{e.accountingGroupId.title}"  />
+          </p:column>
+          <p:column style="width: 100px;">
+            <h:outputText value="#{e.accountingGroupId.parentId.title}"  />
+          </p:column>
+        </p:autoComplete>
+        <p:message for="chequeEntryParty" display="text" />
+      </h:panelGroup>
+
+      <!--Account Group-->      
+      <p:outputLabel value="#{lang.accountGroup}" for="accountGroupMenu" />
+      <h:panelGroup id="agDiv">
+        <p:inputText  value="#{chequeEntryView.chequeEntry.accountGroup.groupName}" readonly="true" rendered="#{!chequeEntryView.accountCombo}"  styleClass="fw" />
+        <p:selectOneMenu id="accountGroupMenu" value="#{chequeEntryView.chequeEntry.accountGroup}" rendered="#{chequeEntryView.accountCombo}"
+                         required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}"
+                         converter="omnifaces.SelectItemsConverter">  
+          <p:ajax event="itemSelect" listener="#{chequeEntryView.accountGroupSelect}" process="@this" update="agDiv accountGroupDiv customerOutStandingDiv"  />
+          <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+          <f:selectItems value="#{chequeEntryView.accountGroupList}" var="ag" itemLabel="#{ag.groupName}" itemValue="#{ag}" />
+        </p:selectOneMenu>
+        <p:message for="accountGroupMenu" display="text" />
+      </h:panelGroup>
+
+      <!-- Cheque No -->
+      <p:outputLabel value="#{lang.chequeNO}" for="chequeNo" />
+      <h:panelGroup>
+        <p:inputText value="#{chequeEntryView.chequeEntry.chequeNo}" maxlength="50" size="20" id="chequeNo" required="true" requiredMessage="#{lang.chequeNO} #{lang.isRequired}" 
+                     autocomplete="off" />
+        <p:message for="chequeNo" display="text" />
+      </h:panelGroup>
+
+      <!-- Cheque Date -->
+      <p:outputLabel value="#{lang.chequeDate}" for="chequeDate" />
+      <h:panelGroup>
+        <p:calendar value="#{chequeEntryView.chequeEntry.chequeDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.chequeDate} #{lang.invalidDate}" maxlength="13" pages="3" 
+                    id="chequeDate" required="false" requiredMessage="#{lang.chequeDate} #{lang.isRequired}" showButtonPanel="true" navigator="true" mask="true">
+          <f:attribute name="from" value="#{chequeEntryView.getChequePresentDays()}" /> <!-- date should be greater than -90 days days -->
+        </p:calendar>
+        <p:message for="chequeDate" display="text"/>
+      </h:panelGroup>
+
+
+      <!-- Cheque Amount -->
+      <p:outputLabel value="#{lang.amount}" for="amount" />
+      <h:panelGroup>
+        <p:inputNumber value="#{chequeEntryView.chequeEntry.amount}" converterMessage="#{lang.amount} #{lang.invalidNumber}" decimalPlaces="2"
+                       autocomplete="off" size="20"
+                       onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="10" id="amount" required="true" requiredMessage="#{lang.amount} #{lang.isRequired}"/>        
+        <p:message for="amount" display="text" />
+      </h:panelGroup>
+
+      <!-- Bank -->
+      <p:outputLabel value="#{lang.bank}" for="chequeEntryBankId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{chequeEntryView.chequeEntry.bankId}" completeMethod="#{chequeEntryView.bankAuto}" converter="wawo.LookupIntConverter" 
+                        required="true" requiredMessage="#{lang.bank} #{lang.isRequired}" id="chequeEntryBankId" var="e" itemValue="#{e}" itemLabel="#{e.name}" 
+                        emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" scrollHeight="600" converterMessage="#{lang.invalidSelection}" 
+                        autocomplete="off" forceSelection="true" >
+          <f:attribute name="clazz" value="#{scmLookupView.bankClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.bankById()}"/>
+        </p:autoComplete>
+        <p:message for="chequeEntryBankId" display="text" />
+      </h:panelGroup>
+      <!-- Note -->
+      <p:outputLabel value="#{lang.note}" for="note" />
+      <h:panelGroup><p:inputTextarea styleClass="fw" value="#{chequeEntryView.chequeEntry.note}" cols="100" maxlength="500" rows="2"  id="note"/>
+        <p:message for="note" display="text"/>        
+      </h:panelGroup> 
+    </ui:define>
+
+    <ui:define name="after">
+      <h:panelGroup id="customerOutStandingDiv"  >
+        <p:fragment rendered="#{(main.edit or main.isNew()) and chequeEntryView.chequeEntry.ledgerId ne null}">
+          #{ledgerTransactionView.chequeEntryInOutStanding(main, chequeEntryView.chequeEntry.ledgerId, chequeEntryView.chequeEntry.id)}
+          <ui:include src="/scm/accounting/payable_receivable_report.xhtml"  >
+            <ui:param name="ledgerId" value="#{chequeEntryView.chequeEntry.ledgerId}" />
+          </ui:include>
+        </p:fragment>
+      </h:panelGroup>
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(chequeEntryView.chequeEntry.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(chequeEntryView.chequeEntry.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(chequeEntryView.chequeEntry.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(chequeEntryView.chequeEntry.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(chequeEntryView.chequeEntry.id)}</ui:define>
+      </ui:decorate>      
+    </ui:define>
+
+
+    <ui:define name="list">
+      <h:panelGroup id="panelGroupDiv">
+        <p:dataTable id="chequeEntryTable" var="chequeEntryVar" widgetVar="chequeEntryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     lazy="true" value="#{chequeEntryView.chequeEntryLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{chequeEntryVar.id}" 
+                     rowsPerPageTemplate="15,50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                     selection="#{chequeEntryView.chequeEntrySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+          <p:column selectionMode="multiple" exportable="false" />
+
+          <p:column sortBy="#{chequeEntryVar.chequeNo}" field="cheque_no" >
+            <f:facet name="header"><h:outputText value="#{lang.chequeNO}" title="#{lang.chequeNO}"/></f:facet>
+            <p:commandLink action="#{main.setViewType(editform)}" value="#{chequeEntryVar.chequeNo}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+              <f:setPropertyActionListener target="#{chequeEntryView.chequeEntry}" value="#{chequeEntryVar}" />
+            </p:commandLink>
+          </p:column>
+          <p:column sortBy="#{chequeEntryVar.ledgerId.title}" field="ledger_id.title" >
+            <f:facet name="header"><h:outputText value="#{lang.party}" title="#{lang.party}"/></f:facet>
+            <p:commandLink actionListener="#{chequeEntryView.ledgerPopup(chequeEntryVar.ledgerId)}" value="#{chequeEntryVar.ledgerId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" />
+          </p:column>
+          <p:column sortBy="#{chequeEntryVar.chequeDate}" field="cheque_date" styleClass="w-100">
+            <f:facet name="header"><h:outputText value="#{lang.chequeDate}" title="#{lang.chequeDate}"/></f:facet>
+            <h:outputText value="#{appView.date(chequeEntryVar.chequeDate)}" escape="false" />
+            <p:commandButton icon="fa fa-external-link-square" styleClass="btn" id="linkTran" actionListener="#{chequeEntryView.journalPopup(chequeEntryVar)}" title="#{lang.accountingTransaction}"  process="@this" immediate="true" onstart="block()" oncomplete="unblock()" rendered="#{chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED and (chequeEntryVar.chequePresent eq 'Due today' or  chequeEntryVar.chequePresent.startsWith('Valid'))}" />
+          </p:column>
+          <p:column sortBy="#{chequeEntryVar.amount}" field="amount" style="text-align: right">
+            <f:facet name="header" ><h:outputText value="#{lang.amount}" title="#{lang.amount}"/></f:facet>
+            <h:outputText styleClass="text-right" value="#{appView.decimal(chequeEntryVar.amount)}" escape="false" />
+          </p:column>
+
+          <p:column sortBy="#{chequeEntryVar.chequeDate}" field="cheque_date"  >          
+            <f:facet name="header"><h:outputText value="#{lang.days}" title="#{lang.days}"/></f:facet>            
+            <h:outputText  styleClass="label" style="background-color: #{chequeEntryVar.chequePresentColor}" value="#{chequeEntryVar.chequePresent}"  escape="false"   />
+          </p:column>
+          <p:column sortBy="#{chequeEntryVar.bankId}" field="bank_id.name" >
+            <f:facet name="header"><h:outputText value="#{lang.bank}" title="#{lang.bank}"/></f:facet>
+            <h:outputText value="#{appView.display(chequeEntryVar.bankId.name)}" escape="false" />
+          </p:column>
+          <p:column sortBy="#{chequeEntryVar.statusId}" field="status_id">
+            <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+            <h:outputText title="#{chequeEntryVar.parentId ne null ? lang.represent : ''}" value="#{appView.display(chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED ? lang.received : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_ISSUED ? lang.deposited : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECONCILED ? lang.cleared : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE ? lang.dishonoured : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_RESUBMITTED ? lang.represent : chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RETURNED ? lang.returned :  chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE_HIDE ? lang.dishonoured : lang.cancelled )}"  escape="false" />
+          </p:column>
+          <p:column styleClass="w-80" exportable="false">
+            <f:facet name="header">
+              <h:outputText value="#{lang.action}" title="#{lang.action}"/>
+            </f:facet>          
+<!--            <p:commandButton id="a" icon="fa fa-repeat" title="#{lang.represent}" styleClass="btn" actionListener="#{chequeEntryView.resubmit(main, chequeEntryVar)}" rendered="#{chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE}" process="@this" update="f1" >
+              <p:confirm header="#{lang.confirmReSubmissionHeader}" message="#{lang.confirmReSubmissionMessage}" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
+            <p:commandButton id="a1" icon="fa fa-arrow-circle-left" title="#{lang.returns}" styleClass="btn" actionListener="#{chequeEntryView.returnToParty(main, chequeEntryVar)}" rendered="#{chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE or chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED}" immediate="true" process="@this" update="f1" partialSubmit="true">
+              <p:confirm header="#{lang.confirmReSubmissionHeader}" message="#{lang.confirmReSubmissionMessage}" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>-->
+            <p:commandButton id="a" icon="fa fa-repeat" title="#{lang.represent}" styleClass="btn" actionListener="#{chequeEntryView.typeChequeEntry(chequeEntryVar, 2)}" 
+                             rendered="#{chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE}" process="@this" update="confirmDialogId" oncomplete="PF('confirmDialogWidget').show();"  />
+            <p:commandButton id="a1" icon="fa fa-arrow-circle-left" title="#{lang.returns}" styleClass="btn" actionListener="#{chequeEntryView.typeChequeEntry(chequeEntryVar, 1)}" 
+                             rendered="#{chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE or chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED}"
+                             process="@this" update="confirmDialogId" oncomplete="PF('confirmDialogWidget').show();"  />
+
+            <p:commandButton id="a2" icon="fa fa-remove" title="#{lang.cancel}" styleClass="btn" actionListener="#{chequeEntryView.cancel(main, chequeEntryVar)}" rendered="#{chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_BOUNCE or chequeEntryVar.statusId eq AccountingConstant.BANK_CHEQUE_RECIEVED}" immediate="true" process="@this" update="f1" partialSubmit="true">
+              <p:confirm header="#{lang.confirm} #{lang.cancel}" message="#{lang.confirmCancelMessage}"  icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
+          </p:column>
+          <p:column styleClass="w-40" exportable="false">
+            <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+            <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+              <ui:define name="cby">#{appView.display(chequeEntryVar.createdBy)}</ui:define>
+              <ui:define name="cat">#{appView.dateTime(chequeEntryVar.createdAt)}</ui:define>
+              <ui:define name="uby">#{appView.display(chequeEntryVar.modifiedBy)}</ui:define>
+              <ui:define name="uat">#{appView.dateTime(chequeEntryVar.modifiedAt)}</ui:define>
+              <ui:define name="id">#{appView.display(chequeEntryVar.id)}</ui:define>
+            </ui:decorate>
+          </p:column>
+        </p:dataTable> 	
+      </h:panelGroup>
+      <p:dialog widgetVar="confirmDialogWidget" id="confirmDialogId" position="center" positionType="absolute" draggable="false" resizable="false" 
+                closable="true" closeOnEscape="true" modal="true" blockScroll="true" header="#{lang.confirm} #{lang.required}"  width="430" style="background-color: #FFF;" >
+
+        <h:panelGroup>
+          <div style="padding:20px;">
+            <span style="font-size: 13px;">
+              Are you going to #{chequeEntryView.type eq 2 ? 'Re submit':'Return'} the cheque <b>#{chequeEntryView.selectedChequeEntry.chequeNo} </b> .?
+            </span>
+          </div>
+          <p:panelGrid columns="1"> 
+            <p:message id="narrationMsg" for="narration" display="text"  />
+            <p:outputLabel  value="#{lang.narration}" for="narration" />
+            <p:inputTextarea id="narration" required="true" cols="50" rows="2" value="#{chequeEntryView.narration}" requiredMessage="#{lang.narration} #{lang.isRequired}" />
+
+          </p:panelGrid>
+          <div style="text-align: right;padding:10px;">
+            <p:commandButton value="#{lang.no}" styleClass="btn btn-info" onclick="PF('confirmDialogWidget').hide();" />
+            <p:commandButton value="#{lang.yes}" styleClass="btn btn-primary" action="#{chequeEntryView.submitOrReturnChequEntry(main)}" 
+                             process="confirmDialogId" update="narrationMsg" onstart="block();" oncomplete="unblock();"  />
+          </div>
+        </h:panelGroup>
+      </p:dialog>
+    </ui:define> 
+  </ui:decorate>
+</ui:composition>

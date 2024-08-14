@@ -1,0 +1,176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+
+  #{debitCreditNoteReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+
+  <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+  <p:importConstants type="spica.constant.ReportConstant" />
+  <p:importConstants type="spica.constant.AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="subLabel" value="#{debitCreditNoteReportView.filterParameters.filterType eq AccountingConstant.SUPPLIER_DEBIT_CREDIT_NOTE?'SUPPLIER':'CUSTOMER'}"/>
+    <ui:param name="ids" value="debitCreditNoteReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="debitCreditNoteReportST" onkeyup="return callDtFilter(this.value, 'debitCreditNoteReport');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <h:panelGroup styleClass="L" >  
+        <h:panelGroup>
+          <p:selectOneButton value="#{debitCreditNoteReportView.filterParameters.filterType}" >
+            <f:selectItem itemLabel="SUPPLIER" itemValue="#{AccountingConstant.SUPPLIER_DEBIT_CREDIT_NOTE}" />
+            <f:selectItem itemLabel="CUSTOMER" itemValue="#{AccountingConstant.CUSTOMER_DEBIT_CREDIT_NOTE}" />
+            <p:ajax event="change" listener="#{debitCreditNoteReportView.partyChangeEvent()}" immediate="true" process="@this" update="f1" onstart="block()" oncomplete="unblock()"/>
+          </p:selectOneButton></h:panelGroup>
+        <h:panelGroup >
+          <p:selectOneMenu id="reportType" value="#{debitCreditNoteReportView.filterParameters.reportType}"  style="padding-left: 10px;width: 125px;"
+                           styleClass="l-p-10"  required="true" >
+            <f:selectItem itemLabel="#{lang.summary}" itemValue="#{ReportConstant.SUMMARY_VIEW}" />
+            <f:selectItem itemLabel="#{lang.detail}" itemValue="#{ReportConstant.DETAIL_VIEW}" />
+            <p:ajax event="change" listener="#{debitCreditNoteReportView.reset()}" immediate="true" process="@this" update="f1" onstart="block()" oncomplete="unblock()"/>
+          </p:selectOneMenu>
+        </h:panelGroup>
+        <h:panelGroup style="padding-left: 10px;">
+          <p:selectOneMenu id="creditOrDebit" value="#{debitCreditNoteReportView.type}"  style="padding-left: 10px;width: 125px;" 
+                           styleClass="l-p-10"  required="true" placeholder="#{lang.debit}/#{lang.credit}">
+            <f:selectItem itemLabel="" itemValue="#{0}" />
+            <f:selectItem itemLabel="#{lang.debit}" itemValue="#{1}" />
+            <f:selectItem itemLabel="#{lang.credit}" itemValue="#{2}" />
+            <p:ajax event="change" listener="#{debitCreditNoteReportView.reset()}" immediate="true" process="@this" update="f1" onstart="block()" oncomplete="unblock()"/>
+          </p:selectOneMenu>
+        </h:panelGroup>
+        <h:panelGroup id="accountGroupDiv" rendered="#{debitCreditNoteReportView.filterParameters.filterType eq AccountingConstant.CUSTOMER_DEBIT_CREDIT_NOTE}">
+          <p:autoComplete id="accountGroup"  value="#{debitCreditNoteReportView.filterParameters.accountGroup}" completeMethod="#{debitCreditNoteReportView.accountGroupAuto}" 
+                          converter="wawo.LookupIntConverter" style="padding-left: 10px;"
+                          var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"                              
+                          title="#{lang.accountGroup}">
+            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+            <p:column style="width:250px;">
+              <h:outputText value="#{e.groupName}" />
+            </p:column>
+            <p:column style="width: 40px;">
+              <h:outputText value="#{e.groupCode}" />
+            </p:column>
+            <p:column style="width: 50px;">
+              <p:fragment rendered="#{e.isDefault eq 0}">
+                <i class="fa fa-users" style="color:#000;"></i>
+              </p:fragment>
+              <p:fragment rendered="#{e.isDefault eq 1}">
+                <i class="fa fa-users" style="color:#CCC;" ></i>
+              </p:fragment>
+            </p:column>
+            <p:ajax event="itemSelect" process="accountGroupDiv" update="debitCreditNoteReportTable " onstart="block()" oncomplete="unblock()"
+                    listener="#{debitCreditNoteReportView.reset()}"/>
+          </p:autoComplete>                
+        </h:panelGroup>  
+        <h:panelGroup id="accountDiv"  rendered="#{debitCreditNoteReportView.filterParameters.filterType eq AccountingConstant.SUPPLIER_DEBIT_CREDIT_NOTE}">
+          <p:autoComplete id='account'  value="#{debitCreditNoteReportView.filterParameters.account}" completeMethod="#{debitCreditNoteReportView.accountAuto}" converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.vendorId.vendorName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountCombo}" autocomplete="off" forceSelection="true" required="false" requiredMessage="#{lang.account} #{lang.isRequired}" 
+                          style="padding-left: 10px;">
+            <f:attribute name="clazz" value="#{scmLookupView.accountClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountById()}"/>        
+            <p:column style="width: 200px;">
+              <h:outputText value="#{e.accountTitle}" />
+            </p:column>
+            <p:column style="width: #{userRuntimeView.getAccountingAutoWidth()}px;">
+              <h:outputText value="#{e.accountCode}" />
+            </p:column>
+          </p:autoComplete>
+        </h:panelGroup>
+      </h:panelGroup>
+
+      <h:panelGroup styleClass="L" >   
+        <p:commandButton actionListener="#{debitCreditNoteReportView.backOrNext(-1)}" icon="fa fa-arrow-circle-left" immediate="true" process="@this" update="fromDate debitCreditNoteReportTable"  styleClass="btn" 
+                         onstart="block()" oncomplete="unblock()" />
+        <p:commandButton actionListener="#{debitCreditNoteReportView.backOrNext(1)}" icon="fa fa-arrow-circle-right" immediate="true" process="@this" update="fromDate debitCreditNoteReportTable" styleClass="btn" 
+                         onstart="block()" oncomplete="unblock()" />
+        <!--From Date-->
+        <p:calendar id="fromDate" value="#{debitCreditNoteReportView.filterParameters.fromDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.fromDate} #{lang.isRequired}" styleClass="fw" onfocus="this.select();"
+                    converterMessage="#{lang.fromDate} #{lang.invalidDate}" title="#{lang.fromDate}" pages="1" onclick="this.select();" 
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                    maxdate="#{debitCreditNoteReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: debitCreditNoteReportView.filterParameters.today}">
+          <p:ajax event="dateSelect" listener="#{debitCreditNoteReportView.reset()}" process="@this" onstart="block();" oncomplete="unblock();"  update="toDateDIV debitCreditNoteReportTable"/>          
+          <p:ajax event="change" listener="#{debitCreditNoteReportView.reset()}" process="@this" onstart="block();" oncomplete="unblock();"  update="toDateDIV debitCreditNoteReportTable"/>          
+        </p:calendar>
+        <p:message for="fromDate" display="text" id="fmess"/>
+      </h:panelGroup>
+      <!--To Date-->
+      <h:panelGroup styleClass="L" id="toDateDIV" >
+        <p:calendar id="toDate" value="#{debitCreditNoteReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" validator="#{sysRuntimeView.dateLteToday}"
+                    required="true" requiredMessage="#{lang.toDate} #{lang.isRequired}" styleClass="fw" onclick="this.select();" onfocus="this.select();"
+                    converterMessage="#{lang.toDate} #{lang.invalidDate}" title="#{lang.toDate}" pages="1" mindate="#{debitCreditNoteReportView.filterParameters.fromDate}"
+                    maxlength="10" size="10" showButtonPanel="true" navigator="true" mask="true"  
+                    maxdate="#{debitCreditNoteReportView.filterParameters.today ge userRuntimeView.company.currentFinancialYear.endDate?userRuntimeView.company.currentFinancialYear.endDate: debitCreditNoteReportView.filterParameters.today}" >
+          <p:ajax event="dateSelect" listener="#{debitCreditNoteReportView.reset()}" immediate="true" onstart="block();" oncomplete="unblock();" update="debitCreditNoteReportTable"/>          
+        </p:calendar>
+        <p:message for="toDate" display="text" id="tmess"/>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="list">
+
+      <p:dataTable id="debitCreditNoteReportTable" var="row" widgetVar="debitCreditReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{debitCreditNoteReportView.debitCreditReportList}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('debitCreditReportWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column headerText="#{lang.documentNo}" sortBy="#{row.documentNo}"  filterBy="#{row.documentNo}" filterStyleClass="hidden">
+          <p:commandLink actionListener="#{popUpView.showDebitCreditNote(row.id)}" immediate="true"  >
+            <h:outputText value="#{appView.title(row.documentNo)}" title="#{appView.title(row.documentNo)}" escape="false" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.entryDate}" sortBy="#{row.entryDate}"  filterBy="#{row.entryDate}" filterStyleClass="hidden"><h:outputText value="#{appView.date(row.entryDate)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.type}" sortBy="#{row.invoiceType}"  filterBy="#{row.invoiceType}" filterStyleClass="hidden"><h:outputText value="#{row.invoiceType}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/></p:column>
+        <p:column headerText="#{lang.invoiceDate}" sortBy="#{row.invoiceDate}"  filterBy="#{row.invoiceDate}" filterStyleClass="hidden"><h:outputText value="#{row.invoiceDate ne null ?appView.date(row.invoiceDate):''}" escape="false" /></p:column>
+        <p:column headerText="#{lang.customerName}"  rendered="#{debitCreditNoteReportView.filterParameters.filterType eq AccountingConstant.CUSTOMER_DEBIT_CREDIT_NOTE}" sortBy="#{row.customerName}"  filterBy="#{row.party}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.party)}" title="#{appView.title(row.party)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.supplierName}"  rendered="#{debitCreditNoteReportView.filterParameters.filterType eq AccountingConstant.SUPPLIER_DEBIT_CREDIT_NOTE}" sortBy="#{row.customerName}"  filterBy="#{row.party}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.party)}" title="#{appView.title(row.party)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.title}" rendered="#{debitCreditNoteReportView.filterParameters.reportType eq ReportConstant.DETAIL_VIEW}" sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.hsnCode}" rendered="#{debitCreditNoteReportView.filterParameters.reportType eq ReportConstant.DETAIL_VIEW}" filterBy="#{row.hsnCode}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.hsnCode)}" title="#{appView.title(row.hsnCode)}" escape="false" /></p:column>
+        <p:column headerText="#{lang.taxPercentage}" rendered="#{debitCreditNoteReportView.filterParameters.reportType eq ReportConstant.DETAIL_VIEW}" sortBy="#{row.taxPerc}"  filterBy="#{row.taxPerc}" filterStyleClass="hidden"><h:outputText value="#{(row.taxPerc)}" title="#{(row.taxPerc)}" escape="false" /></p:column>
+
+        <p:column headerText="#{lang.taxableValue}" sortBy="#{row.taxableValue}"  style="text-align: right" filterBy="#{row.taxableValue}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.taxableValue)}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/>
+        </p:column>
+
+        <p:column headerText="#{lang.igst}"  sortBy="#{row.igst}" style="text-align: right" filterBy="#{row.igst}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.igst)}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/>
+        </p:column>
+        <p:column headerText="#{lang.cgst}"  sortBy="#{row.cgst}"  style="text-align: right" filterBy="#{row.cgst}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.cgst)}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/>
+        </p:column>
+        <p:column headerText="#{lang.sgst}" sortBy="#{row.sgst}"  style="text-align: right" filterBy="#{row.sgst}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.sgst)}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/>
+        </p:column>
+        <p:column headerText="#{lang.gstNo}  #{lang.amount}" sortBy="#{row.gstAmount}"  style="text-align: right" filterBy="#{row.gstAmount}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.gstAmount)}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/>
+        </p:column>
+        <p:column headerText="#{lang.bill} #{lang.amount}" sortBy="#{row.netAmount}"  style="text-align: right" filterBy="#{row.billAmount}" filterStyleClass="hidden">
+          <h:outputText value="#{appView.decimal(row.netAmount)}" escape="false" style="color:#{row.invoiceType eq 'CREDIT NOTE'? '':ReportConstant.COLOR_RED}"/>
+        </p:column>
+      </p:dataTable>
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

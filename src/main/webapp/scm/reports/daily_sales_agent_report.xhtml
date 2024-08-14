@@ -1,0 +1,150 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{salesAgentReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <p:importConstants type="spica.constant.ReportConstant" />
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="dailySalesAgentReport"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList" >
+      <h:panelGrid columns="6">
+        <h:panelGrid columns="2" >
+          <p:outputLabel value="#{lang.salesReturn}" for="srSwitch" style="padding-left: 10px;padding-right: 10px;" />
+          <p:inputSwitch  value="#{salesAgentReportView.filterParameters.includeReturn}" onLabel="#{lang.on}" offLabel="#{lang.off}" id="srSwitch" >
+            <p:ajax  process="@this" update="reportList" onstart="block();" oncomplete="unblock();" immediate="true" 
+                     listener="#{salesAgentReportView.setDailyReport(null)}"/> 
+          </p:inputSwitch >
+        </h:panelGrid>
+        <h:panelGroup id="salesAgentDiv" style="padding-left: 10px;padding-right: 10px;">
+          <p:autoComplete id="salesAgent"  value="#{salesAgentReportView.filterParameters.salesAgent}" completeMethod="#{salesAgentReportView.salesAgentAuto}" 
+                          converter="wawo.LookupIntConverter" scrollHeight="500"
+                          var="e" itemValue="#{e}" itemLabel="#{e.name}" emptyMessage="#{lang.noResult}" dropdown="true" cache="false" queryDelay="500" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectSalesAgent}" autocomplete="off" forceSelection="true"                               
+                          title="#{lang.salesAgent}" rendered="#{salesAgentReportView.filterParameters.filterOption eq 0}" >
+            <f:attribute name="clazz" value="#{scmLookupView.salesAgentClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.salesAgentById()}"/>        
+            <p:column style="width:250px;">
+              <h:outputText value="#{e.name}" />
+            </p:column>
+            <p:column style="width: 40px;">
+              <h:outputText value="#{e.userCode}" />
+            </p:column>
+            <p:ajax event="itemSelect" process="salesAgentDiv" update="reportList" 
+                    listener="#{salesAgentReportView.salesAgentSelectEvent}" onstart="block()" oncomplete="unblock()" />
+          </p:autoComplete>               
+        </h:panelGroup> 
+        <h:panelGroup id="accountGroupDiv" rendered="true">
+          <p:autoComplete id='accountGroup'  value="#{salesAgentReportView.filterParameters.accountGroup}" completeMethod="#{userRuntimeView.accountGroupAuto}" converter="wawo.LookupIntConverter" 
+                          var="e" itemValue="#{e}" itemLabel="#{e.groupName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" 
+                          converterMessage="#{lang.invalidSelection}" placeholder="#{lang.selectAccountGroupCombo}" autocomplete="off" forceSelection="true"  
+                          title="#{lang.accountGroup}" >
+            <f:attribute name="clazz" value="#{scmLookupView.accountGroupClass()}"/>
+            <f:attribute name="byid" value="#{scmLookupView.accountGroupById()}"/>        
+            <p:column style="width:250px;">
+              <h:outputText value="#{e.groupName}" />
+            </p:column>
+            <p:column style="width: 40px;">
+              <h:outputText value="#{e.groupCode}" />
+            </p:column>
+            <p:column style="width: 50px;">
+              <p:fragment rendered="#{e.isDefault eq 0}">
+                <i class="fa fa-users" style="color:#000;"></i>
+              </p:fragment>
+              <p:fragment rendered="#{e.isDefault eq 1}">
+                <i class="fa fa-users" style="color:#CCC;" ></i>
+              </p:fragment>
+            </p:column>
+            <p:ajax event="itemSelect" process="@this" onstart="block();" oncomplete="unblock();"  listener="#{salesAgentReportView.setDailyReport(null)}" 
+                    update="reportList"/>          
+
+          </p:autoComplete>    
+        </h:panelGroup>      
+        <!-- To Date -->
+        <p:calendar value="#{salesAgentReportView.filterParameters.toDate}" pattern="#{lang.datePattern}" converterMessage="#{lang.toDate} #{lang.invalidDate}" maxlength="13" 
+                    id="toDate" showButtonPanel="true" navigator="true" mask="true" size="13" placeholder="#{lang.toDate}" onclick="this.select();" onfocus="this.select();"
+                    maxdate="#{userRuntimeView.maxEntryDate}"
+                    mindate="#{userRuntimeView.minEntryDate}" >
+          <p:ajax event="dateSelect" process="@this" onstart="block();" oncomplete="unblock();"  listener="#{salesAgentReportView.setDailyReport(null)}" immediate="true" update="reportList"/>          
+          <p:ajax event="change"  process="@this" onstart="block();" oncomplete="unblock();" listener="#{salesAgentReportView.setDailyReport(null)}"  immediate="true" update="reportList"/>     
+        </p:calendar>
+
+        <p:commandButton value="#{lang.ok}"  styleClass="btn btn-info" immediate="false"
+                         process="reportList" update="reportList"  style="padding-left: 10px;padding-right: 10px;" onstart="block()" oncomplete="unblock()"  >
+          <p:ajax event="click" listener="#{salesAgentReportView.reset()}"/>
+        </p:commandButton>
+
+        <p:commandButton value="#{lang.export}" actionListener="#{salesAgentReportView.export(main,true)}" immediate="true"  process="@this"  styleClass="btn btn-primary" ajax="false">
+        </p:commandButton>
+      </h:panelGrid>
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="reportList" >
+        <p:importConstants type="spica.constant.ReportConstant" var="REPORTCONSTANT" />
+
+        <p:dataTable id="dailySalesAgentReport" var="row" widgetVar="dailySalesAgentReportWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     rowIndexVar="index" value="#{salesAgentReportView.dailyReport}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                     scrollHeight="540" rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                     rowHover="true" reflow="true" draggableColumns="true"  paginatorAlwaysVisible="false" paginatorPosition="bottom"  >
+
+          <p:column headerText="#{lang.slno}" exportable="true" visible="false" >
+            <h:outputText value="#{index+1}" />
+          </p:column>
+          <p:column headerText="#{lang.invoiceNo}" sortBy="#{row.invoiceNo}"  filterBy="#{row.invoiceNo}" filterStyleClass="hidden">
+            <p:commandLink actionListener="#{salesAgentReportView.openInvoicePopUp(row.id,row.invoiceOrReturn)}" immediate="true" >
+              <h:outputText value="#{appView.title(row.invoiceNo)}" title="#{appView.title(row.invoiceNo)}" escape="false" />
+            </p:commandLink>
+          </p:column>
+
+          <p:column headerText="#{lang.customerName}"  sortBy="#{row.customerName}"  filterBy="#{row.customerName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.customerName)}" title="#{appView.title(row.customerName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.productName}"  sortBy="#{row.productName}"  filterBy="#{row.productName}" filterStyleClass="hidden"><h:outputText value="#{appView.title(row.productName)}" title="#{appView.title(row.productName)}" escape="false" /></p:column>
+          <p:column headerText="#{lang.qty}"  sortBy="#{row.qty}"  style="text-align: right" filterBy="#{row.qty}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.number(row.qty)}" escape="false" style="color: #{row.invoiceOrReturn eq 2? REPORTCONSTANT.COLOR_RED:''}" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.number(salesAgentReportView.qty)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.qtyFree}"  sortBy="#{row.qtyFree}"  style="text-align: right" filterBy="#{row.qtyFree}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.number(row.qtyFree)}" escape="false" />
+            <f:facet name="footer">
+              <h:outputText value="#{appView.number(salesAgentReportView.freeQty)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.salesValue}"   style="text-align: right" filterBy="#{row.salesValue}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.salesValue)}" escape="false" style="color: #{row.invoiceOrReturn eq 2? REPORTCONSTANT.COLOR_RED:''}"/>
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesAgentReportView.salesValue)}" />
+            </f:facet>
+          </p:column>
+          <p:column headerText="#{lang.bill} #{lang.amount}"  sortBy="#{row.netAmount}"  style="text-align: right" filterBy="#{row.netAmount}" filterStyleClass="hidden">
+            <h:outputText value="#{appView.decimal(row.netAmount)}" escape="false" style="color: #{row.invoiceOrReturn eq 2? REPORTCONSTANT.COLOR_RED:''}"/>
+            <f:facet name="footer">
+              <h:outputText value="#{appView.decimal(salesAgentReportView.billAmt)}" />
+            </f:facet>
+          </p:column>
+
+
+        </p:dataTable>
+
+
+      </h:panelGroup>
+
+    </ui:define>
+  </ui:decorate>           
+</ui:composition>

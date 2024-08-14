@@ -1,0 +1,174 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >      
+  <ui:define name="navRight" >
+    <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" oncomplete="closePopup();"  icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+  </ui:define>
+  <h:panelGroup layout="block" id="accountGroupDiv" styleClass="m-b-5">
+    <p:selectOneMenu value="#{accountingMainView.selectedAccountGroup}"  id="accountGroupId" 
+                     rendered="#{ledgerTransactionView.accountingLedger.debtorsOrCreditors}"
+                     converter="omnifaces.SelectItemsConverter"  var="agp" >
+      <f:selectItem itemLabel="#{lang.all} #{lang.accountGroup}" itemValue="#{null}" />
+      <f:selectItems value="#{ledgerTransactionView.lookupGroupAuto()}" var="a" itemValue="#{a}" itemLabel="#{a.groupName}" />
+      <p:column styleClass="w-340">
+        <h:outputText value="#{agp.groupName}" />
+      </p:column>
+      <p:column>
+        <h:outputText value="#{agp.groupCode}" />
+      </p:column>          
+      <p:ajax event="itemSelect" process="accountGroupDiv" listener="#{ledgerTransactionView.accountGroupOutstandingFilter}" update="leftTable rightTable payableAmountGroup receivableAmountGroup" /> 
+    </p:selectOneMenu>        
+  </h:panelGroup>
+  <h:panelGroup layout="block" styleClass="row" > 
+
+    <h:panelGroup layout="block" styleClass="col-md-6">
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml"> 
+        <ui:param name="label" value="#{lang.receivable}"/>
+        <ui:define name="menuleft">        
+
+          <h:panelGroup id="receivableAmountGroup" rendered="#{ledgerTransactionView.getRemainingReceivable() ne null}" styleClass="label ib-m m-x-10" style="font: inherit;background-color: #{AccountingConstant.COLOR_DR}" >  #{appView.decimal(ledgerTransactionView.getRemainingReceivable())}</h:panelGroup>
+          <h:panelGroup rendered="#{ledgerTransactionView.getRemainingReceivable() ne null}" > #{lang.from} </h:panelGroup> 
+          <h:panelGroup rendered="#{ledgerTransactionView.getRemainingReceivable() ne null}" styleClass="ib-m" > #{ledgerTransactionView.accountingLedger.title} </h:panelGroup>
+        </ui:define>        
+
+        <p:dataTable id="rightTable" var="detailItemVar" widgetVar="rightWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{ledgerTransactionView.transactionDetail.getDetailItemReceivable()}"  rowKey="#{detailItemVar.id}" 
+                     selection="#{chequeEntryView.transactionDetailItemSelectedReceivable}" rowSelectMode="checkbox" >
+          <p:column selectionMode="multiple" exportable="false" rendered="#{ledgerTransactionView.isChequeEntry()}" />
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.documentType}" title="#{lang.documentType}" escape="false"  />
+            </f:facet>
+            #{detailItemVar.documentTypeId.title}   
+          </p:column>
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}" escape="false" />
+            </f:facet>
+            #{detailItemVar.documentNumber}
+          </p:column>
+          <p:column styleClass="w-160">
+            <f:facet name="header">
+              <h:outputText value="#{lang.date} / #{lang.reference} #{lang.no}" title="#{lang.date} / #{lang.reference} #{lang.no}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.date(detailItemVar.accountingTransactionDetailId.entryDate)} " escape="false" 
+                          title="#{appView.date(detailItemVar.accountingTransactionDetailId.entryDate)} / #{appView.title(detailItemVar.referNumber)}" />
+            <h:outputText value="/ #{appView.title(detailItemVar.referNumber)}" rendered="#{detailItemVar.referNumber ne null}"
+                          title="#{appView.date(detailItemVar.accountingTransactionDetailId.entryDate)} / #{appView.title(detailItemVar.referNumber)}" />
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.amount}" title="#{lang.amount}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.netAmount)}" style="color: #{detailItemVar.fontColor}" escape="false" />
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.balance}" title="#{lang.balance}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.balanceAmount)}" escape="false" />
+          </p:column>  
+
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.running} #{lang.balance}" title="#{lang.running} #{lang.balance}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.runningBalance)}" escape="false" style="color:##{detailItemVar.documentTypeId.voucherTypeId.displayColor}" title="#{detailItemVar.documentTypeId.voucherTypeId.title}" />
+          </p:column>  
+          <p:column style="width:40px;"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.dueDays}" title="#{lang.dueDays}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{detailItemVar.dueDays}" title="#{detailItemVar.dueDays}" escape="false" />
+          </p:column>  
+          <p:columnGroup type="footer">
+            <p:row>
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="#{lang.total}" />
+              <p:column style="text-align:right" styleClass="text-right" >
+                <f:facet name="footer" >   
+                  <span class="label" style="background-color: #{AccountingConstant.COLOR_CR}">#{appView.decimal(ledgerTransactionView.creditTotal)}</span>
+                </f:facet>
+              </p:column>
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+            </p:row>     
+          </p:columnGroup>
+        </p:dataTable> 
+      </ui:decorate>
+    </h:panelGroup>   
+
+    <h:panelGroup layout="block" styleClass="col-md-6" pt:data-fast-input="true" >
+      <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+        <ui:param name="label" value="#{lang.payable}"/>
+        <ui:define name="menuleft" >         
+          <h:panelGroup id="payableAmountGroup">            
+            <h:panelGroup rendered="#{ledgerTransactionView.getRemainingPayable() ne null}" styleClass="label  ib-m m-x-10" style="font: inherit;background-color: #{AccountingConstant.COLOR_CR}" > 
+              #{appView.decimal(ledgerTransactionView.getRemainingPayable())}</h:panelGroup>
+            <h:panelGroup rendered="#{ledgerTransactionView.getRemainingPayable() ne null}"  > #{lang.to} </h:panelGroup> 
+            <h:panelGroup rendered="#{ledgerTransactionView.getRemainingPayable() ne null}" styleClass="ib-m" > #{ledgerTransactionView.accountingLedger.title} </h:panelGroup>
+          </h:panelGroup>
+        </ui:define>
+        <p:dataTable id="leftTable" var="detailItemVar" widgetVar="leftWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{ledgerTransactionView.transactionDetail.getDetailItemPayable() }" rowIndexVar="rowIndex"
+                     selection="#{chequeEntryView.transactionDetailItemSelectedPayable}" rowKey="#{detailItemVar.id}" rowSelectMode="checkbox"  >
+          <p:column selectionMode="multiple" exportable="false" rendered="#{ledgerTransactionView.isChequeEntry()}" />
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.documentType}" title="#{lang.documentType}" escape="false" />
+            </f:facet>
+            #{detailItemVar.documentTypeId.title}
+          </p:column>              
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.documentNo}" title="#{lang.documentNo}" escape="false" />
+            </f:facet>             
+            #{detailItemVar.documentNumber}
+          </p:column>
+          <p:column>
+            <f:facet name="header">
+              <h:outputText value="#{lang.date} / #{lang.reference} #{lang.no}" title="#{lang.date} / #{lang.reference} #{lang.no}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.date(detailItemVar.documentDate)} " escape="false"  
+                          title="#{appView.date(detailItemVar.documentDate)} / #{appView.title(detailItemVar.referNumber)}" />
+            <h:outputText value="/ #{detailItemVar.referNumber}" rendered="#{detailItemVar.referNumber ne null}"
+                          title="#{appView.date(detailItemVar.documentDate)} / #{appView.title(detailItemVar.referNumber)}" />
+          </p:column>          
+          <p:column style="text-align: right" > 
+            <f:facet name="header">
+              <h:outputText value="#{lang.amount}" title="#{lang.amount}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.netAmount)}" escape="false" />
+          </p:column>
+          <p:column style="text-align: right"> 
+            <f:facet name="header">
+              <h:outputText value="#{lang.balance}" title="#{lang.balance}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{appView.decimal(detailItemVar.balanceAmount)}" escape="false" />
+          </p:column> 
+          <p:column style="width:80px;text-align: right;">
+            <f:facet name="header">
+              <h:outputText value="#{lang.dueDays}" title="#{lang.dueDays}" escape="false" />
+            </f:facet>
+            <h:outputText value="#{detailItemVar.dueDays}" title="#{detailItemVar.dueDays}" escape="false" />
+          </p:column>
+          <p:columnGroup type="footer">
+            <p:row>
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <p:column style="text-align:right" footerText="" />
+              <!--              <p:column style="text-align:right" footerText="" />     -->
+              <p:column style="text-align:right" footerText="#{lang.total}" />
+              <p:column style="text-align:right" styleClass="text-right" >
+                <f:facet name="footer" >   
+                  <span class="label" style="background-color: #{AccountingConstant.COLOR_DR}">#{appView.decimal(ledgerTransactionView.debitTotal)}</span>
+                </f:facet>
+              </p:column>
+              <p:column style="text-align:right" footerText="" />
+            </p:row>     
+          </p:columnGroup>
+        </p:dataTable> 
+      </ui:decorate>
+    </h:panelGroup>
+  </h:panelGroup>
+</ui:composition>

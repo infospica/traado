@@ -1,0 +1,21 @@
+<ui:composition
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:p="http://primefaces.org/ui"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+  <p:ajaxExceptionHandler type="javax.faces.application.ViewExpiredException"
+                          update="exceptionDialog" onexception="PF('exceptionDialog').show();" />
+  <p:ajaxExceptionHandler type="javax.faces.view.facelets.TagAttributeException"
+                          update="exceptionDialog"
+                          onexception="PF('exceptionDialog').show();" />
+  <p:ajaxExceptionHandler type="java.lang.Throwable"
+                          update="exceptionDialog"
+                          onexception="PF('exceptionDialog').show();" />
+  <p:dialog  id="exceptionDialog" header="Session Timed Out" widgetVar="exceptionDialog" minHeight="200" responsive="true" fitViewport="true" >
+    <p:button onclick="document.location.href = document.location.href;" value="Reload!"/>  You session has expired, Reload the page. <br/><br/>
+    <h:panelGrid rendered="#{'Development' eq facesContext.application.projectStage}">
+      Disable this message by turning the Stage to Production.<br/>   Message: #{pfExceptionHandler.message} <br/> StackTrace:#{pfExceptionHandler.formattedStackTrace}"
+    </h:panelGrid>
+  </p:dialog>  
+</ui:composition>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  #{customerBankContactView.switchCustomerBankContact(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{customerBankContactView.customerBankContact.customerBankAcId.customerId.customerName}" />
+    <ui:param name="subLabel" value="#{customerBankContactView.customerBankContact.customerBankAcId.bankId.name}" />
+    <ui:param name="labelLevel3" value="#{lang.contact}" />
+   <!--<ui:param name="labelOnly" value="#{true}" />-->
+    <ui:param name="ids" value="customerBankContact" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{customerBankContactView.deleteCustomerBankContact(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('customerBankContactWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{customerBankContactView.cloneCustomerBankContact(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true" actionListener="#{customerBankContactView.customerBankContactPopupClose()}"
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{customerBankContactView.deleteCustomerBankContact(main)}" value="#{lang.delete}" onclick="wdgOff('customerBankContactWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{customerBankContactView.saveCustomerBankContact(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.contactName}" for="contactName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerBankContactView.customerBankContact.contactName}" maxlength="50" id="contactName" autocomplete="off"
+                     required="true" requiredMessage="#{lang.name} #{lang.isRequired}" validator="wawo.WhiteSpaceValidator"/>
+        <p:message for="contactName" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.designation}" for="customerBankContactDesignationId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{customerBankContactView.customerBankContact.designationId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.designation} #{lang.isRequired}"
+                         id="customerBankContactDesignationId">
+          <f:selectItems value="#{customerBankContactView.selectDesignationByCustomerContext(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="customerBankContactDesignationId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerBankContactView.customerBankContact.phone1}" validator="wawo.WhiteSpaceValidator" maxlength="13"
+                     autocomplete="off" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" id="phone1" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerBankContactView.customerBankContact.phone2}" autocomplete="off" maxlength="13" id="phone2" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone2" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerBankContactView.customerBankContact.email}" autocomplete="off" maxlength="50" id="email" validator="wawo.EmailValidator"/>
+        <p:message for="email" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.fax1}" for="fax1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerBankContactView.customerBankContact.fax1}" autocomplete="off" maxlength="13" id="fax1" >
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax1" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{customerBankContactView.customerBankContact.sortOrder}" autocomplete="off" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0"
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.status}" for="statusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{customerBankContactView.customerBankContact.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}"
+                         id="statusId">
+          <f:selectItems value="#{customerBankContactView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="statusId" display="text" />
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(customerBankContactView.customerBankContact.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(customerBankContactView.customerBankContact.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(customerBankContactView.customerBankContact.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(customerBankContactView.customerBankContact.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="customerBankContactTable" var="customerBankContactVar" widgetVar="customerBankContactWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{customerBankContactView.customerBankContactLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{customerBankContactVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{customerBankContactView.customerBankContactSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.contactName}" sortBy="#{customerBankContactVar.contactName}" field="id" >
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{customerBankContactVar.contactName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{customerBankContactView.customerBankContact}" value="#{customerBankContactVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.accountName}" sortBy="#{customerBankContactVar.customerBankAcId.accountName}" field="customer_bank_ac_id.account_name" filterBy="#{customerBankContactVar.customerBankAcId.accountName}" filterStyle="display:none">
+          <h:outputText value="#{appView.display(customerBankContactVar.customerBankAcId.accountName)}" title="#{appView.title(customerBankContactVar.customerBankAcId.accountName)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.designation}" sortBy="#{customerBankContactVar.designationId.title}" field="designation_id.title">
+          <h:outputText value="#{appView.display(customerBankContactVar.designationId.title)}" title="#{appView.title(customerBankContactVar.designationId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.phone1}" sortBy="#{customerBankContactVar.phone1}" field="phone_1">
+          <h:outputText value="#{appView.display(customerBankContactVar.phone1)}" title="#{appView.title(customerBankContactVar.phone1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.fax1}" sortBy="#{customerBankContactVar.fax1}" field="fax_1">
+          <h:outputText value="#{appView.display(customerBankContactVar.fax1)}" title="#{appView.title(customerBankContactVar.fax1)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.email}" sortBy="#{customerBankContactVar.email}" field="email">
+          <h:outputText value="#{appView.display(customerBankContactVar.email)}" title="#{appView.title(customerBankContactVar.email)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.status}" sortBy="#{customerBankContactVar.statusId.title}" field="status_id.title">
+          <h:outputText value="#{appView.display(customerBankContactVar.statusId.title)}" title="#{appView.title(customerBankContactVar.statusId.title)}" rendered="#{customerBankContactVar.statusId.id==1}" escape="false" />
+          <h:outputText value="#{appView.display(customerBankContactVar.statusId.title)}" title="#{appView.title(customerBankContactVar.statusId.title)}" rendered="#{customerBankContactVar.statusId.id==3}" style="color:grey" escape="false" />
+        </p:column>
+        <p:column headerText="Log">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(customerBankContactVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(customerBankContactVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(customerBankContactVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(customerBankContactVar.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</html>
+

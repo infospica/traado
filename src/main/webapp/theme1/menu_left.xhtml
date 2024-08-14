@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"> 
+  <h:form id="f0" prependId="false" >
+    <ul class="menu">
+      <!--      <li class="active" aria-label="Dashboard">
+              <a class="ignoreLoad" href="main.xhtml"><span class="icon fa fa-dashboard"></span><span>Dashboard-1</span></a>
+            </li>-->
+      <ui:repeat value="#{userRuntimeView.getMenuList()}" var="menu" varStatus="menuVar">
+        <li class="#{menuVar.index eq 0 ? 'active' : ''}">
+          <p:commandLink id="xma" action="#{main.setViewPath(sm.pageUrl,list)}" process="@this" update="globalCompanyDiv globalAccount f1" immediate="true" 
+                         rendered="#{menu.pageUrl ne null}">
+            <span class="icon #{menu.iconPath == null ? 'fa fa-pie-chart' : menu.iconPath}"></span>
+            <span>#{menu.title}</span>            
+            <f:setPropertyActionListener target="#{userRuntimeView.menuActive}" value="#{menu}"/>
+            <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+            <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+            <f:setPropertyActionListener target="#{main.pageData.searchKeyWord}" value="#{null}" />            
+          </p:commandLink>
+          <p:link styleClass="ignoreLoad" rendered="#{menu.pageUrl eq null}" href="javascript:;" >
+            <span class="icon #{menu.iconPath == null ? 'fa fa-pie-chart' : menu.iconPath}"></span>
+            <span>#{menu.title}</span>
+          </p:link>
+          <ul>
+            <ui:repeat value="#{menu.parentIdMenu}" var="sm">
+              <li><p:commandLink id="xm" value="#{sm.title}" action="#{main.setViewPath(sm.pageUrl,list)}" process="@this" update="globalCompanyDiv globalAccount f1" immediate="true" >
+                  <f:setPropertyActionListener target="#{userRuntimeView.menuActive}" value="#{sm}"/>
+                  <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+                  <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+                  <f:setPropertyActionListener target="#{main.pageData.searchKeyWord}" value="#{null}" />
+                </p:commandLink></li>
+            </ui:repeat>
+          </ul>
+        </li>
+      </ui:repeat>           
+    </ul>
+  </h:form>
+</ui:composition> 

@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{tradingAccountReportView.reset()}
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    }
+  </style>
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{userRuntimeView.menuActive.title}"/>
+    <ui:param name="ids" value="tradingAccount"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>
+
+    <ui:define name="newList">
+      <p:inputText styleClass="fw" id="tradingAccountST" onkeyup="return callDtFilter(this.value, 'tradingAccount');"  placeholder="#{lang.search}"/>
+    </ui:define>
+
+    <ui:define name="form">
+    </ui:define>
+    <ui:define name="rightList" >
+      <p:importConstants type="spica.constant.ReportConstant" var="ReportConstant" />
+      <p:selectOneMenu id="reportType" value="#{tradingAccountReportView.reportType}"  styleClass="l-p-10" >
+        <f:selectItem itemLabel="#{lang.selectReportNameCombo}" itemValue="#{null}" />
+        <f:selectItem itemLabel="#{lang.summary}" itemValue="#{ReportConstant.SUMMARY_VIEW}" />
+        <f:selectItem itemLabel="#{lang.detail}" itemValue="#{ReportConstant.DETAIL_VIEW}" />
+        <p:ajax event="itemSelect" process="reportType" onstart="block()" oncomplete="unblock()" />
+      </p:selectOneMenu>
+
+      <p:commandButton value="#{lang.ok}" styleClass="btn btn-info" onclick="block();" oncomplete="unblock();" 
+                       process="reportType" update="tradingAccountTable"  style="margin-left: 3px; margin-bottom: 4px;"  >
+      </p:commandButton>
+    </ui:define>
+    <ui:define name="list">
+      <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+
+      <p:dataTable id="tradingAccountTable" var="row" widgetVar="tradingAccountWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   value="#{tradingAccountReportView.getTradingAccountReportList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                   rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+        <f:facet name="header">
+          <o:importFunctions type="java.lang.Math" var="m" />
+          <p:outputPanel styleClass="hidden" >
+            <p:inputText id="globalFilter"  onkeyup="return PF('tradingAccountWidget').filter()" />
+          </p:outputPanel>
+        </f:facet>
+        <p:column sortBy="#{row.parentOrAccount}"  filterBy="#{row.parentOrAccount}" filterStyleClass="hidden">
+          <f:facet name="header"><h:outputText value="#{lang.account}" title="#{lang.account}"/></f:facet>
+          <h:outputText value="#{appView.display(row.parentOrAccount)}" title="#{appView.title(row.parentOrAccount)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.openValue}"  filterBy="#{row.openValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.opening} #{lang.value}" title="#{lang.opening} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.openValue)}" title="#{appView.decimal(row.openValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.purValue}"  filterBy="#{row.purValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.purchase} #{lang.value}" title="#{lang.purchase} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.purValue)}" title="#{appView.decimal(row.purValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.purRetValue}"  filterBy="#{row.purRetValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseReturn} #{lang.value}" title="#{lang.purchaseReturn} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.purRetValue)}" title="#{appView.decimal(row.purRetValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.salesValue}"  filterBy="#{row.salesValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.sales} #{lang.value}" title="#{lang.sales} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.salesValue)}" title="#{appView.decimal(row.salesValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.salesRetValue}"  filterBy="#{row.salesRetValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.salesReturn} #{lang.value}" title="#{lang.salesReturn} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.salesRetValue)}" title="#{appView.decimal(row.salesRetValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.stockAdjValue}"  filterBy="#{row.stockAdjValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.stockAdjustment} #{lang.value}" title="#{lang.stockAdjustment} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.stockAdjValue)}" title="#{appView.decimal(row.stockAdjValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.stockMovValue}"  filterBy="#{row.stockMovValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.stockMovement} #{lang.value}" title="#{lang.stockMovement} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.stockMovValue)}" title="#{appView.decimal(row.stockMovValue)}" escape="false" /></p:column>
+
+        <p:column sortBy="#{row.closingValue}"  filterBy="#{row.closingValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.closing} #{lang.value}" title="#{lang.closing} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.closingValue)}" title="#{appView.decimal(row.closingValue)}" escape="false" /></p:column> 
+
+        <p:column sortBy="#{row.gpValue}"  filterBy="#{row.gpValue}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.grossProfit} #{lang.value}" title="#{lang.grossProfit} #{lang.value}"/></f:facet>
+          <h:outputText value="#{appView.decimal(row.gpValue)}" title="#{appView.decimal(row.gpValue)}" escape="false" /></p:column> 
+
+        <p:column sortBy="#{row.gpPercentage}"  filterBy="#{row.gpPercentage}" filterStyleClass="hidden" style="text-align: right">
+          <f:facet name="header"><h:outputText value="#{lang.grossProfit} #{lang.percentage}" title="#{lang.grossProfit} #{lang.percentage}"/></f:facet>
+          <h:outputText value="#{row.gpPercentage lt 0 ? '(':''}#{row.gpPercentage lt 0 ? m:abs(row.gpPercentage):appView.decimal(row.gpPercentage)}#{row.gpPercentage lt 0 ? ')':''}" title="#{appView.decimal(row.gpPercentage)}" escape="false" /></p:column> 
+
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

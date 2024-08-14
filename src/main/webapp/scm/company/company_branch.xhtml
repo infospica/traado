@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{companyBranchView.switchCompanyBranch(main, main.viewType)}
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{companyBranchView.companyBranch.companyId.companyName} / #{main.isEdit() ? companyBranchView.companyBranch.branchName : lang.branches} " />
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="companyBranch" />
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{companyBranchView.cloneCompanyBranch(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{companyBranchView.companyBranchPopupClose}"
+                       oncomplete="parent.companyBranchPopupReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{companyBranchView.deleteCompanyBranch(main)}" value="#{lang.delete}" onclick="wdgOff('companyBranchWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{companyBranchView.saveCompanyBranch(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.modify==true or userRuntimeView.privilege.add==true}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <!-- branch Name-->
+      <p:outputLabel value="#{lang.branchName}" for="branchName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.branchName}" maxlength="50" required="true" requiredMessage="#{lang.branchName} #{lang.isRequired}" id="branchName" />
+        <p:message for="branchName" display="text"/>
+      </h:panelGroup>
+
+      <!-- address -->
+      <p:outputLabel value="#{lang.address}" for="address" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{companyBranchView.companyBranch.address}" cols="100" rows="2" maxlength="500" required="true" requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" />
+        <p:message for="address" display="text"/>
+      </h:panelGroup>
+
+      <!--country-->
+      <p:outputLabel value="#{lang.country}" for="companyBranchCountryId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{companyBranchView.companyBranch.countryId}" completeMethod="#{companyBranchView.countryAuto}" converter="wawo.LookupIntConverter" 
+                         required="true" requiredMessage="#{lang.country} #{lang.isRequired}"  id="companyBranchCountryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" update="companyBranchStateDiv companyBranchDistrictDiv phone1" listener="#{companyBranchView.clearStateDistrict}"/>
+        </p:autoComplete><p:message for="companyBranchCountryId" display="text" />
+      </h:panelGroup>
+
+      <!--state-->
+      <p:outputLabel value="#{lang.state}" for="companyBranchStateId"/>
+      <h:panelGroup id="companyBranchStateDiv">
+        <p:autoComplete  value="#{companyBranchView.companyBranch.stateId}" completeMethod="#{companyBranchView.stateAuto}" converter="wawo.LookupIntConverter" 
+                         required="true" requiredMessage="#{lang.state} #{lang.isRequired}"  id="companyBranchStateId" var="e" itemValue="#{e}" itemLabel="#{e.stateName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+          <p:ajax event="itemSelect" update="companyBranchDistrictDiv" listener="#{companyBranchView.clearDistrict}"/>
+        </p:autoComplete><p:message for="companyBranchStateId" display="text" />
+      </h:panelGroup>
+
+      <!--district-->
+      <p:outputLabel value="#{lang.district}" for="companyBranchDistrictId"/>
+      <h:panelGroup id="companyBranchDistrictDiv">
+        <p:autoComplete  value="#{companyBranchView.companyBranch.districtId}" completeMethod="#{companyBranchView.districtAuto}" converter="wawo.LookupIntConverter"  
+                         required="true" requiredMessage="#{lang.district} #{lang.isRequired}" id="companyBranchDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+          <!--<p:ajax event="itemSelect" update="companyBranchTerritoryDiv" listener="#{companyBranchView.clearTerritory}"/>-->
+        </p:autoComplete><p:message for="companyBranchDistrictId" display="text" />
+      </h:panelGroup>
+
+      <!--territory-->
+<!--            <p:outputLabel value="#{lang.territory}" for="companyBranchTerritoryId"/>
+      <h:panelGroup id="companyBranchTerritoryDiv">
+        <p:autoComplete  value="#{companyBranchView.companyBranch.territoryId}" completeMethod="#{companyBranchView.territoryAuto}" converter="wawo.LookupIntConverter" 
+                         id="companyBranchTerritoryId" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw" >
+          required="true" requiredMessage="#{lang.territory} #{lang.isRequired}"
+          <f:attribute name="clazz" value="#{scmLookupView.territoryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.territoryById()}"/>
+        </p:autoComplete><p:message for="companyBranchTerritoryId" display="text" />
+      </h:panelGroup>-->
+
+      <!--pincode-->
+      <p:outputLabel value="#{lang.pincode}" for="pin" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{companyBranchView.companyBranch.pin}" maxlength="6" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="0"  thousandSeparator="" validatorMessage="#{lang.pincode} #{lang.requiredLength} is 6 " id="pin">
+         <f:validateLength minimum="6"/>
+        </p:inputNumber>
+        <p:message for="pin" display="text"/>
+      </h:panelGroup>
+
+      <!--phone1-->
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.phone1}" maxlength="13" id="phone1" required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}"
+                       validator="wawo.WhiteSpaceValidator">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup>
+
+      <!--phone2-->
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.phone2}" maxlength="13" id="phone2" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone2" display="text"/>
+      </h:panelGroup>
+
+      <!--phone3-->
+      <p:outputLabel value="#{lang.phone3}" for="phone3" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.phone3}" maxlength="13" id="phone3" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+      </h:panelGroup>
+
+      <!--fax1-->
+      <p:outputLabel value="#{lang.fax1}" for="fax1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.fax1}" maxlength="13" id="fax1">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax1" display="text"/>
+      </h:panelGroup>
+
+      <!--fax2-->
+      <p:outputLabel value="#{lang.fax2}" for="fax2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.fax2}" maxlength="13" id="fax2">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax2" display="text"/>
+      </h:panelGroup>
+
+      <!--email-->
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{companyBranchView.companyBranch.email}" maxlength="50" id="email" validator="wawo.EmailValidator">
+        </p:inputText>
+        <p:message for="email" display="text"/>
+      </h:panelGroup>
+
+      <!--Sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{companyBranchView.companyBranch.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                      onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0" maxlength="3" id="sortOrder" styleClass="fw" thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="companyBankStatusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{companyBranchView.companyBranch.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
+                         id="companyBankStatusId" styleClass="fw">
+          <f:selectItems value="#{companyBranchView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="companyBankStatusId" display="text" />
+      </h:panelGroup> 
+
+    </ui:define>
+
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(companyBranchView.companyBranch.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(companyBranchView.companyBranch.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(companyBranchView.companyBranch.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(companyBranchView.companyBranch.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+</html>
+

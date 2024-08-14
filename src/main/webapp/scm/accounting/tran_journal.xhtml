@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" >      
+       
+       <p:dataTable id="journalTable" var="journalVar" widgetVar="journalWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                     value="#{journalView.getJournalList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{journalVar.id}" rowIndexVar="index"
+                     rowHover="true" reflow="false" draggableColumns="true" scrollable="false" rendered="#{journalView.filterJournal.isContra() or journalView.filterJournal.isJournal() or journalView.filterJournal.isOpeningEntry()}" >
+          <p:column styleClass="w-60 #{journalVar.debit ne null  ? 'text-left' : 'text-left'}">
+            <p:commandLink actionListener="#{popUpView.showLedgerBalance(journalVar.accountingLedgerId)}" >
+              <h:outputText value="#{journalVar.debit ne null  ? lang.by : journalVar.credit ne null ? lang.to : ''}" escape="false" styleClass="label" 
+                            style="background-color: #{journalVar.debit ne null ? AccountingConstant.COLOR_DR : AccountingConstant.COLOR_CR}" />
+            </p:commandLink>
+          </p:column>
+          <p:column >
+            <f:facet name="header">
+              <p:commandLink id="cl2" actionListener="#{journalView.openLedgerPopup()}" process="@this" immediate="true" rendered="#{!main.popup}" >
+                #{lang.ledger}
+              </p:commandLink>
+            </f:facet>
+            <h:panelGroup id="ledgerDivJ" layout="block">
+              <!--<h:outputText value="#{journalVar.accountingLedgerId.title}" rendered="#{main.isEdit()}"/>-->
+              <p:commandLink id="linkJ" actionListener="#{popUpView.showLedgerBalance(journalVar.accountingLedgerId)}" value="#{journalVar.accountingLedgerId.title}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.view} #{lang.ledger}" rendered="#{main.isEdit() and !journalView.editable}"/>
+              <p:autoComplete value="#{journalVar.accountingLedgerId}" completeMethod="#{journalView.accountingLedgerAuto}" converter="wawo.LookupIntConverter"
+                              id="ledgerId" dynamic="true"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" cacheTimeout="3000" queryDelay="500" maxResults="25"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="false"  styleClass="fw" rendered="#{main.isNew() or journalView.editable}">
+                <f:attribute name="clazz" value="#{scmLookupView.accountingLedgerClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.accountingLedgerById()}"/>
+                <p:ajax event="itemSelect" process="entryDate1 ledgerDivJ" listener="#{journalView.actionOpenDetailItemPopup(main, journalVar)}" update="accountGroupDiv partyLedgerId"  />
+                <p:column style="width: 300px;"><h:outputText value="#{e.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.title}" /></p:column>
+                <p:column style="width: 150px;"><h:outputText value="#{e.accountingGroupId.parentId.title}" /></p:column>
+              </p:autoComplete>
+              <p:message for="ledgerId" display="text" />
+            </h:panelGroup>
+          </p:column>
+          <p:column headerText="#{lang.debit}" styleClass="w-180 text-right">
+            <h:outputText styleClass="fw" value="#{appView.decimal(journalVar.debit)}" rendered="#{main.isEdit() and !journalView.editable}"/>
+            <h:panelGroup id="debitDiv" rendered="#{main.isNew() or journalView.editable}">
+              <p:inputNumber value="#{journalVar.debit}" converterMessage="#{lang.debit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="debit" valueChangeListener="#{journalView.onDebitValueChanged}" styleClass="fw">
+                <p:ajax event="valueChange" listener="#{journalView.onDebitBlur(main, journalVar, index)}" process="@this journalTable" update="@this creditDiv journalTable" partialSubmit="true"/>
+              </p:inputNumber>
+              <p:message for="debit" display="text"/>
+            </h:panelGroup>
+          </p:column>
+          <p:column headerText="#{lang.credit}" styleClass="w-180 text-right">
+            <h:outputText styleClass="fw" value="#{appView.decimal(journalVar.credit)}" rendered="#{main.isEdit() and !journalView.editable}"/>
+            <h:panelGroup id="creditDiv" rendered="#{main.isNew() or journalView.editable}">
+              <p:inputNumber value="#{journalVar.credit}" converterMessage="#{lang.credit} #{lang.invalidNumber}" decimalPlaces="2"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999" minValue="-9999" maxlength="8" id="credit" valueChangeListener="#{journalView.onCreditValueChanged}"  styleClass="fw">
+                <!--<p:ajax event="blur" listener="#{journalView.onCreditBlur(main, journalVar, index)}" process="@this journalTable" update="@this debitDiv journalTable" partialSubmit="true" />-->
+                <p:ajax event="valueChange" listener="#{journalView.onCreditBlur(main, journalVar, index)}" process="@this journalTable" update="@this debitDiv journalTable" partialSubmit="true" />
+              </p:inputNumber>
+              <p:message for="credit" display="text"/>
+            </h:panelGroup>
+          </p:column>
+          <p:column styleClass="w-40 text-right">
+            <h:outputText styleClass="fw" value="#{journalVar.debit ne null ? lang.dr : journalVar.credit ne null ? lang.cr : ''}" escape="false" />
+          </p:column>
+          <p:column  styleClass="w-220 text-right" headerText="#{lang.note}" >
+            <h:panelGroup id="note">
+              <p:inputText  value="#{journalVar.narration}" id="tNote"  styleClass="fw" readonly="#{main.isEdit() and !journalView.editable}"/>
+            </h:panelGroup>
+          </p:column>
+        </p:dataTable>
+</ui:composition>

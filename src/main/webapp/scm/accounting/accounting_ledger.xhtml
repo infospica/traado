@@ -1,0 +1,409 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"    >      
+  #{accountingLedgerView.switchAccountingLedger(main, viewType)}
+  <p:importConstants type="spica.constant.AccountingConstant" var="AccountingConstant" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.ledgerMaster}" />
+    <ui:param name="ids" value="accountingLedger" />
+    <ui:param name="cols" value="4" />  
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{accountingLedgerView.deleteAccountingLedger(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('accountingLedgerWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{accountingLedgerView.cloneAccountingLedger(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{accountingLedgerView.deleteAccountingLedger(main)}" value="#{lang.delete}" onclick="wdgOff('accountingLedgerWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{accountingLedgerView.saveAccountingLedger(main)}" value="#{lang.save}" onclick="toTop()" id="btnSave" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>
+    </ui:define>   
+    <ui:define name="rightList">   
+      <!--<h:panelGroup layout="block" styleClass="L" id="selectedAccountingLedger">-->
+      <p:selectOneMenu value="#{accountingLedgerView.selectedAccountingGroup}"  id="accountingLedgerAccountingHeadId" converter="omnifaces.SelectItemsConverter" filter="true" var="t" filterMatchMode="contains">
+        <f:selectItem itemLabel="#{lang.all} #{lang.ledger} #{lang.group}" itemValue="#{null}" />
+        <f:selectItems value="#{accountingLedgerView.accountingGroupAuto('')}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+        <p:column styleClass="w-180">
+          <h:outputText value="#{t.title}" />
+        </p:column>
+        <p:column>
+          <h:outputText value="#{t.accountingHeadId.title}" />
+        </p:column>
+        <p:column styleClass="w-180">
+          <h:outputText value="#{t.parentId.title}" />
+        </p:column>
+        <p:ajax event="itemSelect" process="@this" update="accountingLedgerTable" />
+      <!--<p:ajax event="itemSelect" process="selectedAccountingLedger" listener="#{ledgerTransactionView.groupFilter}" update="accountingLedgerTable" />--> 
+      </p:selectOneMenu>        
+      <!--</h:panelGroup>-->
+    </ui:define>
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}"  oncomplete="closePopup()" immediate="true" styleClass="btn btn-default" icon="fa fa-times"  iconPos="right"/>
+    </ui:define>
+    <ui:define name="form">     
+
+      <p:outputLabel value="#{lang.ledger} #{lang.name}" for="title" />
+      <h:panelGroup>
+        <p:inputText autocomplete="off" value="#{accountingLedgerView.accountingLedger.title}" maxlength="50" id="title" styleClass="fw" required="true" requiredMessage="#{lang.ledger} #{lang.isRequired}"/>
+        <p:message for="title" display="text"/>
+      </h:panelGroup>
+
+      <p:commandLink process="@this" update="openBalanceDlg" oncomplete="unblock(); PF('openBalanceDlgVar').show();" rendered="#{accountingLedgerView.accountingLedger.isVendorOrCustomers()}" >
+        <p:outputLabel value="#{lang.opening}" for="openingBalance"/>
+      </p:commandLink>
+      <p:outputLabel id="lblOpeningBalance" value="#{lang.opening}" for="openingBalance" rendered="#{!accountingLedgerView.accountingLedger.isVendorOrCustomers()}"/>
+      <h:panelGroup layout="block" id="openingBalanceTxtDiv">
+        <p:inputNumber value="#{accountingLedgerView.accountingLedger.openingBalance}" converterMessage="#{lang.opening} #{lang.invalidNumber}"
+                       decimalPlaces="2" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " 
+                       readonly="#{accountingLedgerView.accountingLedger.isVendorOrCustomers()}" valueChangeListener="#{accountingLedgerView.openingBalanceModified}"
+                       maxlength="15" id="openingBalance" disabled="#{!accountingLedgerView.hasOpeningBalance()}">
+          <!--<p:ajax event="change" process="@this" update="isDebitOrCredit" />-->
+        </p:inputNumber>    
+          <!--disabled="#{!accountingLedgerView.hasOpeningBalance()}"-->
+        <p:selectOneButton value="#{accountingLedgerView.accountingLedger.isDebitOrCredit}" immediate="true"
+                           disabled="#{!accountingLedgerView.hasOpeningBalance()}" 
+                           requiredMessage="#{lang.isDebitOrCredit} #{lang.isRequired}" id="isDebitOrCredit" >
+          <f:selectItem itemLabel="#{lang.dr}" itemValue="#{AccountingConstant.IS_DEBIT}" />
+          <f:selectItem itemLabel="#{lang.cr}" itemValue="#{AccountingConstant.IS_CREDIT}" />
+          <p:ajax event="change" process="@this" update="@this" />
+        </p:selectOneButton>
+        <!--<p:outputLabel value="#{accountingLedgerView.accountingLedger.isDebitOrCredit eq 1?lang.dr:lang.cr}" rendered="#{!accountingLedgerView.hasOpeningBalance()}"/>-->
+        <p:message for="openingBalance" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.accountingGroup}" for="accountingLedgerAccountingGroupId"/>
+      <h:panelGroup>
+        <p:autoComplete value="#{accountingLedgerView.accountingLedger.accountingGroupId}" completeMethod="#{accountingLedgerView.accountingGroupAuto}" converter="wawo.LookupIntConverter"   
+                        required="true" requiredMessage="#{lang.accountingGroup} #{lang.isRequired}" id="accountingLedgerAccountingGroupId" var="e" itemValue="#{e}" itemLabel="#{e.title}"
+                        emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="40" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                        styleClass="fw" scrollHeight="600" >
+          <p:ajax event="itemSelect" immediate="true" process="@this" update="taxCodeLabel taxCodeDiv hsnCodeLabel hsnCodeDiv tdsCodeDiv tdsLabel billLabel billRcmTds gstId gstPanel countryLabel countryDiv stateLabel stateDiv addLabel addDiv pinLabel pinDiv openingBalanceTxtDiv" 
+                  listener="#{accountingLedgerView.accountingGroupSelectEvent}"/>
+          <f:attribute name="clazz" value="#{scmLookupView.accountingGroupClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.accountingGroupById()}"/>
+          <p:column styleClass="w-180">
+            <h:outputText value="#{e.title}" />
+          </p:column>
+          <p:column>
+            <h:outputText value="#{e.accountingHeadId.title}" />
+          </p:column>
+          <p:column styleClass="w-180">
+            <h:outputText value="#{e.parentId.title}" />
+          </p:column>
+
+        </p:autoComplete>
+        <p:message for="accountingLedgerAccountingGroupId" display="text" />
+      </h:panelGroup>
+
+<!--      <p:outputLabel value="#{lang.opening} #{lang.entryDate}" />
+      <h:panelGroup>
+        <p:calendar value="#{accountingLedgerView.accountingLedger.openingBalanceEntryDate}" pattern="#{lang.datePattern}"
+                    styleClass="test"
+                    converterMessage="#{lang.entryDate} #{lang.invalidDate}" title="#{lang.entryDate}"
+                    maxlength="29" id="openingBalanceEntryDate" disabled="#{accountingLedgerView.accountingLedger.openingBalanceEntryDate ne null}" />
+
+      </h:panelGroup>-->
+      <p:outputLabel value="#{lang.financialYearStartDate}" />
+      <h:panelGroup>
+        <p:calendar value="#{userRuntimeView.company.financialYearStartDate}" pattern="#{lang.datePattern}"
+                    required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}" styleClass="test"
+                    converterMessage="#{lang.entryDate} #{lang.invalidDate}" title="#{lang.entryDate}"
+                    maxlength="29" id="financialYearStartDate" disabled="true" mask="true" />
+      </h:panelGroup>
+
+      <h:panelGroup id="gstPanel" >
+        <p:outputLabel value="GST" for="gstRegNumber" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}" />
+      </h:panelGroup>
+      <h:panelGroup id="gstId">
+        <p:inputText  styleClass="fw" value="#{accountingLedgerView.accountingLedger.gstTaxNo}" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"
+                      id="gstRegNumber" readonly="#{accountingLedgerView.accountingLedger.entityId ne null}" >
+          <f:validator validatorId="spica.scm.validators.GstinValidator" />  
+          <p:ajax event="change" process="@this" update="billRcmTds gstId" />
+        </p:inputText>
+        <p:message for="gstRegNumber" display="text" />        
+      </h:panelGroup>
+
+
+
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{accountingLedgerView.accountingLedger.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}"
+                       decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="3" id="sortOrder" />
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>  
+
+      <p:outputLabel value="#{lang.description}" for="description" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{accountingLedgerView.accountingLedger.description}" cols="100" rows="2" maxlength="500"  id="description" autoResize="false" />
+        <p:message for="description" display="text"/>
+      </h:panelGroup>
+
+      <h:panelGroup id="billLabel">
+        <p:outputLabel value="#{lang.billwise}" title="Billwill will ask for bill details"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+        <p:selectBooleanCheckbox value="#{accountingLedgerView.billwise}" id="billwise"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}">  </p:selectBooleanCheckbox>
+      </h:panelGroup>
+      <h:panelGroup id="billRcmTds" >
+
+        <h:panelGrid columns="3" rendered="#{!accountingLedgerView.isValidGst()}">
+          <h:panelGroup>
+            <p:outputLabel value="RCM" title="#{lang.RCM}"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+            <p:selectBooleanCheckbox value="#{accountingLedgerView.rcm}" id="rcm"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}">  </p:selectBooleanCheckbox>
+          </h:panelGroup>
+          <h:panelGroup>
+            <p:outputLabel value="TDS" title="#{lang.TDS}"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+            <p:selectBooleanCheckbox value="#{accountingLedgerView.tds}" id="tds"  immediate="true"   rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}">
+              <p:ajax update="tdsPANgp" />
+            </p:selectBooleanCheckbox>
+          </h:panelGroup>
+          <h:panelGroup  id="tdsPANgp"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"> 
+            <p:outputLabel for="tdsPAN" value="#{lang.pan}" rendered="#{accountingLedgerView.tds}" />
+            <p:inputText  id="tdsPAN" required="true" requiredMessage="#{lang.pan} #{lang.isRequired}" styleClass="fw"
+                          value="#{accountingLedgerView.accountingLedger.pan}" rendered="#{accountingLedgerView.tds}" style="width:150px;"  />
+            <p:message for="tdsPAN" display="text" />
+          </h:panelGroup>
+        </h:panelGrid>
+
+      </h:panelGroup>
+
+      <h:panelGroup id="countryLabel">
+        <p:outputLabel value="#{lang.country}" for="ledgerCountryId" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="countryDiv">
+        <p:autoComplete  value="#{accountingLedgerView.accountingLedger.countryId}" completeMethod="#{accountingLedgerView.countryAuto}" converter="wawo.LookupIntConverter" required="true"
+                         requiredMessage="#{lang.country} #{lang.isRequired}" id="ledgerCountryId" var="c" itemValue="#{c}" itemLabel="#{c.countryName}"
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                         autocomplete="off" forceSelection="true"  styleClass="fw" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}" scrollHeight="600">
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" immediate="true" process="@this" 
+                  update="stateDiv currencyDiv" listener="#{accountingLedgerView.countrySelectEvent}"/>
+        </p:autoComplete>
+        <p:message for="ledgerCountryId" display="text" />
+      </h:panelGroup>      
+
+      <p:outputLabel value="#{lang.currency}" for="currency"/>
+      <h:panelGroup id="currencyDiv">                      
+        <p:selectOneMenu styleClass="L" id="currency" value="#{accountingLedgerView.accountingLedger.currencyId}"
+                         required="true" requiredMessage="#{lang.currency} #{lang.isRequired}" converter="omnifaces.SelectItemsConverter" >
+          <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+          <f:selectItems  value="#{scmLookupView.currency(main)}" var="c" itemLabel="#{c.code}" itemValue="#{c}" />
+          <p:message for="currency" display="text"/>
+        </p:selectOneMenu>
+      </h:panelGroup> 
+
+
+
+      <h:panelGroup id="stateLabel">
+        <p:outputLabel value="#{lang.state}" for="ledgerStateId" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="stateDiv">
+        <p:autoComplete value="#{accountingLedgerView.accountingLedger.stateId}" completeMethod="#{accountingLedgerView.stateAuto}" converter="wawo.LookupIntConverter"   id="ledgerStateId"
+                        var="e" itemValue="#{e}" itemLabel="#{e.stateName}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="25"
+                        converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" styleClass="fw" required="true" scrollHeight="600"
+                        requiredMessage="#{lang.state} #{lang.isRequired}" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+          <p:ajax event="itemSelect" immediate="true" process="@this" listener="#{accountingLedgerView.stateSelectEvent}"/>
+        </p:autoComplete><p:message for="ledgerStateId" display="text" />
+      </h:panelGroup>
+
+      <h:panelGroup id="addLabel">
+        <p:outputLabel value="#{lang.address}" for="address"  rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="addDiv">
+        <p:inputTextarea tabindex="5" value="#{accountingLedgerView.accountingLedger.address}" cols="100" rows="2" maxlength="500"
+                         id="address" autoResize="false" styleClass="fw" style="position: relative" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}"/>
+        <p:message for="address" display="text"/>
+      </h:panelGroup>
+
+      <h:panelGroup id="pinLabel">
+        <p:outputLabel value="#{lang.pincode}" for="pin" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}" />
+      </h:panelGroup>
+      <h:panelGroup id="pinDiv">
+        <p:inputNumber styleClass="fw" value="#{accountingLedgerView.accountingLedger.pin}" maxlength="6" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="0"  thousandSeparator="" 
+                       validatorMessage="#{lang.pincode} #{lang.requiredLength} is 6 "  id="pin" rendered="#{accountingLedgerView.accountingLedger.isDebtorsOrCreditors()}" >
+          <f:validateLength minimum="6" />
+        </p:inputNumber>
+        <p:message for="pin" display="text"/>
+      </h:panelGroup>
+
+
+
+      <h:panelGroup id="taxCodeLabel" >
+        <p:outputLabel value="#{lang.taxCode}" for="servicesTaxCodeId" rendered="#{userRuntimeView.isGstRegime() and accountingLedgerView.accountingLedger.isExpense()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="taxCodeDiv">
+        <p:selectOneMenu value="#{accountingLedgerView.accountingLedger.igstId}"  converter="omnifaces.SelectItemsConverter" id="servicesTaxCodeId"
+                         styleClass="fw" rendered="#{userRuntimeView.isGstRegime() and accountingLedgerView.accountingLedger.isExpense()}">
+          <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+          <f:selectItems value="#{accountingLedgerView.taxCodeAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.code}"  />
+        </p:selectOneMenu>
+        <p:message for="servicesTaxCodeId" display="text" />
+      </h:panelGroup>
+
+      <h:panelGroup id="tdsLabel" >
+        <p:outputLabel value="#{lang.tds}" for="servicesTaxCodeId" rendered="#{userRuntimeView.isGstRegime() and accountingLedgerView.accountingLedger.isExpense()}"/>
+      </h:panelGroup>      
+      <h:panelGroup id="tdsCodeDiv">
+        <p:selectOneMenu value="#{accountingLedgerView.accountingLedger.tdsId}"  converter="omnifaces.SelectItemsConverter" id="tdsCodeId"
+                         styleClass="fw" rendered="#{userRuntimeView.isGstRegime() and accountingLedgerView.accountingLedger.isExpense()}">
+          <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+          <f:selectItems value="#{accountingLedgerView.taxCodeTdsAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.code}"  />
+        </p:selectOneMenu>
+        <p:message for="tdsCodeId" display="text" />
+      </h:panelGroup>  
+
+      <h:panelGroup id="hsnCodeLabel" >
+        <p:outputLabel value="#{lang.sacCode}" for="sacCode" rendered="#{userRuntimeView.isGstRegime() and accountingLedgerView.accountingLedger.isExpense()}"/>
+      </h:panelGroup>
+      <h:panelGroup id="hsnCodeDiv">
+        <p:inputText value="#{accountingLedgerView.accountingLedger.hsnSacCode}" maxlength="10" id="sacCode" styleClass="fw" rendered="#{userRuntimeView.isGstRegime() and accountingLedgerView.accountingLedger.isExpense()}" />
+        <p:message for="sacCode" display="text" />
+      </h:panelGroup> 
+
+      <h:panelGroup   >
+
+        <p:outputLabel value="#{lang.balance}" rendered="#{(accountingLedgerView.closingBalanceDebit gt accountingLedgerView.closingBalanceCredit) or (accountingLedgerView.closingBalanceCredit gt accountingLedgerView.closingBalanceDebit) }" />
+      </h:panelGroup>
+      <h:panelGroup>
+        <p:commandLink actionListener="#{popUpView.showLedgerBalance(accountingLedgerView.accountingLedger)}" title="#{lang.balance}" >
+          <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_DR}" value="#{appView.decimal(accountingLedgerView.closingBalanceDebit)}"  
+                        rendered="#{(accountingLedgerView.accountingLedger.balanceDebit ne null) and (accountingLedgerView.accountingLedger.balanceDebit gt 0) }" />
+          <h:outputText styleClass="label" style="background-color: #{AccountingConstant.COLOR_CR}" value="#{appView.decimal(accountingLedgerView.closingBalanceCredit)}"  
+                        rendered="#{(accountingLedgerView.accountingLedger.balanceCredit ne null) and ((accountingLedgerView.accountingLedger.balanceCredit eq 0) or (accountingLedgerView.accountingLedger.balanceCredit lt 0))}"/>
+        </p:commandLink>
+      </h:panelGroup>
+
+
+<!--      <p:outputLabel value="#{lang.entity}" for="entityId" />
+<h:panelGroup>
+  <p:inputNumber value="#{accountingLedgerView.accountingLedger.entityId}" converterMessage="#{lang.entityId} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" 
+                 maxlength="10" id="entityId" />
+  <p:message for="entityId" display="text"/>
+</h:panelGroup>
+
+<p:outputLabel value="#{lang.entityType}" for="accountingLedgerAccountingEntityTypeId"/>
+<h:panelGroup>
+  <p:autoComplete value="#{accountingLedgerView.accountingLedger.accountingEntityTypeId}" completeMethod="#{accountingLedgerView.accountingEntityTypeAuto}" converter="wawo.LookupIntConverter"   
+                  id="accountingLedgerAccountingEntityTypeId" var="e" 
+                  itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                  autocomplete="off" forceSelection="true"  styleClass="fw" >
+    <f:attribute name="clazz" value="#{scmLookupView.accountingEntityTypeClass()}"/>
+    <f:attribute name="byid" value="#{scmLookupView.accountingEntityTypeById()}"/>
+  </p:autoComplete>
+  <p:message for="accountingLedgerAccountingEntityTypeId" display="text" />
+</h:panelGroup>-->
+      <p:dialog id="openBalanceDlg" widgetVar="openBalanceDlgVar"  header="#{lang.opening} #{lang.balance}" dynamic="true" closable="true"  height="600"
+                modal="true" resizable="true" closeOnEscape="true">
+        <!-- pt:data-fast-input="true" -->
+
+        <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+          <ui:param name="label" value="#{lang.opening} #{lang.balance} "/>
+          <ui:param name="ids" value="opbEntry"/>
+          <ui:define name="menuleft"> 
+            <p:spacer width="4" /> <p:commandButton style="float: right;" value="#{lang.confirm}" process="openBalanceDlg" 
+                             rendered="#{accountingLedgerView.hasOpeningBalance()}"
+                             actionListener="#{accountingLedgerView.saveOpeningBalance}" update="openingBalanceTxtDiv"
+                             styleClass="btn btn-info"  /></ui:define>
+
+          <p:dataTable id="accountList" var="tradeOutstandingVar" value="#{accountingLedgerView.tradeOutstandingList}" rowKey="#{tradeOutstandingVar.id}" 
+                       tableStyleClass="mDataTable editLinks">              
+              <p:column headerText="#{lang.supplier}" style="text-align: right">
+              <h:outputText value="#{tradeOutstandingVar.accountId.vendorId.vendorName}" />
+            </p:column>
+            <p:column headerText="#{lang.opening}" styleClass="w-140" style="text-align: right">
+              <p:inputNumber id="productRateId" value="#{tradeOutstandingVar.valueAfterTax}"
+                             readonly="#{!accountingLedgerView.hasOpeningBalance()}"
+                             onfocus="this.select()" inputStyleClass="text-right" maxValue="999999999.00" decimalPlaces="2" minValue="0.0" >
+                <p:ajax event="change" process="@this" listener="#{accountingLedgerView.loadAccountGroupList(tradeOutstandingVar)}" update="accGroupDiv"  />
+              </p:inputNumber>                
+            </p:column>
+            <p:column headerText="#{lang.credit}/#{lang.debit}" styleClass="w-100" >
+              <p:selectOneButton value="#{tradeOutstandingVar.isDebitOrCredit}" disabled="#{!accountingLedgerView.hasOpeningBalance()}"   >
+                <f:selectItem itemLabel="#{lang.dr}" itemValue="#{AccountingConstant.IS_DEBIT}" />
+                <f:selectItem itemLabel="#{lang.cr}" itemValue="#{AccountingConstant.IS_CREDIT}" />
+              </p:selectOneButton>
+            </p:column>
+
+            <p:column headerText="#{lang.accountGroup}"  >
+              <h:panelGroup id="accGroupDiv" >
+                <p:selectOneMenu value="#{tradeOutstandingVar.accountGroupId}"  styleClass="fw"
+                                 rendered="#{tradeOutstandingVar.id eq null and (tradeOutstandingVar.accountGroupList ne null and tradeOutstandingVar.accountGroupList.size() gt 1)}" 
+                                 converter="omnifaces.SelectItemsConverter">
+                  <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}" />
+                  <f:selectItems value="#{tradeOutstandingVar.accountGroupList}" var="e" itemValue="#{e}" itemLabel="#{e.groupName}" />
+                </p:selectOneMenu>
+                <p:inputText  value="#{tradeOutstandingVar.accountGroupId.groupName}" readonly="true" styleClass="fw" rendered="#{tradeOutstandingVar.id ne null or (tradeOutstandingVar.accountGroupList ne null and tradeOutstandingVar.accountGroupList.size() lt 2)}" />
+              </h:panelGroup>
+            </p:column>
+
+          </p:dataTable>
+        </ui:decorate>
+      </p:dialog>
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(accountingLedgerView.accountingLedger.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(accountingLedgerView.accountingLedger.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(accountingLedgerView.accountingLedger.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(accountingLedgerView.accountingLedger.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(accountingLedgerView.accountingLedger.id)}</ui:define>
+      </ui:decorate>
+
+
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="accountingLedgerTable" var="accountingLedgerVar" widgetVar="accountingLedgerWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{accountingLedgerView.accountingLedgerLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{accountingLedgerVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{accountingLedgerView.accountingLedgerSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{accountingLedgerVar.title}" field="t1.title" >
+          <f:facet name="header"><h:outputText value="#{lang.ledger}" title="#{lang.ledger}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(accountingLedgerVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{accountingLedgerView.accountingLedger}" value="#{accountingLedgerVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{accountingLedgerVar.accountingGroupId.title}" field="t2.title">
+          <f:facet name="header"><h:outputText value="#{lang.accountingGroup}" title="#{lang.accountingGroup}"/></f:facet>
+          <h:outputText value="#{appView.display(accountingLedgerVar.accountingGroupId.title)}" title="#{appView.title(accountingLedgerVar.accountingGroupId.title)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{accountingLedgerVar.entityId}" field="t1.entity_id" style="text-align: center">
+          <f:facet name="header"><h:outputText value="#{lang.entity}" title="#{lang.entity}"/></f:facet>
+          <h:outputText value="#{appView.number(accountingLedgerVar.entityId)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{accountingLedgerVar.accountingEntityTypeId.title}" field="t3.title">
+          <f:facet name="header"><h:outputText value="#{lang.entityType}" title="#{lang.entityType}"/></f:facet>
+          <h:outputText value="#{appView.display(accountingLedgerVar.accountingEntityTypeId.title)}" title="#{appView.title(accountingLedgerVar.accountingEntityTypeId.title)}" escape="false" />
+        </p:column>
+        <!--
+                <p:column headerText="#{lang.companyName}" sortBy="#{accountingLedgerVar.companyId.companyName}" field="company_id.company_name">
+                  <h:outputText value="#{appView.display(accountingLedgerVar.companyId.companyName)}" title="#{appView.title(accountingLedgerVar.companyId.companyName)}" escape="false" />
+                </p:column>-->
+        <p:column sortBy="#{accountingLedgerVar.sortOrder}" field="t1.sort_order">
+          <f:facet name="header"><h:outputText value="#{lang.sortOrder}" title="#{lang.sortOrder}"/></f:facet>
+          <h:outputText value="#{appView.number(accountingLedgerVar.sortOrder)}" title="#{appView.number(accountingLedgerVar.sortOrder)}" escape="false" />
+        </p:column>
+        <p:column exportable="false">
+          <f:facet name="header">
+            <h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(accountingLedgerVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(accountingLedgerVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(accountingLedgerVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(accountingLedgerVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(accountingLedgerVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

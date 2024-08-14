@@ -1,0 +1,11 @@
+footer.footer{
+	font-size:11px;
+	background:$Clr3;
+	padding: 1px 15px;
+	border-top:$Brdr 1px solid;
+	border-bottom:$prColor 2px solid;
+	@extend .clearfix !optional;
+	a{
+		color:$Clr6;
+	}
+}

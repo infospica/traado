@@ -1,0 +1,574 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:h="http://xmlns.jcp.org/jsf/html"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">  
+  #{contractView.switchContract(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTabDialog.xhtml">
+    <ui:param name="label" value="#{    lang.contract}" />
+    <ui:param name="ids" value="contract" />
+    <ui:param name="newList" value="false" />
+    <ui:define name="toolForm" />
+    <ui:define name="more" />
+    <ui:define name="reset" />
+    <ui:define name="navRight" >
+      <p:commandButton process="@this" immediate="true"                        
+                       actionListener="#{contractView.constractListDialogClose}"
+                       icon="fa fa-times" iconPos="right" styleClass="btn btn-default right"  />            
+    </ui:define>
+    <ui:define name="form">
+
+      <p:tabView rendered="#{main.isForm()}" pt:data-watermark="block"  prependId="false" dynamic="true" cache="false" activeIndex="#{contractView.activeIndex}" styleClass="materialTabs">
+        <p:tab title="#{lang.contract}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="contract2" />
+
+            <!-- Version Number -->
+            <p:outputLabel value="#{lang.versionNo}" />
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView p-x-5" value="#{contractView.contract.versionNo}" id="versionNo" />
+            </h:panelGroup>
+
+            <!--Contract Status-->
+            <p:outputLabel value="#{lang.status}" />
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView p-x-5" value="#{contractView.contract.contractStatusId.title}" />
+            </h:panelGroup>
+
+            <!-- Contract Title -->
+            <p:outputLabel value="#{lang.contractTitle}" />
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView p-x-5" value="#{contractView.contract.contractTitle}" />
+            </h:panelGroup>
+
+            <!-- Contract Code -->
+            <p:outputLabel value="#{lang.contractCode}"  />
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView p-x-5" value="#{contractView.contract.contractCode}" />
+            </h:panelGroup>
+
+            <!-- Valid From -->
+            <p:outputLabel value="#{lang.validFrom}" />
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView p-x-5"  value="#{appView.dateTime(contractView.contract.validFrom)}" />
+            </h:panelGroup>
+
+            <!-- Valid To -->
+            <p:outputLabel value="#{lang.validTo}" />
+            <h:panelGroup>
+              <h:outputLabel styleClass="txtView p-x-5"  value="#{appView.dateTime(contractView.contract.validTo)}" />
+            </h:panelGroup>
+
+            <!-- Document Copy Path -->
+            <p:outputLabel value="#{lang.documentCopyPath}" for="documentCopyPath" />
+            <h:panelGroup id="documentCopyPathPart">
+              <h:inputFile value="#{contractView.documentCopyPathPart}"  maxlength="200" id="documentCopyPath" disabled="true"/>
+              <p:spacer width="5"/>
+              <p:commandLink value="#{appIo.fileName(contractView.contract.documentCopyPath)}" ajax="false" id="documentCopyPathLink" class="ignoreLoad" >
+                <p:fileDownload value="#{appIo.downloadPrivate(contractView.contract.documentCopyPath)}" />
+              </p:commandLink><p:message for="documentCopyPath" display="text"/>
+            </h:panelGroup>
+
+            <!-- Note -->
+            <p:outputLabel value="#{lang.note}" />
+            <h:panelGroup>
+              <p:inputTextarea readonly="true" value="#{contractView.contract.note}" cols="100" rows="3" maxlength="500" id="cnote" autoResize="false" />
+            </h:panelGroup>
+
+          </ui:decorate>
+
+          <div class="row">
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="label" value="#{lang.deposit}" />
+                <ui:param name="ids" value="deposit" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <!-- Deposit Amount -->
+                <p:outputLabel value="#{lang.depositAmount}" for="depositAmount" />
+                <h:panelGroup>                    
+                  <p:inputNumber value="#{contractView.contract.depositAmount}" converterMessage="#{lang.depositAmount} #{lang.invalidNumber}"
+                                 decimalPlaces="2" styleClass="fw"
+                                onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15"
+                                 id="depositAmount" />                  
+                </h:panelGroup>
+
+                <!-- Deposit Interest Rate Percent -->
+                <p:outputLabel value="#{lang.depositInterestRatePercent}" for="depositInterestRatePercent" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.depositInterestRatePercent}" converterMessage="#{lang.depositInterestRatePercent} #{lang.invalidNumber}"
+                                 styleClass="fw" decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="depositInterestRatePercent" />                  
+                </h:panelGroup>
+
+                <!-- Contract Deposit Interest Claim Freq -->
+                <p:outputLabel value="#{lang.depositInterestClaimFreq}" for="contractDepositInterestClaimFreqId"/>
+                <h:panelGroup>
+                  <p:autoComplete value="#{contractView.contract.depositInterestClaimFreqId}" completeMethod="#{contractView.periodsAuto}"
+                                  styleClass="fw" inputStyleClass="fw"
+                                  converter="wawo.LookupIntConverter"   id="contractDepositInterestClaimFreqId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" >
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                </h:panelGroup>
+
+                <!-- Deposit Interest Claim Due Day -->
+                <p:outputLabel value="#{lang.depositInterestClaimDueDay}" for="depositInterestClaimDueDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.depositInterestClaimDueDay}" converterMessage="#{lang.depositInterestClaimDueDay} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="depositInterestClaimDueDay" />                  
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="stock" />
+                <ui:param name="label" value="#{lang.stock}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Stock Holding Ratio Factor -->
+                <p:outputLabel value="#{lang.stockHoldingRatioFactor}" for="stockHoldingRatioFactor" />
+                <h:panelGroup>
+                  <p:inputText value="#{contractView.contract.stockHoldingRatioFactor}" styleClass="fw" maxlength="200" id="stockHoldingRatioFactor" />                  
+                </h:panelGroup>
+
+                <!-- Stock Holding Ratio Avg Months -->
+                <p:outputLabel value="#{lang.stockHoldingRatioAvgMonths}" for="stockHoldingRatioAvgMonths" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.stockHoldingRatioAvgMonths}" converterMessage="#{lang.stockHoldingRatioAvgMonths} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.monthSymbol}" symbolPosition="s" maxlength="10" id="stockHoldingRatioAvgMonths" />                  
+                </h:panelGroup>
+
+                <!-- Stock Status Report Frequency -->
+                <p:outputLabel value="#{lang.stockStatusReportFreq}" for="contractStockStatusReportFreqId"/>
+                <h:panelGroup>
+                  <p:autoComplete value="#{contractView.contract.stockStatusReportFreqId}" completeMethod="#{contractView.periodsAuto}" converter="wawo.LookupIntConverter"
+                                  styleClass="fw" inputStyleClass="fw"
+                                  id="contractStockStatusReportFreqId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                                  cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                                  style="position: relative" >
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>                  
+                </h:panelGroup>
+
+                <!--Stock Status Report Due Day-->
+                <p:outputLabel value="#{lang.stockStatusReportDueDay}" for="stockStatusReportDueDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.stockStatusReportDueDay}" converterMessage="#{lang.stockStatusReportDueDay} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="stockStatusReportDueDay" />
+                  <p:message for="stockStatusReportDueDay" display="text"/>
+                </h:panelGroup>
+                
+                <p:outputLabel value="#{lang.nearExpiryDays}" for="nearExpiryDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.nearExpiryDays}" converterMessage="#{lang.nearExpiryDays} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="100" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="nearExpiryDays" />
+                  <p:message for="nearExpiryDays" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="purchasePolicy" />
+                <ui:param name="label" value="#{lang.purchasePolicy}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <!-- Purchase Credit Days Applicable From -->
+                <p:outputLabel value="#{lang.purchaseCreditdaysAppliFrom}" for="purchaseCreditdaysAppliFrom" />
+                <h:panelGroup>
+                  <p:selectOneMenu value="#{contractView.contract.purchaseCreditdaysAppliFrom}"  id="purchaseCreditdaysAppliFrom" styleClass="fw"  >
+                    <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                    <f:selectItems value="#{contractView.listPurchaseCreditOn}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneMenu>
+                  <p:message for="purchaseCreditdaysAppliFrom" display="text"/>
+                </h:panelGroup>
+
+                <!-- Purchase Credit Days -->
+                <p:outputLabel value="#{lang.purchaseCreditDays}" for="purchaseCreditDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.purchaseCreditDays}" converterMessage="#{lang.purchaseCreditDays} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" maxlength="10" id="purchaseCreditDays" />
+                  <p:message for="purchaseCreditDays" display="text"/>
+                </h:panelGroup>
+
+
+                <!-- Immediate Purch Pay Disc Per -->
+                <p:outputLabel value="#{lang.immediatePurchPayDiscPer}" for="immediatePurchPayDiscPer" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.immediatePurchPayDiscPer}" converterMessage="#{lang.immediatePurchPayDiscPer} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="immediatePurchPayDiscPer" />
+                  <p:message for="immediatePurchPayDiscPer" display="text"/>
+                </h:panelGroup>
+
+                <!-- Lr Amount Applicable -->
+                <p:outputLabel value="#{lang.lrAmountApplicable}" for="isLrAmountApplicable"  />
+                <h:panelGroup id="lrAmountApplicable" >
+                  <h:outputText value="N/A" rendered="#{!contractView.isMarketer()}"/>
+                  <p:selectOneRadio value="#{contractView.contract.isLrAmountApplicable}"  id="isLrAmountApplicable" rendered="#{contractView.isMarketer()}" >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="isLrAmountApplicable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Is Factory Direct -->
+                <p:outputLabel value="#{lang.factoryDirect}" for="isFactoryDirect" rendered="#{userRuntimeView.isVatRegime()}" />
+                <h:panelGroup layout="block" rendered="#{userRuntimeView.isVatRegime()}">
+                  <p:selectOneRadio value="#{contractView.contract.isFactoryDirect}"  id="isFactoryDirect" style="display: inline-table;vertical-align: bottom;">
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <h:panelGroup id="exciseDutySpan"  style="display: inline-block;padding: 6px;vertical-align: top;">
+                    <h:outputText rendered="#{accountView.isFactoryDirect()}" value="#{lang.exciseDutyApplicable}" />
+                  </h:panelGroup>
+                  <p:message for="isFactoryDirect" display="text"/>
+                </h:panelGroup>
+
+              </ui:decorate>
+            </div>
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="salesPolicy" />
+                <ui:param name="label" value="#{lang.salesPolicy}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Sales Credit Days -->
+                <p:outputLabel value="#{lang.salesCreditDays}" for="salesCreditDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.salesCreditDays}" converterMessage="#{lang.salesCreditDays} #{lang.invalidNumber}" decimalPlaces="0"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" symbolPosition="s" maxlength="10" id="salesCreditDays" />
+                  <p:message for="salesCreditDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Immediate Sales Pay Disc Per -->
+                <p:outputLabel value="#{lang.immediateSalesPayDiscPer}" for="immediateSalesPayDiscPer" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.immediateSalesPayDiscPer}" converterMessage="#{lang.immediateSalesPayDiscPer} #{lang.invalidNumber}"
+                                 decimalPlaces="2" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="immediateSalesPayDiscPer" />
+                  <p:message for="immediateSalesPayDiscPer" display="text"/>
+                </h:panelGroup>
+
+                <!-- PTS Margin Percent -->
+                <p:outputLabel value="#{lang.ptsMarginPercent}" for="ptsMarginPercent" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.ptsMarginPercent}" converterMessage="#{lang.ptsMarginPercent} #{lang.invalidNumber}" decimalPlaces="2"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="ptsMarginPercent" />
+                  <p:message for="ptsMarginPercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- PTR Margin Percent -->
+                <p:outputLabel value="#{lang.ptrMarginPercent}" for="ptrMarginPercent" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.ptrMarginPercent}" converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}" decimalPlaces="2"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="ptrMarginPercent" />
+                  <p:message for="ptrMarginPercent" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="returnPolicy" />
+                <ui:param name="label" value="#{lang.returnPolicy}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Return Expired Item Within Days-->
+                <p:outputLabel value="#{lang.returnExpItemWithinDays}" for="returnExpItemWithinDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.returnExpItemWithinDays}" converterMessage="#{lang.returnExpItemWithinDays} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" symbolPosition="s" maxlength="10" id="returnExpItemWithinDays" />
+                  <p:message for="returnExpItemWithinDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Return Damaged Item Within Days -->
+                <p:outputLabel value="#{lang.returnDmgItemWithinDays}" for="returnDmgItemWithinDays" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.returnDmgItemWithinDays}" converterMessage="#{lang.returnDmgItemWithinDays} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" symbolPosition="s" maxlength="10" id="returnDmgItemWithinDays" />
+                  <p:message for="returnDmgItemWithinDays" display="text"/>
+                </h:panelGroup>
+
+                <!-- Return Non-moving Item Within Day-->
+                <p:outputLabel value="#{lang.returnNonmvgItemWithinDay}" for="returnNonmvgItemWithinDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.returnNonmvgItemWithinDay}" converterMessage="#{lang.returnNonmvgItemWithinDay} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daysSymbol}" symbolPosition="s" maxlength="10" id="returnNonmvgItemWithinDay" />
+                  <p:message for="returnNonmvgItemWithinDay" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="statutoryForm" />
+                <ui:param name="label" value="#{lang.statutoryForm}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- Contract Statutory Submission Freq -->
+                <p:outputLabel value="#{lang.statutorySubmissionFreq}" for="contractStatutorySubmissionFreqId"/>
+                <h:panelGroup>
+                  <p:autoComplete value="#{contractView.contract.statutorySubmissionFreqId}" completeMethod="#{contractView.periodsAuto}"
+                                  styleClass="fw" inputStyleClass="fw"
+                                  converter="wawo.LookupIntConverter"   id="contractStatutorySubmissionFreqId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" >
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                  <p:message for="contractStatutorySubmissionFreqId" display="text" />
+                </h:panelGroup>
+
+                <!-- Statutory Submission Due Day-->
+                <p:outputLabel value="#{lang.statutorySubmissionDueDay}" for="statutorySubmisssionDueDay" />
+                <h:panelGroup>
+                  <p:inputNumber value="#{contractView.contract.statutorySubmissionDueDay}" converterMessage="#{lang.statutorySubmissionDueDay} #{lang.invalidNumber}"
+                                 decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="statutorySubmisssionDueDay" />
+                  <p:message for="statutorySubmisssionDueDay" display="text"/>
+                </h:panelGroup>
+              </ui:decorate>
+            </div>
+          </div>
+
+          <div class="row">
+            <h:panelGroup layout="block" id="benefitTypeDiv" styleClass="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="contractBenefit" />
+                <ui:param name="label" value="#{lang.contractBenefit}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+
+                <!-- Commission Claim Frequency -->
+                <p:outputLabel value="#{lang.commissionClaimFrequency}" for="contractCommissionClaimFrequencyId" rendered="#{contractView.isBenefitByCommission()}"/>
+                <h:panelGroup rendered="#{contractView.isBenefitByCommission()}">
+                  <p:autoComplete value="#{contractView.contract.commissionClaimFrequencyId}" completeMethod="#{contractView.periodsAuto}" converter="wawo.LookupIntConverter"
+                                  styleClass="fw" inputStyleClass="fw" id="contractCommissionClaimFrequencyId" var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" dropdown="true"
+                                  cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                                  style="position: relative" >
+                    <f:attribute name="clazz" value="#{scmLookupView.periodsClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.periodsById()}"/>
+                  </p:autoComplete>
+                  <p:message for="contractCommissionClaimFrequencyId" display="text" />
+                </h:panelGroup>
+
+                <!-- Commission Claim Due Day -->
+                <p:outputLabel value="#{lang.commissionClaimDueDay}" for="commissionClaimDueDay" rendered="#{contractView.isBenefitByCommission()}" />
+                <h:panelGroup rendered="#{contractView.isBenefitByCommission()}">
+                  <p:inputNumber value="#{contractView.contract.commissionClaimDueDay}" converterMessage="#{lang.commissionClaimDueDay} #{lang.invalidNumber}"
+                                  decimalPlaces="0" onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999" minValue="0" symbol="#{lang.daySymbol}" maxlength="10" id="commissionClaimDueDay" />
+                  <p:message for="commissionClaimDueDay" display="text"/>
+                </h:panelGroup>
+
+                <!-- Commission Applicable On -->
+                <p:outputLabel value="#{lang.commissionApplicableOn}" for="commissionApplicableOn" rendered="#{contractView.isBenefitByCommission()}"  />
+                <h:panelGroup rendered="#{contractView.isBenefitByCommission()}" >
+                  <p:selectOneMenu value="#{contractView.contract.commissionApplicableOn}"  id="commissionApplicableOn" styleClass="fw" >
+                    <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                    <f:selectItems value="#{contractView.listCommissionOn}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax listener="#{contractView.ajaxBehaviorEventHandler}"/>
+                  </p:selectOneMenu>
+                  <p:message for="commissionApplicableOn" display="text"/>
+                </h:panelGroup>
+
+                <!-- Commission By Range -->
+                <p:outputLabel value="#{lang.commissionByRange}" rendered="#{contractView.isBenefitByCommission()}"/>
+                <h:panelGroup rendered="#{contractView.isBenefitByCommission()}">
+                  <p:selectOneRadio value="#{contractView.contract.commissionByRange}"  >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax listener="#{contractView.ajaxBehaviorEventHandler}" update="benefitTypeDiv rangeDiv" />
+                  </p:selectOneRadio>
+                </h:panelGroup>
+
+                <!-- Commission Value -->
+                <p:outputLabel value="" rendered="#{contractView.isBenefitByCommission()}"/>
+                <h:panelGroup rendered="#{contractView.isBenefitByCommission()}">
+                  <p:selectOneRadio value="#{contractView.contract.commissionValueType}" disabled="#{contractView.isCommissionRangeExist()}">
+                    <f:selectItems value="#{contractView.listCommissionValueType}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                    <p:ajax listener="#{contractView.ajaxBehaviorEventHandler}" update="benefitTypeDiv" />
+                  </p:selectOneRadio>
+                </h:panelGroup>
+
+                <!-- Commission Value Percent -->
+                <p:outputLabel value="#{lang.commissionValueFixed}" for="commissionValueFixed"
+                               rendered="#{contractView.isFixedCommissionByRange()}"  />
+                <h:panelGroup rendered="#{contractView.isFixedCommissionByRange()}" >
+                  <p:inputNumber value="#{contractView.contract.commissionValueFixed}" converterMessage="#{lang.commissionValueFixed} #{lang.invalidNumber}" decimalPlaces="2"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="commissionValueFixed" />
+                  <p:message for="commissionValueFixed" display="text"/>
+                </h:panelGroup>
+
+                <!-- Commission Value Percent -->
+                <p:outputLabel value="#{lang.commissionValuePercent}" for="commissionValuePercent"
+                               rendered="#{contractView.isPercentageCommissionByRange()}" />
+                <h:panelGroup rendered="#{contractView.isPercentageCommissionByRange()}">
+                  <p:inputNumber value="#{contractView.contract.commissionValuePercent}" converterMessage="#{lang.commissionValuePercent} #{lang.invalidNumber}" decimalPlaces="2"
+                                onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="commissionValuePercent" />
+                  <p:message for="commissionValuePercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- Margin Percentage -->
+                <p:outputLabel value="#{lang.marginPercentage}" for="marginPercentage" rendered="#{contractView.isBenefitByMarginPercentage()}" />
+                <h:panelGroup rendered="#{contractView.isBenefitByMarginPercentage()}">
+                  <p:inputNumber   value="#{contractView.contract.marginPercentage}"
+                                   converterMessage="#{lang.marginPercentage} #{lang.invalidNumber}" decimalPlaces="2"
+                                  onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="marginPercentage" />
+                  <p:message for="marginPercentage" display="text"/>
+                </h:panelGroup>
+
+                <!-- Vendor Reserve Percent -->
+                <p:outputLabel value="#{lang.vendorReservePercent}" for="vendorReservePercent" rendered="#{contractView.isBenefitByMarginPercentage()}" />
+                <h:panelGroup rendered="#{contractView.isBenefitByMarginPercentage()}">
+                  <p:inputNumber value="#{contractView.contract.vendorReservePercent}" converterMessage="#{lang.vendorReservePercent} #{lang.invalidNumber}" decimalPlaces="2"
+                                 onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="vendorReservePercent" />
+                  <p:message for="vendorReservePercent" display="text"/>
+                </h:panelGroup>
+
+                <!-- Total Margin -->
+                <p:outputLabel value="#{lang.totalMargin}" rendered="#{contractView.isBenefitByMarginPercentage()}" />
+                <h:panelGroup id="totalmargin" rendered="#{contractView.isBenefitByMarginPercentage()}">
+                  <p:inputNumber value="#{contractView.totalMargin}"
+                                  decimalPlaces="2" readonly="true"
+                                onfocus="this.select()" inputStyleClass="fw text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" />
+                </h:panelGroup>
+
+              </ui:decorate>
+            </h:panelGroup>
+            <div class="col-md-6">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="claimableExpense" />
+                <ui:param name="label" value="#{lang.claimableExpense}" />
+                <ui:param name="styleClass" value="#{sysRuntimeView.grid2Medium}" />
+                <!-- CST Claimable -->
+                <p:outputLabel value="#{lang.cstClaimable}" for="cstClaimable"
+                               rendered="#{accountUtilView.isSuperStockiest(contractView.contract.accountId) and accountUtilView.isCstApplicable(accountView.account) and userRuntimeView.isVatRegime()}"/>
+                <h:panelGroup rendered="#{accountUtilView.isSuperStockiest(contractView.contract.accountId) and accountUtilView.isCstApplicable(accountView.account) and userRuntimeView.isVatRegime()}">
+                  <p:selectOneRadio value="#{contractView.contract.cstClaimable}"  id="cstClaimable" >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="cstClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Loading Expense Claimable -->
+                <p:outputLabel value="#{lang.loadingExpenseClaimable}" for="loadingExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{contractView.contract.loadingExpenseClaimable}"  id="loadingExpenseClaimable" >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="loadingExpenseClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Unloading Expense Claimable -->
+                <p:outputLabel value="#{lang.unloadingExpenseClaimable}" for="unloadingExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{contractView.contract.unloadingExpenseClaimable}"  id="unloadingExpenseClaimable" >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="unloadingExpenseClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Freight Expense Claimable -->
+                <p:outputLabel value="#{lang.freightExpenseClaimable}" for="freightExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{contractView.contract.freightExpenseClaimable}"  id="freightExpenseClaimable" >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="freightExpenseClaimable" display="text"/>
+                </h:panelGroup>
+
+                <!-- Other Expense Claimable
+                <p:outputLabel value="#{lang.otherExpenseClaimable}" for="otherExpenseClaimable" />
+                <h:panelGroup>
+                  <p:selectOneRadio value="#{contractView.contract.otherExpenseClaimable}"  id="otherExpenseClaimable" >
+                    <f:selectItems value="#{contractView.listYesNo}" var="e" itemValue="#{e.intValue}" itemLabel="#{e.itemLabel}" />
+                  </p:selectOneRadio>
+                  <p:message for="otherExpenseClaimable" display="text"/>
+                </h:panelGroup> -->
+              </ui:decorate>
+            </div>
+          </div>
+
+          <h:panelGroup id="rangeDiv">
+            <h:panelGroup layout="block" styleClass="row" rendered="#{contractView.isCommisionByRange()}">
+              <h:panelGroup layout="block" id="TypeDiv" styleClass="col-md-6">
+                <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+                  <ui:param name="label" value="#{lang.commissionByRange}" />
+                  <ui:param name="cols" value="1" />
+                  <ui:define name="menuleft">
+                    <p:commandButton action="#{accountView.addNewContractCommiByRange()}"
+                                     disabled="true"
+                                     update="contractCommissionByRangeTable commissionValueId"
+                                     immediate="true" process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"
+                                     oncomplete="setEdit('contractCommissionByRangeTable');" >
+                    </p:commandButton>
+                  </ui:define>
+
+                  <p:dataTable id="contractCommissionByRangeTable" var="contractCommissionByRangeVar" widgetVar="contractCommissionByRangeWidget"
+                               rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                               tableStyleClass="mDataTable mDataTable-center fw editLinks" rowIndexVar="commissionRangeIndex"
+                               emptyMessage="#{lang.slabNotDefined}"
+                               value="#{contractView.contractCommiByRangeList}">
+                    <p:column headerText="#{lang.rangeFrom}">
+                      <h:outputText value="#{appView.decimal(contractCommissionByRangeVar.rangeFrom)}" />
+                    </p:column>
+                    <p:column headerText="#{lang.rangeTo}">
+                      <h:outputText value="#{appView.decimal(contractCommissionByRangeVar.rangeTo)}" escape="false" />
+                    </p:column>
+                    <p:column headerText="#{lang.valueFixed}" rendered="#{contractView.isFixedCommissionValue()}">
+                      <h:outputText value="#{appView.decimal(contractCommissionByRangeVar.valueFixed)}" escape="false" />
+                    </p:column>
+                    <p:column headerText="#{lang.valuePercentage}" rendered="#{contractView.isPercentageCommissionValue()}" >
+                      <h:outputText value="#{appView.decimal(contractCommissionByRangeVar.valuePercentage)}" escape="false" />
+                    </p:column>
+                  </p:dataTable>
+                </ui:decorate>
+              </h:panelGroup>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(contractView.contract.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(contractView.contract.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(contractView.contract.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(contractView.contract.modifiedAt)}</ui:define>
+          </ui:decorate>          
+        </p:tab>
+      </p:tabView>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="contractTable" var="contractVar" widgetVar="contractWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{contractView.contractLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{contractVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true"
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+
+        <p:column headerText="#{lang.versionNo}" sortBy="#{contractVar.versionNo}" field="version_no">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(contractVar.versionNo)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{contractView.contract}" value="#{contractVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <p:column headerText="#{lang.accountCode}" sortBy="#{contractVar.accountId.accountCode}" field="account_id.account_code">
+          <h:outputText value="#{appView.display(contractVar.accountId.accountCode)}" title="#{appView.display(contractVar.accountId.accountCode)}" escape="false" />
+        </p:column>
+
+        <p:column headerText="#{lang.validFrom}" sortBy="#{contractVar.validFrom}" field="valid_from" >
+          <h:outputText value="#{appView.dateTime(contractVar.validFrom)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.validTo}" sortBy="#{contractVar.validTo}" field="valid_to" >
+          <h:outputText value="#{appView.dateTime(contractVar.validTo)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.status}" sortBy="#{contractVar.contractStatusId.title}" field="status_id.title">
+          <h:outputText value="#{appView.display(contractVar.contractStatusId.title)}" title="#{appView.title(contractVar.contractStatusId.title)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.log}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(contractVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(contractVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(contractVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(contractVar.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>
+

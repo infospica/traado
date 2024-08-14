@@ -1,0 +1,95 @@
+///*@import "compass/reset";*/
+/*Media Programming */
+
+@media only screen and (max-width: 1600px) {
+    
+}
+
+@media only screen and (max-width: 1200px) {
+	
+}
+
+/* Smaller than standard 960 (devices and browsers) */
+@media only screen and (max-width: 1024px){
+	
+}
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 768px) and (max-width: 1024px){
+	
+}
+
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 768px) and (max-width: 959px){
+}
+
+$navbar-height:86px;
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 767px){
+	.header .navbar-default .navbar-brand {
+		width:100% !important;
+		min-width:100%;
+		&.minimise{
+			.lg{display:block;}
+			.sm{display:none;}
+		}
+		img{
+			left: 0px;
+			right: 0px;
+			display: block;
+			margin: 0px auto;
+		}
+	}
+	
+	.respMenu{
+		.navbar-nav{ margin:0px -15px; }
+		.navbar-right .dropdown-menu{
+			right: 0px;
+			left: auto;
+		}
+		.navbar-nav .open .dropdown-menu{
+			color:$Txt;
+			float: left;
+			background:#fff;
+			border-top:$navbar-default-border 1px solid;
+			& > li > a{color:$Txt;}
+		}
+		.dropdown{
+			&.user .welcome{display:none;}
+			&.notification{
+				position:static;
+				.dropdown-menu{
+					right:5%;
+					@include box-shadow(0px 6px 12px rgba(0, 0, 0, 0.176));
+					&.rightBar{
+						color: $Clr3;
+						background:$Clr6;
+					}
+				}
+			}
+		}
+		.rightBar{ top: $navbar-height;}
+	}
+	.page {
+		padding-top: 0;//$navbar-height;
+		&.noScrollHgt{ padding-top: 45px; }
+	}
+	.navbar-fixed-top {
+		margin-bottom: 0px;
+		position: relative;
+	}
+}
+
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+@media only screen and (min-width: 480px) and (max-width: 767px){
+}
+
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+@media only screen and (max-width: 479px){
+	
+}
+
+@media only screen and (max-width: 360px) {
+    
+}
+
+/*Media Programming*/

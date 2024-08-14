@@ -1,0 +1,755 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{vendorView.switchVendor(main, viewType)}
+  <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.supplier}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? vendorView.vendor.vendorName : null}" />
+    <ui:param name="ids" value="vendor" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{vendorView.deleteVendor(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('vendorWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{vendorView.cloneVendor(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{vendorView.deleteVendor(main)}" value="#{lang.delete}" onclick="wdgOff('vendorWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:commandButton action="#{vendorView.saveVendor(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"
+                       rendered="#{userRuntimeView.privilege.add == true or userRuntimeView.privilege.modify == true}"
+                       process="f1" update="f1" >
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  id="vendorTabView" dynamic="true" cache="false" activeIndex="#{vendorView.activeIndex}" styleClass="materialTabs" >
+        <!-- Vendor Tab -->
+        <p:tab id="vendorTab" title="#{lang.supplier}" >
+          <p:remoteCommand name="commodityPopupReturn" process="@this" update="commodityDiv" />
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="vendor" />
+
+            <!-- Vendor Name -->
+            <p:outputLabel value="#{lang.name}" for="vendorName" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{vendorView.vendor.vendorName}" maxlength="50" required="true" requiredMessage="#{lang.name} #{lang.isRequired}"
+                           id="vendorName" validator="wawo.WhiteSpaceValidator" autocomplete="off" />
+              <p:message for="vendorName" display="text"/>
+            </h:panelGroup>
+
+            <!-- Vendor Type -->
+            <p:outputLabel value="#{lang.supplierType}" for="vendorType" />
+            <h:panelGroup id="vendorTypeDiv">
+              <p:selectOneMenu value="#{vendorView.vendor.vendorType}" styleClass="fw" converter="omnifaces.SelectItemsConverter"
+                               disabled="#{!vendorView.editable}" id="vendorType">
+                <f:selectItems value="#{vendorView.vendorType}" var="t" itemLabel="#{t.itemLabel}" itemValue="#{t.intValue}" />
+                <p:ajax event="itemSelect" process="vendorTypeDiv"
+                        update="primaryVendorLabel primaryVendorDiv commodityDiv commodities primaryVendor" listener="#{vendorView.vendorTypeSelectEvent}" />
+              </p:selectOneMenu>
+              <p:message for="vendorType" display="text"/>
+            </h:panelGroup>
+
+            <!-- Parent Vendor -->
+            <h:panelGroup id="primaryVendorLabel">
+              <p:outputLabel value="#{lang.primary} #{lang.supplier}" for="primaryVendor" rendered="#{vendorView.renderPrimaryVendor}" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" id="primaryVendorDiv">
+              <p:selectOneMenu value="#{vendorView.vendor.vendorId}"  rendered="#{vendorView.renderPrimaryVendor}"
+                               required="true" requiredMessage="#{lang.primary} #{lang.vendor} #{lang.isRequired}"  styleClass="fw"
+                               id="primaryVendor" converter="omnifaces.SelectItemsConverter" disabled="#{!vendorView.editable}">
+                <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                <f:selectItems value="#{vendorView.selectPrimaryVendor()}" var="v" itemValue="#{v}" itemLabel="#{v.vendorName}" />
+                <p:ajax event="itemSelect" immediate="true" process="@this" update="commodityDiv" listener="#{vendorView.primaryVendorSelectEvent}" resetValues="true" />
+              </p:selectOneMenu>
+              <p:message for="primaryVendor" display="text"/>
+            </h:panelGroup>
+
+            <!-- Supplier Group -->
+            <!--            <h:panelGroup id="supplierGroupLbl">
+                          <p:commandLink actionListener="#{vendorView.supplierGroupOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+                            <p:outputLabel value="#{lang.supplierGroup}" for="vendorSupplierGroupId"/>
+                          </p:commandLink> 
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" id="supplierGroupDiv">
+                          <p:inputText readonly="true" value="#{vendorView.vendor.supplierGroupId.title}" title="Supplier Group" rendered="#{vendorView.secondaryVendor}" styleClass="fw" />
+                          <p:selectOneMenu value="#{vendorView.vendor.supplierGroupId}"  id="vendorSupplierGroupId" converter="omnifaces.SelectItemsConverter"
+                                           required="true" requiredMessage="#{lang.supplierGroup} #{lang.isRequired}"
+                                           disabled="#{vendorView.secondaryVendor or !vendorView.editable}" styleClass="fw" rendered="#{!vendorView.secondaryVendor}" >
+                            <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" /> 
+                            <f:selectItems value="#{vendorView.lookupSupplierGroupByCompany()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+                          </p:selectOneMenu>
+                          <p:autoComplete value="#{vendorView.vendor.supplierGroupId}" completeMethod="#{vendorView.supplierGroupAuto}" converter="wawo.LookupIntConverter" required="true"
+                                          requiredMessage="#{lang.supplierGroup} #{lang.isRequired}" id="vendorSupplierGroupId" var="c" itemValue="#{c}" itemLabel="#{c.title}"
+                                          emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                                          autocomplete="off" forceSelection="true"  styleClass="fw">
+                            <f:attribute name="clazz" value="#{scmLookupView.supplierGroupClass()}"/>
+                            <f:attribute name="byid" value="#{scmLookupView.supplierGroupById()}"/>
+                          </p:autoComplete>
+                          <p:message for="vendorSupplierGroupId" display="text" />
+                        </h:panelGroup>-->
+
+            <!-- Vendor country -->
+            <p:commandLink actionListener="#{vendorView.countryOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.country}" for="vendorCountryId"/>
+            </p:commandLink> 
+            <h:panelGroup id="countryDiv">
+              <p:autoComplete value="#{vendorView.vendor.countryId}" completeMethod="#{vendorView.countryAuto}" converter="wawo.LookupIntConverter" required="true"
+                              requiredMessage="#{lang.country} #{lang.isRequired}" id="vendorCountryId" var="c" itemValue="#{c}" itemLabel="#{c.countryName}"
+                              emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                              autocomplete="off" forceSelection="true"  styleClass="fw" disabled="#{vendorView.accountExist}">
+                <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+                <p:ajax event="itemSelect" immediate="true" process="@this" update="vendorStateDiv vendorDistrictDiv pinDiv pinLabel phone1 currencyDiv" listener="#{vendorView.countrySelectEvent}"/>
+              </p:autoComplete>
+              <p:message for="vendorCountryId" display="text" />
+            </h:panelGroup>
+
+            <!-- GSTIN -->
+            <h:panelGroup id="gstinLabel" rendered="#{userRuntimeView.isGstRegime()}">
+              <p:commandLink target="_blank"  onclick="window.open('#{SystemConstants.GST_URL}')"  > 
+                <p:outputLabel value="#{lang.gstin}" for="gstNo" title="#{lang.gstinabbr}" />
+              </p:commandLink>
+            </h:panelGroup>
+            <h:panelGroup id="gstinDiv" rendered="#{userRuntimeView.isGstRegime()}">
+              <p:inputText styleClass="fw text-uppercase" value="#{vendorView.vendor.gstNo}" maxlength="15" id="gstNo" autocomplete="off" required="true" requiredMessage="#{lang.gstin} #{lang.isRequired}">
+                <f:validator validatorId="spica.scm.validators.GstinValidator" />
+                <p:ajax event="change" listener="#{vendorView.gstinChangeEventHandler}" update="panDiv countryDiv vendorStateDiv vendorDistrictDiv gstinDiv" process="gstinDiv" />
+              </p:inputText>
+              <p:message for="gstNo" display="text"/>
+            </h:panelGroup>
+
+            <!-- Pan No -->
+            <p:outputLabel value="#{lang.pan} #{lang.sno}" for="pan" title="#{lang.panabbr}" />
+            <h:panelGroup id="panDiv">
+              <p:inputText styleClass="fw text-uppercase" value="#{vendorView.vendor.panNo}" maxlength="10" id="pan" autocomplete="off"
+                           required="true" requiredMessage="#{lang.pan} #{lang.isRequired}" readonly="#{userRuntimeView.isGstRegime()}">
+                <f:validator validatorId="spica.scm.validators.PanCardValidator" />
+              </p:inputText>
+              <p:message for="pan" display="text"/>
+            </h:panelGroup>
+
+            <!-- vendor state -->
+            <p:commandLink actionListener="#{vendorView.stateOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.state}" for="vendorStateId"/>
+            </p:commandLink> 
+            <h:panelGroup id="vendorStateDiv">
+              <p:autoComplete  value="#{vendorView.vendor.stateId}" completeMethod="#{vendorView.stateAuto}" converter="wawo.LookupIntConverter"
+                               dropdown="true" required="true" requiredMessage="#{lang.state} #{lang.isRequired}" id="vendorStateId" var="s"
+                               itemValue="#{s}" itemLabel="#{s.stateName ne null ? s.stateName +=' ('+=s.stateCode+=')' : ''}"
+                               emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw" readonly="#{userRuntimeView.isGstRegime()}">
+                <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+                <p:ajax event="itemSelect" immediate="true" process="@this" update="vendorDistrictDiv" listener="#{vendorView.stateSelectEvent}"/>
+                <p:column styleClass="w-20">
+                  <h:outputText value="#{s.stateCode}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{s.stateName}" />
+                </p:column>
+              </p:autoComplete>
+              <p:message for="vendorStateId" display="text" />
+            </h:panelGroup>
+
+            <!-- vendor district -->
+            <p:commandLink actionListener="#{vendorView.districtOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.district}" for="vendorDistrictId"/>
+            </p:commandLink>             
+            <h:panelGroup id="vendorDistrictDiv">
+              <p:autoComplete  value="#{vendorView.vendorRegAddress.districtId}" completeMethod="#{vendorView.districtAuto}" converter="wawo.LookupIntConverter"
+                               id="vendorDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}"
+                               dropdown="true" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}"
+                               autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+              </p:autoComplete>
+              <p:message for="vendorDistrictId" display="text" />
+            </h:panelGroup>
+
+            <!-- Vendor Registered Address-->
+            <p:outputLabel value="Registered #{lang.address}" for="address" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{vendorView.vendorRegAddress.address}" cols="100" rows="2" maxlength="500" required="true"                                
+                                requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" validator="wawo.WhiteSpaceValidator"/>
+              <p:message for="address" display="text"/>
+            </h:panelGroup>
+
+            <!--pin -->
+            <h:panelGroup id="pinLabel">
+              <p:outputLabel value="#{vendorView.pinLength==5 ? lang.zip:lang.pincode}" for="pin" />
+            </h:panelGroup>
+            <h:panelGroup id="pinDiv">
+              <p:inputNumber styleClass="fw" value="#{vendorView.vendorRegAddress.pin}" maxlength="#{vendorView.pinLength}" onfocus="this.select()" inputStyleClass="text-right" maxValue="#{vendorView.pinValue}" decimalPlaces="0"
+                             thousandSeparator="" validatorMessage="#{lang.requiredLength} is #{vendorView.pinLength} " autocomplete="off"
+                             id="pin" >
+                <f:validateLength minimum="#{vendorView.pinLength}"/>
+              </p:inputNumber>
+              <p:message for="pin" display="text"/>
+            </h:panelGroup>
+
+            <!-- phone 1 -->
+            <h:panelGroup>                 
+              <p:outputLabel value="#{lang.phone} #{lang.no} " for="phone1" />
+              <p:outputLabel value="(#{vendorView.vendor.countryId.phoneCode})" rendered="#{vendorView.vendor.countryId.phoneCode ne null}" />                      
+            </h:panelGroup>
+            <h:panelGroup>  
+              <p:inputText  value="#{vendorView.vendorRegAddress.phone1}" maxlength="#{vendorView.vendor.countryId.phoneNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                            autocomplete="off" id="phone1" size="50" title="#{lang.maximum} #{vendorView.vendor.countryId.phoneNumberLength} #{lang.digit}">    
+
+                <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+              </p:inputText>
+              <p:tooltip id="phone1ToolTip" for="phone1" showEvent="focus" hideEvent="blur" />
+              <p:message for="phone1" display="text"/>
+            </h:panelGroup>    
+
+            <!-- Mobile 1 -->
+            <h:panelGroup>                 
+              <p:outputLabel value="#{lang.mobile} #{lang.no} " for="phone2" />
+              <p:outputLabel value="(#{vendorView.vendor.countryId.phoneCode})" rendered="#{vendorView.vendor.countryId.phoneCode ne null}" />                      
+            </h:panelGroup>            
+            <h:panelGroup>
+              <p:inputText  value="#{vendorView.vendorRegAddress.phone2}" maxlength="#{vendorView.vendor.countryId.mobileNumberLength}"  validatorMessage="#{lang.errorInvalidPhoneNo}"
+                            autocomplete="off" id="phone2" size="50" title = "#{lang.maximum} #{vendorView.vendor.countryId.mobileNumberLength} #{lang.digit}" >                  
+                <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}"  />
+              </p:inputText>
+              <p:tooltip id="phone2ToolTip" for="phone2" showEvent="focus" hideEvent="blur" />
+              <p:message for="phone2" display="text"/>
+            </h:panelGroup>   
+
+            <!-- email -->
+            <p:outputLabel value="#{lang.email}" for="email" />
+            <h:panelGroup>
+              <p:inputText styleClass="fw" value="#{vendorView.vendorRegAddress.email}" maxlength="50" id="email" autocomplete="off" validator="wawo.EmailValidator"/>
+              <p:message for="email" display="text"/>
+            </h:panelGroup>
+
+            <!-- Description -->
+            <p:outputLabel value="#{lang.description}" for="description" />
+            <h:panelGroup>
+              <p:inputTextarea  styleClass="fw" value="#{vendorView.vendor.description}" cols="100" rows="2" maxlength="500"  id="description" autoResize="false" />
+              <p:message for="description" display="text"/>
+            </h:panelGroup>
+
+            <!-- Manufacturer -->
+            <p:outputLabel value="#{lang.manufacturer}" for="manufacturer" rendered="#{vendorView.manufacture.id eq null}"/>
+            <h:panelGroup layout="block" id="manufacturerDiv" rendered="#{vendorView.manufacture.id eq null}">
+              <p:selectBooleanCheckbox value="#{vendorView.manufacturer}" id="manufacturer" >
+                <p:ajax update="lblMcode txtMcode" process="@this" />
+              </p:selectBooleanCheckbox>
+              <p:message for="manufacturer" display="text"/>
+            </h:panelGroup>
+
+            <!-- Vendor Code -->
+            <h:panelGroup id="lblMcode">
+              <p:outputLabel value="#{lang.manufacturer} #{lang.code}" for="vendorCode" rendered="#{vendorView.manufacturer}" />
+            </h:panelGroup>
+            <h:panelGroup id="txtMcode">
+              <p:inputText styleClass="fw text-uppercase" value="#{vendorView.manufacture.code}" maxlength="3" id="vendorCode" validator="wawo.WhiteSpaceValidator" autocomplete="off"
+                           required="true" requiredMessage="#{lang.vendor} #{lang.code} #{lang.isRequired}" rendered="#{vendorView.manufacturer}" />
+              <p:message for="vendorCode" display="text"/>
+
+            </h:panelGroup>
+            <h:panelGroup id="mnfPop">
+              <p:commandLink actionListener="#{vendorView.openManufacturerPopup()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()"  >
+                <p:outputLabel value="#{lang.manufacturer}" for="manufacturerPopup" rendered="#{vendorView.manufacture.id ne null}"/>
+              </p:commandLink>
+            </h:panelGroup>
+            <h:panelGroup>
+              <p:outputLabel value="#{vendorView.manufacture.name}" styleClass="fw" id="manufacturerPopup"/>
+              <p:message for="manufacturerPopup" display="text"/>
+            </h:panelGroup>  
+
+            <!-- Currency -->
+            <p:outputLabel value="#{lang.currency}" for="currency"/>
+            <h:panelGroup id="currencyDiv">
+              <p:selectOneMenu styleClass="L" id="currency" value="#{vendorView.vendor.currencyId}" required="true" requiredMessage="#{lang.currency} #{lang.isRequired}"                                
+                               converter="omnifaces.SelectItemsConverter" >
+                <f:selectItem itemLabel="#{lang.select} #{lang.one}" itemValue="#{null}" />
+                <f:selectItems  value="#{scmLookupView.currency(main)}" var="c" itemLabel="#{c.code}" itemValue="#{c}" />
+                <p:message for="currency" display="text"/>
+              </p:selectOneMenu>
+            </h:panelGroup> 
+
+            <!--Taxable-->
+            <p:outputLabel value="#{lang.taxable}" for="vendorTaxable"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{vendorView.vendor.taxable}" id="vendorTaxable" style="position: relative" styleClass="fw">
+                <f:selectItem itemValue="1" itemLabel="#{lang.taxableZone}" />
+                <f:selectItem itemValue="2" itemLabel="#{lang.taxableFreeZoneAllExempted}/#{lang.sez}" />
+                <f:selectItem itemValue="3" itemLabel="#{lang.taxableFreeZoneFreeZoneExempted}" />
+              </p:selectOneMenu>
+              <p:message for="vendorTaxable" display="text" />
+            </h:panelGroup>
+
+            <p:outputLabel value="#{lang.isCompany}" for="isCompany" />
+            <h:panelGroup layout="block" id="isCompanyDiv">
+              <p:selectOneRadio id="isCompany" value="#{vendorView.vendor.isCompany}" layout="grid"  
+                                required="true" requiredMessage="#{lang.isCompany} #{lang.isRequired}" columns="2">
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+              </p:selectOneRadio>
+            </h:panelGroup>
+
+            <!-- Tax Applicable -->
+            <p:outputLabel value="#{lang.declarationOfGoodsRequired}" for="vatApplicable"/>
+            <h:panelGroup>
+              <p:selectOneRadio value="#{vendorView.vendor.taxApplicable}" required="true" requiredMessage="#{lang.declarationOfGoodsRequired} #{lang.isRequired}" id="vatApplicable">
+                <f:selectItem itemLabel="YES" itemValue="1" />
+                <f:selectItem itemLabel="NO" itemValue="0" />
+              </p:selectOneRadio>
+              <p:message for="vatApplicable" display="text"/>
+            </h:panelGroup>
+
+            <!-- Vendor Commodities -->
+            <p:commandLink actionListener="#{vendorView.openCommodityPopup()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.commodity}" for="commodities"/>
+            </p:commandLink>
+            <h:panelGroup layout="block" id="commodityDiv">
+              <p:selectManyCheckbox id="commodities" value="#{vendorView.commodityList}" converter="omnifaces.SelectItemsConverter"
+                                    layout="responsive" columns="1"
+                                    required="true" requiredMessage="#{lang.atleastOneCommodity} #{lang.isRequired}" >
+                <f:selectItems value="#{vendorView.selectCommodity(main)}" var="c" itemLabel="#{c.title}" itemValue="#{c}"  />
+              </p:selectManyCheckbox>
+              <p:message for="commodities" display="text"/>
+            </h:panelGroup>            
+
+            <!--Vendor Brand-->
+            <p:commandLink actionListener="#{vendorView.brandOpen()}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.brand}(s)" for="manufactureId" />     
+            </p:commandLink>
+            <h:panelGroup id="brandListDiv">
+              <p:autoComplete  multiple="true" value="#{vendorView.brandList}" completeMethod="#{vendorView.brandByCompanyAuto}"
+                               converter="wawo.LookupIntConverter" cache="true" required="true" requiredMessage="#{lang.brand} #{lang.isRequired}"
+                               validator="#{vendorView.vendorValidation}" tabindex="10" 
+                               id="manufactureId" var="brand" itemValue="#{brand}" itemLabel="#{brand.code}" emptyMessage="#{lang.noResult}"
+                               queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                               style="position: relative" styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.brandClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.brandById()}"/>
+                <p:ajax event="itemSelect" listener="#{vendorView.onBrandSelect}" update="@this" />
+                <p:ajax event="itemUnselect" process="brandListDiv" immediate="true" update="@this" listener="#{vendorView.onBrandUnSelect}" onstart="block();" oncomplete="unblock();" />
+                <p:column style="width:10%">
+                  <h:outputText value="#{brand.code}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{brand.name}" />
+                </p:column>
+              </p:autoComplete>
+              <p:message for="manufactureId" display="text" />
+            </h:panelGroup>
+          </ui:decorate>
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(vendorView.vendor.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(vendorView.vendor.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(vendorView.vendor.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(vendorView.vendor.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:tab>
+
+        <!-- Vendor Address -->
+        <p:tab  title="#{lang.address}" disabled="#{main.isNew()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="vendorAddress" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{vendorView.vendorAddressNewDialog()}" title="#{lang.newform}" immediate="true" process="@this" icon="fa fa-plus"
+                               iconPos="left" styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+              </p:commandButton>
+              <p:remoteCommand name="vendorAddressNewDialogReturned" process="@this" actionListener="#{vendorView.vendorAddressDialogReturn}" update="vendorAddressTable" />
+            </ui:define>
+
+            <p:dataTable id="vendorAddressTable" var="vendorAddressVar" widgetVar="vendorAddressWidget" value="#{vendorView.getVendorAddressList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('vendorAddressWidget').filter();" />
+                </p:outputPanel>
+              </f:facet>
+
+              <!-- Address -->
+              <p:column sortBy="#{vendorAddressVar.address}" field="address_type_id.title" filterBy="#{vendorAddressVar.address}"
+                        filterStyleClass="hidden" >
+                <f:facet name="header"><h:outputText value="#{lang.address}" title="#{lang.address}"/></f:facet>
+                <p:commandLink action="#{vendorView.vendorAddressEditDialog(vendorAddressVar.id)}" value="#{vendorAddressVar.address}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}"></p:commandLink>
+              </p:column>
+
+              <!-- Address Type -->
+              <p:column sortBy="#{vendorAddressVar.addressTypeId.title}" field="address_type_id.title" filterBy="#{vendorAddressVar.addressTypeId.title}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.addressType}" title="#{lang.addressType}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.addressTypeId.title)}" title="#{appView.title(vendorAddressVar.addressTypeId.title)}" escape="false" />
+              </p:column>
+
+              <!-- State -->
+              <p:column sortBy="#{vendorAddressVar.stateId.stateName}" field="state_id.state_name">
+                <f:facet name="header"><h:outputText value="#{lang.state}" title="#{lang.state}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.stateId.stateName)}" title="#{appView.title(vendorAddressVar.stateId.stateName)}" escape="false" />
+              </p:column>
+
+              <!-- District -->
+              <p:column sortBy="#{vendorAddressVar.districtId.districtName}" field="district_id.district_name">
+                <f:facet name="header"><h:outputText value="#{lang.district}" title="#{lang.district}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.districtId.districtName)}" title="#{appView.title(vendorAddressVar.districtId.districtName)}" escape="false" />
+              </p:column>
+
+              <!-- Phone 1 -->
+              <p:column sortBy="#{vendorAddressVar.phone1}" field="phone_1">
+                <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.phone1)}" title="#{appView.title(vendorAddressVar.phone1)}" escape="false" />
+              </p:column>
+
+              <!-- Fax 1 -->
+              <p:column sortBy="#{vendorAddressVar.fax1}" field="fax_1">
+                <f:facet name="header"><h:outputText value="#{lang.fax}" title="#{lang.fax}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.fax1)}" title="#{appView.title(vendorAddressVar.fax1)}" escape="false" />
+              </p:column>
+
+              <!-- Email -->
+              <p:column sortBy="#{vendorAddressVar.email}" field="email">
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.email)}" title="#{appView.title(vendorAddressVar.email)}" escape="false" />
+              </p:column>
+
+              <!-- Status -->
+              <p:column sortBy="#{vendorAddressVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorAddressVar.statusId.title)}" title="#{appView.title(vendorAddressVar.statusId.title)}" rendered="#{vendorAddressVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(vendorAddressVar.statusId.title)}" title="#{appView.title(vendorAddressVar.statusId.title)}" rendered="#{vendorAddressVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+
+              <!-- Logs -->
+              <p:column headerText="#{lang.log}">
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(vendorAddressVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(vendorAddressVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(vendorAddressVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(vendorAddressVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(vendorAddressVar.id)}</ui:define>
+
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+        <!-- Vendor Contact -->
+        <p:tab  title="#{lang.contact}" disabled="#{main.isNew()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="vendorContact" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{vendorView.userProfileNewDialog(0)}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}"  >
+              </p:commandButton>
+              <p:remoteCommand name="userProfilePopupReturned" actionListener="#{vendorView.vendorContactDialogReturn}" update="vendorContactTable"  immediate="true" process="@this"/>
+            </ui:define>
+
+            <p:dataTable id="vendorContactTable" var="vendorContactVar" widgetVar="vendorContactWidget" value="#{vendorView.getVendorContactList(main)}"
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"
+                         tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText styleClass="fw" id="globalFilter" onkeyup="PF('vendorContactWidget').filter();" placeholder="#{lang.search}"/>
+                </p:outputPanel>
+              </f:facet>
+
+              <p:ajax event="rowEdit" update="vendorContactTable" listener="#{vendorContactView.onRowEdit}"/>
+
+              <!-- Contact Name -->
+              <p:column sortBy="#{vendorContactVar.userProfileId.name}" field="name" filterBy="#{vendorContactVar.userProfileId.name}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorContactVar.userProfileId.name)}" title="#{appView.title(vendorContactVar.userProfileId.name)}" escape="false" />
+              </p:column>
+
+              <!-- Designation -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.designation}" title="#{lang.designation}"/></f:facet>
+                <p:cellEditor>
+                  <f:facet name="output">
+                    <h:outputText value="#{vendorContactVar.designationId.title}" />
+                  </f:facet>
+                  <f:facet name="input">
+                    <p:selectOneMenu value="#{vendorContactVar.designationId}" style="width:100%" converter="omnifaces.SelectItemsConverter">
+                      <f:selectItems value="#{vendorContactView.selectDesignationByVendorContext(main)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+                      <p:ajax event="itemSelect" listener="#{vendorContactView.ajaxEventHandler}" update="panDiv"/>
+                    </p:selectOneMenu>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <!-- Pan -->
+              <p:column sortBy="#{vendorContactVar.panNo}" field="pan_no" style="text-align: center">
+                <f:facet name="header"><h:outputText value="#{lang.pan} #{lang.no}" title="#{lang.panabbr}"/></f:facet>
+                <p:cellEditor id="panDiv">
+                  <f:facet name="output">
+                    <h:outputText value="#{appView.display(vendorContactVar.panNo)}" title="#{appView.title(vendorVar.panNo)}" escape="false"
+                                  rendered="#{vendorView.isSalesAgent(vendorContactVar.designationId.id)}" styleClass="text-uppercase"/>
+                  </f:facet>
+                  <f:facet name="input">
+                    <h:panelGroup>
+                      <p:inputText styleClass="fw text-uppercase" value="#{vendorContactVar.panNo}" maxlength="20"
+                                   id="pan" rendered="#{vendorView.isSalesAgent(vendorContactVar.designationId.id)}">
+                        <f:validator validatorId="spica.scm.validators.PanCardValidator" />
+                      </p:inputText>
+                      <p:message for="pan" display="text"/>
+                    </h:panelGroup>
+                  </f:facet>
+                </p:cellEditor>
+              </p:column>
+
+              <!-- Phone -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.phone}" title="#{lang.phone}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorContactVar.userProfileId.phone1)}" />
+              </p:column>
+
+              <!-- Email -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.email}" title="#{lang.email}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorContactVar.userProfileId.email)}" title="#{appView.title(vendorContactVar.userProfileId.email)}" escape="false"/>
+              </p:column>
+
+              <!-- Action Buttons/Icons -->
+              <p:column headerText="">
+                <f:facet name="header"><h:outputText value="#{lang.action}" title="#{lang.action}"/></f:facet>
+                <div style="float: left;">
+                  <p:rowEditor />
+                </div>
+                <div>
+                  <p:commandButton action="#{vendorView.deleteVendorContact(main,vendorContactVar)}" process="@this"
+                                   value="" update="vendorContactTable" icon="fa fa-trash">
+                    <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                  </p:commandButton>
+                </div>
+              </p:column>
+
+              <!-- Logs -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(vendorContactVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(vendorContactVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(vendorContactVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(vendorContactVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(vendorContactVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+        <!-- Vendor Bank -->
+        <p:tab title="#{lang.bank}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="vendorBank" />
+            <ui:define name="menuleft">
+              <p:commandButton action="#{vendorView.vendorBankNewDialog()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}" />
+              <p:remoteCommand name="vendorBankNewDialogReturned" actionListener="#{vendorView.vendorBankDialogReturn}" update="vendorBankTable" />
+            </ui:define>
+
+            <p:dataTable id="vendorBankTable" var="vendorBankVar" widgetVar="vendorBankWidget" value="#{vendorView.getVendorBankList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('vendorBankWidget').filter();" />
+                </p:outputPanel>
+              </f:facet>
+
+              <!-- Bank Name -->
+              <p:column sortBy="#{vendorBankVar.bankId.name}" field="bank_id.name" filterBy="#{vendorBankVar.bankId.name}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.bank}" title="#{lang.bank}"/></f:facet>
+
+                <p:commandLink action="#{vendorView.vendorBankEditDialog(vendorBankVar.id)}" value="#{vendorBankVar.bankId.name}" process="@this" immediate="true"
+                               onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+
+              <!-- Account Name -->
+              <p:column sortBy="#{vendorBankVar.accountName}" field="account_name" >
+                <f:facet name="header"><h:outputText value="#{lang.accountName}" title="#{lang.accountName}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorBankVar.accountName)}" title="#{appView.title(vendorBankVar.accountName)}" escape="false" />
+              </p:column>
+
+              <!-- Account Number -->
+              <p:column sortBy="#{vendorBankVar.accountNo}" field="account_no" filterBy="#{vendorBankVar.accountNo}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.accountNumber}" title="#{lang.accountNumber}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorBankVar.accountNo)}" title="#{appView.title(vendorBankVar.accountNo)}" escape="false" />
+              </p:column>
+
+              <!-- Account Type -->
+              <p:column sortBy="#{vendorBankVar.bankAccountTypeId.title}" field="account_type_id.title" filterBy="#{vendorBankVar.bankAccountTypeId.title}" filterStyleClass="hidden" >
+                <f:facet name="header"><h:outputText value="#{lang.accountType}" title="#{lang.accountType}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorBankVar.bankAccountTypeId.title)}" title="#{appView.title(vendorBankVar.bankAccountTypeId.title)}" escape="false" />
+              </p:column>
+
+              <!-- Branch Name -->
+              <p:column sortBy="#{vendorBankVar.branchName}" field="branch_name" filterBy="#{vendorBankVar.branchName}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.branchName}" title="#{lang.branchName}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorBankVar.branchName)}" title="#{appView.title(vendorBankVar.branchName)}" escape="false" />
+              </p:column>
+
+              <!-- Status -->
+              <p:column sortBy="#{vendorBankVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorBankVar.statusId.title)}" title="#{appView.title(vendorBankVar.statusId.title)}" rendered="#{vendorBankVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(vendorBankVar.statusId.title)}" title="#{appView.title(vendorBankVar.statusId.title)}" rendered="#{vendorBankVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+
+              <!-- Bank Contact -->
+              <p:column headerText="#{lang.contact}" >
+                <f:facet name="header"><h:outputText value="#{lang.contact}" title="#{lang.contact}"/></f:facet>
+                <p:commandButton action="#{vendorView.bankContactDialog(vendorBankVar)}" process="@this" immediate="true"  icon="fa fa-eye"
+                                 onstart="block()" oncomplete="unblock()" title="View">
+                </p:commandButton>
+                <p:commandButton action="#{vendorView.bankContactDialogNewForm(vendorBankVar)}" icon="fa fa-plus" process="@this" immediate="true"
+                                 onstart="block()" oncomplete="unblock()" title="New">
+                </p:commandButton>
+              </p:column>
+
+              <!-- Logs -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(vendorBankVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(vendorBankVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(vendorBankVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(vendorBankVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(vendorBankVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+        <!-- Vendor License -->
+        <p:tab title="#{lang.license}" disabled="#{main.isNew()}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="vendorLicense" />
+            <ui:define name="menuleft">
+              <p:commandButton actionListener="#{vendorView.vendorLicenseNewDialog()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus"
+                               iconPos="left" styleClass="btn btn-info"  rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}" >
+              </p:commandButton>
+              <p:remoteCommand name="vendorLicenseDialogReturned" process="@this" immediate="true" actionListener="#{vendorView.vendorLicenseDialogReturn}" update="vendorLicenseTable" />
+            </ui:define>
+
+            <p:dataTable id="vendorLicenseTable" var="vendorLicenseVar" widgetVar="vendorLicenseWidget" value="#{vendorView.getVendorLicenseList(main)}" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  tableStyleClass="mDataTable mDataTable-center fw editLinks" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('vendorLicenseWidget').filter();" />
+                </p:outputPanel>
+              </f:facet>
+
+              <!-- License Key -->
+              <p:column sortBy="#{vendorLicenseVar.licenseKey}" field="title" filterBy="#{vendorLicenseVar.licenseKey}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.license}" title="#{lang.license}"/></f:facet>
+                <p:commandLink action="#{vendorView.vendorLicenseEditDialog(vendorLicenseVar.id)}" value="#{appView.display(vendorLicenseVar.licenseKey)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+
+              <!-- License Type -->
+              <p:column sortBy="#{vendorLicenseVar.licenseTypeId.title}" field="license_type_id.title" filterBy="#{vendorLicenseVar.licenseTypeId.title}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.licenseType}" title="#{lang.licenseType}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorLicenseVar.licenseTypeId.title)}" title="#{appView.title(vendorLicenseVar.licenseTypeId.title)}" escape="false" />
+              </p:column>
+
+              <!-- Issued At -->
+              <p:column sortBy="#{vendorLicenseVar.issuedAt}" field="issued_at" filterBy="#{vendorLicenseVar.issuedAt}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.issuedAt}" title="#{lang.issuedAt}"/></f:facet>
+                <h:outputText value="#{appView.date(vendorLicenseVar.issuedAt)}" escape="false" />
+              </p:column>
+
+              <!-- Valid From -->
+              <p:column sortBy="#{vendorLicenseVar.validFrom}" field="valid_from" filterBy="#{vendorLicenseVar.validFrom}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.validFrom}" title="#{lang.validFrom}"/></f:facet>
+                <h:outputText value="#{appView.date(vendorLicenseVar.validFrom)}" escape="false" />
+              </p:column>
+
+              <!-- Valid To -->
+              <p:column sortBy="#{vendorLicenseVar.validTo}" field="valid_to" filterBy="#{vendorLicenseVar.validTo}" filterStyleClass="hidden" >
+                <f:facet name="header"><h:outputText value="#{lang.validTo}" title="#{lang.validTo}"/></f:facet>
+                <h:outputText value="#{appView.date(vendorLicenseVar.validTo)}" escape="false" />
+              </p:column>
+
+              <!-- File Path -->
+              <p:column sortBy="#{vendorLicenseVar.filePath}" field="file_path">
+                <f:facet name="header"><h:outputText value="#{lang.filePath}" title="#{lang.filePath}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorLicenseVar.filePath)}" title="#{appView.title(vendorLicenseVar.filePath)}" escape="false" />
+              </p:column>
+
+              <!-- Status -->
+              <p:column sortBy="#{vendorLicenseVar.statusId.title}" field="status_id.title">
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{appView.display(vendorLicenseVar.statusId.title)}" title="#{appView.title(vendorLicenseVar.statusId.title)}" rendered="#{vendorLicenseVar.statusId.id==1}" escape="false" />
+                <h:outputText value="#{appView.display(vendorLicenseVar.statusId.title)}" title="#{appView.title(vendorLicenseVar.statusId.title)}" rendered="#{vendorLicenseVar.statusId.id==3}" style="color:grey" escape="false" />
+              </p:column>
+
+              <!-- Logs -->
+              <p:column>
+                <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(vendorLicenseVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(vendorLicenseVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(vendorLicenseVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(vendorLicenseVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(vendorLicenseVar.id)}</ui:define>
+                </ui:decorate>
+              </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+      </p:tabView>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="vendorTable" var="vendorVar" widgetVar="vendorWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{vendorView.vendorLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{vendorVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{vendorView.vendorSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <!-- Vendor Name -->
+        <p:column sortBy="#{vendorVar.vendorName}" field="vendor_name" >
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{vendorVar.vendorName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{vendorView.vendor}" value="#{vendorVar}" />
+          </p:commandLink>
+        </p:column>      
+
+        <p:column  sortBy="#{vendorVar.supplierGroupId.title}" field="scm_supplier_group.title" sortable="true" >
+          <f:facet name="header"><h:outputText value="#{lang.supplierGroup}" title="#{lang.supplierGroup}"/></f:facet>
+          <h:outputText value="#{appView.display(vendorVar.supplierGroupId.title)}" title="#{appView.title(vendorVar.supplierGroupId.title)}" escape="false" />
+        </p:column> 
+
+        <!-- GST Number -->
+        <p:column  sortBy="#{vendorVar.gstNo}" field="gst_no" rendered="#{userRuntimeView.isGstRegime()}">
+          <f:facet name="header"><h:outputText value="#{lang.gstin}" title="#{lang.gstinabbr}"/></f:facet>
+          <h:outputText value="#{appView.display(vendorVar.gstNo)}" title="#{appView.title(vendorVar.gstNo)}" escape="false" styleClass="text-uppercase" />
+        </p:column>   
+
+        <p:column  sortBy="#{vendorVar.vendorId.vendorName}" field="parent_id.vendor_name" sortable="true">
+          <f:facet name="header"><h:outputText value="#{lang.primary} #{lang.supplier}" title="#{lang.primary} #{lang.supplier}"/></f:facet>
+          <h:outputText value="#{appView.display(vendorVar.vendorId.vendorName)}" title="#{appView.title(vendorVar.vendorId.vendorName)}" escape="false" />
+        </p:column>
+
+        <!-- Description -->
+        <p:column  sortBy="#{vendorVar.description}" field="description">
+          <f:facet name="header"><h:outputText value="#{lang.description}" title="#{lang.description}"/></f:facet>
+          <h:outputText value="#{appView.display(vendorVar.description)}" title="#{appView.title(vendorVar.description)}" escape="false" />
+        </p:column>
+
+        <p:column exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(vendorVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(vendorVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(vendorVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(vendorVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(vendorVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

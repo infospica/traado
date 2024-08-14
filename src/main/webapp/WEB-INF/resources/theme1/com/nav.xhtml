@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  <ui:include src="/theme1/messages.xhtml" />
+  <ui:insert name="nav">
+    <div class="bar-N  bg-default wrapTop">
+      <div class="L h5"><h:panelGroup rendered="#{!main.popup}"><span>#{userRuntimeView.menuActive.parentId.title}</span> <i class="fa fa-angle-right m-x-5" style="color: #08c;"></i></h:panelGroup>
+        <h:panelGroup rendered="#{labelOnly ne null and labelOnly}" >
+          <span>#{label}</span>
+<!--          <span>#{userRuntimeView.menuActive.title}</span>-->
+          <h:panelGroup rendered="#{subLabel ne null}"><i class="fa fa-angle-right m-x-5" style="color: #08c;"></i>#{subLabel}</h:panelGroup>
+          <h:panelGroup rendered="#{labelLevel3 ne null}"><i class="fa fa-angle-right m-x-5" style="color: #08c;"></i>#{labelLevel3}</h:panelGroup>
+        </h:panelGroup>        
+        <p:commandLink action="#{main.setViewType(list)}" rendered="#{labelOnly eq null or !labelOnly }" process="@this" update="f1" immediate="true" onclick="block()" >
+          <span>#{label}</span>
+<!--          <span>#{userRuntimeView.menuActive.title}</span>-->
+          <h:panelGroup rendered="#{subLabel ne null}"><i class="fa fa-angle-right m-x-5" style="color: #08c;"></i>#{subLabel}</h:panelGroup>
+          <h:panelGroup rendered="#{labelLevel3 ne null}"><i class="fa fa-angle-right m-x-5" style="color: #08c;"></i>#{labelLevel3}</h:panelGroup>
+          <f:setPropertyActionListener target="#{main.pageData.totalRecords}" value="#{null}" />
+          <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" /> 
+        </p:commandLink><i class="fa fa-angle-right m-x-5" aria-hidden="true" style="color: #08c;"></i>
+        <!--<p:commandLink action="#{main.setViewType(newform)}" value="#{lang.newform}" process="@this" update="f1" immediate="true" onclick="toTop()" rendered="#{main.isNew()}" > <f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" /> </p:commandLink>-->        
+        <h:outputText value="#{navLabel eq null ? lang.newform : navLabel}" rendered="#{main.isNew()}" />        
+        <h:outputText value="#{navLabel eq null ? lang.edit : navLabel}" rendered="#{main.isEdit()}" />
+        <h:outputText value="#{navLabel eq null ? lang.list : navLabel}" rendered="#{main.isList()}" />
+      </div>
+      <h:panelGroup styleClass="L" style="padding-left: 5%" layout="block">
+        <ui:insert name="navLeftRight" />
+      </h:panelGroup>
+      <h:panelGroup styleClass="R" style="padding-left: 5%" layout="block">
+        <ui:insert name="navRight" />
+      </h:panelGroup>
+    </div>
+  </ui:insert>
+</ui:composition>
+
+

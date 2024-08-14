@@ -1,0 +1,340 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"    >      
+  #{importSalesView.switchImportSales(main, viewType)} 
+  <style>
+    .ui-datatable table {
+      table-layout: auto; 
+    } 
+  </style>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.importSales}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? importSalesView.importSales.referenceNo : lang.list}" />
+    <ui:param name="navLabel" value="" />
+    <ui:param name="ids" value="importSales" />
+    <ui:param name="deleteFormMenu" value="#{true}" />
+    <ui:param name="reset" value="false" />    
+
+    <p:importConstants type="spica.sys.SystemConstants" var="SYSCONSTANT" />
+    <ui:define name="save" >
+      <p:commandButton id="downLoad" ajax="false" actionListener="#{importSalesView.downloadExcelFormat(main)}" immediate="true" partialSubmit="true"
+                       styleClass="btn btn-info" rendered="#{main.isNew() or importSalesView.importSales.id eq null}" value="#{lang.downloadExcelFormat}"/>
+
+      <h:panelGroup id="importBtnDiv">
+        <p:fileUpload styleClass="myUpload" fileUploadListener="#{importSalesView.handleFileUpload}" id="dragDropUpload" mode="advanced"  auto="true" sizeLimit="10000000"
+                      allowTypes="/(\.|\/)(xls|xlsx)$/" dragDropSupport="true" chooseIcon="fa fa-upload" uploadIcon="fa fa-upload" style="display:none;"
+                      onstart="block();" oncomplete="unblock();" >
+        </p:fileUpload> 
+        <p:commandButton  id="importBtn" onclick="document.querySelector('.myUpload input').click()" onstart="block();" oncomplete="unblock()" styleClass="btn btn-info"
+                          rendered="#{(main.isNew() or importSalesView.importSales.id eq null)}" value="#{lang.importSales}" disabled="#{!importSalesView.importable}"/>
+        <p:remoteCommand name="uploadCommand" update="f1" />
+      </h:panelGroup>
+
+      <p:commandButton id="validate" ajax="true" actionListener="#{importSalesView.actionSalesImport(main)}" immediate="true" partialSubmit="true"
+                       styleClass="btn btn-info" rendered="#{main.edit}" value="#{lang.validateAndImport}" update="f1" onstart="block();" oncomplete="unblock()"/>
+
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{importSalesView.deleteImportSalesList(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('importSalesWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >      
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton styleClass="hidden" />
+      <p:commandButton action="#{importSalesView.deleteImportSalesList(main)}" value="#{lang.delete}" onclick="wdgOff('importSalesWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="formRight" >
+      <h:panelGroup id="errorNumDiv" rendered="#{importSalesView.importSales.status ne SYSCONSTANT.IMPORT_SUCCESS and importSalesView.errorLogNum gt 0}" style="padding-right:10px">
+        <h:outputText value="#{lang.errors}#{lang.colon} "> </h:outputText>
+        <p:outputLabel value="#{importSalesView.errorLogNum}" style="color:#C62828"/>
+      </h:panelGroup>
+      <h:outputText value="#{lang.referenceNo}#{lang.colon} "> </h:outputText>
+      <p:outputLabel value="#{importSalesView.importSales.referenceNo}" style="color:#{sysRuntimeView.statusColor(0)}"/>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <h:panelGroup>
+        <p:panelGrid  columns="4" layout="grid" styleClass="ui-panelgrid-blank form-horizontal"
+                      columnClasses="col-md-2 col-sm-4 control-label,col-md-4 col-sm-7,col-md-2 col-sm-4 control-label,col-md-4 col-sm-7">
+
+          <!-- Customer -->
+          <p:commandLink actionListener="#{popUpView.showCustomerPopUpForm(null)}" immediate="true" >
+            <p:outputLabel value="#{lang.customer}" for="customerId"/>
+          </p:commandLink>
+          <h:panelGroup id="customerDiv"> 
+            <p:autoComplete value="#{importSalesView.importSales.customerId}" completeMethod="#{importSalesView.customerAuto}" 
+                            converter="wawo.LookupIntConverter"
+                            id="customerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                            required="true" requiredMessage="#{lang.customer} #{lang.isRequired}"  dropdown="true"
+                            cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                            style="position: relative" styleClass="fw" >
+              <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+              <p:ajax event="itemSelect" listener="#{importSalesView.customerSelectedEvent}" update="priceListDiv importBtn importBtnDiv"  />
+              <p:column>
+                #{e.customerName}
+              </p:column>
+            </p:autoComplete>
+            <p:message for="customerId" display="text" />
+          </h:panelGroup>
+
+          <!-- Entry Date -->
+          <p:outputLabel value="#{lang.entryDate}" for="entryDate" /> 
+          <h:panelGroup>
+            <p:calendar value="#{importSalesView.importSales.entryDate}" pattern="#{lang.datePattern}" 
+                        converterMessage="#{lang.entryDate} #{lang.invalidDate}" required="true" requiredMessage="#{lang.entryDate} #{lang.isRequired}"
+                        validator="#{sysRuntimeView.dateLteToday}" mindate="#{userRuntimeView.company.currentFinancialYear.startDate}"
+                        maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}"
+                        maxlength="29" id="entryDate" showButtonPanel="true" navigator="true" mask="true" styleClass="test">
+              <p:ajax event="dateSelect" listener="#{importSalesView.entryDateSelectedEvent}"  update="importBtnDiv"/>
+              <p:ajax event="blur" process="@this" update="importBtnDiv"/>
+            </p:calendar>
+            <p:message for="entryDate" display="text"/>
+
+          </h:panelGroup>
+
+          <!-- Account group price list -->
+          <p:outputLabel value="#{lang.priceList}" for="accountGroupPriceListId" />
+          <h:panelGroup id="priceListDiv">
+            <p:inputText id="txtAccountGroupPriceListId" value="#{importSalesView.importSales.accountGroupPriceListId.title}"  readonly="true" styleClass="fw" rendered="#{main.edit}" />
+            <p:selectOneMenu value="#{importSalesView.importSales.accountGroupPriceListId}"  id="accountGroupPriceListId"
+                             required="true" requiredMessage="#{lang.priceList} #{lang.isRequired}" rendered="#{!main.edit}"
+                             styleClass="fw" converter="omnifaces.SelectItemsConverter">
+              <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+              <f:selectItems value="#{importSalesView.accountGroupPriceListByAccountGroup()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              <p:ajax event="itemSelect" listener="#{importSalesView.priceListSelectedEvent}" update="priceListDiv importBtnDiv"  />
+            </p:selectOneMenu>
+            <p:message for="accountGroupPriceListId" display="text" />
+          </h:panelGroup>
+
+
+          <!--Remarks-->
+          <p:outputLabel value="#{lang.remarks}" for="remarksId" />
+          <h:panelGroup id="remarksId">
+            <p:inputTextarea value="#{importSalesView.importSales.note}"
+                             cols="50" rows="2" maxlength="500" id="note" autoResize="false" styleClass="fw" >
+              <p:ajax process="@this"/>
+            </p:inputTextarea>
+          </h:panelGroup>
+
+        </p:panelGrid>
+      </h:panelGroup>
+    </ui:define>
+
+    <ui:define name="after" >
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <style>
+        .mDataTable td, .themeTable td, .dataTable td{border-top:none; border-bottom: none; }
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th{border: none;}
+
+        .bg-danger {
+          color: #fff;
+          background: #ef565a !important;
+        }
+      </style>
+      <h:panelGroup id="p2" layout="block" styleClass="card" rendered="#{!main.list and importSalesView.importSalesItemList ne null and importSalesView.importSalesItemList.size() gt 0}" >
+        <p:dataTable id="importSalesItemTable" var="row" widgetVar="importSalesItemWidget" rowIndexVar="rowIndex"
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable" value="#{importSalesView.getImportSalesItemList()}"
+                     rows="10" editable="true" editMode="cell" rowStyleClass="#{row.errorStatus eq SYSCONSTANT.ERROR?'highlight warning' : 'highlight'}"
+                     paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"  
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="10,50,100,150" rowKey="#{row.id eq null?importSalesView.getRowKey():row.id}"
+                     rowSelectMode="checkbox" selection="#{importSalesView.selectedSalesItemList}"
+                     >                
+          <p:ajax event="page" process="@this" update="@this" oncomplete="refreshDatatable();" immediate="true"  />          
+          <p:ajax event="rowSelectCheckbox"  />
+          <p:ajax event="rowUnselectCheckbox" />
+          <p:ajax event="toggleSelect" />
+
+          <p:column selectionMode="multiple" exportable="false"/>
+          <p:column style="width:30px">
+            <f:facet name="header">
+              <p:commandButton process="@this" value="" update="f1" icon="fa fa-trash" tabindex="-1"
+                               rendered="true" style="color: mediumvioletred;" actionListener="#{importSalesView.deleteImportSalesItem(main)}" title="Delete Error Log Items" >
+                <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+              </p:commandButton>
+            </f:facet>
+          </p:column>
+
+          <p:column sortBy="#{row.lineNo}" field="id" filterBy="#{row.lineNo}" filterStyleClass="hidden">
+            <f:facet name="header"><h:outputText value="#{lang.lineNo}" title="#{lang.lineNo}"/></f:facet>
+            <h:outputText value="#{appView.number(row.lineNo)}" title="#{appView.title(row.lineNo)}" escape="false" /></p:column>
+
+          <!--Error-->
+          <p:column sortBy="#{row.error}" filterBy="#{row.error}" filterStyleClass="hidden" width="400" style="width:400;" rendered="#{importSalesView.importSales.status eq 0}">
+            <f:facet name="header"><h:outputText value="#{lang.errors} " title="#{lang.errors}"/></f:facet>
+            <h:outputText value="#{appView.display(row.error)}" title="#{appView.title(row.error)}" styleClass="fw" /></p:column>
+
+          <!--Product Name-->
+          <p:column width="350">
+            <f:facet name="header"><h:outputText value="#{lang.product}" title="Product Name"/></f:facet>
+            <p:autoComplete id="productId" value="#{row.product}" completeMethod="#{importSalesView.completeProduct}"
+                            converter="spica.scm.converter.LineItemConverter" autocomplete="off" style="position: relative"  panelStyle="width:400px !important;"
+                            cache="true" cacheTimeout="30000" queryDelay="500" maxResults="100" scrollHeight="500" title="#{prod.productName}"
+                            var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+              <f:attribute name="param" value="#{prod}" />
+              <p:ajax event="itemSelect" onstart="block();" oncomplete="unblock();" listener="#{importSalesView.updateLineItem(main,row)}" update="productBatchId" />
+            </p:autoComplete>
+          </p:column>
+
+          <!--Batch No-->
+          <p:column width="200">
+            <f:facet name="header"><h:outputText value="#{lang.batchNo}" title="Batch No"/></f:facet>
+            <p:autoComplete id="productBatchId" value="#{row.productBatch}" completeMethod="#{importSalesView.completeBatch(filter, row)}"  
+                            converter="spica.scm.converter.LineItemConverter" autocomplete="off" style="position: relative"  panelStyle="width:400px !important;"
+                            cache="true" cacheTimeout="30000" queryDelay="500" maxResults="100" scrollHeight="500" title="#{e.batchNo}"
+                            var="e" itemLabel="#{e.batchNo}" itemValue="#{e}" forceSelection="true">
+              <f:attribute name="selectItem" value="#{row}" />
+              <f:attribute name="param" value="#{row.batchNo}" />
+              <p:column headerText="#{lang.batch}">
+                <h:outputText value="#{e.batchNo}" />
+              </p:column>
+              <p:column headerText="#{lang.expDate}">
+                <h:outputText value="#{appView.date(e.expiryDateActual)}" />
+              </p:column>     
+              <p:column headerText="#{lang.mrp}">
+                <h:outputText value="#{e.valueMrp}" />
+              </p:column>
+              <p:ajax event="itemSelect" update="rate boxQty qty freeQty expDate mrp" process="@this"
+                      listener="#{importSalesView.batchSelectEvent(main)}" onstart="block();" oncomplete="unblock();" />
+            </p:autoComplete>
+          </p:column>
+
+          <!--Expiry Date-->
+          <p:column sortBy="#{row.expiryDate}" filterBy="#{row.expiryDate}" filterStyleClass="hidden" width="200">
+            <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+            <p:inputMask id="expDate" mask="99-99" value="#{row.date}" title="#{row.date}" styleClass="fw" autocomplete="off" >
+              <p:ajax event="blur" process="@this" delay="500" listener="#{importSalesView.updateLineItem(main,row)}" />
+            </p:inputMask>
+          </p:column>
+
+          <!--Box Qty-->
+          <p:column sortBy="#{row.boxQty}" filterBy="#{row.boxQty}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.boxQty}" title="#{lang.boxQty}"/></f:facet>
+            <p:inputNumber id="boxQty" value="#{row.boxQty}" styleClass="fw" autocomplete="off" decimalPlaces="0" inputStyleClass="text-right"
+                           title="#{row.secToPriQuantity ne null?'1 box = ':''} #{row.secToPriQuantity ne null? row.secToPriQuantity:''}#{row.secToPriQuantity ne null? ' qty; ':''} #{row.qtyAvailable!=null?'max qty: ':''} #{row.qtyAvailable ne null?row.qtyAvailable:''}">
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importSalesView.updateBoxQty(main,row)}" update="qty freeQty" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Qty-->
+          <p:column sortBy="#{row.qty}" filterBy="#{row.qty}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.qty}" title="#{lang.qty}"/></f:facet>
+            <p:inputNumber id="qty" value="#{row.qty}" styleClass="fw" autocomplete="off" decimalPlaces="0"
+                           title="#{row.qtyAvailable!=null?'max qty: ':''} #{(row.qtyAvailable ne null?(row.qtyAvailable-(row.freeQty ne null?row.freeQty:0)):0)}" 
+                           maxValue="#{(row.qtyAvailable ne null?(row.qtyAvailable-(row.freeQty ne null?row.freeQty:0)):0)}" inputStyleClass="text-right" >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importSalesView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Free Qty-->
+          <p:column sortBy="#{row.freeQty}" filterBy="#{row.freeQty}" filterStyleClass="hidden" width="200" style="text-align: right;" >
+            <f:facet name="header"><h:outputText value="#{lang.freeQty}" title="#{lang.freeQty}"/></f:facet>
+            <p:inputNumber id="freeQty" value="#{row.freeQty}" styleClass="fw" autocomplete="off" decimalPlaces="0"
+                           title="#{row.qtyAvailable!=null?'max qty: ':''} #{(row.qtyAvailable ne null?(row.qtyAvailable-(row.qty ne null?row.qty:0)):0)}" 
+                           maxValue="#{(row.qtyAvailable ne null?(row.qtyAvailable-(row.qty ne null?row.qty:0)):0)}" inputStyleClass="text-right" >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importSalesView.updateLineItem(main,row)}"  />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Product Discount Value-->
+          <p:column sortBy="#{row.productDiscountValue}" filterBy="#{row.productDiscountValue}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.productDiscountValue}" title="#{lang.productDiscountValue}"/></f:facet>
+            <p:inputNumber id="discValue" value="#{row.productDiscountValue}" title="#{appView.decimal(row.productDiscountValue)}" styleClass="fw" autocomplete="off"
+                           disabled="#{row.productDiscountPercentage!=null and row.productDiscountPercentage gt 0}" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="300" listener="#{importSalesView.updateLineItem(main,row)}" update="discPerc" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Product Discount Percentage-->
+          <p:column sortBy="#{row.productDiscountPercentage}" filterBy="#{row.productDiscountPercentage}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.productDiscountPercentage}" title="#{lang.productDiscountPercentage}"/></f:facet>
+            <p:inputNumber id="discPerc" value="#{row.productDiscountPercentage}" title="#{appView.decimal(row.productDiscountPercentage)}" styleClass="fw" autocomplete="off"
+                           disabled="#{row.productDiscountValue!=null and row.productDiscountValue gt 0}" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="300" listener="#{importSalesView.updateLineItem(main,row)}" update="discValue" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--MRP-->
+          <p:column sortBy="#{row.mrp}" filterBy="#{row.mrp}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+            <p:inputNumber id="mrp" value="#{row.mrp}" styleClass="fw" autocomplete="off" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importSalesView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+          <!--Rate-->
+          <p:column sortBy="#{row.rate}" filterBy="#{row.rate}" filterStyleClass="hidden" width="200" style="text-align: right;">
+            <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+            <p:inputNumber id="rate" value="#{row.rate}" title="default Rate: #{row.productDetailSales.pricelistPts}" styleClass="fw" autocomplete="off" inputStyleClass="text-right"  >
+              <p:ajax event="keyup" process="@this" delay="500" listener="#{importSalesView.updateLineItem(main,row)}" />
+            </p:inputNumber>
+          </p:column>
+
+        </p:dataTable>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="importSalesTable" var="importSalesVar" widgetVar="importSalesWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{importSalesView.importSalesLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{importSalesVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true"
+                   paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{importSalesView.importSalesListSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true"
+                   paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false" >
+
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <!-- Reference No -->
+        <p:column sortBy="#{importSalesVar.referenceNo}" field="scm_import.reference_no">
+          <f:facet name="header"><h:outputText value="#{lang.referenceNo}" title="#{lang.referenceNo}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(importSalesVar.referenceNo)}"
+                         process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{importSalesView.importSales}" value="#{importSalesVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Customer Name -->
+        <p:column sortBy="#{importSalesVar.customerId.customerName}" field="scm_import.customer_id.customer_name">
+          <f:facet name="header"><h:outputText value="#{lang.customerName}" title="#{lang.customerName}"/></f:facet>
+          <h:outputText value="#{importSalesVar.customerId.customerName}" escape="false" />
+        </p:column>
+
+        <!-- Entry Date -->
+        <p:column sortBy="#{importSalesVar.entryDate}" field="scm_import.entry_date" >
+          <f:facet name="header"><h:outputText value="#{lang.entryDate}" title="#{lang.entryDate}"/></f:facet>
+          <h:outputText value="#{appView.date(importSalesVar.entryDate)}" escape="false" />
+        </p:column>
+
+        <!-- Status -->
+        <p:column sortBy="#{importSalesVar.status}" field="scm_import.status" >
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{importSalesVar.status ne 1 ? lang.pending: lang.imported }" title="#{importSalesVar.status}" escape="false"
+                        style="background-color: #{sysRuntimeView.statusColor(importSalesVar.status eq 0 ?1:2)}"
+                        styleClass="m-r-5 #{sysRuntimeView.statusStyle(importSalesVar.status)}" />
+        </p:column>
+
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(importSalesVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(importSalesVar.createdAt)}</ui:define>
+            <ui:define name="id">#{appView.display(importSalesVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+
+  </ui:decorate>
+  <script>
+    function refreshDatatable() {
+      page.refresh();
+    }
+  </script>
+</ui:composition>

@@ -1,0 +1,22 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+  <ui:include src="com/confirmDialog.xhtml"/>
+  <ui:include src="com/deleteDialog.xhtml" />
+  <h:panelGroup id="#{ids}F" styleClass="card"  pt:data-watermark="#{watermark eq null ? 'true' : watermark}" layout="block" rendered="#{rendered eq null ? true : rendered}">
+    <ui:insert name="toolbar" >
+      <ui:include src="com/toolForm.xhtml" />
+    </ui:insert>
+    <p:panelGrid rendered="#{grid eq null ? true : false}"  columns="#{cols eq null ? 2 : cols}" layout="grid" styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{styleClass eq null ? col eq 4 ? sysRuntimeView.getGrid4() : sysRuntimeView.grid2Small : styleClass }">
+      <ui:insert />
+    </p:panelGrid>
+    <ui:insert name="after"/>
+  </h:panelGroup>
+  <ui:insert name="afterForm"/>
+</ui:composition>
+
+

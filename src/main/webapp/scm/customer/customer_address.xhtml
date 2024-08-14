@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+  #{customerAddressView.switchCustomerAddress(main, main.viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{customerAddressView.customerAddress.customerId.customerName}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? appView.display(customerAddressView.customerAddress.address) : lang.address}" />   
+    <ui:param name="labelOnly" value="#{true}" />
+    <ui:param name="ids" value="customerAddress" />
+    <ui:param name="deleteFormMenu" value="#{!customerAddressView.registeredAddress}"/>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{customerAddressView.cloneCustomerAddress(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" 
+                  icon="fa fa-clone" iconPos="left" rendered="false"/>
+    </ui:define>
+
+    <ui:define name="navRight" >      
+      <p:commandButton rendered="#{main.popup}"  process="@this" immediate="true"  actionListener="#{customerAddressView.customerAddressPopupClose}"
+                       oncomplete="parent.customerAddressPopupReturned();closePopup();" 
+                       icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />      
+    </ui:define>
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{customerAddressView.deleteCustomerAddress(main)}" value="#{lang.delete}" onclick="wdgOff('customerAddressWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{customerAddressView.saveCustomerAddress(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+
+      <p:outputLabel value="#{lang.addressType}" for="customerAddressAddressTypeId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{customerAddressView.customerAddress.addressTypeId}" completeMethod="#{customerAddressView.lookupAddressType}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.customer} #{lang.addressType} #{lang.isRequired}" id="customerAddressAddressTypeId" var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.addressTypeClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.addressTypeById()}"/>
+        </p:autoComplete>
+        <p:message for="customerAddressAddressTypeId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.address}" for="address" />
+      <h:panelGroup>
+        <p:inputTextarea  styleClass="fw" value="#{customerAddressView.customerAddress.address}" cols="100" rows="3" maxlength="500" required="true" requiredMessage="#{lang.address} #{lang.isRequired}" id="address" autoResize="false" />
+        <p:message for="address" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.country}" for="customerAddressCountryId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{customerAddressView.customerAddress.countryId}" completeMethod="#{customerAddressView.countryAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.country} #{lang.isRequired}" id="customerAddressCountryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         readonly="true"
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" update="customerAddressStateDiv customerAddressDistrictDiv phone1 phone2" listener="#{customerAddressView.clearStateDistrict}"/>
+        </p:autoComplete>
+        <p:message for="customerAddressCountryId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.state}" for="customerAddressStateId"/>
+      <h:panelGroup id="customerAddressStateDiv">
+        <p:autoComplete  value="#{customerAddressView.customerAddress.stateId}" completeMethod="#{customerAddressView.stateAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.state} #{lang.isRequired}" id="customerAddressStateId" var="e" itemValue="#{e}" itemLabel="#{e.stateName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" readonly="#{customerAddressView.customerAddress.addressTypeId.id eq 1}"
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+          <p:ajax event="itemSelect" update="customerAddressDistrictDiv" listener="#{customerAddressView.clearDistrict}"/>
+        </p:autoComplete>
+        <p:message for="customerAddressStateId" display="text" />
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.district}" for="customerAddressDistrictId"/>
+      <h:panelGroup id="customerAddressDistrictDiv">
+        <p:autoComplete  value="#{customerAddressView.customerAddress.districtId}" 
+                         completeMethod="#{customerAddressView.districtAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.district} #{lang.isRequired}" 
+                         id="customerAddressDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw">
+          <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+          <p:ajax event="itemSelect" listener="#{customerAddressView.clearTerritory}" update="customerAddressTerritoryDiv"/>
+        </p:autoComplete>
+        <p:message for="customerAddressDistrictId" display="text" />
+      </h:panelGroup>  
+
+      <p:outputLabel value="#{lang.territory}" for="customerAddressTerritoryId"/>
+      <h:panelGroup id="customerAddressTerritoryDiv">
+        <p:autoComplete  value="#{customerAddressView.customerAddress.territoryId}" 
+                         completeMethod="#{customerAddressView.territoryAuto}" converter="wawo.LookupIntConverter"   
+                         id="customerAddressTerritoryId" var="e" itemValue="#{e}" itemLabel="#{e.territoryName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  style="position: relative" required="false" requiredMessage="#{lang.territory} #{lang.isRequired}">
+
+          <f:attribute name="clazz" value="#{scmLookupView.territoryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.territoryById()}"/>
+        </p:autoComplete>
+        <p:message for="customerAddressTerritoryId" display="text" />
+      </h:panelGroup> 
+      <p:outputLabel value="#{lang.cityorTown}" for="cityOrTown" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.cityOrTown}" maxlength="20" autocomplete="off"
+                     required="true" requiredMessage="#{lang.cityOrTown} #{lang.isRequired}"  id="cityOrTown">
+        </p:inputText>
+        <p:message for="cityOrTown" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.pincode}" for="pin" />
+      <h:panelGroup>
+        <p:inputNumber styleClass="fw" value="#{customerAddressView.customerAddress.pin}" maxlength="6" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999" decimalPlaces="0"  thousandSeparator="" 
+                       autocomplete="off" validatorMessage="#{lang.pincode} #{lang.requiredLength} is 6 " id="pin" >
+          <f:validateLength minimum="6" />
+        </p:inputNumber>
+        <p:message for="pin" display="text"/>
+      </h:panelGroup>
+
+      <p:outputLabel value="#{lang.phone1}" for="phone1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.phone1}" validator="wawo.WhiteSpaceValidator" maxlength="13" autocomplete="off"
+                     required="true" requiredMessage="#{lang.phone1} #{lang.isRequired}" validatorMessage="#{lang.errorInvalidPhoneNo}" id="phone1">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone1" display="text"/>
+      </h:panelGroup>  
+
+      <p:outputLabel value="#{lang.phone2}" for="phone2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.phone2}" autocomplete="off" maxlength="13" id="phone2" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone2" display="text"/>
+      </h:panelGroup> 
+
+      <p:outputLabel value="#{lang.phone3}" for="phone3" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.phone3}" autocomplete="off" maxlength="13" id="phone3" validatorMessage="#{lang.errorInvalidPhoneNo}">
+          <f:validateRegex pattern="#{userRuntimeView.company.countryId.phoneNoRegex}" />
+        </p:inputText>
+        <p:message for="phone3" display="text"/>
+      </h:panelGroup> 
+
+      <p:outputLabel value="#{lang.email}" for="email" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.email}" autocomplete="off" maxlength="50" id="email" validator="wawo.EmailValidator"/>
+        <p:message for="email" display="text"/>
+      </h:panelGroup>
+      <p:outputLabel value="#{lang.fax1}" for="fax1" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.fax1}" autocomplete="off" maxlength="13" id="fax1">
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax1" display="text"/>
+      </h:panelGroup>            
+      <p:outputLabel value="#{lang.fax2}" for="fax2" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{customerAddressView.customerAddress.fax2}" autocomplete="off" maxlength="13" id="fax2" >
+          <f:validator validatorId="spica.scm.validators.FaxValidator" />
+        </p:inputText>
+        <p:message for="fax2" display="text"/>
+      </h:panelGroup>            
+
+      <!--Sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{customerAddressView.customerAddress.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" 
+                       autocomplete="off" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="sortOrder" styleClass="fw" thousandSeparator=""/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+      <!--status-->
+      <p:outputLabel value="#{lang.status}" for="companyAddressStatusId"/>
+      <h:panelGroup>
+        <p:selectOneMenu value="#{customerAddressView.customerAddress.statusId}" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}" 
+                         id="companyAddressStatusId" styleClass="fw">
+          <f:selectItems value="#{customerAddressView.statusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+        </p:selectOneMenu>
+        <p:message for="companyAddressStatusId" display="text" />
+      </h:panelGroup> 
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(customerAddressView.customerAddress.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(customerAddressView.customerAddress.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(customerAddressView.customerAddress.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(customerAddressView.customerAddress.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+  </ui:decorate>
+</html>

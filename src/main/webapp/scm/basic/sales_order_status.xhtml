@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{salesOrderStatusView.switchSalesOrderStatus(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesOrderStatus}" />
+    <ui:param name="ids" value="salesOrderStatus" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesOrderStatusView.deleteSalesOrderStatus(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesOrderStatusWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{salesOrderStatusView.cloneSalesOrderStatus(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesOrderStatusView.deleteSalesOrderStatus(main)}" value="#{lang.delete}" onclick="wdgOff('salesOrderStatusWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{salesOrderStatusView.saveSalesOrderStatus(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">   
+      
+      <!--Title-->
+      <p:outputLabel value="#{lang.title}" for="title" />
+      <h:panelGroup><p:inputText styleClass="fw" value="#{salesOrderStatusView.salesOrderStatus.title}" maxlength="200" required="true" requiredMessage="#{lang.title} #{lang.isRequired}" id="title" /><p:message for="title" display="text"/></h:panelGroup>
+      
+      <!--sort Order-->
+      <p:outputLabel value="#{lang.sortOrder}" for="proirity" />
+      <h:panelGroup><p:inputNumber value="#{salesOrderStatusView.salesOrderStatus.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999" minValue="0" maxlength="5" id="proirity" /><p:message for="proirity" display="text"/></h:panelGroup>            
+    
+    </ui:define>
+    
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(salesOrderStatusView.salesOrderStatus.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(salesOrderStatusView.salesOrderStatus.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(salesOrderStatusView.salesOrderStatus.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(salesOrderStatusView.salesOrderStatus.modifiedAt)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    
+    <ui:define name="list">
+      <p:dataTable id="salesOrderStatusTable" var="salesOrderStatusVar" widgetVar="salesOrderStatusWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesOrderStatusView.salesOrderStatusLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesOrderStatusVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "   
+                   selection="#{salesOrderStatusView.salesOrderStatusSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />        
+        <p:column headerText="#{lang.title}" sortBy="#{salesOrderStatusVar.title}" field="title">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesOrderStatusVar.title)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesOrderStatusView.salesOrderStatus}" value="#{salesOrderStatusVar}" />
+          </p:commandLink>          
+        </p:column>
+<!--        <p:column headerText="#{lang.sortOrder}" sortBy="#{salesOrderStatusVar.sortOrder}" field="proirity" style="text-align: right"><h:outputText value="#{appView.number(salesOrderStatusVar.sortOrder)}" escape="false" /></p:column>-->
+        <p:column headerText="#{lang.log}" exportable="false">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesOrderStatusVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesOrderStatusVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesOrderStatusVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesOrderStatusVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(salesOrderStatusVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column>  
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

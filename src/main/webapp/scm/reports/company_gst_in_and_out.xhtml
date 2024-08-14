@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" 
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" >
+  #{companyGstInAndOutView.resetCompanyGstInAndOutView()}  
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="Company GST In And Out Report"/>
+    <ui:param name="ids" value="gstInandOut"/>
+    <ui:param name="deleteListMenu" value="false"/>
+    <ui:param name="search" value="false"/>
+    <ui:param name="padding" value=""/>
+
+    <!--  TO OVERRIDE -->
+    <ui:define name="deleteList"/>    
+    <ui:define name="menu1"/>
+    <ui:define name="deleteForm"/>
+    <ui:define name="save"/>    
+    <ui:define name="form"/>
+    <ui:define name="newList"/>
+
+    <ui:define name="rightList">
+
+
+      <p:calendar value="#{companyGstInAndOutView.filterParameters.fromDate}" 
+                  pattern="#{lang.datePattern}" converterMessage="#{lang.invalidDate}" maxlength="13" 
+                  mindate="#{userRuntimeView.company.currentFinancialYear.startDate}" 
+                  maxdate="#{userRuntimeView.company.currentFinancialYear.endDate}" 
+                  id="fromDate" showButtonPanel="true"  mask="true" placeholder="#{lang.fromDate}" onclick="this.select();" onfocus="this.select();" autocomplete="off" >
+        <p:ajax event="dateSelect" immediate="true" process="@this" listener="#{companyGstInAndOutView.resetCompanyGstInAndOutView()}" />        
+      </p:calendar>
+
+      <p:commandButton value="#{lang.ok}" process="fromDate" onclick="block();" oncomplete="unblock();" update="reportList"
+                       styleClass="btn btn-info" style="margin-left: 3px; margin-bottom: 4px;"  >
+      </p:commandButton>
+
+    </ui:define>
+
+    <ui:define name="list">
+      <h:panelGroup id="reportList" > 
+        <p:importConstants type="spica.constant.AccountingConstant" var="ACCOUNTING_CONSTANTS" />
+        <p:dataTable id="gstInandOutTable"  value="#{companyGstInAndOutView.getGstViewList(main)}" rowIndexVar="index" var="gst"  rowKey="#{index}"
+                     tableStyleClass="mDataTable mDataTable-center fw editLinks" 
+                     expandedRow="true" >            
+          <p:column style="width:50px" exportable="false">
+            <p:rowToggler  />
+          </p:column>
+          <p:column style="text-align: right;width:100px;" headerText="#{lang.slno}" >
+            <h:outputText value="#{index+1}" />
+          </p:column>
+          <p:column style="text-align: right;" headerText="Type" >
+            <h:outputText value="#{gst.ledgerCode}" />
+          </p:column>
+          <p:column style="text-align: right;" headerText="#{lang.igst}" >
+            <p:outputLabel value="#{appView.decimal(gst.igst)}" rendered="#{!(gst.igst gt 0)}" />
+            <p:commandLink value="#{appView.decimal(gst.igst)}" actionListener="#{companyGstInAndOutView.showReportDetailByTax(gst,45)}" immediate="true" accesskey=""
+                           rendered="#{gst.igst gt 0}" onstart="block()" oncomplete="unblock()" />
+          </p:column>
+          <p:column style="text-align: right;" headerText="#{lang.cgst}" >
+            <p:outputLabel value="#{appView.decimal(gst.cgst)}" rendered="#{!(gst.cgst gt 0)}" />
+            <p:commandLink value="#{appView.decimal(gst.cgst)}" actionListener="#{companyGstInAndOutView.showReportDetailByTax(gst,46)}" immediate="true" 
+                           rendered="#{gst.cgst gt 0}" onstart="block()" oncomplete="unblock()" />
+          </p:column>
+          <p:column style="text-align: right;" headerText="#{lang.sgst}" >
+            <p:outputLabel value="#{appView.decimal(gst.sgst)}" rendered="#{!(gst.sgst gt 0)}" />
+            <p:commandLink value="#{appView.decimal(gst.sgst)}" actionListener="#{companyGstInAndOutView.showReportDetailByTax(gst,47)}" immediate="true"
+                           rendered="#{gst.sgst gt 0}" onstart="block()" oncomplete="unblock()" />
+          </p:column>
+          <p:rowExpansion >
+            <div style="margin-right:-25px;">
+              <table style="width:100%;" border="0">
+                <tr>
+                  <td style="width:50px;">
+                    &#160;
+                  </td>
+                  <td style="width:75px;">
+                    &#160;
+                  </td>
+
+                  <td>
+                    <table style="width:100%;border: none;" >
+                      <tr>
+                        <td style="width:20%;">&#160;</td>
+                        <td style="width:2%;">&#160;</td>
+                        <td style="width:20%;position:relative;" valign="top">
+                          <p:fragment rendered="#{gst.igst>0}">
+                            <div style="position:absolute;top:0px;">
+                              <!--<div style="text-align: center;padding-bottom: 10px;"><strong>#{lang.igst}</strong></div>-->
+                              <div style="text-align: center;">
+                                <table style="width:100%;">
+                                  <p:repeat var="dt" value="#{companyGstInAndOutView.getGstDetailViewList(main,gst.ledgerCode)}">
+                                    <p:fragment rendered="#{dt.igst>0}">
+                                      <tr>
+                                        <td><h:outputText value="#{dt.title}" /></td>
+                                        <td align="right" style="height:30px;">                                          
+                                          <p:commandLink value="#{appView.decimal(dt.igst)}" actionListener="#{companyGstInAndOutView.showReportDetailDialog(dt)}" immediate="true" onstart="block()" oncomplete="unblock()" />                                         
+                                        </td>
+                                      </tr>
+                                    </p:fragment>
+                                  </p:repeat>
+                                </table>
+                              </div>
+                            </div>
+                          </p:fragment>
+                        </td>
+                        <td style="width:20%;position:relative;" valign="top">                          
+                          <p:fragment rendered="#{gst.cgst>0}" >
+                            <div style="position:absolute;top:0px;">
+                              <!--<div style="text-align: center;padding-bottom: 10px;"><strong>#{lang.cgst}</strong></div>-->
+                              <div style="text-align: center;">
+                                <table style="width:100%;">
+                                  <p:repeat var="dt" value="#{companyGstInAndOutView.getGstDetailViewList(main,gst.ledgerCode)}">
+                                    <p:fragment rendered="#{dt.cgst>0}">
+                                      <tr>
+                                        <td><h:outputText value="#{dt.title}" /></td>
+                                        <td align="right" style="height:30px;">                                          
+                                          <p:commandLink value="#{appView.decimal(dt.cgst)}" onstart="block()" oncomplete="unblock()" actionListener="#{companyGstInAndOutView.showReportDetailDialog(dt)}" immediate="true" />                                         
+                                        </td>
+                                      </tr>
+                                    </p:fragment>
+                                  </p:repeat>
+                                </table>
+                              </div>
+                            </div>
+                          </p:fragment>
+                        </td>
+                        <td style="width:20%;position:relative;" valign="top">
+                          <p:fragment rendered="#{gst.sgst>0}">
+                            <div style="">
+                              <!--<div style="text-align: center;padding-bottom: 10px;"><b> #{lang.sgst}</b><br /></div>-->
+                              <div style="text-align: center;">
+                                <table style="width:100%;">
+                                  <p:repeat var="dt" value="#{companyGstInAndOutView.getGstDetailViewList(main,gst.ledgerCode)}">
+                                    <p:fragment rendered="#{dt.sgst>0}">
+                                      <tr>
+                                        <td><h:outputText value="#{dt.title}" /></td>
+                                        <td align="right" style="height:30px;">
+                                          <p:commandLink value="#{appView.decimal(dt.sgst)}" onstart="block()" oncomplete="unblock()" actionListener="#{companyGstInAndOutView.showReportDetailDialog(dt)}" immediate="true" />
+                                        </td>
+                                      </tr>
+                                    </p:fragment>
+                                  </p:repeat>
+                                </table>
+                              </div>
+                            </div>
+                          </p:fragment>
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+
+            </div>
+          </p:rowExpansion>
+        </p:dataTable>
+      </h:panelGroup>   
+
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

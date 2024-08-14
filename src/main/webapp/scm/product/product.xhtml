@@ -1,0 +1,870 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  #{productView.switchProduct(main, viewType)} 
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.product}"/>
+    <ui:param name="subLabel" value="#{main.isEdit() ? productView.product.productName : null}"/>
+    <ui:param name="navLabel" value="#{main.isEdit() ? productView.product.productStatusId.title : null}" />
+    <ui:param name="ids" value="product" />
+    <ui:param name="deleteListMenu" value="true" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" oncomplete="closePopup();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{productView.deleteProduct(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('productWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{productView.deleteProduct(main)}" value="#{lang.delete}" onclick="wdgOff('productWidgetDel')"
+                       partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{productView.cloneProduct(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+    <ui:define name="save" >
+      <p:commandButton action="#{productView.actionSaveProduct(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary"
+                       rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}" process="productTab" update="f1"
+                       oncomplete="handleComplete(xhr, status, args)">        
+      </p:commandButton>
+      <p:commandButton actionListener="#{productView.saveProductClose(main)}" value="#{lang.save} #{lang.andSymbol} #{lang.close}" 
+                       onclick="toTop()" styleClass="btn btn-primary" process="productTab" update="f1" 
+                       rendered="#{(userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true) and main.popup}">        
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="form">
+      <ui:decorate template="/WEB-INF/resources/theme1/com/popupDialogInit.xhtml"> </ui:decorate>
+      <p:tabView  prependId="false" dynamic="true" cache="false" activeIndex="#{productView.activeIndex}" styleClass="materialTabs" rendered="#{main.isForm()}">
+        <p:ajax event="tabChange" onstart="block();" oncomplete="unblock();"  />
+        <p:tab title="#{lang.product}" id="productTab" >          
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="product" />
+            <ui:param name="label" value="productxxxxx"/>
+
+            <!-- Product Name -->
+            <p:outputLabel value="#{lang.productName}" for="productName" />
+            <h:panelGroup>
+              <p:inputText value="#{productView.product.productName}" maxlength="700" required="true" requiredMessage="#{lang.productName} #{lang.isRequired}"
+                           id="productName" tabindex="1" styleClass="fw" autocomplete="off"  />
+              <p:message for="productName" display="text"/>
+            </h:panelGroup>
+
+            <!-- Commodity -->
+            <p:commandLink  actionListener="#{popUpView.showCommodity(null)}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();">
+              <p:outputLabel value="#{lang.commodity}" for="productCommodityId"/>
+            </p:commandLink>
+            <h:panelGroup id="commodityDiv">
+              <p:remoteCommand name="commodityPopupReturn" update="@this"  process="@this" immediate="true" />
+              <p:selectOneMenu value="#{productView.product.commodityId}"  id="productCommodityId" tabindex="2"
+                               required="true" requiredMessage="#{lang.commodity} #{lang.isRequired}"
+                               disabled="#{productView.productDetailExist or !(main.isNew() or (productView.product.commodityId ne null and (userRuntimeView.privilege.editField or userRole.isRoot()))) }"                               
+                               converter="omnifaces.SelectItemsConverter" styleClass="fw o-100">
+                <f:selectItem itemLabel="#{lang.selectCombo}" itemValue="#{null}" />
+                <f:selectItems value="#{productView.selectVendorCommodity()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+                <p:ajax event="itemSelect" process="commodityDiv" update="productHsnCode productCategoryDiv productTypeDiv commodityTaxesLabel chNameLblDiv chNameTextDiv geneNameLbltDiv geneNameTextDiv"
+                        listener="#{productView.commoditySelectEventHandler}"/>
+              </p:selectOneMenu>
+              <p:outputLabel value="#{productView.commodityTaxes}" id="commodityTaxesLabel" rendered="false"/>
+              <p:message for="productCommodityId" display="text" />
+            </h:panelGroup>
+
+            <!-- Product Category -->
+            <p:commandLink actionListener="#{popUpView.showProductCategory(null)}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();" >
+              <p:outputLabel value="#{lang.productCategory}" for="productProductCategoryId"/>
+            </p:commandLink>
+            <h:panelGroup id="productCategoryDiv">
+              <p:autoComplete value="#{productView.product.productCategoryId}" completeMethod="#{productView.productCategoryAuto}" converter="wawo.LookupIntConverter" tabindex="3"
+                              required="true" requiredMessage="#{lang.productCategory} #{lang.isRequired}" id="productProductCategoryId"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" 
+                              disabled="#{productView.productDetailExist or !(main.isNew() or (productView.product.commodityId ne null and (userRuntimeView.privilege.editField or userRole.isRoot()))) }"
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" dropdown="true"
+                              autocomplete="off" forceSelection="true"  styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.productCategoryClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productCategoryById()}"/>
+                <p:ajax event="itemSelect" process="productCategoryDiv" update="categoryExDuty hsnCodeDiv" listener="#{productView.productCategorySelectEventHandler}"/>
+              </p:autoComplete>
+              <p:outputLabel value="#{productView.productCategoryTaxes}" id="categoryExDuty"/>
+              <p:message for="productProductCategoryId" display="text" />
+            </h:panelGroup>
+
+            <!-- Product Type -->
+            <p:commandLink actionListener="#{popUpView.showProductType(null)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.productType}" for="productProductTypeId"/>
+            </p:commandLink>
+            <h:panelGroup id="productTypeDiv">
+              <p:remoteCommand name="productTypeReturned" actionListener="#{productView.productTypeReturned()}" update="productTypeDiv"  process="@this" immediate="true" />
+              <p:selectOneMenu value="#{productView.product.productTypeId}"  id="productProductTypeId" tabindex="4"
+                               required="true" requiredMessage="#{lang.productType} #{lang.isRequired}"
+                               disabled="#{productView.productDetailExist}"
+                               converter="omnifaces.SelectItemsConverter" styleClass="fw o-100">
+                <f:selectItems value="#{productView.productTypeAuto()}" var="e" itemValue="#{e}" itemLabel="#{e.title}" />
+              </p:selectOneMenu>
+              <p:message for="productProductTypeId" display="text" />
+            </h:panelGroup>
+
+            <!-- Product Classification -->
+            <p:commandLink actionListener="#{popUpView.productClassificationOpen(null)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.productClassification}" for="productProductClassificationId"/>
+            </p:commandLink>
+            <h:panelGroup id="productClassificationDiv">
+              <p:autoComplete value="#{productView.productClassificationList}" completeMethod="#{productView.productClassificationAuto}"
+                              converter="wawo.LookupIntConverter" id="productProductClassificationId" tabindex="12" dropdown="true" multiple="true"
+                              required="true" requiredMessage="#{lang.productClassification} #{lang.isRequired}"
+                              var="e" itemValue="#{e}" itemLabel="#{e.title}" emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30"
+                              converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true" style="position: relative" styleClass="fw" >
+                <f:attribute name="clazz" value="#{scmLookupView.productClassificationClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.productClassificationById()}"/>
+                <p:ajax event="itemSelect" listener="#{productView.onClassificationSelect}" update="@this" />
+                <p:ajax event="itemUnselect" process="productClassificationDiv" immediate="true" listener="#{productView.onClassificationUnselect}" />
+              </p:autoComplete>
+              <p:message for="productProductClassificationId" display="text" />
+            </h:panelGroup>
+
+
+
+            <!-- HSN Code -->
+            <h:panelGroup rendered="#{userRuntimeView.isGstRegime()}">
+              <p:outputLabel value="#{lang.hsnCode}" for="productHsnCode" />
+            </h:panelGroup>
+            <h:panelGroup id="hsnCodeDiv" rendered="#{userRuntimeView.isGstRegime()}">
+              <p:inputText value="#{productView.product.hsnCode}" maxlength="10" tabindex="6" id="productHsnCode" validator="wawo.WhiteSpaceValidator"
+                           required="true" requiredMessage="#{lang.hsnCode} #{lang.isRequired}" autocomplete="off"/>
+              <p:message for="productHsnCode" display="text"/>
+            </h:panelGroup>
+
+            <!-- Chemical Name -->
+            <h:panelGroup id="chNameLblDiv">
+              <p:outputLabel value="#{lang.chemicalName}" for="productNameChemical" rendered="#{productView.isCommodityMedicine()}"/>
+            </h:panelGroup>
+            <h:panelGroup id="chNameTextDiv">
+              <p:inputText value="#{productView.product.productNameChemical}" maxlength="50" tabindex="6" autocomplete="off"
+                           id="productNameChemical" rendered="#{productView.isCommodityMedicine()}"/>
+              <p:message for="productNameChemical" display="text"/>
+            </h:panelGroup>
+
+            <!-- Generic Name -->
+            <h:panelGroup id="geneNameLbltDiv">
+              <p:outputLabel value="#{lang.genericName}" for="productNameGeneric" rendered="#{productView.isCommodityMedicine()}"/>
+            </h:panelGroup>
+            <h:panelGroup id="geneNameTextDiv">
+              <p:inputText value="#{productView.product.productNameGeneric}" maxlength="50" tabindex="7" autocomplete="off"
+                           id="productNameGeneric" rendered="#{productView.isCommodityMedicine()}"/>
+              <p:message for="productNameGeneric" display="text"/>
+            </h:panelGroup>            
+
+            <!-- Pack Size -->
+            <p:outputLabel value="#{lang.packSize}" for="packSize" />
+            <h:panelGroup>
+              <p:inputNumber value="#{productView.product.packSize}" maxlength="6" id="packSize"
+                             readonly="#{productView.productDetailExist}" tabindex="8"  autocomplete="off"
+                             required="true" requiredMessage="#{lang.packSize} #{lang.isRequired}" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="999999.99"/>
+              <p:outputLabel value="(Eg: 10 for 10 Tab, 100 for 100ml)"/>
+              <p:message for="packSize" display="text"/>
+            </h:panelGroup>
+
+            <!-- Pack Unit -->
+            <p:outputLabel value="#{lang.unit}" for="packUnit" />
+            <h:panelGroup id="productUnitDiv">
+              <p:selectOneMenu value="#{productView.product.productUnitId}"
+                               disabled="#{productView.productBatchExist}" styleClass="o-100" tabindex="9"
+                               id="packUnit" converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.unit} #{lang.isRequired}">
+                <f:selectItem itemValue="#{null}" itemLabel="#{lang.selectCombo}"/>
+                <f:selectItems value="#{productView.productPackingUnit(main)}" var="e" itemValue="#{e}" itemLabel="#{e.title}"/>
+                <p:ajax event="itemSelect" process="@this" update="productPackingDiv" listener="#{productView.productUnitItemSelectEvent}" />
+              </p:selectOneMenu>
+              <p:message for="packUnit" display="text"/>
+            </h:panelGroup>
+
+            <!-- Product Packing -->
+            <p:commandLink actionListener="#{popUpView.showProductPackingOpen(null)}" process="@this" immediate="true" ignoreAutoUpdate="true" onstart="block();" oncomplete="unblock();">
+              <p:outputLabel value="#{lang.productPacking}" for="productProductPackingDetailId" />
+            </p:commandLink>
+            <h:panelGroup id="productPackingDiv">
+              <p:remoteCommand name="productPackingPopupReturn" actionListener="#{productView.productPackingReturned()}" update="productProductPackingDetailId" process="@this" />
+              <p:selectOneMenu value="#{productView.product.productPackingDetailId}"  id="productProductPackingDetailId" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{lang.productPacking} #{lang.isRequired}" styleClass="fw o-100" tabindex="10" height="400" >
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{productView.lookupProductPackingDetail()}" var="e" itemValue="#{e}" itemLabel="#{e.title} " />   
+              </p:selectOneMenu>
+              <p:message for="productProductPackingDetailId" display="text" />
+            </h:panelGroup>
+
+            <!-- Packing Description -->
+            <p:outputLabel value="#{lang.packageDescription}" for="packDescription"/>
+            <h:panelGroup>
+              <p:inputText value="#{productView.product.packingDescription}" id="packDescription" styleClass="fw" size="40" 
+                           required="true" requiredMessage="#{lang.packageDescription} #{lang.isRequired}" />
+            </h:panelGroup>
+
+            <!-- Brand -->
+            <p:outputLabel value="#{lang.brand}" for="productBrandId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{productView.product.brandId}"  id="productBrandId" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{lang.brand} #{lang.isRequired}" styleClass="fw o-100" tabindex="11"
+                               disabled="#{productView.productSold}">
+                <f:selectItem itemLabel="#{lang.noSelection}" itemValue="#{null}" />
+                <f:selectItems value="#{productView.lookupBrandByCompany()}" var="e" itemValue="#{e}" itemLabel="#{e.name}" />
+              </p:selectOneMenu><p:message for="productBrandId" display="text" />
+            </h:panelGroup>
+
+            <!-- Manufactures -->
+            <p:commandLink actionListener="#{popUpView.showManuFacture(null)}" process="@this" immediate="true" onstart="block()" oncomplete="unblock()" >
+              <p:outputLabel value="#{lang.manufacture}(s)" for="manufactureId"/>
+            </p:commandLink>
+            <h:panelGroup id="manufactureListDiv">
+              <p:autoComplete  multiple="true" value="#{productView.manufactureList}" completeMethod="#{productView.manufactureByCompanyAuto}"
+                               converter="wawo.LookupIntConverter" cache="true" required="true" requiredMessage="#{lang.manufacture} #{lang.isRequired}"
+                               validator="#{productView.productValidation}" tabindex="12"
+                               id="manufactureId" var="manf" itemValue="#{manf}" itemLabel="#{manf.code}" emptyMessage="#{lang.noResult}"
+                               queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off" forceSelection="true"
+                               style="position: relative" styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.manufactureClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.manufactureById()}"/>
+                <p:column style="width:10%">
+                  <h:outputText value="#{manf.code}" />
+                </p:column>
+                <p:column>
+                  <h:outputText value="#{manf.name}" />
+                </p:column>
+                <p:ajax event="itemSelect" listener="#{productView.onManufactureSelect}" update="@this" />
+                <p:ajax event="itemUnselect" process="manufactureListDiv" immediate="true" listener="#{productView.onManufactureUnSelect}" />
+              </p:autoComplete><p:message for="manufactureId" display="text" />
+            </h:panelGroup>
+
+            <!-- Near Expiry Days -->
+            <p:outputLabel  value="#{lang.nearExpiryDays}" for="nearExpiryDays"></p:outputLabel>
+            <h:panelGroup layout="block">
+              <p:inputNumber id="nearExpiryDays" value="#{productView.product.expirySalesDays}" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="120"
+                             required="true" requiredMessage="#{lang.nearExpiryDays} #{lang.isRequired}" tabindex="12" decimalPlaces="0" />
+            </h:panelGroup>
+
+            <!-- Product Status -->
+            <p:outputLabel value="#{lang.productStatus}" for="productProductStatusId"/>
+            <h:panelGroup>
+              <p:selectOneMenu value="#{productView.product.productStatusId}" 
+                               converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{lang.status} #{lang.isRequired}"
+                               id="productProductStatusId" tabindex="13">
+                <f:selectItems value="#{productView.productStatusAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+              </p:selectOneMenu>
+              <p:message for="productProductStatusId" display="text" />
+            </h:panelGroup>
+
+            <h:outputLabel value="#{lang.description}" />
+            <h:panelGroup>
+              <p:inputTextarea rows="2" value="#{productView.product.description}" cols="80" maxlength="500" autoResize="false" />
+            </h:panelGroup>
+
+            <h:outputLabel value="#{lang.images}" rendered="#{productView.uploadGallery}"  />
+            <h:panelGroup rendered="#{productView.uploadGallery}" >
+              <div>
+                <p:commandButton  icon="fa fa-image" value="#{lang.manage} #{lang.gallery}" styleClass="btn btn-info" actionListener="#{productView.manageGallery()}" 
+                                  immediate="true" process="@this" />                
+              </div>
+              <p:fragment id="imageFragment">
+                <table>
+                  <tr>
+                    <p:panelGrid columns="2">
+                      <p:repeat value="#{productView.getProductImages(main)}" var="gallery">
+                        <td valign="top" >
+                          <img src="data:image/png;base64, #{gallery.content} " /> 
+                          <p:graphicImage value="data:image/jpg;base64,#{gallery.content}" height="50" width="50" />           
+                        </td>                     
+                      </p:repeat>
+                    </p:panelGrid>
+                  </tr>
+                </table>
+              </p:fragment>
+            </h:panelGroup>
+
+
+
+          </ui:decorate>        
+
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+            <ui:define name="cby">#{appView.display(productView.product.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productView.product.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productView.product.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productView.product.modifiedAt)}</ui:define>
+          </ui:decorate>
+        </p:tab>
+
+        <!-- Product Batch -->
+        <p:tab title="#{lang.productBatch}"  id="productBatchTab" rendered="#{main.edit}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+            <ui:param name="ids" value="productBatch" />
+
+            <ui:define name="menuleft">
+              <p:commandButton actionListener="#{productView.actionNewProductBatch()}" title="#{lang.add}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left"
+                               styleClass="btn btn-info" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+
+              </p:commandButton>                
+              <p:remoteCommand name="productBatchPopupReturned" actionListener="#{productView.productBatchPopupReturned(main)}" update="productBatchTable"
+                               process="@this" immediate="true" />
+            </ui:define>
+
+            <p:dataTable id="productBatchTable" var="productBatchVar" widgetVar="productBatchWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{productView.productBatchList}" rows="#{main.pageData.pageSize}" rowKey="#{productBatchVar.id}"
+                         rowsPerPageTemplate="#{main.pageData.pageSize},50,100,150" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                         rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="true" >
+
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('productBatchWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+
+              <!-- Batch -->
+              <p:column filterBy="#{productBatchVar.batchNo}" >
+                <f:facet name="header" ><h:outputText value="#{lang.batch}" title="#{lang.batch}"/></f:facet>
+                <p:commandLink action="#{productView.actionEditProductBatch(productBatchVar.id)}" value="#{appView.display(productBatchVar.batchNo)}"
+                               process="@this" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+                </p:commandLink>
+              </p:column>
+
+              <!-- MRP -->
+              <p:column filterBy="#{productBatchVar.valueMrp}" styleClass="w-100 text-right">
+                <f:facet name="header"><h:outputText value="#{lang.mrp}" title="#{lang.mrp}"/></f:facet>
+                <h:outputText value="#{appView.decimal(productBatchVar.valueMrp)}" escape="false" />
+              </p:column>
+
+              <!-- Expiry Date -->
+              <p:column filterBy="#{productBatchVar.expiryDateActual}" styleClass="w-100 text-right">
+                <f:facet name="header"><h:outputText value="#{lang.expiryDate}" title="#{lang.expiryDate}"/></f:facet>
+                <h:outputText value="#{sysRuntimeView.dateToMMYY(productBatchVar.expiryDateActual)}" escape="false" />
+              </p:column>
+
+              <!-- Expiry Date Sales -->
+              <p:column filterBy="#{productBatchVar.expiryDateSales}" styleClass="w-100">
+                <f:facet name="header"><h:outputText value="#{lang.expiryDateSale}" title="#{lang.expiryDateSale}"/></f:facet>
+                <h:outputText value="#{sysRuntimeView.dateToMMYY(productBatchVar.expiryDateSales)}" escape="false" />
+              </p:column>
+
+              <!-- Product Packing -->
+              <p:column styleClass="w-120" filterBy="#{productBatchVar.productPackingDetailId.title}" >
+                <f:facet name="header"><h:outputText value="#{lang.packing}" title="#{lang.packing}"/></f:facet>
+                <h:outputText value="#{appView.display(productBatchVar.productPackingDetailId.title)}" escape="false" />
+              </p:column>
+
+              <!-- Default Product Packing -->
+              <p:column styleClass="w-100" filterBy="#{productBatchVar.defaultProductPackingId.title}" >
+                <f:facet name="header"><h:outputText value="#{lang.defaults} #{lang.packing}" title="#{lang.defaults} #{lang.packing}"/></f:facet>
+                <h:outputText value="#{appView.display(productBatchVar.defaultProductPackingId.title)}" escape="false" />
+              </p:column>
+
+              <!-- Available Quantity -->
+              <p:column  styleClass="w-100" headerText="#{lang.quantity}" filterBy="#{productBatchVar.quantityAvailable}" >
+                <f:facet name="header"><h:outputText value="#{lang.quantity}" title="#{lang.quantity}"/></f:facet>
+                <h:outputText value="#{productBatchVar.quantityAvailable}" escape="false" />
+              </p:column>
+
+              <!-- Available Free Quantity -->
+              <p:column styleClass="w-80" filterBy="#{productBatchVar.quantityFreeAvailable}" >
+                <f:facet name="header"><h:outputText value="#{lang.Free} #{lang.quantity}" title="#{lang.Free} #{lang.quantity}"/></f:facet>
+                <h:outputText value="#{productBatchVar.quantityFreeAvailable}" escape="false" />
+              </p:column>
+
+              <!-- Blocked Flag -->
+              <p:column styleClass="w-40" filterBy="#{productBatchVar.isSaleable eq 1 ? lang.no : lang.yes}" >
+                <f:facet name="header"><h:outputText value="#{lang.blocked}" title="#{lang.blocked}"/></f:facet>
+                <h:outputText value="#{productBatchVar.isSaleable eq 1 ? lang.no : lang.yes}" escape="false" styleClass="label" style="background-color: #{sysRuntimeView.statusColorYesNo(productBatchVar.isSaleable)}" />
+              </p:column>
+
+              <p:column styleClass="w-100"  filterBy="#{productBatchVar.isPurchased eq 1 ? 'Purchased' : 'Not Purchased'}" >
+                <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+                <h:outputText value="#{productBatchVar.isPurchased eq 1 ? 'Purchased' : 'Not Purchased'}" escape="false" />
+              </p:column>
+
+              <p:column headerText="#{lang.action}" styleClass="w-100" >
+                <p:commandButton id="priceListBtn" icon="fa #{productBatchVar.isPurchased eq 1 ? 'fa-eye' : 'fa-eye-slash'}" title="View Price List" action="#{productView.getProductDetailPriceList(main, productBatchVar)}" 
+                                 disabled="#{productBatchVar.isPurchased ne 1}" oncomplete="PF('priceListDlg').show();" update="priceListTable" process="@this">
+                </p:commandButton>
+
+                <p:commandButton id="deleteBtn" icon="fa fa-trash" title="#{lang.delete}" action="#{productView.deleteProductBatch(main, productBatchVar)}" 
+                                 update="productBatchTable" rendered="#{productView.isBatchDeletable(main, productBatchVar) and userRuntimeView.privilege.editField ==true}">
+                  <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+                </p:commandButton>
+
+                <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+                  <ui:define name="cby">#{appView.display(productBatchVar.createdBy)}</ui:define>
+                  <ui:define name="cat">#{appView.dateTime(productBatchVar.createdAt)}</ui:define>
+                  <ui:define name="uby">#{appView.display(productBatchVar.modifiedBy)}</ui:define>
+                  <ui:define name="uat">#{appView.dateTime(productBatchVar.modifiedAt)}</ui:define>
+                  <ui:define name="id">#{appView.display(productBatchVar.id)}</ui:define>
+                </ui:decorate>        
+              </p:column>
+            </p:dataTable>
+
+            <!-- Product Price List Pop-up -->
+            <p:dialog header="#{lang.priceList}" widgetVar="priceListDlg" modal="true" dynamic="true" closable="true" >      
+
+              <p:dataTable id="priceListTable" var="priceVar" widgetVar="priceWidget"
+                           value="#{productView.productPricelistList}" rowHover="true" reflow="false"  
+                           tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+
+                <p:ajax event="rowEdit" listener="#{productView.onRowEdit}" update="priceListTable"/>
+
+                <!-- Product Price List Name -->
+                <p:column headerText="#{lang.productPricelist}" field="account_group_price_list_id.title">
+                  <h:outputText value="#{appView.display(priceVar.accountGroupPriceListId.title)}" escape="false"/>
+                </p:column>
+
+                <!-- Product Name -->
+                <p:column headerText="#{lang.productName}" field="account_group_price_list_id.product_detail_id.product_name">
+                  <h:outputText value="#{appView.display(priceVar.productDetailId.productBatchId.productId.productName)}" escape="false"/>
+                </p:column>
+
+                <!-- Product Rate -->
+                <p:column headerText="Price" field="value_pts_per_prod_piece_sell"> 
+                  <p:cellEditor>
+                    <f:facet name="output">
+                      <h:outputText value="#{appView.decimal(priceVar.valuePtsPerProdPieceSell)}" escape="false"  />
+                    </f:facet>
+                    <f:facet name="input"> 
+                      <h:panelGroup>
+                        <p:inputNumber styleClass="fw" value="#{priceVar.valuePtsPerProdPieceSell}" converterMessage="#{lang.price} #{lang.invalidNumber}" decimalPlaces="2" 
+                                       onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="5" required="true" requiredMessage="#{lang.price} #{lang.isRequired}" 
+                                       id="valuePrice" />
+                        <p:message for="valuePrice" display="text"/>
+                      </h:panelGroup>
+                    </f:facet>
+                  </p:cellEditor>
+                </p:column>
+
+                <!-- Row Edit -->
+                <p:column>
+                  <p:rowEditor/>
+                </p:column>
+
+              </p:dataTable>
+            </p:dialog>
+
+          </ui:decorate>
+        </p:tab>
+        <!--Product Preset-->
+        <p:tab title="#{lang.productPreset}"  id="productPackingTab" rendered="#{main.edit}" >
+          <!--          <h:panelGroup layout="block" styleClass="bar-T bg-default m-b-10">
+                      <h:panelGroup layout="block" styleClass="L">
+                        <h:commandButton action="#{productView.saveProductPreset(main)}"  value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+                          <f:ajax execute="productPackingTab" render="f1"/>
+                        </h:commandButton>
+          
+                        <p:commandButton actionListener="#{productView.deletePreset(main)}" rendered="#{!productView.presetIsDeletable(main)}" 
+                                         value="#{lang.delete}" icon="fa fa-trash" styleClass="btn btn-danger" update="presetDiv" >                
+                        </p:commandButton>
+                      </h:panelGroup>
+                    </h:panelGroup>-->
+
+          <h:panelGroup layout="block" styleClass="f-row" id="presetDiv" rendered="#{productView.presetLists eq null or productView.presetLists.size() eq 0}" >            
+
+            <h:panelGroup layout="block" styleClass="f-col-md-12">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="marginPanel" />
+                <ui:param name="label" value="Margin"/>
+                <ui:param name="grid" value="false" />
+                <ui:param name="rendered" value="#{main.isEdit()}"/>
+
+                <ui:define name="menuleft">
+                  <h:panelGroup>
+                    <h:commandButton action="#{productView.saveProductPreset(main)}"  value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+                      <f:ajax execute="productPackingTab" render="f1"/>
+                    </h:commandButton>
+                    <p:commandButton actionListener="#{productView.deletePreset(main)}" rendered="#{!productView.presetIsDeletable(main)}" 
+                                     value="#{lang.delete}" icon="fa fa-trash" styleClass="btn btn-danger" update="presetDiv" >                
+                    </p:commandButton>
+                  </h:panelGroup>                  
+                </ui:define>
+
+                <ui:define name="subAfter">
+
+                  <h:panelGroup layout="block" styleClass="form-horizontal" >
+
+                    <!-- PTR Margin Percent -->
+                    <h:panelGroup layout="block" styleClass="form-group">
+                      <p:outputLabel value="#{lang.ptrMargin} #{lang.percentageSymbol}" styleClass="col-md-3 control-label" for="ptrMarginPercentage"/>
+                      <h:panelGroup layout="block" styleClass="col-md-9 ">
+                        <h:panelGroup layout="block" styleClass="flex">
+                          <h:panelGroup layout="block" styleClass="cell-1">
+                            <p:inputNumber styleClass="fw" value="#{productView.productPreset.ptrMarginPercentage}" converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}"
+                                           decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="ptrMarginPercentage"/>
+                            <h:outputText value="(#{userRuntimeView.contract.ptrMarginPercent} #{appView.percentageSymbol})" rendered="#{productView.ptrMarginPercentageValue()}"/>
+                            <p:message for="ptrMarginPercentage" display="text"/>
+                          </h:panelGroup>
+                          <h:panelGroup layout="block" styleClass="cell-1">
+                            <p:selectOneMenu value="#{productView.productPreset.mrpltePtrRateDerivationCriterion}" id="mrpltePtrRateDerivationCriterion" required="true" requiredMessage="#{lang.mrpltePtrRateDerivationCriterion} #{lang.isRequired}">
+                              <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                              <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+                            </p:selectOneMenu>
+
+                          </h:panelGroup>
+                        </h:panelGroup>
+                      </h:panelGroup>
+                    </h:panelGroup>
+
+                    <!-- PTS Margin Percent -->
+                    <h:panelGroup layout="block" styleClass="form-group">
+                      <p:outputLabel value="#{lang.ptsMargin} #{lang.percentageSymbol}" styleClass="col-md-3 control-label" for="ptsMarginPercentage"/>
+                      <h:panelGroup layout="block" styleClass="col-md-9 ">
+                        <h:panelGroup layout="block" styleClass="flex">
+                          <h:panelGroup layout="block" styleClass="cell-1">
+                            <p:inputNumber styleClass="fw" value="#{productView.productPreset.ptsMarginPercentage}" converterMessage="#{lang.ptsMarginPercent} #{lang.invalidNumber}"
+                                           decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.00" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="ptsMarginPercentage"/>
+                            <h:outputText value="(#{userRuntimeView.contract.ptsMarginPercent} #{appView.percentageSymbol})" rendered="#{productView.ptsMarginPercentageValue()}"/>
+                            <p:message for="ptsMarginPercentage" display="text"/>
+
+                          </h:panelGroup>
+                          <h:panelGroup layout="block" styleClass="cell-1">
+                            <p:selectOneMenu value="#{productView.productPreset.ptrPtsRateDerivationCriterion}" id="ptrPtsRateDerivationCriterion" required="true" requiredMessage="#{lang.ptrPtsRateDerivationCriterion} #{lang.isRequired}">
+                              <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                              <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+                            </p:selectOneMenu>
+                          </h:panelGroup>
+                        </h:panelGroup>
+                      </h:panelGroup>
+                    </h:panelGroup>
+                    <!-- Margin Percentage -->
+                    <h:panelGroup layout="block" styleClass="form-group">
+                      <p:outputLabel value="#{lang.margin} #{lang.percentageSymbol}" styleClass="col-md-3 control-label" for="marginPercentage" rendered="#{productView.isTradeTypeSS()}"/>
+                      <h:panelGroup layout="block" styleClass="col-md-9 " rendered="#{productView.isTradeTypeSS()}">
+                        <h:panelGroup layout="block" styleClass="flex">
+                          <h:panelGroup layout="block" styleClass="cell-1">
+                            <p:inputNumber styleClass="fw" value="#{productView.productPreset.marginPercentage}" converterMessage="#{lang.marginPercentage} #{lang.invalidNumber}"
+                                           decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00" minValue="0.00" symbol="#{appView.percentageSymbol}" symbolPosition="s" maxlength="5" id="marginPercentage"
+                                           required="true" requiredMessage="#{lang.marginPercentage} #{lang.isRequired}"/>
+                            <h:outputText value="(#{userRuntimeView.contract.marginPercentage} #{appView.percentageSymbol})" rendered="#{productView.marginPercentValue()}"/>
+                            <p:message for="marginPercentage" display="text"/>
+                          </h:panelGroup>
+                          <h:panelGroup layout="block" styleClass="cell-1">
+                            <p:selectOneMenu value="#{productView.productPreset.ptsSsRateDerivationCriterion}" id="ptsSsRateDerivationCriterion" required="true" requiredMessage="#{lang.ptsSsRateDerivationCriterion} #{lang.isRequired}">
+                              <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                              <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+                            </p:selectOneMenu>
+                          </h:panelGroup>
+                        </h:panelGroup>
+                      </h:panelGroup>
+                    </h:panelGroup>
+
+
+                    <!-- Vendor Reserve Percent -->
+<!--            <p:outputLabel value="#{lang.vendorReservePercent}" for="vendorReservePercentage" rendered="#{productView.isTradeTypeSS()}"/>
+           <h:panelGroup rendered="#{productView.isTradeTypeSS()}" layout="block" styleClass="row">
+             <div class="col-md-6">
+               <p:inputNumber styleClass="fw" value="#{productView.productPreset.vendorReservePercentage}" converterMessage="#{lang.vendorReservePercent} #{lang.invalidNumber}"
+                              decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" minValue="0.0" symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="vendorReservePercentage"/>
+               <h:outputText value="(#{userRuntimeView.contract.vendorReservePercent} #{appView.percentageSymbol})" rendered="#{productView.vendorReservePercentageValue()}"/>
+               <p:message for="vendorReservePercentage" display="text"/>
+             </div>
+           </h:panelGroup>-->
+
+                  </h:panelGroup>
+
+
+                </ui:define>               
+
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+          <h:panelGroup layout="block" styleClass="row" id="presetDivPm" rendered="#{productView.presetLists ne null and productView.presetLists.size() gt 0}" >            
+
+            <h:panelGroup layout="block" styleClass="col-md-12">
+              <ui:decorate template="/WEB-INF/resources/theme1/subTitleForm.xhtml">
+                <ui:param name="ids" value="marginPanelPm" />
+                <ui:param name="label" value="Margin"/>
+                <ui:param name="grid" value="false" />
+                <ui:param name="rendered" value="#{main.isEdit()}"/>
+
+                <ui:define name="menuleft">
+                  <h:panelGroup>
+                    <p:commandButton action="#{productView.saveProductPresetList(main)}"  value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" />                                        
+                    <p:commandButton actionListener="#{productView.deletePreset(main)}" rendered="#{!productView.presetIsDeletable(main)}" 
+                                     value="#{lang.delete}" icon="fa fa-trash" styleClass="btn btn-danger" update="presetDiv" >                
+                    </p:commandButton>
+                  </h:panelGroup>                  
+                </ui:define>
+
+                <ui:define name="subAfter">
+
+
+                  <h:panelGroup layout="block"  rendered="#{productView.presetLists ne null and productView.presetLists.size() gt 0}">
+                    <p:dataTable id="productMasterPresetListTable" var="row" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                                 value="#{productView.presetLists}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                                 rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                                 rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+                      <p:column headerText="#{lang.account}">
+                        <h:outputText value="#{row.accountId.accountTitle}" />
+                      </p:column>
+                      <p:column headerText="#{lang.ptrMargin} #{lang.percentageSymbol}">
+                        <h:panelGroup layout="block" styleClass="col-md-9 ">
+                          <h:panelGroup layout="block" styleClass="flex">
+                            <h:panelGroup layout="block" styleClass="cell-1">
+                              <p:inputNumber styleClass="fw" value="#{row.ptrMarginPercentage}" converterMessage="#{lang.ptrMarginPercent} #{lang.invalidNumber}"
+                                             decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.000" minValue="0.0"
+                                             symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="ptrMarginPercentagePM"/>
+                              <p:message for="ptrMarginPercentagePM" display="text"/>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="cell-1">
+                              <p:selectOneMenu value="#{row.mrpltePtrRateDerivationCriterion}" id="mrpltePtrRateDerivationCriterionPM" required="true" 
+                                               requiredMessage="#{lang.mrpltePtrRateDerivationCriterion} #{lang.isRequired}">
+                                <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                                <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+                              </p:selectOneMenu>
+
+                            </h:panelGroup>
+                          </h:panelGroup>
+                        </h:panelGroup>
+                      </p:column>
+                      <p:column headerText="#{lang.ptsMargin} #{lang.percentageSymbol}" >
+                        <h:panelGroup layout="block" styleClass="col-md-9 ">
+                          <h:panelGroup layout="block" styleClass="flex">
+                            <h:panelGroup layout="block" styleClass="cell-1">
+                              <p:inputNumber styleClass="fw" value="#{row.ptsMarginPercentage}" converterMessage="#{lang.ptsMarginPercent} #{lang.invalidNumber}"
+                                             decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100" minValue="0.0" 
+                                             symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="6" id="ptsMarginPercentagePM"/>
+                              <p:message for="ptsMarginPercentagePM" display="text"/>
+
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="cell-1">
+                              <p:selectOneMenu value="#{row.ptrPtsRateDerivationCriterion}" id="ptrPtsRateDerivationCriterionPM" required="true" 
+                                               requiredMessage="#{lang.ptrPtsRateDerivationCriterion} #{lang.isRequired}">
+                                <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                                <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+                              </p:selectOneMenu>
+                            </h:panelGroup>
+                          </h:panelGroup>
+                        </h:panelGroup>
+                      </p:column>
+                      <p:column  headerText="#{lang.margin} #{lang.percentageSymbol}" >
+                        <h:panelGroup layout="block" styleClass="col-md-9 " rendered="#{productView.isTradeTypeSS()}">
+                          <h:panelGroup layout="block" styleClass="flex">
+                            <h:panelGroup layout="block" styleClass="cell-1">
+                              <p:inputNumber styleClass="fw" value="#{row.marginPercentage}" converterMessage="#{lang.marginPercentage} #{lang.invalidNumber}"
+                                             decimalPlaces="3" onfocus="this.select()" inputStyleClass="text-right" maxValue="100" minValue="0.0" 
+                                             symbol="#{appView.percentageSymbol} " symbolPosition="s" maxlength="5" id="marginPercentagePM"
+                                             required="true" requiredMessage="#{lang.marginPercentage} #{lang.isRequired}"/>
+                              <p:message for="marginPercentagePM" display="text"/>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="cell-1">
+                              <p:selectOneMenu value="#{row.ptsSsRateDerivationCriterion}" id="ptsSsRateDerivationCriterionPM" required="true" 
+                                               requiredMessage="#{lang.ptsSsRateDerivationCriterion} #{lang.isRequired}">
+                                <f:selectItem itemValue="2" itemLabel="#{lang.markDown}"/>
+                                <f:selectItem itemValue="1" itemLabel="#{lang.markUp}"/>
+                              </p:selectOneMenu>
+                            </h:panelGroup>
+                          </h:panelGroup>
+                        </h:panelGroup>
+                      </p:column>
+                    </p:dataTable>
+                  </h:panelGroup>
+
+                </ui:define>               
+
+              </ui:decorate>
+            </h:panelGroup>
+          </h:panelGroup>
+
+        </p:tab>
+      </p:tabView>
+      <p:dialog id="dlgProductCat" widgetVar="dlgProductCatVar" header="Attention" resizable="false" showEffect="clip"
+                hideEffect="clip" closeOnEscape="true" modal="true">
+        <h:outputText value="Please verify &#38; confirm Purchase, Purchase return, Sales , Sales return draft entries if exits. Proceed with Product category Change?"  escape="false" />
+        <div class="btn-T m-t-20 b-t-1 p-y-5 text-center">          
+          <p:commandButton type="button" value="#{lang.cancel}" styleClass="btn btn-info" onclick="PF('dlgProductCatVar').hide();" />
+          <p:commandButton id="confirmBtn1" action="#{productView.saveProduct(main)}" value="#{lang.confirm}" 
+                           styleClass="btn btn-primary" oncomplete="PF('dlgProductCatVar').hide();" >
+          </p:commandButton>
+        </div>
+      </p:dialog>
+      <script>
+        //<![CDATA[
+        function handleComplete(xhr, status, args) {
+          if (args.saved === 0) {
+            PF('dlgProductCatVar').show();
+          }
+        }
+        //]]>
+      </script>
+    </ui:define>
+
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >      
+      <p:selectBooleanCheckbox value="#{productView.productFilter}" itemLabel="#{lang.productByVendorCommodityAndBrand}" style="width:206px;" >
+        <p:ajax update="productTable" listener="#{productView.productFilterSelectEvent(main)}" onstart="block();" oncomplete="unblock();" />
+      </p:selectBooleanCheckbox>      
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="productTable" var="productVar" widgetVar="productWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{productView.productLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{productVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,150" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{productView.productSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom" scrollable="false" >
+        <p:column selectionMode="multiple" exportable="false" />
+        <!-- Product Name -->
+        <p:column sortBy="#{productVar.productName}" field="scm_product.product_name" filterBy="#{productVar.productName}" filterStyle="display:none" style="width:300px">
+          <f:facet name="header"><h:outputText value="#{lang.name}" title="#{lang.name}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{productVar.productName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{productView.product}" value="#{productVar}" />
+          </p:commandLink>
+        </p:column>
+
+        <!-- Brand -->
+        <p:column headerText="#{lang.brand}" sortBy="#{productVar.brandId.name}" field="scm_brand.name">
+          <h:outputText value="#{appView.display(productVar.brandId.name)}" title="#{appView.title(productVar.brandId.name)}" escape="false" />
+        </p:column>
+
+        <!--         Commodity 
+                <p:column headerText="#{lang.commodity}" sortBy="#{productVar.commodityId.title}" field="commodity_id.title">
+                  <h:outputText value="#{appView.display(productVar.commodityId.title)}" title="#{appView.title(productVar.commodityId.title)}" escape="false" />
+                </p:column>-->
+
+        <!-- Product Category -->
+        <p:column sortBy="#{productVar.productCategoryId.title}" field="product_category_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.category}" title="#{lang.category}"/></f:facet>
+          <h:outputText value="#{appView.display(productVar.productCategoryId.title)}" title="#{appView.title(productVar.productCategoryId.title)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{productVar.hsnCode}" field="scm_product.hsn_code">
+          <f:facet name="header"><h:outputText value="#{lang.hsnCode}" title="#{lang.hsnCode}"/></f:facet>
+          <h:outputText value="#{productVar.hsnCode}" title="#{productVar.hsnCode}" />
+        </p:column>
+
+        <!-- Product Type -->
+        <p:column sortBy="#{productVar.productTypeId.title}" field="product_type_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.type}" title="#{lang.type}"/></f:facet>
+          <h:outputText value="#{appView.display(productVar.productTypeId.title)}" title="#{appView.title(productVar.productTypeId.title)}" escape="false" />
+        </p:column>
+
+        <p:column sortBy="#{productVar.productCategoryId.salesTaxCodeId.code}" field="scm_productcommodity_id.sales_tax_code_id.code">
+          <f:facet name="header"><h:outputText value="#{lang.salesTax} #{lang.code}" title="#{lang.salesTax} #{lang.code}"/></f:facet>
+          <h:outputText value="#{productVar.productCategoryId.salesTaxCodeId.code}" title="#{productVar.productCategoryId.salesTaxCodeId.code}" />
+
+        </p:column>
+
+        <p:column sortBy="#{productVar.productCategoryId.purchaseTaxCodeId.code}" field="scm_productcommodity_id.purchase_tax_code_id.code">
+          <f:facet name="header"><h:outputText value="#{lang.purchaseTax} #{lang.code}" title="#{lang.purchaseTax} #{lang.code}"/></f:facet>
+          <h:outputText value="#{productVar.productCategoryId.purchaseTaxCodeId.code}" title="#{productVar.productCategoryId.purchaseTaxCodeId.code}" />
+        </p:column>
+
+        <!-- Product Pack Size -->
+        <p:column sortBy="#{productVar.packSize}" field="scm_product.pack_size">
+          <f:facet name="header"><h:outputText value="#{lang.packSize}" title="#{lang.packSize}"/></f:facet>
+          <h:outputText value="#{appView.display(productVar.packSize)} #{productVar.productUnitId.title}" title="#{appView.title(productVar.packSize)}" escape="false" />
+        </p:column>
+
+        <!-- Product Pack detail -->
+        <p:column sortBy="#{productVar.productPackingDetailId.title}" field="scm_product.pack_size">
+          <f:facet name="header"><h:outputText value="#{lang.pack} #{lang.detail}" title="#{lang.pack} #{lang.detail}"/></f:facet>
+          <h:outputText value="#{appView.display(productVar.productPackingDetailId.title)} " title="#{appView.title(productVar.productPackingDetailId.title)}" escape="false" />
+        </p:column>
+
+        <!-- Product Status -->
+        <p:column sortBy="#{productVar.productStatusId.title}" field="product_status_id.title">
+          <f:facet name="header"><h:outputText value="#{lang.status}" title="#{lang.status}"/></f:facet>
+          <h:outputText value="#{appView.display(productVar.productStatusId.title)}" title="#{appView.title(productVar.productStatusId.title)}" escape="false" />
+        </p:column>
+
+        <!-- Log -->
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(productVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(productVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(productVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(productVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(productVar.id)}</ui:define>
+          </ui:decorate>
+          <p:commandButton id="tagBtn" icon="fa fa-eye" type="button"  />
+          <p:overlayPanel for="tagBtn" hideEffect="fade" showEvent="click" hideEvent="clcik" at="left" style="width:auto;min-width: 700px;" >            
+            <p:dataTable value="#{productView.getProductProfiles(main,productVar.id)}" var="profile" tableStyleClass="mDataTable mDataTable-center fw editLinks" 
+                         paginator="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowKey="#{profile.id}" rows="10">
+
+              <p:column headerText="#{lang.supplierName}">
+                <div style="overflow-wrap: break-word;white-space: normal;width: 190px;paddimg:10px;">
+                  <h:outputText value="#{profile.suppliername}" title="#{profile.suppliername}" />
+                </div>
+              </p:column>
+              <p:column headerText="#{lang.productPreset}" style="text-align: center;">
+                <p:fragment rendered="#{profile.productpreset eq 1}" > <i class="fa fa-check" aria-hidden="true" style="color:#09a77b;" ></i> </p:fragment>
+                <p:fragment rendered="#{profile.productpreset eq 0}" > <i class="fa fa-times" aria-hidden="true" style="color:#fd4921;" ></i> </p:fragment>
+              </p:column>
+              <p:column headerText="#{lang.productBatch}" style="text-align: center;">
+                <p:fragment rendered="#{profile.productbatch eq 1}" > <i class="fa fa-check" aria-hidden="true" style="color:#09a77b;" ></i> </p:fragment>
+                <p:fragment rendered="#{profile.productbatch eq 0}" > <i class="fa fa-times" aria-hidden="true" style="color:#fd4921;" ></i> </p:fragment>
+              </p:column>
+              <p:column headerText="#{lang.purchase} #{lang.possible}" style="text-align: center;">
+                <p:fragment rendered="#{profile.purchasepossible eq 1}" > <i class="fa fa-check" aria-hidden="true" style="color:#09a77b;" ></i> </p:fragment>
+                <p:fragment rendered="#{profile.purchasepossible eq 0}" ><i class="fa fa-times" aria-hidden="true" style="color:#fd4921;" ></i> </p:fragment>
+              </p:column>
+              <p:column headerText="#{lang.sales} #{lang.channel}">
+                <div style="overflow-wrap: break-word;white-space: normal;width: 200px;paddimg:10px;">
+                  <h:outputText value="#{profile.saleschannel}" title="#{profile.saleschannel}" />
+                </div>
+              </p:column>
+            </p:dataTable>  
+
+            <!--            <table>
+                          <tr>
+                            <th style="width:auto;width: 190px">
+                              <div style="overflow-wrap: break-word;white-space: normal;width: 190px;">
+                                <h:outputText value="#{lang.supplierName}" />
+                              </div>
+                            </th>
+                            <th align="center" style="width:auto;width: 95px;">
+                              <div style="overflow-wrap: break-word;white-space: normal;">
+                                <h:outputText value="#{lang.productPreset}" />
+                              </div>
+                            </th>
+                            <th align="center" style="width:auto;width: 90px;">
+                              <div style="overflow-wrap: break-word;white-space: normal;">
+                                <h:outputText value="#{lang.productBatch}" />
+                              </div>
+                            </th>
+                            <th align="center" style="width:auto;width: 120px;">
+                              <div style="overflow-wrap: break-word;white-space: normal;">
+                                <h:outputText value="#{lang.purchase} #{lang.possible} " />
+                              </div>
+                            </th>
+                            <th style="width:auto;width:200px;">
+                              <div style="overflow-wrap: break-word;white-space: normal;">
+                                <h:outputText value="#{lang.sales} #{lang.channel}" />
+                              </div>
+                            </th>
+                          </tr>
+                          <p:repeat value="#{productView.getProductProfiles(main,productVar.id)}" var="profile">
+                            <tr>
+                              <td style="">
+                                <div style="overflow-wrap: break-word;white-space: normal;width: 190px;paddimg:10px;">
+                                  <h:outputText value="#{profile.suppliername}" title="#{profile.suppliername}" />
+                                </div>
+                              </td>
+                              <td align="center"> 
+                                <p:fragment rendered="#{profile.productpreset eq 1}" > <i class="fa fa-check" aria-hidden="true"></i> </p:fragment>
+                                <p:fragment rendered="#{profile.productpreset eq 0}" > <i class="fa fa-times" aria-hidden="true"></i> </p:fragment>
+                              </td>
+                              <td align="center">
+                                <p:fragment rendered="#{profile.productbatch eq 1}" > <i class="fa fa-check" aria-hidden="true"></i> </p:fragment>
+                                <p:fragment rendered="#{profile.productbatch eq 0}" > <i class="fa fa-times" aria-hidden="true"></i> </p:fragment>
+                              </td>
+                              <td align="center" >
+                                <p:fragment rendered="#{profile.purchasepossible eq 1}" > <i class="fa fa-check" aria-hidden="true"></i> </p:fragment>
+                                <p:fragment rendered="#{profile.purchasepossible eq 0}" ><i class="fa fa-times" aria-hidden="true"></i> </p:fragment>
+                              </td>
+                              <td > 
+                                <div style="overflow-wrap: break-word;white-space: normal;width: 200px;paddimg:10px;">
+                                  <h:outputText value="#{profile.saleschannel}" title="#{profile.saleschannel}" />
+                                </div>
+                              </td>
+                            </tr>
+                          </p:repeat>
+                        </table>-->
+          </p:overlayPanel>  
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

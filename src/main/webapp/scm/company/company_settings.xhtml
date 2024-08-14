@@ -1,0 +1,410 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{companySettingsView.switchCompanySettings(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageTab.xhtml">
+    <ui:param name="label" value="#{lang.companySettings}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? companySettingsView.companySettings.companyId.companyName : null}" />
+    <ui:param name="ids" value="companySettings" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{companySettingsView.deleteCompanySettings(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('companySettingsWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{companySettingsView.cloneCompanySettings(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{companySettingsView.deleteCompanySettings(main)}" value="#{lang.delete}" onclick="wdgOff('companySettingsWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{companySettingsView.saveCompanySettings(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-success"><f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+
+
+    <ui:define name="list">
+      <p:dataTable id="companySettingsTable" var="companySettingsVar" widgetVar="companySettingsWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{companySettingsView.companySettingsLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{companySettingsVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100,200" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{companySettingsView.companySettingsSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="true" >
+
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column sortBy="#{companySettingsVar.id}" field="scm_company_settings.id" >
+          <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{companySettingsVar.id}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{companySettingsView.companySettings}" value="#{companySettingsVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{companySettingsVar.companyId.companyName}" field="company_id.company_name">
+          <f:facet name="header"><h:outputText value="#{lang.companyName}" title="#{lang.companyName}"/></f:facet>
+          <h:outputText value="#{appView.display(companySettingsVar.companyId.companyName)}" title="#{appView.title(companySettingsVar.companyId.companyName)}" escape="false" />
+        </p:column>
+        <p:column sortBy="#{companySettingsVar.printInvoiceFooter}" field="scm_company_settings.print_invoice_footer">
+          <f:facet name="header"><h:outputText value="#{lang.invoiceFooter}" title="#{lang.invoiceFooter}"/></f:facet>
+          <h:outputText value="#{appView.display(companySettingsVar.printInvoiceFooter)}" title="#{appView.title(companySettingsVar.printInvoiceFooter)}" escape="false" />
+        </p:column>
+<!--        <p:column sortBy="#{companySettingsVar.printInvoiceLogo}" field="scm_company_settings.print_invoice_logo">
+          <f:facet name="header"><h:outputText value="#{lang.printInvoiceLogo}" title="#{lang.printInvoiceLogo}"/></f:facet>
+          <h:outputText value="#{appView.display(companySettingsVar.printInvoiceLogo)}" title="#{appView.title(companySettingsVar.printInvoiceLogo)}" escape="false" />
+        </p:column>-->
+      </p:dataTable> 	
+    </ui:define>  
+    <ui:define name="form">
+      <p:tabView prependId="false" dynamic="true" cache="false"  styleClass="materialTabs" tabindex="#{companySettingsView.tabIndex}">
+        <p:tab title="#{lang.general}" id="generalId">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+
+            <p:outputLabel value="#{lang.makeSalesAgentCompulsory}" for="limitReturn" />
+            <h:panelGroup layout="block" id="compulsorySalesAgentDiv">              
+              <p:selectOneButton value="#{companySettingsView.companySettings.compulsorySalesAgent}"  >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+                <p:ajax event="change"  update="dayofClosing" immediate="true" />
+              </p:selectOneButton>              
+            </h:panelGroup>
+            <h:outputLabel id="enableClosingofTradeLabel" value="  #{lang.lockConfirmedTrading}" />
+            <h:panelGrid columns="5">
+              <h:panelGroup >
+
+                <p:selectOneButton value="#{companySettingsView.companySettings.enableCloseOfTrade}" >
+                  <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                  <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+                  <p:ajax event="change"  update="dayofClosing" immediate="true"  />
+                </p:selectOneButton>  
+
+              </h:panelGroup>
+              <h:outputLabel value=" " style="width:20px"/>
+              <h:outputLabel id="dayofClosingLabel" value="  #{lang.dayOfClosing}" />
+              <h:outputLabel value=" " style="width:15px"/>
+              <h:panelGroup id="dayofClosing">               
+                <p:inputNumber  value="#{companySettingsView.companySettings.dayOfClosing}"  
+                                disabled="#{companySettingsView.companySettings.enableCloseOfTrade eq 0}"
+                                minValue="0" decimalPlaces="0" maxlength="5" size="5" maxValue="28" required="true"/>
+              </h:panelGroup>
+            </h:panelGrid>
+            <p:outputLabel value="#{lang.limitReturnQtyBySales}" for="limitReturn" />
+            <h:panelGroup layout="block" id="limitReturnsDiv">
+              <p:selectOneButton id="limitReturn" value="#{companySettingsView.companySettings.limitReturnBySales}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+                <p:ajax event="change" update="dayofClosing" />
+              </p:selectOneButton>                
+            </h:panelGroup>
+            <h:outputLabel value="#{lang.splitSalesReturn}"  />
+            <h:panelGrid columns="5">
+              <h:panelGroup >
+                <p:selectOneButton value="#{companySettingsView.companySettings.splitSalesReturn}" >
+                  <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                  <f:selectItem itemLabel="#{lang.no}" itemValue="0" /> 
+                  <p:ajax event="change" update="splitForGstFiling" />
+                </p:selectOneButton>                
+              </h:panelGroup>
+              <h:outputLabel value=" " style="width:20px"/>
+              <h:outputLabel id="splitForGstFilingLabel" value="  #{lang.splitReturnForGstFiling}" />
+              <h:outputLabel value=" " style="width:15px"/>
+              <h:panelGroup id="splitForGstFiling">
+                <p:selectOneButton disabled="#{companySettingsView.companySettings.splitSalesReturn eq 0}" 
+                                   value="#{companySettingsView.companySettings.returnSplitForGstFiling}" >
+                  <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                  <f:selectItem itemLabel="#{lang.no}" itemValue="0" /> 
+                  <p:ajax />
+                </p:selectOneButton>              
+              </h:panelGroup>
+            </h:panelGrid>
+
+            <h:outputLabel value="Dr/Cr Invoice Wise " />
+            <h:panelGroup>
+              <p:selectOneButton value="#{companySettingsView.companySettings.invoiceWise}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" /> 
+                <p:ajax />
+              </p:selectOneButton> 
+
+            </h:panelGroup>   
+            <h:outputLabel value="#{lang.uploadProductImage}" />
+            <h:panelGroup>
+              <p:selectOneButton value="#{companySettingsView.companySettings.productGallery}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />              
+              </p:selectOneButton> 
+
+            </h:panelGroup>
+            <h:outputLabel value="Service Business" rendered="#{main.appUser.root}"/>
+            <h:panelGroup>
+              <p:selectOneButton value="#{companySettingsView.companySettings.serviceBusiness}" rendered="#{main.appUser.root}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />              
+              </p:selectOneButton> 
+
+            </h:panelGroup>
+            <h:outputLabel value="#{lang.enable} #{lang.CompanyBasedPurchasePrefix}"  />
+            <h:panelGrid columns="7">
+              <h:panelGroup >
+                <p:selectOneButton value="#{companySettingsView.companySettings.enableCompanyPrefix}" >
+                  <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                  <f:selectItem itemLabel="#{lang.no}" itemValue="0" /> 
+                  <p:ajax event="change" update="purchasePrefix purchaseReturnPrefix" />
+                </p:selectOneButton>                
+              </h:panelGroup>
+              <h:outputLabel value=" " style="width:20px"/>
+              <h:outputLabel id="purchasePrefixLabel" value="  #{lang.prefix}" />
+              <h:outputLabel value=" " style="width:15px"/>
+              <h:panelGroup id="purchasePrefix" styleClass="editLinks">
+                <p:inputText disabled="#{companySettingsView.companySettings.enableCompanyPrefix ne 1}" placeholder="#{lang.purchase}"
+                             rendered="#{companySettingsView.companySettings.purchaseDocPrefix eq null}"
+                             required="#{companySettingsView.companySettings.enableCompanyPrefix eq 1}"  value="#{companySettingsView.companySettings.purchasePrefix}" >
+                </p:inputText>               
+                <p:commandLink action="#{popUpView.accountGroupDocPrefixEditDialog(companySettingsView.companySettings.purchaseDocPrefix.id)}" rendered="#{companySettingsView.companySettings.purchaseDocPrefix ne null}"
+                               value="#{appView.display(companySettingsView.companySettings.purchaseDocPrefix.docPrefix)}" process="@this" immediate="true" 
+                               title="#{lang.purchase} #{lang.prefix}">
+                </p:commandLink>
+              </h:panelGroup>
+              <h:outputLabel value=" " style="width:15px"/>
+              <h:panelGroup id="purchaseReturnPrefix"  styleClass="editLinks">
+                <p:inputText disabled="#{companySettingsView.companySettings.enableCompanyPrefix ne 1}" placeholder="#{lang.purchaseReturn}" rendered="#{companySettingsView.companySettings.purchaseReturnDocPrefix eq null}"
+                             value="#{companySettingsView.companySettings.purchaseReturnPrefix}" required="#{companySettingsView.companySettings.enableCompanyPrefix eq 1}">
+                </p:inputText>  
+                <p:commandLink action="#{popUpView.accountGroupDocPrefixEditDialog(companySettingsView.companySettings.purchaseReturnDocPrefix.id)}" rendered="#{companySettingsView.companySettings.purchaseReturnDocPrefix ne null}"
+                               value="#{appView.display(companySettingsView.companySettings.purchaseReturnDocPrefix.docPrefix)}" process="@this" immediate="true"
+                               title="#{lang.purchaseReturn} #{lang.prefix}" >
+                </p:commandLink>
+              </h:panelGroup>
+            </h:panelGrid>
+
+            <h:outputLabel value="Trading to Account posting" rendered="#{main.appUser.root}" />
+            <h:panelGroup>
+              <p:selectOneMenu id="tota" value="#{companySettingsView.companySettings.tradeToAccounting}" rendered="#{main.appUser.root}">
+                <f:selectItem itemLabel="POST ALL activities from trade to accounting"  itemValue="#{AC_CONSTANT.TRADE_TO_ACCOUNTING_ALLOW_ALL}" />
+                <f:selectItem itemLabel="POST ONLY CURRENT FINANCIAL YEAR activities from trade to accounting " itemValue="#{AC_CONSTANT.TRADE_TO_ACCOUNTING_ONLY_FOR_CURRENT_YEAR}" />      
+                <f:selectItem itemLabel="POST NO activities from trade to accounting " itemValue="#{AC_CONSTANT.TRADE_TO_ACCOUNTING_NONE}" />                
+              </p:selectOneMenu>
+            </h:panelGroup>
+          </ui:decorate>
+        </p:tab> 
+
+        <p:tab title="#{lang.print}" id="printId" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">     
+            <p:importConstants type="spica.constant.AccountingConstant" var="AC_CONSTANT" />
+            <ui:param name="ids" value="printSettings" />
+            <ui:define name="moreForm" />
+            <p:importConstants type="spica.sys.SystemConstants" var="SYSTEM_CONSTANTS" />
+            <p:outputLabel value="#{lang.invoiceFooter}" for="printInvoiceFooter" />
+            <h:panelGroup><p:inputTextarea value="#{companySettingsView.companySettings.printInvoiceFooter}" cols="100" rows="3" maxlength="2147483647" id="printInvoiceFooter" autoResize="false" styleClass="fw" /><p:message for="printInvoiceFooter" display="text"/></h:panelGroup>
+            <p:outputLabel value="#{lang.showManaufaturer}" />
+            <h:panelGroup> 
+              <p:selectOneButton value="#{companySettingsView.companySettings.showManufacturer}" >
+                <f:selectItem itemLabel="#{lang.on}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.off}" itemValue="0" />               
+              </p:selectOneButton>   
+
+            </h:panelGroup> 
+            <p:outputLabel value="#{lang.landscpeFormat}" for="format" />
+            <h:panelGroup>
+              <p:selectOneMenu id="format" value="#{companySettingsView.companySettings.landScapeFormat}" >
+                <f:selectItem itemLabel="#{lang.singleLine}" itemValue="#{SYSTEM_CONSTANTS.PRINT_SINGLE_LINE}" />
+                <f:selectItem itemLabel="#{lang.multipleLine}" itemValue="#{SYSTEM_CONSTANTS.PRINT_MULTIPLE_LINE}" />                
+              </p:selectOneMenu>
+            </h:panelGroup>
+            <p:outputLabel value="#{lang.gstNo} #{lang.label} #{lang.position} (A4)" for="gstLabel"/>
+            <h:panelGroup >
+              <p:selectOneMenu id="gstLabel" value="#{companySettingsView.companySettings.printBillTitlePosition}" >
+                <f:selectItem itemLabel="#{lang.top}" itemValue="#{SYSTEM_CONSTANTS.PRINT_BILL_TITLE_TOP}" />
+                <f:selectItem itemLabel="#{lang.middle}" itemValue="#{SYSTEM_CONSTANTS.PRINT_BILL_TITLE_MIDDLE}" />                
+              </p:selectOneMenu>
+            </h:panelGroup>
+            <h:outputLabel value="#{lang.showHorizontalLines}"  />
+            <h:panelGroup >
+              <p:selectOneButton value="#{companySettingsView.companySettings.printHorizontalLine}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" /> 
+                <p:ajax />
+              </p:selectOneButton> 
+            </h:panelGroup>
+            <h:outputLabel value="#{lang.showHeaderonAllPages}"  />
+            <h:panelGroup >
+              <p:selectOneButton value="#{companySettingsView.companySettings.headerOnAllPages}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" /> 
+                <p:ajax />
+              </p:selectOneButton>             
+
+            </h:panelGroup>
+            <h:outputLabel value="#{lang.company} #{lang.logo}"  />
+            <h:panelGroup id="logoGroup">              
+              <p:panelGrid columns="2" style="vertical-align: top">
+                <h:panelGroup>
+                  <p:fileUpload  id="file-input" widgetVar="file-input" fileUploadListener="#{companySettingsView.handleFileUpload}" mode="advanced" auto="true" process="@this" immediate="true" update="logoGroup" 
+                                 allowTypes="/(\.|\/)(jpe?g|png)$/" dragDropSupport="true" sizeLimit="300000" style="width:400px;" performVirusScan="false"
+                                 previewWidth="50" invalidFileMessage="Please provide a valid file type(jpeg/png)" invalidSizeMessage="File size should be less than 300kB"
+                                 >               
+                  </p:fileUpload>
+                  <p:message for="file-input" id="messages" display="text" />
+                </h:panelGroup>
+                <p:fragment id="logo" rendered="#{companySettingsView.companySettings.fileContent ne null}">
+                  <table>
+                    <tr>
+                      <td valign="top" >
+                        <img src="data:image/png;base64, #{companySettingsView.companySettings.fileContent} " />            
+                      </td>
+                      <td valign="top">
+                        <p:commandLink actionListener="#{companySettingsView.deleteFileUpload(main)}" process="@this"
+                                       update="logoGroup" onclick="block();" oncomplete="unblock()" ><i class="fa fa-times" style="font-size: 14px;" /></p:commandLink>
+                      </td>
+                    </tr>
+                  </table>
+
+                </p:fragment>
+              </p:panelGrid>
+            </h:panelGroup>
+          </ui:decorate>
+        </p:tab>
+        <p:tab title="#{lang.sms}" rendered="#{userRole.isRoot()}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="smsConfiguration" />
+            <ui:define name="moreForm" />
+            <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+
+            <h:outputLabel value="#{lang.smsEnabled}" />
+            <h:panelGroup>
+
+              <p:selectOneButton value="#{companySettingsView.companySettings.smsEnabled}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+                <p:ajax event="change" immediate="true" update="smsAllowedDiv salesInvoicediv serviceProviderComboDiv " />
+              </p:selectOneButton>
+
+            </h:panelGroup>
+
+            <h:outputLabel value="#{lang.salesInvoice}" />
+            <h:panelGroup  id="salesInvoicediv">               
+              <p:selectOneButton disabled="#{companySettingsView.companySettings.smsEnabled eq 0}" value="#{companySettingsView.companySettings.smsSalesInvoice}" >
+                <f:selectItem itemLabel="#{lang.yes}" itemValue="1" />
+                <f:selectItem itemLabel="#{lang.no}" itemValue="0" />
+                <p:ajax event="change"  />
+              </p:selectOneButton>
+
+            </h:panelGroup>
+
+            <h:outputLabel value="#{lang.serviceProvider}" />
+            <h:panelGroup id="serviceProviderComboDiv">
+
+              <p:selectOneMenu value="#{companySettingsView.companySettings.smsProviderId}" styleClass="fw"
+                               converter="omnifaces.SelectItemsConverter" id="serviceProviderCombo"                                    
+                               required="true" requiredMessage="#{lang.select} #{lang.serviceProvider}"
+                               disabled="#{companySettingsView.companySettings.smsEnabled eq 0}" >
+                <f:selectItem itemLabel="#{lang.select} #{lang.serviceProvider}" itemValue="#{null}" />
+                <f:selectItems value="#{companySettingsView.serviceProviderList}" var="sp" itemLabel="#{sp.smsProvider}" itemValue="#{sp}"  />
+              </p:selectOneMenu>
+              <p:message display="text" for="serviceProviderCombo"  >
+                <p:autoUpdate />
+              </p:message>             
+            </h:panelGroup>
+
+
+            <h:outputLabel value="#{lang.smsAllowed}"/>
+            <h:panelGroup id="smsAllowedDiv">                        
+              <p:inputNumber value="#{companySettingsView.companySettings.smsAllowed}" decimalPlaces="0"
+                             disabled="#{companySettingsView.companySettings.smsEnabled eq 0}" />
+            </h:panelGroup>
+            <h:outputLabel value="#{lang.smsUsed}" />
+            <h:panelGroup>
+              <p:outputLabel value="#{companySettingsView.companySettings.smsUsed}" />
+            </h:panelGroup>
+
+
+          </ui:decorate>
+        </p:tab>
+
+        <p:tab title="#{lang.email}">
+          <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+            <ui:param name="ids" value="mailConfiguration" />
+            <ui:define name="moreForm" />
+            <p:importConstants type="spica.sys.SystemConstants" var="SystemConstants" />
+            <div style="text-align: center;">
+              <p:panelGrid columns="2">
+                <h:outputLabel value="#{lang.name}" />
+                <p:inputText value="#{companySettingsView.companySettings.emailUser}" />
+
+                <h:outputLabel value="#{lang.userName}"/>
+                <p:inputText value="#{companySettingsView.companySettings.emailUserName}" />
+
+                <h:outputText value="#{lang.password}" />
+                <p:inputText value="#{companySettingsView.companySettings.emailPassword}" />
+
+                <h:outputText value="#{lang.security}"/>
+                <p:selectOneMenu value="#{companySettingsView.companySettings.emailSecurity}"  >
+                  <f:selectItem itemLabel="#{lang.none}" itemValue="#{SystemConstants.EMAIL_SECURITY_NONE}" />
+                  <f:selectItem itemLabel="TSL/SSL" itemValue="#{SystemConstants.EMAIL_SECURITY_SSL_TSSL}" />
+                  <f:selectItem itemLabel="STARTTLS" itemValue="#{SystemConstants.EMAIL_SECURITY_STARTTLS}" />
+                </p:selectOneMenu>
+
+                <h:outputText value="#{lang.authentication}"/>
+                <p:selectOneMenu value="#{companySettingsView.companySettings.emailAuth}">
+                  <f:selectItem itemLabel="#{lang.noAuthentication}" itemValue="#{SystemConstants.EMAIL_NO_AUTHENTICATION}" />
+                  <f:selectItem itemLabel="#{lang.password} #{lang.authentication}" itemValue="#{SystemConstants.EMAIL_PASSWORD_AUTHENTICATION}" />                
+                </p:selectOneMenu>
+
+                <h:outputText value="#{lang.smtpServer}" />
+                <p:inputText value="#{companySettingsView.companySettings.smtpServer}" />
+
+                <h:outputText value="#{lang.smtpPort}" />
+                <p:inputText value="#{companySettingsView.companySettings.smtpPort}" />
+
+                <h:outputText value="#{lang.imapServer}" />
+                <p:inputText value="#{companySettingsView.companySettings.imapServer}" />
+
+                <h:outputText value="#{lang.imapPort}" />
+                <p:inputText value="#{companySettingsView.companySettings.imapPort}" />
+
+              </p:panelGrid>
+            </div>
+          </ui:decorate>
+        </p:tab>
+        <p:tab title="#{lang.financialYear}" >
+          <ui:decorate template="/WEB-INF/resources/theme1/subTitleList.xhtml">
+            <ui:param name="label" value="#{lang.financialYear}" />
+            <ui:param name="ids" value="financialYear" />
+            <p:commandButton action="#{popUpView.financialYearListPopup(main, companySettingsView.companySettings)}" update="financialYearTable" process="@this" icon="fa fa-plus" styleClass="btn btn-info"
+                             title="#{lang.add} #{lang.newform} #{lang.priceList}" >
+              <p:remoteCommand name="finYearPopupReturned" actionListener="#{companySettingsView.setFinancialYearList(null)}"
+                               update="financialYearTable"  process="@this" immediate="true"  />
+            </p:commandButton>
+            <p:dataTable id="financialYearTable" var="row" widgetVar="financialYearTableWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                         value="#{companySettingsView.getFinancialYearList(main)}" rows="#{main.pageData.pageSize}" rowKey="#{row.id}"
+                         rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; " 
+                         rowHover="true" reflow="true" draggableColumns="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"  scrollable="false" >
+              <f:facet name="header">
+                <p:outputPanel styleClass="hidden" >
+                  <p:inputText id="globalFilter"  onkeyup="return PF('financialYearTableWidget').filter()" />
+                </p:outputPanel>
+              </f:facet>
+              <p:column sortBy="#{row.financialYearId.id}" filterBy="#{row.financialYearId.id}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.id}" title="#{lang.id}"/></f:facet>
+                <h:outputText value="#{appView.display(row.financialYearId.id)}" title="#{appView.title(row.financialYearId.id)}" escape="false" />
+              </p:column>
+              <p:column sortBy="#{row.financialYearId.title}" field="id" filterBy="#{row.financialYearId.title}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.title}" title="#{lang.title}"/></f:facet>
+                <h:outputText value="#{appView.display(row.financialYearId.title)}" title="#{appView.title(row.financialYearId.title)}" escape="false" /></p:column>
+              <p:column sortBy="#{row.financialYearId.startDate}" field="id" filterBy="#{row.financialYearId.startDate}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.startDate}" title="#{lang.startDate}"/></f:facet>
+                <h:outputText value="#{appView.date(row.financialYearId.startDate)}" title="#{appView.date(row.financialYearId.startDate)}" escape="false" /></p:column>
+              <p:column sortBy="#{row.financialYearId.endDate}" field="id" filterBy="#{row.financialYearId.endDate}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.endDate}" title="#{lang.endDate}"/></f:facet>
+                <h:outputText value="#{appView.date(row.financialYearId.endDate)}" title="#{appView.date(row.financialYearId.endDate)}" escape="false" /></p:column>
+              <p:column sortBy="#{row.financialYearId.endDate}" field="id" filterBy="#{row.financialYearId.endDate}" filterStyleClass="hidden">
+                <f:facet name="header"><h:outputText value="#{lang.current} #{lang.financialYear}" title="#{lang.current} #{lang.financialYear}"/></f:facet>
+                <h:selectBooleanCheckbox  value="#{companySettingsView.isCurrentFinancialYear(row.isCurrentFinancialYear)}"  >
+                  <p:ajax event="change" update="financialYearTable" listener="#{companySettingsView.currentFinancialYearChangeListener(main, row)}" /> 
+                </h:selectBooleanCheckbox> </p:column>
+            </p:dataTable>
+          </ui:decorate>
+        </p:tab>
+
+      </p:tabView>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >      
+  #{territoryView.switchTerritory(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.territory}" />
+    <ui:param name="ids" value="territory" />
+
+    <ui:define name="navRight" >
+      <p:commandButton rendered="#{main.popup}" process="@this" immediate="true" oncomplete="unblock();" icon="fa fa-times"  iconPos="right" styleClass="btn btn-default" onclick="closePopup();"  />
+    </ui:define>
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{territoryView.deleteTerritory(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('territoryWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="menu1" >
+      <p:menuitem actionListener="#{territoryView.cloneTerritory(main)}" value="#{lang.clone}" process="f1" update="f1" onclick="toTop()" icon="fa fa-clone" iconPos="left"/>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{territoryView.deleteTerritory(main)}" value="#{lang.delete}" onclick="wdgOff('territoryWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="save" >
+      <h:commandButton action="#{territoryView.saveTerritory(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary" rendered="#{userRuntimeView.privilege.add==true or userRuntimeView.privilege.modify==true}">
+        <f:ajax execute="f1" render="f1"  /></h:commandButton>     
+    </ui:define>   
+
+    <ui:define name="form">    
+      <!--Territory Name-->
+      <p:outputLabel value="#{lang.territoryName}" for="territoryName" />
+      <h:panelGroup>
+        <p:inputText styleClass="fw" value="#{territoryView.territory.territoryName}" validator="wawo.WhiteSpaceValidator" maxlength="50" 
+                     required="true" requiredMessage="#{lang.territoryName} #{lang.isRequired}" id="territoryName"/>
+        <p:message for="territoryName" display="text"/>
+      </h:panelGroup>
+
+      <!--Country-->
+      <p:outputLabel value="#{lang.country}" for="countryId"/>
+      <h:panelGroup>
+        <p:autoComplete  value="#{territoryView.territory.countryId}" completeMethod="#{territoryView.countryAuto}" converter="wawo.LookupIntConverter"   
+                         required="true" requiredMessage="#{lang.country} #{lang.isRequired}" id="countryId" var="e" itemValue="#{e}" itemLabel="#{e.countryName}" 
+                         emptyMessage="#{lang.noResult}" dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                         autocomplete="off" forceSelection="true"  styleClass="fw" >
+          <f:attribute name="clazz" value="#{scmLookupView.countryClass()}"/>
+          <f:attribute name="byid" value="#{scmLookupView.countryById()}"/>
+          <p:ajax event="itemSelect" listener="#{territoryView.clearStateDistrict}" update="stateDiv districtDiv" process="@this"/>
+        </p:autoComplete>
+        <p:message for="countryId" display="text" />
+      </h:panelGroup>
+
+      <!--State-->
+      <p:outputLabel value="#{lang.state}" for="stateId"/>
+      <h:panelGroup id="stateDiv">
+        <p:selectManyCheckbox id="stateId" value="#{territoryView.stateSelected}" layout="responsive" columns="3" converter="omnifaces.SelectItemsConverter" 
+                              required="true" requiredMessage="#{lang.state} #{lang.isRequired}">
+          <f:selectItems value="#{territoryView.stateAuto(filter)}" var="type" itemLabel="#{type.stateName}" itemValue="#{type}" />
+          <p:ajax update="districtDiv" process="@this districtDiv"/>
+        </p:selectManyCheckbox>
+        <p:message for="stateId" display="text" />
+      </h:panelGroup>
+
+      <!--District-->
+      <p:outputLabel value="#{lang.district}" for="districtId" />
+      <h:panelGroup id="districtDiv">
+        <p:selectManyCheckbox id="districtId" value="#{territoryView.districtSelected}" layout="responsive" columns="3" converter="omnifaces.SelectItemsConverter" 
+                              requiredMessage="#{lang.district} #{lang.isRequired}">
+          <f:selectItems value="#{territoryView.districtAuto()}" var="type" itemLabel="#{type.districtName}" itemValue="#{type}" />
+        </p:selectManyCheckbox>
+        <p:message for="districtId" />
+      </h:panelGroup>
+      <!-- Sort Order -->
+      <p:outputLabel value="#{lang.sortOrder}" for="sortOrder" />
+      <h:panelGroup>
+        <p:inputNumber value="#{territoryView.territory.sortOrder}" converterMessage="#{lang.sortOrder} #{lang.invalidNumber}" decimalPlaces="0" thousandSeparator="" onfocus="this.select()" inputStyleClass="text-right" maxValue="999" 
+                       minValue="0" maxlength="3" id="sortOrder"/>
+        <p:message for="sortOrder" display="text"/>
+      </h:panelGroup>
+
+    </ui:define>
+    <ui:define name="after">
+      <ui:decorate template="/WEB-INF/resources/theme1/auditInfoForm.xhtml">
+        <ui:define name="cby">#{appView.display(territoryView.territory.createdBy)}</ui:define>
+        <ui:define name="cat">#{appView.dateTime(territoryView.territory.createdAt)}</ui:define>
+        <ui:define name="uby">#{appView.display(territoryView.territory.modifiedBy)}</ui:define>
+        <ui:define name="uat">#{appView.dateTime(territoryView.territory.modifiedAt)}</ui:define>
+        <ui:define name="id">#{appView.display(territoryView.territory.id)}</ui:define>
+      </ui:decorate>
+    </ui:define>
+    <ui:define name="list">
+      <p:dataTable id="territoryTable" var="territoryVar" widgetVar="territoryWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{territoryView.territoryLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{territoryVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{territoryView.territorySelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+
+        <p:column  sortBy="#{territoryVar.territoryName}" field="territory_name" >
+          <f:facet name="header"><h:outputText value="#{lang.territoryName}" title="#{lang.territoryName}"/></f:facet>
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{territoryVar.territoryName}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{territoryView.territory}" value="#{territoryVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column sortBy="#{territoryVar.countryId.countryName}" field="country_id.country_name">
+          <f:facet name="header"><h:outputText value="#{lang.country}" title="#{lang.country}"/></f:facet>
+          <h:outputText value="#{appView.display(territoryVar.countryId.countryName)}" title="#{appView.title(territoryVar.countryId.countryName)}" escape="false" />
+        </p:column>
+        <p:column  exportable="false">
+          <f:facet name="header"><h:outputText value="#{lang.log}" title="#{lang.log}"/></f:facet>
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(territoryVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(territoryVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(territoryVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(territoryVar.modifiedAt)}</ui:define>
+            <ui:define name="id">#{appView.display(territoryVar.id)}</ui:define>
+          </ui:decorate>
+        </p:column> 
+
+      </p:dataTable> 	
+    </ui:define>   
+  </ui:decorate>
+</ui:composition>

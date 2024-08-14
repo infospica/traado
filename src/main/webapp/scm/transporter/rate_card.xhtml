@@ -1,0 +1,247 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"  >
+  <ui:decorate template="/WEB-INF/resources/theme1/contentForm.xhtml">
+    <ui:define name="moreForm"/>
+    <ui:define name="save" >
+      <h:commandButton action="#{transporterView.saveTransporterRateCard(main)}" value="#{lang.save}" onclick="toTop()" styleClass="btn btn-primary">
+        <f:ajax execute="#{ids}F" render="f1"  />
+      </h:commandButton>
+    </ui:define>
+    <ui:define name="formRight" >
+      <p:commandButton action="#{transporterView.deleteTransporterRateCard(main)}" icon="fa fa-trash" onclick="toTop()" immediate="true" process="@this" partialSubmit="true" update="f1" styleClass="btn btn-danger">
+        <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+    
+    <p:outputLabel value="#{lang.rate}" for="#{ids}lrRateFixed" />
+    <h:panelGroup>
+      <p:inputNumber value="#{transporterView.transporterRateCard.lrRateFixed}" converterMessage="#{lang.rate} #{lang.invalidNumber}" 
+                     decimalPlaces="2" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999999" minValue="0.0" symbol="#{appView.currencySymbol} " maxlength="15" id="#{ids}lrRateFixed" 
+                     required="true" requiredMessage="#{lang.rate} #{lang.isRequired}"  />
+      <p:message for="#{ids}lrRateFixed" display="text"/>
+    </h:panelGroup>
+  </ui:decorate>
+
+  <ui:decorate template="/WEB-INF/resources/theme1/contentList.xhtml">
+    <ui:param name="rendered" value="#{main.isEdit() and transporterView.isRateCardExist()}" />
+
+    <script>
+//      function setEdit() {
+////        jQuery('.ui-datatable-data tr').first().find('span.ui-icon-pencil').each(function () {
+////          jQuery(this).trigger('click');
+////        });
+////        alert('test2');
+//      }
+    </script>
+    <ui:param name="label" value="#{lang.transporter} #{lang.rateCard}" />
+
+    <ui:define name="menuleft">          
+    <!--  <p:commandButton action="#{transporterView.transporterFreightRateNewDialog()}" value="#{lang.newform}" immediate="true" process="@this" icon="fa fa-plus" iconPos="left" styleClass="btn btn-info"  >
+        <p:ajax event="dialogReturn" listener="#{transporterView.transporterFreightRateDialogReturn}" update="#{ids}Table" />
+      </p:commandButton>
+      -->
+      <p:commandButton action="#{transporterView.addNewRateCard()}" update="#{ids}Table" immediate="true" process="@this" icon="fa fa-plus" 
+                       iconPos="left" styleClass="btn btn-info"  oncomplete="jQuery('.ui-datatable-data tr').first().find('span.ui-icon-pencil').each(function(){jQuery(this).click()});">
+
+      </p:commandButton>
+    </ui:define>
+
+    <p:dataTable id="#{ids}Table" var="transporterFreightRateVar" widgetVar="#{ids}Widget" value="#{transporterView.getTransporterFreightRateList(main)}" 
+                 rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"  scrollable="false"  
+                 tableStyleClass="mDataTable mDataTable-center fw editLinks" editable="true">
+      <p:ajax event="rowEdit" update="#{ids}Table" listener="#{transporterFreightRateView.onRowEdit}"/>
+      <f:facet name="header">
+        <p:outputPanel styleClass="hidden" >
+          <p:inputText id="globalFilter"  onkeyup="return PF('#{ids}Widget').filter()" />
+        </p:outputPanel>
+      </f:facet>
+
+<!--      <p:column headerText="#{lang.id}" sortBy="#{transporterFreightRateVar.id}" field="id" filterBy="#{transporterFreightRateVar.id}" filterStyleClass="hidden">
+        <h:outputText  title="#{appView.title(transporterFreightRateVar.id)}" escape="false" />
+        <p:commandLink action="#{transporterView.transporterFreightRateEditDialog(transporterFreightRateVar.id)}" value="#{transporterFreightRateVar.id}" 
+                       process="@this" update="f1" immediate="true" onstart="block()" 
+                       oncomplete="unblock()" title="#{lang.editMe}">
+
+          <p:ajax event="dialogReturn" listener="#{transporterView.transporterFreightRateDialogReturn}" update="#{ids}Table" />
+        </p:commandLink>
+      </p:column>-->
+
+      <p:column sortBy="#{transporterFreightRateVar.sourceStateId.stateName}" field="source_state_id.state_name"
+                filterBy="#{transporterFreightRateVar.sourceStateId.stateName}" filterStyleClass="hidden">
+         <f:facet name="header"><h:outputText value="#{lang.source} #{lang.state}" title="#{lang.source} #{lang.state}"/></f:facet>
+          <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(transporterFreightRateVar.sourceStateId.stateName)}" title="#{appView.title(transporterFreightRateVar.sourceStateId.stateName)}" escape="false" />
+          </f:facet>
+          <f:facet name="input"> 
+            <h:panelGroup>
+
+              <p:autoComplete value="#{transporterFreightRateVar.sourceStateId}" completeMethod="#{transporterFreightRateView.stateAuto}" 
+                              converter="wawo.LookupIntConverter"   id="transporterFreightRateSourceStateId" var="e" itemValue="#{e}" itemLabel="#{e.stateName}" 
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                              autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+                <p:ajax event="itemSelect" listener="#{transporterFreightRateView.isSourceDistrictSelect}" update="districtDivSource"/>
+              </p:autoComplete>
+              <p:message for="transporterFreightRateSourceStateId" display="text" />
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column sortBy="#{transporterFreightRateVar.sourceDistrictId.districtName}" field="source_district_id.district_name">
+        <f:facet name="header"><h:outputText value="#{lang.source} #{lang.district}" title="#{lang.source} #{lang.district}"/></f:facet>
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(transporterFreightRateVar.sourceDistrictId.districtName)}" title="#{appView.title(transporterFreightRateVar.sourceDistrictId.districtName)}" escape="false" />
+          </f:facet>
+          <f:facet name="input">
+
+            <h:panelGroup id="districtDivSource">
+              <p:autoComplete value="#{transporterFreightRateVar.sourceDistrictId}" completeMethod="#{transporterFreightRateView.districtAutoSource}" 
+                              converter="wawo.LookupIntConverter"   id="transporterFreightRateSourceDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" 
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                              autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+              </p:autoComplete>
+              <p:message for="transporterFreightRateSourceDistrictId" display="text" />
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column sortBy="#{transporterFreightRateVar.destinationStateId.stateName}" field="destination_state_id.state_name">
+        <f:facet name="header"><h:outputText value="#{lang.destination} #{lang.state}" title="#{lang.destination} #{lang.state}"/></f:facet>
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{transporterFreightRateVar.destinationStateId.stateName}" 
+                          title="#{transporterFreightRateVar.destinationStateId.stateName}" escape="false" />
+          </f:facet>
+          <f:facet name="input">  
+            <h:panelGroup>
+              <p:autoComplete value="#{transporterFreightRateVar.destinationStateId}" completeMethod="#{transporterFreightRateView.stateAuto}" 
+                              converter="wawo.LookupIntConverter"   id="transporterFreightRateDestinationStateId" var="e" itemValue="#{e}" itemLabel="#{e.stateName}" 
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                              autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.stateClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.stateById()}"/>
+                <p:ajax event="itemSelect" listener="#{transporterFreightRateView.isDestinationDistrictSelect}" update="districtDivDestination"/>
+              </p:autoComplete>
+              <p:message for="transporterFreightRateDestinationStateId" display="text" />
+
+            </h:panelGroup>
+
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column sortBy="#{transporterFreightRateVar.destinationDistrictId.districtName}" field="destination_district_id.district_name">
+        <f:facet name="header"><h:outputText value="#{lang.destination} #{lang.district}" title="#{lang.destination} #{lang.district}"/></f:facet>
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(transporterFreightRateVar.destinationDistrictId.districtName)}" 
+                          title="#{appView.title(transporterFreightRateVar.destinationDistrictId.districtName)}" escape="false" />
+          </f:facet>
+          <f:facet name="input"> 
+<!--            <h:selectOneMenu value="#{transporterFreightRateVar.destinationDistrictId}" converter="omnifaces.SelectItemsConverter">
+              <f:selectItems value="#{transporterFreightRateView.districtAuto(filter)}" var="e" itemLabel="#{e.districtName}" itemValue="#{e}" />
+            </h:selectOneMenu>-->
+            <h:panelGroup id="districtDivDestination">
+              <p:autoComplete value="#{transporterFreightRateVar.destinationDistrictId}" completeMethod="#{transporterFreightRateView.districtAuto}" 
+                              converter="wawo.LookupIntConverter"   id="transporterFreightRateDestinationDistrictId" var="e" itemValue="#{e}" itemLabel="#{e.districtName}" 
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                              autocomplete="off" forceSelection="true"  styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.districtClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.districtById()}"/>
+              </p:autoComplete>
+              <p:message for="transporterFreightRateDestinationDistrictId" display="text" />
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column sortBy="#{transporterFreightRateVar.freightRateBaseUomId.title}" field="freight_rate_base_uom_id.title">
+         <f:facet name="header"><h:outputText value="#{lang.uom}" title="#{lang.uom}"/></f:facet>
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{appView.display(transporterFreightRateVar.freightRateBaseUomId.title)}" title="#{appView.title(transporterFreightRateVar.freightRateBaseUomId.title)}" escape="false" />
+          </f:facet>
+          <f:facet name="input">
+<!--            <h:selectOneMenu value="#{transporterFreightRateVar.freightRateBaseUomId}" converter="omnifaces.SelectItemsConverter">
+              <f:selectItems value="#{transporterFreightRateView.transportFreightRateUomAuto(filter)}" var="e" itemLabel="#{e.title}" itemValue="#{e}" />
+            </h:selectOneMenu>-->
+            <h:panelGroup>
+              <p:autoComplete value="#{transporterFreightRateVar.freightRateBaseUomId}" completeMethod="#{transporterFreightRateView.transportFreightRateUomAuto}" converter="wawo.LookupIntConverter"
+                              required="true" requiredMessage="#{lang.uom} #{lang.isRequired}" id="transporterFreightRateFreightRateBaseUomId" var="e" itemValue="#{e}" itemLabel="#{e.title}"
+                              emptyMessage="#{lang.noResult}" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" 
+                              autocomplete="off" forceSelection="true"  
+                              styleClass="fw">
+                <f:attribute name="clazz" value="#{scmLookupView.transportFreightRateUomClass()}"/>
+                <f:attribute name="byid" value="#{scmLookupView.transportFreightRateUomById()}"/>
+              </p:autoComplete>
+              <p:message for="transporterFreightRateFreightRateBaseUomId" display="text" />
+            </h:panelGroup>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+₹ 
+
+      <p:column>
+        <f:facet name="header"><h:outputText value="#{lang.slabRate}" title="#{lang.slabRate}"/></f:facet>
+        <p:cellEditor >
+          <f:facet name="output">
+            <h:outputText value="#{appView.onOk(transporterFreightRateVar.freightRateByBaseUomrange)}" escape="false" />
+          </f:facet>
+          <f:facet name="input">
+            <p:selectOneMenu value="#{transporterFreightRateVar.freightRateByBaseUomrange}" converter="omnifaces.SelectItemsConverter" id="freightRateByBaseUomrange">
+              <f:selectItem itemLabel="#{lang.yes}" itemValue="#{one}" />
+              <f:selectItem itemLabel="#{lang.no}" itemValue="#{zero}" />
+              <p:ajax event="itemSelect" listener="#{transporterFreightRateView.ajaxEventHandler}" update="divRate btnDiv" process="freightRateByBaseUomrange"/>
+            </p:selectOneMenu>
+          </f:facet>
+        </p:cellEditor>
+
+      </p:column>
+
+      <p:column headerText="#{lang.rate}" sortBy="#{transporterFreightRateVar.freightRateFixedPerBaseuom}" field="freight_rate_fixed_per_baseuom" >
+         <f:facet name="header"><h:outputText value="#{lang.rate}" title="#{lang.rate}"/></f:facet>
+        <p:cellEditor id="divRate">
+          <f:facet name="output">
+            <h:outputText value="#{appView.number(transporterFreightRateVar.freightRateFixedPerBaseuom)}" escape="false" rendered="#{transporterFreightRateVar.freightRateByBaseUomrange==0}"/>
+          </f:facet>
+          <f:facet name="input">
+            <p:inputNumber styleClass="fw" value="#{transporterFreightRateVar.freightRateFixedPerBaseuom}" converterMessage="#{lang.rate} #{lang.invalidNumber}" 
+                           decimalPlaces="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="9999999999" minValue="0" maxlength="10" id="freightRateFixedPerBaseuom" 
+                           rendered="#{transporterFreightRateVar.freightRateByBaseUomrange==0}"
+                           required="#{transporterFreightRateVar.freightRateByBaseUomrange==0}" requiredMessage="#{lang.rate} #{lang.isRequired}"/>
+            <p:message for="freightRateFixedPerBaseuom" display="text" />
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+      <p:column>
+        <p:rowEditor id="editRow" />
+      </p:column>
+
+      <p:column style="text-align: center;">
+        <f:facet name="header"><h:outputText value="#{lang.action}" title="#{lang.action}"/></f:facet>
+        <h:panelGroup id="btnDiv" >
+          <p:commandButton action="#{transporterFreightRateView.transporterFreightRateUomRangeListPopup(transporterFreightRateVar)}" process="@this" immediate="true"  icon="fa fa-eye"
+                           onstart="block()" oncomplete="unblock()" title="View UOM Range" rendered="#{transporterFreightRateVar.freightRateByBaseUomrange==1 and transporterFreightRateVar.id ne null}">
+          </p:commandButton>              
+<!--          <p:commandButton action="#{transporterFreightRateView.transporterFreightRateUomRangeNewPopup(transporterFreightRateVar)}" icon="fa fa-plus" process="@this" immediate="true" 
+                           onstart="block()" oncomplete="unblock()" title="Add UOM Range" >
+            <p:ajax event="dialogReturn" update="#{ids}Table" />
+          </p:commandButton>-->
+        </h:panelGroup>
+        <p:commandButton action="#{transporterView.deleteTransporterFreightRateValue(main,transporterFreightRateVar)}" process="@this" 
+                         value="" update="#{ids}Table" icon="fa fa-trash">
+          <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+        </p:commandButton>
+      </p:column>
+
+    </p:dataTable>
+
+  </ui:decorate>
+</ui:composition>

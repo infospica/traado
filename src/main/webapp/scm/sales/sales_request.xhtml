@@ -1,0 +1,336 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:o="http://omnifaces.org/ui">
+  #{salesReqView.switchSalesReq(main, viewType)}
+
+  <ui:decorate template="/WEB-INF/resources/theme1/pageBasic.xhtml">
+    <ui:param name="label" value="#{lang.salesReq}" />
+    <ui:param name="subLabel" value="#{main.isEdit() ? salesReqView.salesReq.requisitionNo : null}" />
+    <ui:param name="navLabel" value="#{main.isEdit() ? salesReqView.salesReq.salesReqStatusId.title : null}" />
+    <ui:param name="ids" value="salesReq" />
+    <ui:param name="reset" value="#{salesReqView.draft or main.isNew()}" />
+    <ui:param name="deleteFormMenu" value="#{salesReqView.draft}" />
+    <ui:param name="deleteListMenu" value="false" />
+
+    <ui:define name="deleteList" >
+      <p:commandButton action="#{salesReqView.deleteSalesReq(main)}" value="#{lang.btnYes}" oncomplete="wdgOff('salesReqWidgetDelConf')" process="f1" update="f1" >
+        <f:setPropertyActionListener target="#{main.pageData.search}" value="#{true}" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="deleteForm" >
+      <p:commandButton action="#{salesReqView.deleteSalesReq(main)}" value="#{lang.delete}" onclick="wdgOff('salesReqWidgetDel')" partialSubmit="true" process="@this" update="f1" title="#{lang.delete}" icon="ui-icon-delete" />
+    </ui:define>
+
+    <ui:define name="menu1" >
+    </ui:define>
+
+    <ui:define name="save" >
+      <p:importConstants type="spica.sys.SystemConstants" var="sysConstant" />
+      <h:commandButton id="saveBtnDraft" value="#{lang.saveAsDraft}" styleClass="btn btn-primary"
+                       rendered="#{salesReqView.draft or main.isNew()}"
+                       action="#{salesReqView.actionSaveSalesReq(main, sysConstant.DRAFT)}">
+        <f:ajax execute="f1" render="f1"  />
+      </h:commandButton>
+
+      <p:commandButton id="saveBtnConfirm" value="#{lang.confirm}" action="#{salesReqView.actionSaveSalesReq(main, sysConstant.CONFIRMED)}"
+                       rendered="#{main.edit and salesReqView.draft}"
+                       styleClass="btn btn-primary" update="f1" process="f1">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+
+      <p:commandButton id="btnSalesOrder" value="#{lang.create} #{lang.salesOrder}"
+                       action="#{salesReqView.mergeToSalesOrder(main)}"
+                       rendered="#{main.edit and salesReqView.mergeable}"
+                       styleClass="btn btn-primary" update="f1" process="f1">
+        <p:confirm header="#{lang.confirm}" message="#{lang.confirm}" icon="ui-icon-alert" />
+      </p:commandButton>
+    </ui:define>
+
+    <ui:define name="afterForm">
+      <div data-watermark="#{salesReqView.confirmed ? 'block' : 'true'}">
+        <p:panelGrid columns="4"  layout="grid"  styleClass="ui-panelgrid-blank form-horizontal" columnClasses="#{sysRuntimeView.grid2Small}">
+
+          <!-- Account Group -->
+          <p:outputLabel value="#{lang.accountGroup}" for="cbSalesAccountGroupId" />
+          <h:panelGroup id="accountGroupDiv" >
+            <p:inputText value="#{salesReqView.accountGroup.groupName}" styleClass="fw" readonly="true" id="cbSalesAccountGroupId" required="true" requiredMessage="#{lang.accountGroup} #{lang.isRequired}" />            
+          </h:panelGroup>
+
+          <!-- Requisition No -->
+          <p:outputLabel value="#{lang.requisitionNo}" />
+          <h:panelGroup id="salesReqNoDiv">
+            <p:inputText styleClass="fw w-220" value="#{salesReqView.salesReq.requisitionNo}" id="requisitionNo" readonly="true" />
+          </h:panelGroup>
+
+          <!-- Customer -->
+          <p:outputLabel value="#{lang.customer}" for="customerId" />
+          <h:panelGroup>
+            <p:autoComplete value="#{salesReqView.customer}" completeMethod="#{salesReqView.customerAuto}" tabindex="2"
+                            converter="wawo.LookupIntConverter"   required="true" requiredMessage="#{lang.customer} #{lang.isRequired}"
+                            id="customerId" var="e" itemValue="#{e}" itemLabel="#{e.customerName}" emptyMessage="#{lang.noResult}"
+                            dropdown="true" cache="true" queryDelay="500" maxResults="30" converterMessage="#{lang.invalidSelection}" autocomplete="off"
+                            forceSelection="true"  styleClass="fw" >
+              <f:attribute name="clazz" value="#{scmLookupView.customerClass()}"/>
+              <f:attribute name="byid" value="#{scmLookupView.customerById()}"/>
+              <p:column>
+                #{e.customerName}
+              </p:column>
+              <p:ajax event="itemSelect" update="accountGroupDiv" listener="#{salesReqView.customerSelectEvent}" />
+            </p:autoComplete>
+            <p:message for="customerId" display="text" />
+          </h:panelGroup>
+
+          <!-- Date -->
+          <p:outputLabel value="#{lang.requisitionDate}" />
+          <h:panelGroup>
+            <p:calendar value="#{salesReqView.salesReq.requisitionDate}" pattern="#{lang.datePattern}"
+                        required="true" requiredMessage="#{lang.date} #{lang.isRequired}" validator="#{sysRuntimeView.dateLteToday}"
+                        converterMessage="#{lang.date} #{lang.invalidDate}" title="#{lang.salesReq} #{lang.date}" maxdate="#{userRuntimeView.getToday()}"
+                        maxlength="29" id="invoiceDate" showButtonPanel="true" navigator="true" mask="true"/>
+          </h:panelGroup>
+
+          <!-- Scheme Required -->
+          <p:outputLabel value="Scheme Required" />
+          <h:panelGroup layout="block">
+            <p:selectBooleanCheckbox value="#{salesReqView.schemeRequired}" id="schemeRequired" tabindex="3" >
+              <p:ajax update="salesItemTable discountPercLabel discountPercDiv fixedDiscountLabel fixedDiscountDiv" />
+            </p:selectBooleanCheckbox>
+          </h:panelGroup>
+
+          <!-- fixed Discount-->
+          <h:panelGroup id="fixedDiscountLabel">
+            <p:outputLabel value="#{lang.fixedDiscount}" rendered="#{salesReqView.schemeRequired}" />
+          </h:panelGroup>
+          <h:panelGroup id="fixedDiscountDiv">
+            <p:inputNumber type="text" tabindex="6"  styleClass="fw w-220" decimalPlaces="2" minValue="0.0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" value="#{salesReqView.salesReq.discValProdPieceFixed}"
+                           id="fixedDiscount" readonly="#{salesReqView.disableFixedDiscount()}" symbol=" #{appView.currencySymbol} " rendered="#{salesReqView.schemeRequired}" >
+              <p:ajax update="discountPercDiv" event="blur" />
+            </p:inputNumber>
+          </h:panelGroup>
+
+          <!-- Note -->
+          <p:outputLabel value="#{lang.note}" />
+          <h:panelGroup>
+            <p:inputTextarea  tabindex="5" styleClass="fw" value="#{salesReqView.salesReq.note}" cols="100" rows="3" maxlength="500" id="note" autoResize="false" />
+          </h:panelGroup>
+
+          <!-- percent Discount -->
+          <h:panelGroup id="discountPercLabel">
+            <p:outputLabel value="#{lang.discountPerc}" rendered="#{salesReqView.schemeRequired}" />
+          </h:panelGroup>
+          <h:panelGroup id="discountPercDiv">
+            <p:inputNumber type="text" tabindex="7"  styleClass="fw w-220" minValue="0.00" onfocus="this.select()" inputStyleClass="text-right" maxValue="100.00"  value="#{salesReqView.salesReq.discValProdPiecePercent}"
+                           rendered="#{salesReqView.schemeRequired}"
+                           id="percentDiscount" readonly="#{salesReqView.disablePercentDiscount()}" symbol=" #{lang.percentageSymbol}" symbolPosition="s" >
+              <p:ajax update="fixedDiscountDiv" event="blur" />
+            </p:inputNumber>
+          </h:panelGroup>
+
+        </p:panelGrid>
+      </div>
+    </ui:define>
+
+    <ui:define name="after">
+      <h:panelGroup layout="block" id="tableContainer" styleClass="card magnet-y m-t--15 p-a-0"
+                    rendered="#{main.edit}" pt:data-watermark="#{salesReqView.confirmed ? 'block' : 'true'}" >
+        <h:panelGroup layout="block" styleClass="table-responsive" >
+          <h:panelGroup id="productTable" layout="block" pt:data-watermark="#{salesReqView.confirmed ? 'block' : 'true'}" >
+            <!-- Sales Req Item Add Button -->
+            <p:remoteCommand name="insertOrUpdateSalesReqItem" actionListener="#{salesReqView.actionInsertOrUpdateSalesReqItem(main)}"
+                             process="f1" update="salesProductTableDiv" />
+            <p:focus context="salesItemTable" id="focusId" />
+
+            <h:panelGroup layout="block" id="salesProductTableDiv" pt:data-fast-input="true">
+              <p:dataTable var="salesItemVar" id="salesItemTable" widgetVar="salesItemTableVar" value="#{salesReqView.salesReqItemList}" rowIndexVar="rowIndex"
+                           tableStyleClass="mDataTable mDataTable-center fw editLinks dataTable purchases">
+
+                <p:column headerText="Sno" width="61" style="text-align: center;">
+                  <h:outputText value="#{rowIndex + 1}" />
+                </p:column>
+
+                <!-- Product -->
+                <p:column headerText="#{lang.product}">
+                  <h:outputText value="#{salesItemVar.productId.productName}" rendered="#{!salesReqView.draft}" />
+                  <p:autoComplete id="productId" value="#{salesItemVar.productId}" completeMethod="#{salesReqView.completeProduct}"
+                                  converter="wawo.LookupIntConverter" autocomplete="off" style="position: relative; z-index: 0 !important;" styleClass="fw"
+                                  cache="true" queryDelay="500" maxResults="30" rendered="#{salesReqView.draft}"
+                                  var="prod" itemLabel="#{prod.productName}" itemValue="#{prod}" forceSelection="true">
+                    <f:attribute name="clazz" value="#{scmLookupView.productClass()}"/>
+                    <f:attribute name="byid" value="#{scmLookupView.productById()}"/>
+                    <f:attribute name="productId" value="#{salesItemVar.productId.id}"/>
+                    <p:ajax event="itemSelect" listener="#{salesReqView.updateProductPrice(salesItemVar)}" update="productQty valuePts" oncomplete="refreshDatatable();" >
+                    </p:ajax>
+                    <p:column >
+                      <f:facet name="header"><span style="font-weight: bold;">Product</span></f:facet>
+                      <h:outputText value="#{prod.productName}" />
+                    </p:column>
+                    <p:column >
+                      <f:facet name="header"><span style="font-weight: bold;">Qty</span></f:facet>
+                      <h:outputText value="#{prod.productQuantity}" />
+                    </p:column>
+                    <p:column>
+                      <f:facet name="header"><span style="font-weight: bold;">Free Qty</span></f:facet>
+                      <h:outputText value="#{prod.productFreeQuantity}" />
+                    </p:column>
+                  </p:autoComplete>
+                </p:column>
+
+                <!-- Qty -->
+                <p:column headerText="#{lang.qty}" width="150">
+                  <f:facet name="header">
+                    <h:outputText value="#{lang.qty}" />
+                    <h:outputText styleClass="fa fa-info-circle p-l-5" title="Quantity" />
+                  </f:facet>
+                  <h:panelGroup layout="block" id="qtyDiv">
+                    <h:outputText value="#{salesItemVar.qtyRequired}" rendered="#{!salesReqView.draft}" />
+                    <p:inputNumber id="productQty" value="#{salesItemVar.qtyRequired}" size="10" minValue="0" maxlength="9" onfocus="this.select()" inputStyleClass="submit_b_#{rowIndex} text-right" maxValue="999999999"
+                                   decimalPlaces="0" styleClass="fw" rendered="#{salesReqView.draft}"
+                                   autocomplete="off" >
+                      <p:ajax event="change" process="qtyDiv" oncomplete="updateInvoiceSummery();" listener="#{salesReqView.qtyChangeEventHandler}" />
+                    </p:inputNumber>
+                  </h:panelGroup>
+                </p:column>
+
+                <!-- Free Qty -->
+                <p:column headerText="#{lang.Free} #{lang.qty}" rendered="#{salesReqView.schemeRequired}" width="150">
+                  <h:outputText value="#{salesItemVar.qtyFreeSuggested}" rendered="#{!salesReqView.draft}" />
+                  <p:inputNumber id="productFreeQty" value="#{salesItemVar.qtyFreeSuggested}" size="10" minValue="0" onfocus="this.select()" inputStyleClass="text-right" maxValue="99999999" maxlength="9"
+                                 autocomplete="off"  decimalPlaces="0" styleClass="fw" rendered="#{salesReqView.draft}" >
+                  </p:inputNumber>
+                </p:column>
+
+                <!-- Disc. Value -->
+                <p:column headerText="Disc. Value" rendered="#{salesReqView.schemeRequired}" width="150">
+                  <h:outputText value="#{salesItemVar.discountValueFixed}" rendered="#{!salesReqView.draft}" />
+                  <p:inputNumber id="productDiscValue" value="#{salesItemVar.discountValueFixed}" autocomplete="off" decimalPlaces="2" rendered="#{salesReqView.draft}"
+                                 styleClass="fw"  disabled="#{salesItemVar.discountValuePercentage ne null}" onfocus="this.select()" 
+                                 inputStyleClass="text-right fw" maxValue="999999" minValue="0.0" maxlength="8" >
+                  </p:inputNumber>
+                </p:column>
+
+                <!-- PTS -->
+                <p:column headerText="Rate" width="150">
+                  <h:panelGroup layout="block" id="valuePts">
+                    <h:outputText id="valuePts_input" value="#{salesItemVar.valueProdPieceSelling}"  />
+                  </h:panelGroup>
+                </p:column>
+
+                <!-- PTS Suggested -->
+                <p:column headerText="Rate Requested" rendered="#{salesReqView.schemeRequired}" width="150">
+                  <h:panelGroup id="valuePtsSuggested">
+                    <h:outputText  value="#{salesItemVar.valueProdPieceSellingForced}" rendered="#{!salesReqView.draft}" />
+                    <p:inputText id="valuePtsSuggested_input" styleClass="fw" value="#{salesItemVar.valueProdPieceSellingForced}" rendered="#{salesReqView.draft}" />
+                  </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="" rendered="#{main.edit and salesReqView.draft}">
+                  <p:commandButton process="@this" value="" update="salesProductTableDiv" icon="fa fa-trash" tabindex="-1"
+                                   actionListener="#{salesReqView.actionDeleteSalesItem(main, salesItemVar)}">
+                    <p:confirm header="#{lang.confirmDeleteHeader}" message="#{lang.confirmDeleteMessage}" icon="ui-icon-alert" />
+                  </p:commandButton>
+                </p:column>
+
+                <f:facet name="footer">
+                  <h:panelGroup layout="block" id="invoiceSummarydiv">
+                    <p:panelGrid>
+                      <p:row>
+                        <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Items :</p:column>
+                        <p:column style="font-weight: bold; text-align: left; width:50px !important; " >#{salesReqView.salesReqItemList.size()}</p:column>
+                        <p:column style="font-weight: bold; text-align: right; width:95px !important;">Total Qty :</p:column>
+                        <p:column style="font-weight: bold; text-align: left; width:50px !important;">#{salesReqView.productQuantityCount}</p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                        <p:column style="font-weight: bold;"></p:column>
+                      </p:row>
+                    </p:panelGrid>
+                  </h:panelGroup>
+                </f:facet>
+              </p:dataTable>
+            </h:panelGroup>
+
+            <p:remoteCommand name="updateInvoiceSummery" process="@this" update="salesItemTable:invoiceSummarydiv" />
+
+            <script>
+              //<![CDATA[
+              function submitForm(params) {
+                insertOrUpdateSalesReqItem([{name: 'rownumber', value: params[2]}]);
+                $('#salesItemTable\\:0\\:productId_input').focus();
+                refreshDatatable();
+                return false;
+              }
+
+              function refreshDatatable() {
+                page.refresh();
+              }
+
+              $(document).ready(function (e) {
+                page.refresh();
+              });
+
+              //]]>
+            </script>
+          </h:panelGroup>
+        </h:panelGroup>
+      </h:panelGroup>
+    </ui:define>
+    <ui:define name="leftRightList" rendered="#{main.isList()}"  >
+      <p:selectOneMenu value="#{salesReqView.salesReqFilter}" >
+        <f:selectItem itemValue="#{null}" itemLabel="#{lang.all}" />
+        <f:selectItem itemValue="2" itemLabel="#{lang.draft}" />
+        <f:selectItem itemValue="1" itemLabel="#{lang.confirmed}"   />
+        <f:selectItem itemValue="3" itemLabel="#{lang.partiallyProcessed}" />
+        <f:selectItem itemValue="4" itemLabel="#{lang.processed}" />
+        <p:ajax update="salesReqTable" />
+      </p:selectOneMenu>
+    </ui:define>
+
+    <ui:define name="list">
+      <p:dataTable id="salesReqTable" var="salesReqVar" widgetVar="salesReqWidget" tableStyleClass="mDataTable mDataTable-center fw editLinks"
+                   lazy="true" value="#{salesReqView.salesReqLazyModel}" rows="#{main.pageData.pageSize}" rowKey="#{salesReqVar.id}"
+                   rowsPerPageTemplate="#{main.pageData.pageSize},50,100" paginator="true" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} &lt;span class='p-x-5'&gt;  &lt;/span&gt; #{lang.rowsPerPage} {RowsPerPageDropdown} &lt;span class='R p-y-10 p-x-5'&gt; #{lang.showing} {CurrentPageReport} #{lang.outof} #{main.pageData.totalRecords} #{lang.entries} &lt;/span&gt; "
+                   selection="#{salesReqView.salesReqSelected}" rowSelectMode="checkbox" rowHover="true" reflow="false" draggableColumns="true" paginatorAlwaysVisible="true" paginatorPosition="bottom"
+                   scrollable="false"  >
+        <p:column selectionMode="multiple" exportable="false" />
+        <p:column headerText="#{lang.requisitionNo}" sortBy="#{salesReqVar.requisitionNo}" field="requisition_no">
+          <p:commandLink action="#{main.setViewType(editform)}" value="#{appView.display(salesReqVar.requisitionNo)}" process="@this" update="f1" immediate="true" onstart="block()" oncomplete="unblock()" title="#{lang.editMe}">
+            <f:setPropertyActionListener target="#{salesReqView.salesReq}" value="#{salesReqVar}" />
+          </p:commandLink>
+        </p:column>
+        <p:column headerText="#{lang.customer}" sortBy="#{salesReqVar.salesAccountId.customerId.customerName}" field="customer_id.customer_name">
+          <h:outputText value="#{appView.display(salesReqVar.salesAccountId.customerId.customerName)}" title="#{appView.title(salesReqVar.salesAccountId.customerId.customerName)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.date}" sortBy="#{salesReqVar.requisitionDate}" field="requisition_date" >
+          <h:outputText value="#{appView.date(salesReqVar.requisitionDate)}" escape="false" />
+        </p:column>
+        <p:column headerText="#{lang.status}" sortBy="#{salesReqVar.salesReqStatusId.title}" field="requisition_status_id.title">          
+          <h:outputText value="#{appView.display(salesReqVar.salesReqStatusId.title)}" title="#{appView.title(salesReqVar.salesReqStatusId.title)}" escape="false" 
+                        styleClass="#{sysRuntimeView.statusStyle(salesReqVar.salesReqStatusId.id)}" style="background-color: #{sysRuntimeView.statusColor(salesReqVar.salesReqStatusId.id)}"/>          
+        </p:column>
+        <p:column headerText="#{lang.salesOrder}" rendered="false">
+          <p:commandButton action="#{main.setViewPath('/scm/sales/sales_order.xhtml',editform)}" icon="fa fa-eye"
+                           process="@this" update="f1" immediate="true" title="#{lang.view}">
+            <f:setPropertyActionListener target="#{salesOrderView.salesReq}" value="#{salesReqVar}"/>
+          </p:commandButton>
+        </p:column>
+        <p:column headerText="Log" exportable="false">
+          <ui:decorate template="/WEB-INF/resources/theme1/auditInfo.xhtml">
+            <ui:define name="cby">#{appView.display(salesReqVar.createdBy)}</ui:define>
+            <ui:define name="cat">#{appView.dateTime(salesReqVar.createdAt)}</ui:define>
+            <ui:define name="uby">#{appView.display(salesReqVar.modifiedBy)}</ui:define>
+            <ui:define name="uat">#{appView.dateTime(salesReqVar.modifiedAt)}</ui:define>
+            <ui:param name="cnf" value="true" />
+            <ui:define name="coby">#{appView.display(salesReqVar.approvedBy)}</ui:define>
+            <ui:define name="coat">#{appView.dateTime(salesReqVar.approvedAt)}</ui:define>
+          </ui:decorate>
+        </p:column>
+      </p:dataTable>
+    </ui:define>
+  </ui:decorate>
+</ui:composition>

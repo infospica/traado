@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:jsf="http://xmlns.jcp.org/jsf" xmlns:h="http://xmlns.jcp.org/jsf/html"  xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+  <f:metadata>
+    <f:viewAction action="#{userRuntimeView.actionValidateSession()}" />
+    <!--<f:event type="postRenderView" listener="#{userRuntimeView.postRenderView}" />-->
+  </f:metadata>
+  <ui:composition template="layout.xhtml" >
+    <ui:define name="content" >
+      <h:form id="timeout" prependId="false">
+        <ui:include src="timeout.xhtml" />
+           </h:form>
+      <h:form id="f1" prependId="false" enctype="multipart/form-data">
+        #{userRuntimeView.loadPermission(main)}
+        <ui:include src="#{main.viewPath}"  >
+          <ui:param name="viewType" value="#{main.viewType}" />
+        </ui:include>        
+        <script>
+          //<![CDATA[
+          function startAppTimeout() {
+            trackTimeout();
+            keepAlive();
+          }
+          startAppTimeout();
+          function restartTimeout() {
+            resetPageTimer();
+            startAppTimeout();
+          }
+          //]]>
+        </script>
+      </h:form>
+      <h:form >
+                #{main.close()}
+         <p:notificationBar position="top" effect="slide" styleClass="top" widgetVar="appBar"  >
+        <br/><div id="appMessages" style="text-align: center" onclick="PF('appBar').hide();">Alert:</div>
+        <div id="appReload" style="text-align: center" onclick="PF('appBar').hide();">Alert:</div>
+      </p:notificationBar>
+         <script>
+            function socketListener(message, channel, event) {              
+               PF('appBar').show();
+                var ul = document.getElementById("appMessages");
+                ul.innerHTML = message;
+            }
+        </script>  
+        <f:websocket channel="applicationChannel" scope="application" onmessage="socketListener" />
+      </h:form>
+    </ui:define>
+  </ui:composition>
+</html>
