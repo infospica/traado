@@ -12,7 +12,7 @@
 
 ## Environment Requirements
 
-Java 8
+Java 8+
 
 Maven
 
@@ -34,10 +34,10 @@ TODO
 
 ## License
 
-GNU/General Public License (see [license](LICENSE))
+MIT License (see [license](LICENSE))
 
-The TRAADO code is licensed as GNU General Public License (v3) and the copyright is owned by Infospica Consultancy Services LLP and Contributors.
+The TRAADO code is licensed as MIT License and the copyright is owned by Infospica Consultancy Services LLP and Contributors.
 
-By contributing to TRAADO, you agree that your contributions will be licensed under its GNU General Public License (v3).
+By contributing to TRAADO, you agree that your contributions will be licensed under its MIT License.
 
 
