@@ -46,7 +46,8 @@
     removeClass = function (elem, c) {
       elem.classList.remove(c);
     };
-  } else {
+  }
+  else {
     hasClass = function (elem, c) {
       return classReg(c).test(elem.className);
     };
@@ -208,7 +209,8 @@
         ev.preventDefault();
         if (self.open) {
           self._resetMenu();
-        } else {
+        }
+        else {
           self._openMenu();
           // the menu should close if clicking somewhere on the body (excluding clicks on the menu)
           document.addEventListener(self.eventtype, function (ev) {
@@ -320,7 +322,8 @@
         if (levelEl.getAttribute('data-level') >= this.level + 1) {
           classie.remove(levelEl, 'mp-level-open');
           classie.remove(levelEl, 'mp-level-overlay');
-        } else if (Number(levelEl.getAttribute('data-level')) == this.level) {
+        }
+        else if (Number(levelEl.getAttribute('data-level')) == this.level) {
           classie.remove(levelEl, 'mp-level-overlay');
         }
       }

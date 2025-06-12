@@ -19,17 +19,11 @@ function openPopupId(id, url, qs, focusId) {
   }
 }
 
-function showError(mess) {
-  setTimeout(function () {
-    showalert(mess, '#messages', 'danger', -1);
-    mess = '';
-  }, 300);
+function showError(mess){
+  setTimeout(function () { showalert(mess, '#messages', 'danger', -1); mess = ''; }, 300);
 }
 function showSuccess(mess) {
-  setTimeout(function () {
-    showalert(mess, '#messages', 'danger', -1);
-    mess = '';
-  }, 300);
+  setTimeout(function () { showalert(mess, '#messages', 'danger', -1); mess = ''; }, 300);
 }
 // custom autocomplete wrapper
 
@@ -150,29 +144,30 @@ function appInit() {
     unblock();
   });
 }
+
 //var blocker = "";
 //search highlighter
 function searchHighlight(field) {
-  $("input[name='" + field + "']").on("keyup", function () {
-    highLight($("input[name='" + field + "']"));
-  });
+    highLight($("input[name='" + field + "']"),".ui-datatable-data tr td");//td:nth-child(3)
 }
-
+function menuHighlight(field) {
+    highLight($("input[name='" + field + "']"),".menu div ul li a");//td:nth-child(3)
+}
 //hightlight field
-function highLight(field) {
+function highLight(field, ele) {
   var keyword = field.val(),
-          options = {
-            "element": "span",
-            "className": "dataHighlight",
-            "separateWordSearch": true
-          },
-          $ctx = $("div.ui-datatable-scrollable-body");
-  $ctx.unmark({
-    done: function () {
+  options = {
+    "element": "span",
+    "className": "dataHighlight",
+    "separateWordSearch": true
+   },
+   $ctx = $(ele);
+   $ctx.unmark({
+    done: function() {
       $ctx.mark(keyword, options);
     }
-  });
-}
+   });
+ }
 
 function preListSelect(widget, wdgOk, wdgConfirm) {
   var rowcount = PF(widget).getSelectedRowsCount();

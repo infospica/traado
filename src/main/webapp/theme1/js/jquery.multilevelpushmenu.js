@@ -147,7 +147,8 @@
         if (e.stopPropagation && e.preventDefault) {
           e.stopPropagation();
           e.preventDefault();
-        } else {
+        }
+        else {
           e.cancelBubble = true;
           e.returnValue = false;
         }
@@ -170,9 +171,11 @@
             var next = document.elementFromPoint(ee.pageX, ee.pageY);
             next = (next.nodeType == 3) ? next.parentNode : next //Opera
             $(next).trigger(event, ee);
-          } catch (err) {
+          }
+          catch (err) {
             $.error('Error while propagating event: ' + err.message);
-          } finally {
+          }
+          finally {
             $element.show();
           }
         });
@@ -283,7 +286,8 @@
                 parseInt($levelHolder.css('margin-left')) < 0;
         if (menus.level == 0 && instanceFC) {
           expandMenu();
-        } else {
+        }
+        else {
           var $nextLevelHolders = instance.settings.container
                   .find('#' + instance.settings.menuID + ' div.levelHolderClass')
                   .filter(function () {
@@ -416,7 +420,8 @@
           });
           if ($levelHolder.swipeStart != undefined && $levelHolder.swipeStart != 0) {
             $levelHolder.significance = touch.pageX - $levelHolder.swipeStart;
-          } else {
+          }
+          else {
             $levelHolder.significance = 0;
             $levelHolder.swipeStart = touch.pageX;
             return true;
@@ -428,7 +433,8 @@
             $levelHolder.significance = 0;
             $levelHolder.swipeStart = 0;
           }
-        } else if (instance.settings.swipe != 'touchscreen') {
+        }
+        else if (instance.settings.swipe != 'touchscreen') {
           stopEventPropagation(emd);
           var significance = 0;
           $levelHolder.unbind('mousemove');
@@ -529,7 +535,8 @@
             instance.settings.container.children('nav:first').css('min-height', instance.settings.menuHeight);
             $('#' + instance.settings.menuID).height(instance.settings.menuHeight);
             maxHeight = instance.settings.container.height();
-          } else {
+          }
+          else {
             $('#' + instance.settings.menuID).height(maxHeight);
           }
           instance.settings.container.css('min-height', maxHeight + 'px');
@@ -589,13 +596,15 @@
         $hiddenLevelHolders.each(function () {
           if (instance.settings.direction == 'rtl') {
             $(this).css('margin-right', (($(this).attr('data-level') == $baseLevelHolder.attr('data-level') && !instance.settings.collapsed) ? 0 : (-2) * $(this).width()))
-          } else {
+          }
+          else {
             $(this).css('margin-left', (($(this).attr('data-level') == $baseLevelHolder.attr('data-level') && !instance.settings.collapsed) ? 0 : (-2) * $(this).width()));
           }
         });
         if (instance.settings.direction == 'rtl') {
           $baseLevelHolder.css('margin-right', (!instance.settings.collapsed) ? 0 : (-2) * $baseLevelHolder.width())
-        } else {
+        }
+        else {
           $baseLevelHolder.css('margin-left', (!instance.settings.collapsed) ? 0 : (-2) * $baseLevelHolder.width());
         }
       }
@@ -631,7 +640,8 @@
             $baseLevelHolder.stop().animate({
               marginRight: ((-1) * $baseLevelHolder.width() + ((instance.settings.fullCollapse) ? 0 : instance.settings.overlapWidth))
             }, instance.settings.durationSlideOut)
-          } else {
+          }
+          else {
             $baseLevelHolder.stop().animate({
               marginLeft: ((-1) * $baseLevelHolder.width() + ((instance.settings.fullCollapse) ? 0 : instance.settings.overlapWidth))
             }, instance.settings.durationSlideOut);
@@ -670,14 +680,17 @@
         collapingObjects[ 'collapsingEnded' ] = false;
         if (typeof level == 'object') {
           level = level.attr('data-level');
-        } else if (typeof level == 'string') {
+        }
+        else if (typeof level == 'string') {
           var $selectedLevelHolder = findMenusByTitle(level);
           if ($selectedLevelHolder && $selectedLevelHolder.length == 1) {
             level = $selectedLevelHolder.attr('data-level');
-          } else {
+          }
+          else {
             level = $baseLevelHolder.attr('data-level');
           }
-        } else if (level == undefined || !isInt(level) || level < 0) {
+        }
+        else if (level == undefined || !isInt(level) || level < 0) {
           level = $baseLevelHolder.attr('data-level');
         }
         if (callbacks == undefined && typeof callbacks != 'object') {
@@ -713,7 +726,8 @@
                 marginRight: ((-1) * lwidth),
                 width: lwidth
               }, instance.settings.durationTransition);
-            } else {
+            }
+            else {
               $(val).stop().animate({
                 marginLeft: ((-1) * lwidth),
                 width: lwidth
@@ -754,7 +768,8 @@
                 currWidth = $baseLevelHolder.width() + parseInt($baseLevelHolder.css('margin-right'), 10);
                 sizeElementWidth(instance.settings.container, currWidth);
               });
-            } else {
+            }
+            else {
               $(val).stop().animate({
                 width: lwidth,
                 marginLeft: ($(val).attr('data-level') == $baseLevelHolder.attr('data-level') && collapseAll) ?
@@ -778,7 +793,8 @@
             if ($(val).attr('data-level') == $baseLevelHolder.attr('data-level') && collapseAll) {
               var blpush = (instance.settings.fullCollapse) ? (-1) * ($baseLevelHolder.width() - ieShadowFilterDistortion) : (-1) * ($baseLevelHolder.width() - ieShadowFilterDistortion) + instance.settings.overlapWidth;
               pushContainers(blpush);
-            } else {
+            }
+            else {
               pushContainers(lpush);
             }
           });
@@ -827,7 +843,8 @@
                 animatedEventCallback(expandingObjects, callbacks);
               });
             });
-          } else {
+          }
+          else {
             $baseLevelHolder.stop().animate({
               marginLeft: 0
             }, instance.settings.durationSlideOut, function () {
@@ -843,9 +860,11 @@
           var $selectedLevelHolder;
           if (typeof menuTitle == 'object') {
             $selectedLevelHolder = menuTitle;
-          } else if (typeof menuTitle == 'string') {
+          }
+          else if (typeof menuTitle == 'string') {
             $selectedLevelHolder = findMenusByTitle(menuTitle);
-          } else {
+          }
+          else {
             $selectedLevelHolder = null;
             $.error('Provided menu selector is not valid');
           }
@@ -875,7 +894,8 @@
                   }, instance.settings.durationTransition, function () {
                     $(val).addClass(instance.settings.menuInactiveClass);
                   });
-                } else {
+                }
+                else {
                   $(val).stop().animate({
                     marginLeft: 0,
                     width: (instance.settings.mode == 'overlap') ? lwidth : baseWidth - ieShadowFilterDistortion
@@ -901,10 +921,12 @@
               $selectedLevelHolder.find('.' + instance.settings.backItemClass).css('visibility', 'visible');
               $selectedLevelHolder.find('ul').css('visibility', 'visible');
               $selectedLevelHolder.removeClass(instance.settings.menuInactiveClass);
-            } else {
+            }
+            else {
               $.error('Invalid menu object provided');
             }
-          } else {
+          }
+          else {
             $.error('No or too many menus named ' + menuTitle);
           }
         }
@@ -920,14 +942,17 @@
                 $sharedLevelHolders, collapseLevel, $searchRes;
         if (typeof menu == 'object') {
           $expandLevelHolder = menu;
-        } else if (typeof menu == 'string') {
+        }
+        else if (typeof menu == 'string') {
           $searchRes = findMenusByTitle(menu);
           if ($searchRes) {
             $expandLevelHolder = $searchRes.eq(0);
-          } else {
+          }
+          else {
             $.error(menu + ' menu level does not exist!');
           }
-        } else {
+        }
+        else {
           $expandLevelHolder = $('#' + instance.settings.menuID + ' div.levelHolderClass:first');
         }
         $sharedLevelHolders = comparePaths($expandLevelHolder, $activeLevelHolder, true);
@@ -937,7 +962,8 @@
                 }).get()) : 0;
         if (collapseLevel < $activeLevelHolder.attr('data-level')) {
           collapseMenu(collapseLevel, [{'method': expandMenuActions, 'args': arguments}]);
-        } else {
+        }
+        else {
           expandMenuActions.apply(this, Array.prototype.slice.call(arguments));
         }
         return $this;
@@ -955,7 +981,8 @@
         if ($selectedLevelHolders.length > 0) {
           returnValue = $selectedLevelHolders;
           response = returnValue;
-        } else {
+        }
+        else {
           returnValue = false;
           response = returnValue;
         }
@@ -974,7 +1001,8 @@
         if ($selectedItems.length > 0) {
           returnValue = $selectedItems;
           response = returnValue;
-        } else {
+        }
+        else {
           returnValue = false;
           response = returnValue;
         }
@@ -1142,7 +1170,8 @@
       if (mobileCheck()) {
         clickEventType = 'touchend';
         dragEventType = 'touchmove';
-      } else {
+      }
+      else {
         clickEventType = 'click';
         dragEventType = 'mousedown';
       }
